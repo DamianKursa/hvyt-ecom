@@ -6,7 +6,9 @@
   "@next/next/no-img-element": "off",
   "no-useless-escape": "off",
   "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-  "no-unused-vars": "off"
+  "no-unused-vars": "off",
+  "react-hooks/exhaustive-deps": "off",
+  "no-irregular-whitespace": "off"
 },
   "globals": { "JSX": true },
   "env": {
