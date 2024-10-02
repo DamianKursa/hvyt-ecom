@@ -1,76 +1,64 @@
 import { gql } from '@apollo/client';
 
 export const GET_SINGLE_PRODUCT = gql`
-  query Product($id: ID!) {
-    product(id: $id, idType: DATABASE_ID) {
+query ProductBySlug($slug: String!) {
+  products(where: { slugIn: [$slug] }) {
+    nodes {
       id
-      databaseId
-      averageRating
+      name
       slug
       description
-      onSale
       image {
-        id
-        uri
-        title
-        srcSet
         sourceUrl
       }
-      name
+      averageRating
+      onSale
       ... on SimpleProduct {
-        salePrice
-        regularPrice
         price
-        id
+        regularPrice
+        salePrice
         stockQuantity
-      }
-      ... on VariableProduct {
-        salePrice
-        regularPrice
-        price
-        id
-        allPaColors {
-          nodes {
-            name
-          }
-        }
-        allPaSizes {
-          nodes {
-            name
-          }
-        }
-        variations {
-          nodes {
-            id
-            databaseId
-            name
-            stockStatus
-            stockQuantity
-            purchasable
-            onSale
-            salePrice
-            regularPrice
-          }
-        }
-      }
-      ... on ExternalProduct {
-        price
-        id
-        externalUrl
-      }
-      ... on GroupProduct {
-        products {
-          nodes {
-            ... on SimpleProduct {
+        galleryImages {
+          edges {
+            node {
               id
-              price
+              sourceUrl
             }
           }
         }
-        id
+      }
+      ... on VariableProduct {
+        price
+        regularPrice
+        salePrice
+        variations {
+          nodes {
+            id
+            stockStatus
+            stockQuantity
+            price
+            regularPrice
+            salePrice
+            image {
+              sourceUrl
+            }
+          }
+        }
+        attributes {
+          nodes {
+            name
+            options
+            # Fetch color hex values if available in the custom fields
+            customFields {
+              colorHex
+            }
+          }
+        }
       }
     }
   }
+}
+
 `;
 
 /**
@@ -141,6 +129,31 @@ export const FETCH_ALL_PRODUCTS_QUERY = gql`
   }
 `;
 
+
+
+export const FETCH_PRODUCTS_WITH_PRICE_AND_IMAGE = gql`
+  query GetProducts {
+    products(first: 50) {
+      nodes {
+        name
+        slug
+        image {
+          sourceUrl
+        }
+        ... on SimpleProduct {
+          price
+        }
+        ... on VariableProduct {
+          variations(first: 1) {
+            nodes {
+              price
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 /**
  * Fetch first 20 categories from GraphQL
  */
@@ -158,60 +171,47 @@ export const FETCH_ALL_CATEGORIES_QUERY = gql`
 
 export const GET_PRODUCTS_FROM_CATEGORY = gql`
   query ProductsFromCategory($id: ID!) {
-    productCategory(id: $id) {
+    productCategory(id: $id, idType: SLUG) {
       id
       name
       products(first: 50) {
         nodes {
           id
-          databaseId
-          onSale
-          averageRating
+          name
           slug
           description
           image {
-            id
-            uri
-            title
-            srcSet
             sourceUrl
           }
-          name
+          galleryImages {
+            nodes {
+              sourceUrl
+            }
+          }
+          onSale
           ... on SimpleProduct {
-            salePrice
-            regularPrice
-            onSale
             price
-            id
+            regularPrice
+            salePrice
           }
           ... on VariableProduct {
-            salePrice
+            price
             regularPrice
-            onSale
-            price
-            id
-          }
-          ... on ExternalProduct {
-            price
-            id
-            externalUrl
-          }
-          ... on GroupProduct {
-            products {
+            salePrice
+            variations {
               nodes {
-                ... on SimpleProduct {
-                  id
-                  price
-                }
+                price
+                regularPrice
+                salePrice
               }
             }
-            id
           }
         }
       }
     }
   }
 `;
+
 
 export const GET_CART = gql`
   query GET_CART {

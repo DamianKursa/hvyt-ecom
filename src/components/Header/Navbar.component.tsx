@@ -1,4 +1,3 @@
-// Imports
 import Link from 'next/link';
 
 // Components
@@ -15,58 +14,116 @@ import useIsMobile from '@/utils/hooks/useIsMobile';
  */
 const Navbar = () => {
   const isMobile = useIsMobile();
+
   return (
-    <header>
-      <nav id="header" className="top-0 z-50 w-full py-1 bg-white ">
-        <div className="container flex md:flex-wrap flex-col md:flex-row items-center justify-between px-6 py-3 mx-auto mt-0 md:min-w-96">
-          <div
-            className="order-3 hidden w-full md:flex md:items-center md:w-auto md:order-1"
-            id="menu"
-          >
-            <ul className="items-center justify-between pt-4 text-base text-gray-700 md:flex md:pt-0">
+    <header className="fixed w-full top-0 z-50">
+      <nav className="w-full bg-transparent py-2 backdrop-blur-md">
+        <div className="container flex items-center justify-between px-6 py-3 mx-auto">
+
+          {/* Logo on the left */}
+          <div className="flex items-center order-1">
+            <Link href="/">
+              <span className="flex items-center text-xl font-bold tracking-wide text-neutral-dark no-underline hover:no-underline">
+                <img src="/icons/Logo.svg" alt="HVYT Logo" className="h-10" />
+              </span>
+            </Link>
+          </div>
+
+          {/* Center navigation for desktop */}
+          <div className="hidden md:flex md:items-center md:space-x-6 bg-neutral-lightest/80 px-6 py-2 rounded-full">
+            <ul className="flex items-center space-x-4 text-base text-neutral-darkest">
               <li>
-                <Link href="/produkter">
-                  <span className="inline-block py-2 pr-4 text-xl font-bold no-underline hover:underline">
-                    Produkter
+                <Link href="/kategoria/uchwyty-meblowe">
+                  <span className="px-4 py-2 font-semibold rounded-full hover:bg-neutral-white hover:text-neutral-darkest transition-all">
+                    Uchwyty
                   </span>
                 </Link>
               </li>
               <li>
-                <Link href="/kategorier">
-                  <span className="inline-block py-2 pr-4 text-xl font-bold no-underline hover:underline">
-                    Kategorier
+                <Link href="/kategoria/klamki">
+                  <span className="px-4 py-2 font-semibold rounded-full hover:bg-neutral-white hover:text-neutral-darkest transition-all">
+                    Klamki
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/kategoria/wieszaki/">
+                  <span className="px-4 py-2 font-semibold rounded-full hover:bg-neutral-white hover:text-neutral-darkest transition-all">
+                    Wieszaki
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/hvyt-objects">
+                  <span className="px-4 py-2 font-semibold rounded-full hover:bg-neutral-white hover:text-neutral-darkest transition-all">
+                    Hvyt Objects
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/kolekcje">
+                  <span className="px-4 py-2 font-semibold rounded-full hover:bg-neutral-white hover:text-neutral-darkest transition-all">
+                    Kolekcje
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/onas">
+                  <span className="px-4 py-2 font-semibold rounded-full hover:bg-neutral-white hover:text-neutral-darkest transition-all">
+                    O nas
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/kontakt">
+                  <span className="px-4 py-2 font-semibold rounded-full hover:bg-neutral-white hover:text-neutral-darkest transition-all">
+                    Kontakt
                   </span>
                 </Link>
               </li>
             </ul>
           </div>
-          <div className="order-1 md:order-2">
-            <Link href="/">
-              <span className="flex items-center text-xl font-bold tracking-wide text-gray-800 no-underline hover:no-underline ">
-                <svg
-                  className="mr-2 text-gray-800 fill-current"
-                  xmlns="https://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  aria-label="Nettbutikk logo"
-                >
-                  <path
-                    d="M5,22h14c1.103,0,2-0.897,2-2V9c0-0.553-0.447-1-1-1h-3V7c0-2.757-2.243-5-5-5S7,4.243,7,7v1H4C3.447,8,3,8.447,3,9v11 C3,21.103,3.897,22,5,22z M9,7c0-1.654,1.346-3,3-3s3,1.346,3,3v1H9V7z M5,10h2v2h2v-2h6v2h2v-2h2l0.002,10H5V10z"
-                    aria-label="Nettbutikk logo"
-                  />
-                </svg>
-                NETTBUTIKK
-              </span>
-            </Link>
-          </div>
-          <div
-            className="flex items-center order-2 md:order-3"
-            id="nav-content"
-          >
-            <AlgoliaSearchBox />
-            <MobileSearch />
-            {!isMobile && <Cart />}
+
+          {/* Shop icons on the right */}
+          <div className="flex items-center space-x-4 order-3">
+            {isMobile ? (
+              // Mobile layout
+              <div className="flex items-center space-x-4">
+                <Link href="/search">
+                  <img src="/icons/search.svg" alt="Search" className="h-6" />
+                </Link>
+                <Link href="/cart">
+                  <img src="/icons/cart.svg" alt="Cart" className="h-6" />
+                </Link>
+                <Link href="/menu">
+                  <img src="/icons/menu.svg" alt="Menu" className="h-6" />
+                </Link>
+              </div>
+            ) : (
+              // Desktop layout for icons with background
+              <div className="flex items-center space-x-4 bg-neutral-lightest/80 px-6 py-2 rounded-full">
+                <Link href="/search">
+                  <span className="p-2 rounded-full hover:bg-neutral-white hover:text-neutral-darkest transition-all">
+                    <img src="/icons/search.svg" alt="Search" className="h-6" />
+                  </span>
+                </Link>
+                <Link href="/wishlist">
+                  <span className="p-2 rounded-full hover:bg-neutral-white hover:text-neutral-darkest transition-all">
+                    <img src="/icons/wishlist.svg" alt="Wishlist" className="h-6" />
+                  </span>
+                </Link>
+                <Link href="/profile">
+                  <span className="p-2 rounded-full hover:bg-neutral-white hover:text-neutral-darkest transition-all">
+                    <img src="/icons/user.svg" alt="User" className="h-6" />
+                  </span>
+                </Link>
+                <Link href="/cart">
+                  <span className="p-2 rounded-full hover:bg-neutral-white hover:text-neutral-darkest transition-all">
+                    <img src="/icons/cart.svg" alt="Cart" className="h-6" />
+                  </span>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </nav>

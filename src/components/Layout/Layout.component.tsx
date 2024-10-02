@@ -1,10 +1,10 @@
 // Imports
 import { ReactNode, useContext, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
+import { useRouter } from 'next/router';
 
 // Components
 import Header from '@/components/Header/Header.component';
-import PageTitle from './PageTitle.component';
 import Footer from '@/components/Footer/Footer.component';
 import Stickynav from '@/components/Footer/Stickynav.component';
 
@@ -32,6 +32,13 @@ interface ILayoutProps {
 
 const Layout = ({ children, title }: ILayoutProps) => {
   const { setCart } = useContext(CartContext);
+  const router = useRouter();
+
+  // Define the pages that should not have a margin
+  const noMarginPages = ['/', '/o-nas', '/kolekcje','/hvyt-objects'];
+
+  // Check if the current page should have a margin or not
+  const hasMargin = !noMarginPages.includes(router.pathname);
 
   const { data, refetch } = useQuery(GET_CART, {
     notifyOnNetworkStatusChange: true,
@@ -41,7 +48,6 @@ const Layout = ({ children, title }: ILayoutProps) => {
 
       if (!updatedCart && !data?.cart?.contents?.nodes.length) {
         // Should we clear the localStorage if we have no remote cart?
-
         return;
       }
 
@@ -58,9 +64,15 @@ const Layout = ({ children, title }: ILayoutProps) => {
 
   return (
     <>
+      {/* Header */}
       <Header title={title} />
-      <PageTitle title={title} />
-      {children}
+      
+      {/* Main content area with conditional margin-top */}
+      <main className={hasMargin ? 'mt-[120px]' : ''}>
+        {children}
+      </main>
+      
+      {/* Footer and Sticky Navigation */}
       <Footer />
       <Stickynav />
     </>

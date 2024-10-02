@@ -2,43 +2,130 @@
 @tailwind components;
 @tailwind utilities;
 
-#cart-div {
-  width: 300px;
+:root {
+  --color-dark-pastel-red: #661F30;
+  --color-bright-pastel-red: #E36178;
+  --color-bright-pastel-pink: #EEB2AD;
+  --color-pastel-brown: #F0E0CF;
+  --color-neon-yellow: #F5F5AD;
+  --color-pastel-azure: #9FC1DF;
+  --color-neutral-white: #FCFCFC;
+  --color-neutral-lightest: #F8F6F7;
+  --color-neutral-lighter: #E1DFE0;
+  --color-neutral-light: #B2B0B1;
+  --color-neutral: #969394;
+  --color-neutral-dark: #857C7F;
+  --color-neutral-darker: #5D5759;
+  --color-neutral-darkest: #363132;
+  --color-black: #0E0B0C;
+  --color-beige-light: #F7F5F2;
+  --color-beige: #E9E5DF;
+  --color-beige-dark: #DAD3C8;
+
+  --font-family-primary: 'Neue Haas Grotesk Display', sans-serif;
+
+  /* Desktop Font Sizes */
+  --font-size-h1: 56px;
+  --font-size-h2: 48px;
+  --font-size-h3: 32px;
+  --font-size-h4: 28px;
+  --font-size-text-large: 24px;
+  --font-size-text-medium: 18px;
+  --font-size-text-regular: 16px;
+  --font-size-text-small: 14px;
+  --font-size-text-extra-small: 12px;
+
+  /* Mobile Font Sizes */
+  --font-size-h1-mobile: 40px;
+  --font-size-h2-mobile: 32px;
+  --font-size-h3-mobile: 24px;
+  --font-size-h4-mobile: 16px;
+  --font-size-text-large-mobile: 20px;
+  --font-size-text-medium-mobile: 16px;
+  --font-size-text-regular-mobile: 14px;
+  --font-size-text-small-mobile: 12px;
+
+  /* Line Heights */
+  --line-height-base: 1.5;
+  --line-height-tight: 120%;
+  --line-height-loose: 150%;
+
+  /* Grid Margins and Gutters */
+  --grid-margin-desktop: 40px;
+  --grid-gutter-desktop: 24px;
+  --grid-margin-mobile: 16px;
+  --grid-gutter-mobile: 20px;
 }
 
-#closeXsearch {
-  padding-left: 5px;
+body {
+  font-family: var(--font-family-primary);
+  line-height: var(--line-height-base);
+  color: var(--color-neutral-darkest);
 }
 
-#close-cart-p {
-  margin-top: 2px;
+h1 { 
+  font-size: var(--font-size-h1); 
+  line-height: var(--line-height-tight); 
+  font-weight: 700;
 }
 
-#mobile-search-close-p {
-  margin-top: -20px;
+h2 { 
+  font-size: var(--font-size-h2); 
+  line-height: var(--line-height-tight); 
+  font-weight: 700;
 }
 
-/* Fix Algolia mobile searchbox design issues */
-
-#mobilesearchdiv {
-  position: absolute;
-  height: 200px;
+h3 { 
+  font-size: var(--font-size-h3); 
+  line-height: var(--line-height-loose); 
+  font-weight: 600;
 }
 
-.ais-SearchBox-submit {
-  width: 48px;
+h4 { 
+  font-size: var(--font-size-h4); 
+  line-height: var(--line-height-loose); 
+  font-weight: 600;
+}
+.light{
+  font-weight: 300;
+}
+/* Typography for text */
+.text-large { 
+  font-size: var(--font-size-text-large); 
+  line-height: var(--line-height-loose); 
 }
 
-.ais-SearchBox-submitIcon {
-  display: none;
+.text-medium { 
+  font-size: var(--font-size-text-medium); 
+  line-height: var(--line-height-loose); 
 }
 
-.ais-SearchBox-reset {
-  margin-left: 10px;
+.text-regular { 
+  font-size: var(--font-size-text-regular); 
+  line-height: var(--line-height-loose); 
 }
 
-/* Fix Chrome padding issue */
+.text-small { 
+  font-size: var(--font-size-text-small); 
+  line-height: var(--line-height-loose); 
+}
+.text-extra-small { 
+  font-size: var(--font-size-text-extra-small); 
+  line-height: var(--line-height-loose); 
+}
 
-.ais-SearchBox-input[type='search']::-webkit-search-cancel-button {
-  display: none;
+/* Mobile styles */
+@media (max-width: 768px) {
+  h1 { font-size: var(--font-size-h1-mobile); }
+  h2 { font-size: var(--font-size-h2-mobile); }
+  h3 { font-size: var(--font-size-h3-mobile); }
+  h4 { font-size: var(--font-size-h4-mobile); }
+  .text-large { font-size: var(--font-size-text-large-mobile); }
+  .text-medium { font-size: var(--font-size-text-medium-mobile); }
+  .text-regular { font-size: var(--font-size-text-regular-mobile); }
+  .text-small { font-size: var(--font-size-text-small-mobile); }
+}
+
+.bg-biege {
+  background-color: #E9E5DF;
 }

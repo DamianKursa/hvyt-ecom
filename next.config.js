@@ -2,10 +2,27 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: [
-      'swewoocommerce.dfweb.no',
-      'res.cloudinary.com',
-      'via.placeholder.com',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'swewoocommerce.dfweb.no',
+        pathname: '/**', // Allow all paths from this domain
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**', // Allow all paths from Cloudinary
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+        pathname: '/**', // Allow all paths from placeholder
+      },
+      {
+        protocol: 'https',
+        hostname: 'hvyt.pl',
+        pathname: '/**', // Allow all paths from hvyt.pl
+      },
     ],
   },
 };

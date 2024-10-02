@@ -1,53 +1,59 @@
-import { FieldValues, useFormContext, UseFormRegister } from 'react-hook-form';
-
-interface ICustomValidation {
-  required?: boolean;
-  minlength?: number;
-}
-
-interface IErrors {}
+import { useFormContext, FieldValues, UseFormRegister } from 'react-hook-form';
 
 export interface IInputRootObject {
   inputLabel: string;
   inputName: string;
-  customValidation: ICustomValidation;
-  errors?: IErrors;
-  register?: UseFormRegister<FieldValues>;
+  customValidation: any;
+  errors?: any;
   type?: string;
 }
 
-/**
- * Input field component displays a text input in a form, with label.
- * The various properties of the input field can be determined with the props:
- * @param {ICustomValidation} [customValidation] - the validation rules to apply to the input field
- * @param {IErrors} errors - the form errors object provided by react-hook-form
- * @param {string} inputLabel - used for the display label
- * @param {string} inputName - the key of the value in the submitted data. Must be unique
- * @param {UseFormRegister<FieldValues>} register - register function from react-hook-form
- * @param {boolean} [required=true] - whether or not this field is required. default true
- * @param {string} [type='text'] - the input type. defaults to text
- */
 export const InputField = ({
   customValidation,
   inputLabel,
   inputName,
-  type,
+  errors,
+  type = 'text',
 }: IInputRootObject) => {
   const { register } = useFormContext();
 
+  // Base input styles with customized placeholder
+  const baseInputClassNames = `
+    block w-full py-3 px-2 text-sm font-light border-b-2
+    border-neutral-light bg-transparent text-neutral-darkest 
+    placeholder:text-neutral-darkest placeholder:font-light placeholder:text-[16px]
+    transition-all duration-300 ease-in-out
+    focus:outline-none focus:border-dark-pastel-red
+  `;
+
+  // Error state handling: Changes the border color to red if there's an error.
+  const stateClassNames = errors && errors[inputName]
+    ? 'border-bright-pastel-red'  // Error state
+    : 'border-neutral-light';     // Default state
+
+  const inputClassNames = `${baseInputClassNames} ${stateClassNames}`;
+
   return (
-    <div className="w-1/2 p-2">
-      <label htmlFor={inputName} className="pb-4">
-        {inputLabel}
-      </label>
+    <div className="mb-6">
+      {/* Input field */}
       <input
-        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         id={inputName}
-        placeholder={inputLabel}
-        type={type ?? 'text'}
-        {...customValidation}
-        {...register(inputName)}
+        placeholder={inputLabel} // Placeholder text
+        type={type}
+        className={inputClassNames}
+        {...register(inputName, { ...customValidation })}
       />
+
+      {/* Error message under input */}
+      {errors && errors[inputName] ? (
+        <p className="mt-2 text-sm text-bright-pastel-red">
+          {errors[inputName]}
+        </p>
+      ) : (
+        <p className="mt-2 text-sm text-neutral-dark">
+          {/* Optional helper text */}
+        </p>
+      )}
     </div>
   );
 };

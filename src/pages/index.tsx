@@ -1,34 +1,49 @@
 // Components
 import Hero from '@/components/Index/Hero.component';
-import DisplayProducts from '@/components/Product/DisplayProducts.component';
 import Layout from '@/components/Layout/Layout.component';
-
-// Utilities
-import client from '@/utils/apollo/ApolloClient';
-
+import NewArrivals from '@/components/Index/NewArivials.component';
+import Bestsellers from '@/components/Index/Bestsellers.component';
+import WybierzColor from '@/components/Index/WybierzColor.component';
+import PasujemyWszedzie from '@/components/Index/Pasujemy.component'
+import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
+import Instagram from '@/components/Index/Instagram';
 // Types
-import type { NextPage, GetStaticProps, InferGetStaticPropsType } from 'next';
-
-// GraphQL
-import { FETCH_ALL_PRODUCTS_QUERY } from '@/utils/gql/GQL_QUERIES';
+import type { NextPage } from 'next';
 
 /**
  * Main index page
  * @function Index
- * @param {InferGetStaticPropsType<typeof getStaticProps>} products
  * @returns {JSX.Element} - Rendered component
  */
 
-const Index: NextPage = ({
-  products,
-}: InferGetStaticPropsType<typeof getStaticProps>) => (
-  <Layout title="Hjem">
-    <Hero />
-    {products && <DisplayProducts products={products} />}
+const Index: NextPage = () => (
+  <Layout title="Strona główna">
+    <Hero
+      title="Wybierz swój HVYT"
+      description="Od eleganckich, nowoczesnych wzorów uchwytów meblowych po ponadczasowe klasyki. Sprawdź jak nasze Hvyt’y mogą odmienić Twoje wnętrze."
+      overlayImage="/hero-overlay.png"
+      background="linear-gradient(270deg, #E4D6B1 6.2%, #E6D8B5 95.01%)"
+      primaryButtonText="Zobacz uchwyty"
+      primaryButtonLink="#"
+      secondaryButtonText="Zobacz gałki"
+      secondaryButtonLink="#"
+    />
+    <NewArrivals />
+    <Bestsellers />
+    <WybierzColor />
+    <PasujemyWszedzie />
+    <NaszeKolekcje />
+    <Instagram />
   </Layout>
-);
+)
 
 export default Index;
+
+/* 
+// Uncomment this if you need to fetch products in the future
+// GraphQL
+import { FETCH_ALL_PRODUCTS_QUERY } from '@/utils/gql/GQL_QUERIES';
+import client from '@/utils/apollo/ApolloClient';
 
 export const getStaticProps: GetStaticProps = async () => {
   const { data, loading, networkStatus } = await client.query({
@@ -43,4 +58,4 @@ export const getStaticProps: GetStaticProps = async () => {
     },
     revalidate: 60,
   };
-};
+}; */
