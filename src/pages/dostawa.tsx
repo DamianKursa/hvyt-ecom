@@ -15,27 +15,47 @@ const DostawaPage = () => {
           {/* Delivery Section */}
           <div className="grid grid-cols-2 gap-8 mb-12">
             <div>
-              <p className="font-size-text-medium text-neutral-darkest">
-                Wasze zamówienia realizujemy do 24h od momentu ich otrzymania. Staramy się zawsze wysyłać jak najszybciej możemy, dlatego średni czas wysyłki jest o wiele krótszy. 
-                W weekend nie pracujemy, dlatego poniedziałki i kolejne dni robocze po świętach są u nas zawsze bardzo pracowite.
+              {/* Description Section */}
+              <p className="font-size-text-medium text-neutral-darkest mb-8">
+                Wasze zamówienia realizujemy do 24h od momentu ich otrzymania. Staramy się zawsze wysyłać jak najszybciej możemy, dlatego średni czas wysyłki jest o wiele krótszy. W weekend nie pracujemy, dlatego poniedziałki i kolejne dni robocze po świętach są u nas zawsze bardzo pracowite.
               </p>
 
-              <h3 className="font-size-h3 font-bold mt-8">Wysyłka możliwa jest przez:</h3>
-              <ul className="mt-4 list-disc list-inside">
-                <li>Kurierem inPost - 12,00 zł</li>
-                <li>Kurierem GLS - 12,99 zł</li>
-                <li>Kurierem GLS (powyżej 300 zł) - 0,00 zł</li>
-              </ul>
-
-              <p className="mt-4">
-                Czas dostawy powyższych przewoźników to od <strong>24h do 48h</strong> od momentu wysłania przez nas przesyłki.
-              </p>
+              {/* Pricing and Shipping Options */}
+              <div className="bg-light-beige p-8 rounded-lg" style={{ minHeight: '250px' }}>
+                <h3 className="font-size-h3 font-bold text-neutral-darkest mb-6">Wysyłka możliwa jest:</h3>
+                <ul className="mb-6">
+                  <li className="flex justify-between items-center mb-2">
+                    <div className="flex items-center">
+                      <Image src="/icons/inpost-icon.svg" alt="InPost" width={24} height={24} />
+                      <span className="ml-2 text-neutral-darkest">Kurierem inPost</span>
+                    </div>
+                    <span className="font-semibold text-neutral-darkest">12,00 zł</span>
+                  </li>
+                  <li className="flex justify-between items-center mb-2">
+                    <div className="flex items-center">
+                      <Image src="/icons/gls-icon.svg" alt="GLS" width={24} height={24} />
+                      <span className="ml-2 text-neutral-darkest">Kurierem GLS</span>
+                    </div>
+                    <span className="font-semibold text-neutral-darkest">12,99 zł</span>
+                  </li>
+                  <li className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <Image src="/icons/gls-icon.svg" alt="GLS Free" width={24} height={24} />
+                      <span className="ml-2 text-neutral-darkest">Kurierem GLS (powyżej 300 zł)</span>
+                    </div>
+                    <span className="font-semibold text-neutral-darkest">0,00 zł</span>
+                  </li>
+                </ul>
+                <p className="text-neutral-darkest">
+                  Czas dostawy powyższych przewoźników to od <strong>24h do 48h</strong> od momentu wysłania przez nas przesyłki.
+                </p>
+              </div>
             </div>
 
-            {/* Image */}
-            <div className="relative h-full rounded-lg overflow-hidden">
+            {/* Image Section */}
+            <div className="relative h-full rounded-lg overflow-hidden" style={{ minHeight: '350px' }}>
               <Image
-                src="/images/dostawa_image.jpg" // Replace with the actual image path
+                src="/images/dostawa.png" // Replace with the actual image path
                 alt="Dostawa"
                 layout="fill"
                 objectFit="cover"

@@ -1,14 +1,13 @@
-import { useState } from 'react';
-import { useQuery } from '@apollo/client';
+import { useState, useEffect } from 'react';
 import ProductPreview from '../Product/ProductPreview.component';
-import { FETCH_PRODUCTS_WITH_PRICE_AND_IMAGE } from '../../utils/gql/GQL_QUERIES';
+import { fetchProductsByCategoryId } from '../../utils/api/woocommerce'; // Assuming you want to fetch by category
 
 interface Product {
   id: string;
   slug: string;
   name: string;
   price: string;
-  image: { sourceUrl: string }; // Image is a single object here
+  image: { src: string };
 }
 
 const fallbackBestsellers: Product[] = [
@@ -17,14 +16,14 @@ const fallbackBestsellers: Product[] = [
     slug: 'uchwyt-industrialny-zloty-1',
     name: 'UCHWYT INDUSTRIALNY ZŁOTY',
     price: '15,90',
-    image: { sourceUrl: 'https://via.placeholder.com/300' },
+    image: { src: 'https://via.placeholder.com/300' },
   },
   {
     id: '2',
     slug: 'uchwyt-industrialny-zloty-2',
     name: 'UCHWYT INDUSTRIALNY ZŁOTY',
     price: '15,90',
-    image: { sourceUrl: 'https://via.placeholder.com/300' },
+    image: { src: 'https://via.placeholder.com/300' },
   },
   // Add more fallback products as needed...
 ];
@@ -33,18 +32,47 @@ const Bestsellers = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 3.8; // Number of slides visible at once
   const gutter = 24; // Gutter size between the slides
+  const [products, setProducts] = useState<Product[]>(fallbackBestsellers);
+  const [loading, setLoading] = useState(true);
 
-  const { loading, error, data } = useQuery<{ products: { nodes: Product[] } }>(FETCH_PRODUCTS_WITH_PRICE_AND_IMAGE);
+  useEffect(() => {
+    const fetchBestsellers = async () => {
+      try {
+        setLoading(true);
+        const categoryId = 123; // Replace with your Bestsellers category ID
+        const fetchedProducts = await fetchProductsByCategoryId(categoryId);
+        const formattedProducts = fetchedProducts.map((product: any) => ({
+          id: product.id,
+          slug: product.slug,
+          name: product.name,
+          price: product.price,
+          image: { src: product.images[0]?.src || '/placeholder.jpg' },
+        }));
+        setProducts(formattedProducts.slice(0, 12)); // Limit to 12 products
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching Bestsellers:', error);
+        setLoading(false);
+      }
+    };
 
-  const products: Product[] = data?.products?.nodes || fallbackBestsellers;
+    fetchBestsellers();
+  }, []);
+
   const totalItems = products.length;
+  const canGoPrev = currentIndex > 0;
+  const canGoNext = currentIndex < totalItems - itemsPerPage;
 
   const handlePrev = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + totalItems) % totalItems);
+    if (canGoPrev) {
+      setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+    }
   };
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % totalItems);
+    if (canGoNext) {
+      setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, totalItems - itemsPerPage));
+    }
   };
 
   return (
@@ -59,39 +87,50 @@ const Bestsellers = () => {
 
         {/* Custom Navigation */}
         <div className="flex items-center space-x-4">
-          <button onClick={handlePrev} className="p-3 bg-neutral-lighter rounded-full shadow-lg">
+          <button
+            onClick={handlePrev}
+            className={`p-3 rounded-full shadow-lg ${canGoPrev ? 'bg-black text-white' : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'}`}
+            disabled={!canGoPrev}
+          >
             <img src="/icons/arrow-left.svg" alt="Previous" className="h-6 w-6" />
           </button>
-          <button onClick={handleNext} className="p-3 bg-neutral-lighter rounded-full shadow-lg">
+          <button
+            onClick={handleNext}
+            className={`p-3 rounded-full shadow-lg ${canGoNext ? 'bg-black text-white' : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'}`}
+            disabled={!canGoNext}
+          >
             <img src="/icons/arrow-right.svg" alt="Next" className="h-6 w-6" />
           </button>
         </div>
       </div>
 
       {/* Product Slider */}
-      <div className="overflow-hidden">
-        <div
-          className="flex transition-transform duration-300"
-          style={{
-            transform: `translateX(-${(currentIndex % totalItems) * (100 / itemsPerPage)}%)`,
-            gap: `${gutter}px`,
-          }}
-        >
-          {products.map((product) => (
-            <div
-              key={product.id} // Use the unique `id` property for the key
-              className="flex-none"
-              style={{
-                width: `calc((100% / ${itemsPerPage}) - ${gutter}px)`,
-                transition: 'all 0.3s ease',
-              }}
-            >
-              {/* Map the single image to an array for the ProductPreview */}
-              <ProductPreview product={{ ...product, images: [{ src: product.image.sourceUrl }] }} />
-            </div>
-          ))}
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="overflow-hidden">
+          <div
+            className="flex transition-transform duration-300"
+            style={{
+              transform: `translateX(-${(currentIndex % totalItems) * (100 / itemsPerPage)}%)`,
+              gap: `${gutter}px`,
+            }}
+          >
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="flex-none"
+                style={{
+                  width: `calc((100% / ${itemsPerPage}) - ${gutter}px)`,
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                <ProductPreview product={{ ...product, images: [{ src: product.image.src }] }} />
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 };

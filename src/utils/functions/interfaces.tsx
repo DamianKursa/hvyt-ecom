@@ -1,14 +1,41 @@
+// interfaces.ts
+
+export interface ProductAttribute {
+  name: string;
+  options: string[];
+}
+
+export interface Product {
+  id: string;
+  name: string;
+  price: string;
+  salePrice?: string;
+  regularPrice?: string;
+  description: string;
+  image: string;
+  attributes: {
+    nodes: ProductAttribute[];
+  };
+  variations?: {
+    nodes: {
+      image?: {
+        sourceUrl: string;
+      };
+    }[];
+  };
+}
+
 export interface Kolekcja {
   id: number;
   slug: string;
   title: {
     rendered: string;
   };
-  content:{
+  content: {
     rendered: string;
-  }
-  imageUrl: string; // This will be added manually later
-  featured_media?: number; // Add featured_media as optional
+  };
+  imageUrl: string;
+  featured_media?: number;
   yoast_head_json?: {
     og_image?: { url: string }[];
   };

@@ -4,7 +4,7 @@ import Layout from '@/components/Layout/Layout.component';
 import { Kolekcja } from '../../utils/functions/interfaces';
 import SkeletonCollectionPage from '@/components/Product/SkeletonCollectionPage';
 import ProductPreview from '../../components/Product/ProductPreview.component';
-import { fetchProductsByAttribute, fetchKolekcjePostsWithImages, fetchMediaById } from '../../utils/api/woocommerce';
+import { fetchCategoryBySlug, fetchProductsByCategoryId, fetchKolekcjePostsWithImages, fetchMediaById } from '../../utils/api/woocommerce';
 import { useRouter } from 'next/router';
 
 const CollectionPage = () => {
@@ -32,8 +32,11 @@ const CollectionPage = () => {
       try {
         if (!slugString) return;
 
-        // Fetch products by the "kolekcja" attribute
-        const fetchedProducts = await fetchProductsByAttribute(slugString);
+        // Fetch category by slug
+        const categoryData = await fetchCategoryBySlug(slugString);
+
+        // Fetch products by category ID (fetch all products, no limit)
+        const fetchedProducts = await fetchProductsByCategoryId(categoryData.id);
         setProducts(fetchedProducts);
 
         // Fetch Kolekcje data for the slider
@@ -135,8 +138,8 @@ const CollectionPage = () => {
             ))}
           </div>
 
-          {/* Third Section: Product Preview */}
-          <div className="grid grid-cols-4 gap-6">
+          {/* Third Section: Product Preview (3 Columns) */}
+          <div className="grid grid-cols-3 gap-6">
             {products.map((product) => (
               <ProductPreview key={product.id} product={product} />
             ))}

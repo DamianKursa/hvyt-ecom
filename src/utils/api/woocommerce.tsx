@@ -22,7 +22,10 @@ interface Attribute {
 export const fetchCategoryBySlug = async (slug: string) => {
   try {
     const response = await WooCommerceAPI.get('/products/categories', {
-      params: { slug },
+      params: { 
+        slug,
+        per_page: 50, // Adjust as necessary
+       },
     });
     if (response.data.length === 0) {
       throw new Error('Category not found');
@@ -30,6 +33,20 @@ export const fetchCategoryBySlug = async (slug: string) => {
     return response.data[0];
   } catch (error) {
     console.error('Error fetching category:', error);
+    throw error;
+  }
+};
+// Fetch product by slug
+export const fetchProductBySlug = async (slug: string) => {
+  try {
+    const response = await WooCommerceAPI.get('/products', {
+      params: {
+        slug,
+      },
+    });
+    return response.data[0]; // Return the first product matching the slug
+  } catch (error) {
+    console.error('Error fetching product by slug:', error);
     throw error;
   }
 };
