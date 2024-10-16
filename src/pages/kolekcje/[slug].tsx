@@ -1,0 +1,150 @@
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Layout from '@/components/Layout/Layout.component';
+import { Kolekcja } from '../../utils/functions/interfaces';
+import SkeletonCollectionPage from '@/components/Product/SkeletonCollectionPage';
+import ProductPreview from '../../components/Product/ProductPreview.component';
+import { fetchProductsByAttribute, fetchKolekcjePostsWithImages, fetchMediaById } from '../../utils/api/woocommerce';
+import { useRouter } from 'next/router';
+
+const CollectionPage = () => {
+  const router = useRouter();
+  const { slug } = router.query;
+
+  const slugString = Array.isArray(slug) ? slug[0] : slug;
+
+  const [products, setProducts] = useState<any[]>([]);
+  const [kolekcjeData, setKolekcjeData] = useState<Kolekcja[] | null>(null);
+  const [featuredImage, setFeaturedImage] = useState<string | null>(null);
+  const [content, setContent] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Function to strip HTML tags from content
+  const stripHTML = (html: string) => {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!slugString) return;
+
+        // Fetch products by the "kolekcja" attribute
+        const fetchedProducts = await fetchProductsByAttribute(slugString);
+        setProducts(fetchedProducts);
+
+        // Fetch Kolekcje data for the slider
+        const fetchedKolekcje = await fetchKolekcjePostsWithImages();
+        setKolekcjeData(fetchedKolekcje);
+
+        // Fetch Kolekcja details like content and featured image
+        const currentKolekcja = fetchedKolekcje.find((kolekcja: Kolekcja) => kolekcja.slug === slugString);
+        setContent(stripHTML(currentKolekcja?.content.rendered || 'Opis kolekcji.'));
+
+        // Fetch the featured image
+        if (currentKolekcja?.featured_media) {
+          const featuredImageUrl = await fetchMediaById(currentKolekcja.featured_media);
+          setFeaturedImage(featuredImageUrl);
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching collection data:', error);
+        setErrorMessage('Error loading collection data.');
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [slugString]);
+
+  const handleCollectionClick = (kolekcjaSlug: string) => {
+    setLoading(true); // Set loading to true when user clicks on a collection box
+    router.push(`/kolekcje/${kolekcjaSlug}`);
+  };
+
+  if (loading) {
+    return (
+      <Layout title="Loading...">
+        <SkeletonCollectionPage />
+      </Layout>
+    );
+  }
+
+  if (errorMessage) {
+    return (
+      <Layout title="Error">
+        <div className="container mx-auto">
+          <p className="text-red-500">{errorMessage}</p>
+        </div>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout title={slugString || 'Kolekcja'}>
+      <section className="w-full py-16">
+        <div className="container mx-auto max-w-grid-desktop">
+          {/* First Section: Title, Content, Featured Image */}
+          <div
+            className="grid grid-cols-2 gap-8 mb-12 rounded-lg"
+            style={{ minHeight: '521px', backgroundColor: '#E9E5DF' }} // Background color and rounded corners
+          >
+            <div className="flex flex-col justify-end p-6">
+              <h1 className="font-size-h1 font-bold text-dark-pastel-red">{slugString}</h1>
+              <p className="font-size-text-medium text-neutral-darkest">
+                {content}
+              </p>
+            </div>
+            <div className="relative h-full rounded-lg overflow-hidden">
+              {featuredImage && (
+                <Image
+                  src={featuredImage}
+                  alt={slugString as string}
+                  layout="fill"
+                  objectFit="cover" // Ensure the image covers the full container
+                  className="rounded-lg h-full"
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Second Section: Slider with 6 visible boxes */}
+          <div className="grid grid-cols-6 gap-4 mb-12">
+            {kolekcjeData?.slice(0, 6).map((kolekcja: Kolekcja) => (
+              <div
+                key={kolekcja.id}
+                className="relative h-[205px] w-full transition-transform duration-300 transform hover:scale-105 rounded-lg overflow-hidden"
+                style={{ backgroundColor: 'var(--color-beige)' }}
+                onClick={() => handleCollectionClick(kolekcja.slug)} // Trigger loading on click
+              >
+                <Image
+                  src={kolekcja.imageUrl || '/placeholder.jpg'}
+                  alt={kolekcja.title.rendered}
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-lg"
+                />
+                <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest bg-white">
+                  {kolekcja.title.rendered}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Third Section: Product Preview */}
+          <div className="grid grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductPreview key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </Layout>
+  );
+};
+
+export default CollectionPage;

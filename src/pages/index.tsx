@@ -1,4 +1,5 @@
 // Components
+import React from 'react';
 import Hero from '@/components/Index/Hero.component';
 import Layout from '@/components/Layout/Layout.component';
 import NewArrivals from '@/components/Index/NewArivials.component';
@@ -18,16 +19,15 @@ import type { NextPage } from 'next';
 
 const Index: NextPage = () => (
   <Layout title="Strona główna">
-    <Hero
-      title="Wybierz swój HVYT"
-      description="Od eleganckich, nowoczesnych wzorów uchwytów meblowych po ponadczasowe klasyki. Sprawdź jak nasze Hvyt’y mogą odmienić Twoje wnętrze."
-      overlayImage="/hero-overlay.png"
-      background="linear-gradient(270deg, #E4D6B1 6.2%, #E6D8B5 95.01%)"
-      primaryButtonText="Zobacz uchwyty"
-      primaryButtonLink="#"
-      secondaryButtonText="Zobacz gałki"
-      secondaryButtonLink="#"
-    />
+  <Hero
+    title="Wybierz swój HVYT"
+    description="Od eleganckich, nowoczesnych wzorów uchwytów meblowych po ponadczasowe klasyki. Sprawdź jak nasze Hvyt’y mogą odmienić Twoje wnętrze."
+    buttonText="Zobacz uchwyty"
+    buttonLink="#"
+    imageSrc="/images/hero-overlay.png"
+    imageAlt="Hvyt Hero Image"
+    bgColor="bg-beige"
+  />
     <NewArrivals />
     <Bestsellers />
     <WybierzColor />

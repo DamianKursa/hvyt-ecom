@@ -1,6 +1,32 @@
 import React, { useState } from 'react';
 
-const SingleProductDetails = ({ product }) => {
+interface Color {
+  name: string;
+}
+
+interface Size {
+  name: string;
+}
+
+interface Product {
+  name: string;
+  salePrice?: string;
+  regularPrice: string;
+  price: string;
+  description: string;
+  allPaColors?: {
+    nodes?: Color[];
+  };
+  allPaSizes?: {
+    nodes?: Size[];
+  };
+}
+
+interface SingleProductDetailsProps {
+  product: Product;
+}
+
+const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({ product }) => {
   const [selectedColor, setSelectedColor] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const isOnSale = !!product.salePrice;
@@ -22,7 +48,7 @@ const SingleProductDetails = ({ product }) => {
       </div>
 
       {/* Variations (Color/Size) */}
-      {product.allPaColors?.nodes.length > 0 && (
+      {product.allPaColors?.nodes && product.allPaColors.nodes.length > 0 && (
         <div className="mt-4">
           <label className="block mb-2 font-semibold">Kolor</label>
           <div className="flex space-x-2">
@@ -41,7 +67,7 @@ const SingleProductDetails = ({ product }) => {
         </div>
       )}
 
-      {product.allPaSizes?.nodes.length > 0 && (
+      {product.allPaSizes?.nodes && product.allPaSizes.nodes.length > 0 && (
         <div className="mt-4">
           <label className="block mb-2 font-semibold">Rozmiar</label>
           <div className="flex space-x-2">

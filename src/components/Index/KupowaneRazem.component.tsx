@@ -3,32 +3,47 @@ import { useQuery } from '@apollo/client';
 import ProductPreview from '../Product/ProductPreview.component';
 import { FETCH_PRODUCTS_WITH_PRICE_AND_IMAGE } from '../../utils/gql/GQL_QUERIES';
 
-const fallbackBestsellers = [
-  // Fallback products (same as before, using static data)
+// Define the product interface to match the expected structure
+interface Product {
+  id: number;
+  slug?: string;
+  name: string;
+  price: string;
+  image: {
+    sourceUrl: string;
+  };
+}
+
+const fallbackBestsellers: Product[] = [
   {
     id: 1,
-    title: 'UCHWYT INDUSTRIALNY ZŁOTY',
+    name: 'UCHWYT INDUSTRIALNY ZŁOTY',
     price: '15,90',
-    image: 'https://via.placeholder.com/300',
+    image: {
+      sourceUrl: 'https://via.placeholder.com/300',
+    },
   },
   {
     id: 2,
-    title: 'UCHWYT INDUSTRIALNY ZŁOTY',
+    name: 'UCHWYT INDUSTRIALNY ZŁOTY',
     price: '15,90',
-    image: 'https://via.placeholder.com/300',
+    image: {
+      sourceUrl: 'https://via.placeholder.com/300',
+    },
   },
-  // Add more fallback products as needed...
 ];
 
 const KupowaneRazem = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 3.8; // 3.8 slides visible
-  const gutter = 24; // Gutter size between the slides
+  const itemsPerPage = 3.8;
+  const gutter = 24;
 
   // Fetch the products from WooCommerce using GraphQL
-  const { loading, error, data } = useQuery(FETCH_PRODUCTS_WITH_PRICE_AND_IMAGE);
+  const { loading, error, data } = useQuery<{ products: { nodes: Product[] } }>(
+    FETCH_PRODUCTS_WITH_PRICE_AND_IMAGE
+  );
 
-  const products = data?.products?.nodes || fallbackBestsellers; // Use fallback if data is unavailable
+  const products: Product[] = data?.products?.nodes || fallbackBestsellers;
   const totalItems = products.length;
 
   const handlePrev = () => {
@@ -43,9 +58,9 @@ const KupowaneRazem = () => {
     <section className="container mx-auto max-w-grid-desktop py-16">
       <div className="flex justify-between mb-[40px]">
         <div className="flex flex-col h-full">
-          <h2 className="font-size-h2 font-bold text-neutral-darkest">Bestsellers</h2>
+          <h2 className="font-size-h2 font-bold text-neutral-darkest">Kupowane Razem</h2>
           <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
-            Poznaj nasze najpopularniejsze modele.
+            Poznaj produkty często kupowane razem.
           </p>
         </div>
 
@@ -69,7 +84,7 @@ const KupowaneRazem = () => {
             gap: `${gutter}px`,
           }}
         >
-          {products.map((product, index) => (
+          {products.map((product: Product, index: number) => (
             <div
               key={product.slug || index} // Fallback for key
               className="flex-none"
@@ -78,7 +93,14 @@ const KupowaneRazem = () => {
                 transition: 'all 0.3s ease',
               }}
             >
-              <ProductPreview product={product} />
+              {/* Map single image to images array for ProductPreview */}
+              <ProductPreview
+                product={{
+                  ...product,
+                  images: [{ src: product.image.sourceUrl }],
+                  slug: product.slug || '', // Enforce slug as string by providing fallback empty string
+                }}
+              />
             </div>
           ))}
         </div>

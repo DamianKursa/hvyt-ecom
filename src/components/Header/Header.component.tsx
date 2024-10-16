@@ -1,3 +1,5 @@
+import React from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import Breadcrumbs from '../UI/Breadcrumbs.component'; // Import the Breadcrumbs component
 
@@ -5,11 +7,20 @@ import Breadcrumbs from '../UI/Breadcrumbs.component'; // Import the Breadcrumbs
 import useIsMobile from '@/utils/hooks/useIsMobile';
 import { useRouter } from 'next/router'; // Import useRouter to conditionally show breadcrumbs
 
+interface IHeaderProps {
+  title?: string;
+}
+
 /**
- * Navigation for the application.
- * Includes mobile menu.
+ * Navigation for the application. Includes mobile menu.
  */
-const Navbar = () => {
+const Navbar: React.FC<IHeaderProps> = ({ title }) => {
+  useEffect(() => {
+    if (title) {
+      document.title = title; // Update the document title dynamically
+    }
+  }, [title]);
+
   const isMobile = useIsMobile();
   const router = useRouter();
 

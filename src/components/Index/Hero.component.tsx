@@ -1,13 +1,32 @@
+import React from 'react';
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 
-const Hero = () => {
-  const imageRef = useRef(null);
-  const boxesRef = useRef([]);
+interface HeroProps {
+  title: string;
+  description: string;
+  buttonText: string;
+  buttonLink: string;
+  imageSrc: string;
+  imageAlt: string;
+  bgColor: string;
+}
+
+const Hero: React.FC<HeroProps> = ({
+  title,
+  description,
+  buttonText,
+  buttonLink,
+  imageSrc,
+  imageAlt,
+  bgColor,
+}) => {
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const boxesRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     if (imageRef.current) {
-      imageRef.current.style.animation = "overlayAnimation 2000ms ease-in-out forwards";
+      imageRef.current.style.animation = 'overlayAnimation 2000ms ease-in-out forwards';
     }
 
     boxesRef.current.forEach((box, index) => {
@@ -20,24 +39,21 @@ const Hero = () => {
   return (
     <section
       id="hero"
-      className="relative flex items-center w-full min-h-[795px] mx-auto bg-right bg-cover overflow-hidden"
-      style={{
-        background: 'linear-gradient(270deg, #E4D6B1 6.2%, #E6D8B5 95.01%)',
-      }}
+      className={`relative flex items-center w-full min-h-[795px] mx-auto overflow-hidden ${bgColor}`}
     >
       <div className="container mx-auto max-w-grid-desktop h-full flex justify-between items-center">
         {/* Background boxes for animation */}
         <div className="absolute right-0 top-0 grid grid-cols-3 grid-rows-4 gap-0 justify-end items-center overflow-hidden">
           {Array.from({ length: 12 }).map((_, idx) => {
             const hasBackground =
-              (idx === 2) || // 1st column, 3rd row (top to bottom)
-              (idx === 4 || idx === 7) || // 2nd column, 2nd and 4th rows
-              (idx >= 8); // 3rd column, all rows
+              idx === 2 || idx === 4 || idx === 7 || idx >= 8;
 
             return (
               <div
                 key={idx}
-                ref={(el) => (boxesRef.current[idx] = el)} // Set ref for each box
+                ref={(el) => {
+                  boxesRef.current[idx] = el;
+                }}
                 className={`w-[200px] h-[200px] ${hasBackground ? 'bg-[#F5F5AD]' : 'bg-transparent'}`}
               />
             );
@@ -45,15 +61,10 @@ const Hero = () => {
         </div>
 
         {/* Overlay Image centered with animation */}
-        <div
-          className="absolute inset-0 flex justify-center items-center"
-          style={{
-            transformOrigin: 'center center',
-          }}
-        >
+        <div className="absolute inset-0 flex justify-center items-center" style={{ transformOrigin: 'center center' }}>
           <Image
-            src="/hero-overlay.png"
-            alt="Overlay Image"
+            src={imageSrc}
+            alt={imageAlt}
             width={1270}
             height={698}
             className="animate-overlay"
@@ -65,26 +76,18 @@ const Hero = () => {
         <div className="container relative z-10 mx-auto">
           <div className="flex flex-col items-start justify-center w-full tracking-wide lg:w-1/2">
             <h1 className="text-6xl font-bold leading-tight text-dark-pastel-red mb-4">
-              Wybierz<br />swój HVYT
+              {title}
             </h1>
             <p className="text-lg leading-relaxed text-neutral-darkest mb-6">
-              Od eleganckich, nowoczesnych wzorów uchwytów <br />meblowych po
-              ponadczasowe klasyki. Sprawdź jak<br />nasze Hvyt’y mogą odmienić Twoje
-              wnętrze.
+              {description}
             </p>
 
             <div className="flex space-x-4">
               <a
-                className="inline-block min-w-[162px]  px-6 py-3 text-lg leading-relaxed text-neutral-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors"
-                href="#"
+                className="inline-block min-w-[162px] px-6 py-3 text-lg leading-relaxed text-neutral-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors"
+                href={buttonLink}
               >
-                Zobacz uchwyty
-              </a>
-              <a
-                className="inline-block min-w-[162px] px-6 py-3 text-lg leading-relaxed border border-black rounded-full hover:border-dark-pastel-red hover:text-dark-pastel-red transition-colors"
-                href="#"
-              >
-                Zobacz gałki
+                {buttonText}
               </a>
             </div>
           </div>
@@ -144,17 +147,8 @@ const Hero = () => {
         }
 
         .animate-overlay {
-          max-width: 100%; /* Ensure the image stays within the hero section */
+          max-width: 100%;
           object-fit: cover;
-        }
-
-        a {
-          padding: 12px 24px; /* 12px top/bottom and 24px left/right */
-          font-weight: 300; /* Light font */
-        }
-
-        .hover-bg {
-          background-color: #DAD3C8;
         }
       `}</style>
     </section>

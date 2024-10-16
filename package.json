@@ -26,6 +26,9 @@
     "@types/react": "^18.3.4",
     "algoliasearch": "^4.24.0",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.7.7",
+    "dompurify": "^3.1.7",
+    "dotenv": "^16.4.5",
     "framer-motion": "11.3.29",
     "graphql": "^16.9.0",
     "lodash": "^4.17.21",
@@ -41,6 +44,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.46.1",
+    "@types/dompurify": "^3.0.5",
     "@types/lodash": "^4.17.7",
     "@types/node": "20.16.1",
     "@types/nprogress": "^0.2.3",

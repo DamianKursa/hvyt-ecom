@@ -3,32 +3,40 @@ import { useQuery } from '@apollo/client';
 import ProductPreview from '../Product/ProductPreview.component';
 import { FETCH_PRODUCTS_WITH_PRICE_AND_IMAGE } from '../../utils/gql/GQL_QUERIES';
 
-const fallbackBestsellers = [
-  // Fallback products (same as before, using static data)
+interface Product {
+  id: string;
+  slug: string;
+  name: string;
+  price: string;
+  image: { sourceUrl: string }; // Image is a single object here
+}
+
+const fallbackBestsellers: Product[] = [
   {
-    id: 1,
-    title: 'UCHWYT INDUSTRIALNY ZŁOTY',
+    id: '1',
+    slug: 'uchwyt-industrialny-zloty-1',
+    name: 'UCHWYT INDUSTRIALNY ZŁOTY',
     price: '15,90',
-    image: 'https://via.placeholder.com/300',
+    image: { sourceUrl: 'https://via.placeholder.com/300' },
   },
   {
-    id: 2,
-    title: 'UCHWYT INDUSTRIALNY ZŁOTY',
+    id: '2',
+    slug: 'uchwyt-industrialny-zloty-2',
+    name: 'UCHWYT INDUSTRIALNY ZŁOTY',
     price: '15,90',
-    image: 'https://via.placeholder.com/300',
+    image: { sourceUrl: 'https://via.placeholder.com/300' },
   },
   // Add more fallback products as needed...
 ];
 
 const Bestsellers = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 3.8; // 3.8 slides visible
+  const itemsPerPage = 3.8; // Number of slides visible at once
   const gutter = 24; // Gutter size between the slides
 
-  // Fetch the products from WooCommerce using GraphQL
-  const { loading, error, data } = useQuery(FETCH_PRODUCTS_WITH_PRICE_AND_IMAGE);
+  const { loading, error, data } = useQuery<{ products: { nodes: Product[] } }>(FETCH_PRODUCTS_WITH_PRICE_AND_IMAGE);
 
-  const products = data?.products?.nodes || fallbackBestsellers; // Use fallback if data is unavailable
+  const products: Product[] = data?.products?.nodes || fallbackBestsellers;
   const totalItems = products.length;
 
   const handlePrev = () => {
@@ -60,7 +68,7 @@ const Bestsellers = () => {
         </div>
       </div>
 
-      {/* Custom Slider */}
+      {/* Product Slider */}
       <div className="overflow-hidden">
         <div
           className="flex transition-transform duration-300"
@@ -69,16 +77,17 @@ const Bestsellers = () => {
             gap: `${gutter}px`,
           }}
         >
-          {products.map((product, index) => (
+          {products.map((product) => (
             <div
-              key={product.slug || index} // Fallback for key
+              key={product.id} // Use the unique `id` property for the key
               className="flex-none"
               style={{
                 width: `calc((100% / ${itemsPerPage}) - ${gutter}px)`,
                 transition: 'all 0.3s ease',
               }}
             >
-              <ProductPreview product={product} />
+              {/* Map the single image to an array for the ProductPreview */}
+              <ProductPreview product={{ ...product, images: [{ src: product.image.sourceUrl }] }} />
             </div>
           ))}
         </div>

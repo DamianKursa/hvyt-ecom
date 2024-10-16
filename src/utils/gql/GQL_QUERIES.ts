@@ -1,65 +1,69 @@
 import { gql } from '@apollo/client';
 
 export const GET_SINGLE_PRODUCT = gql`
-query ProductBySlug($slug: String!) {
-  products(where: { slugIn: [$slug] }) {
-    nodes {
-      id
-      name
-      slug
-      description
-      image {
-        sourceUrl
-      }
-      averageRating
-      onSale
-      ... on SimpleProduct {
-        price
-        regularPrice
-        salePrice
-        stockQuantity
-        galleryImages {
-          edges {
-            node {
+  query ProductBySlug($slug: String!) {
+    products(where: { slugIn: [$slug] }) {
+      nodes {
+        id
+        name
+        slug
+        description
+        image {
+          sourceUrl
+        }
+        averageRating
+        onSale
+        ... on SimpleProduct {
+          price
+          regularPrice
+          salePrice
+          stockQuantity
+          galleryImages {
+            edges {
+              node {
+                id
+                sourceUrl
+              }
+            }
+          }
+        }
+        ... on VariableProduct {
+          price
+          regularPrice
+          salePrice
+          variations {
+            nodes {
               id
-              sourceUrl
+              stockStatus
+              stockQuantity
+              price
+              regularPrice
+              salePrice
+              image {
+                sourceUrl
+              }
+            }
+          }
+          attributes {
+            nodes {
+              name
+              options
             }
           }
         }
-      }
-      ... on VariableProduct {
-        price
-        regularPrice
-        salePrice
-        variations {
-          nodes {
-            id
-            stockStatus
-            stockQuantity
-            price
-            regularPrice
-            salePrice
-            image {
-              sourceUrl
-            }
-          }
+        ... on ExternalProduct {
+          price
+          regularPrice
         }
-        attributes {
-          nodes {
-            name
-            options
-            # Fetch color hex values if available in the custom fields
-            customFields {
-              colorHex
-            }
-          }
+        ... on GroupProduct {
+          price
+          regularPrice
         }
       }
     }
   }
-}
-
 `;
+
 
 /**
  * Fetch first 4 products from a specific category
@@ -170,47 +174,93 @@ export const FETCH_ALL_CATEGORIES_QUERY = gql`
 `;
 
 export const GET_PRODUCTS_FROM_CATEGORY = gql`
-  query ProductsFromCategory($id: ID!) {
-    productCategory(id: $id, idType: SLUG) {
-      id
-      name
-      products(first: 50) {
-        nodes {
-          id
-          name
-          slug
-          description
-          image {
+query ProductsFromCategory($id: ID!) {
+  productCategory(id: $id, idType: SLUG) {
+    id
+    name
+    products(first: 50) {
+      nodes {
+        id
+        name
+        slug
+        description
+        image {
+          sourceUrl
+        }
+        galleryImages {
+          nodes {
             sourceUrl
           }
-          galleryImages {
+        }
+        onSale
+        ... on SimpleProduct {
+          price
+          regularPrice
+          salePrice
+        }
+        ... on VariableProduct {
+          price
+          regularPrice
+          salePrice
+          variations {
             nodes {
-              sourceUrl
-            }
-          }
-          onSale
-          ... on SimpleProduct {
-            price
-            regularPrice
-            salePrice
-          }
-          ... on VariableProduct {
-            price
-            regularPrice
-            salePrice
-            variations {
-              nodes {
-                price
-                regularPrice
-                salePrice
-              }
+              price
+              regularPrice
+              salePrice
             }
           }
         }
       }
     }
   }
+  allPaKolor {
+    nodes {
+      name
+    }
+  }
+  allPaMaterial {
+    nodes {
+      name
+    }
+  }
+  allPaRozstaw {
+    nodes {
+      name
+    }
+  }
+  allPaStyl {
+    nodes {
+      name
+    }
+  }
+  allPaKulka {
+    nodes {
+      name
+    }
+  }
+  allPaWzor {
+    nodes {
+      name
+    }
+  }
+  allPaWielkosc {
+    nodes {
+      name
+    }
+  }
+  allPaTalerzyk {
+    nodes {
+      name
+    }
+  }
+  allPaWariant {
+    nodes {
+      name
+    }
+  }
+}
 `;
+
 
 
 export const GET_CART = gql`

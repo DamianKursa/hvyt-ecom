@@ -35,7 +35,7 @@ const Layout = ({ children, title }: ILayoutProps) => {
   const router = useRouter();
 
   // Define the pages that should not have a margin
-  const noMarginPages = ['/', '/o-nas', '/kolekcje','/hvyt-objects'];
+  const noMarginPages = ['/', '/o-nas','/hvyt-objects'];
 
   // Check if the current page should have a margin or not
   const hasMargin = !noMarginPages.includes(router.pathname);

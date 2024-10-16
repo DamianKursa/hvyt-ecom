@@ -12,7 +12,7 @@ const Kontakt = () => {
 
   return (
     <Layout title="Kontakt">
-      <section className="container mx-auto max-w-grid-desktop px-grid-desktop-margin mt-[115px] pb-[88px] py-16">
+      <section className="container mx-auto max-w-grid-desktop px-grid-desktop-margin pb-[88px] py-16">
         <div className="flex flex-col md:flex-row justify-between rounded-lg overflow-hidden">
           {/* Left Side (Contact Information) */}
           <div className="bg-[#F5F5AD] w-full md:w-4/12 p-8 text-black">

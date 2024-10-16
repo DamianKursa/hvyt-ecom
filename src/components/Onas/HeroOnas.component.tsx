@@ -1,9 +1,9 @@
 import Image from 'next/image';
-import React from 'react';
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const HeroOnas = () => {
-  const imageRef = useRef(null);
+  // Specify the ref type as HTMLDivElement or the specific element type.
+  const imageRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (imageRef.current) {
@@ -44,6 +44,7 @@ const HeroOnas = () => {
         {/* Overlay Image centered with animation */}
         <div
           className="absolute inset-0 flex justify-center items-center"
+          ref={imageRef} // Apply ref to the element you want to animate
           style={{
             transformOrigin: 'center center',
           }}
