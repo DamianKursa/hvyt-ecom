@@ -17,6 +17,7 @@ const ProductPage = () => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
   const [showSnackbar, setShowSnackbar] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +57,12 @@ const ProductPage = () => {
     fetchData();
   }, [slug]);
 
+  const handleQuantityChange = (type: 'increase' | 'decrease') => {
+    setQuantity((prevQuantity) =>
+      type === 'increase' ? prevQuantity + 1 : prevQuantity > 1 ? prevQuantity - 1 : 1
+    );
+  };
+
   if (loading) {
     return (
       <Layout title="Loading...">
@@ -82,10 +89,25 @@ const ProductPage = () => {
     );
   }
 
+  // Gallery images
   const galleryImages = product.images?.map((img: any) => img.src) || [product.image];
 
+  // Product attributes
   const colorAttribute = product.attributes?.find(attr => attr.name === 'pa_kolor');
   const spreadAttribute = product.attributes?.find(attr => attr.name === 'pa_rozstaw');
+
+  // Helper to map color names to actual color codes (adjust this mapping according to available data)
+  const colorMap = {
+    Złoty: '#eded87',
+    Srebrny: '#c6c6c6',
+    Czarny: '#000000',
+    Szary:'#a3a3a3',
+    Różowy:'#edbbd8',
+    Pozostałe:'#c11d51',
+    Niebieski:'#a4dae8',
+    Biały:'#fff'
+
+  };
 
   return (
     <Layout title={product.name}>
@@ -103,73 +125,106 @@ const ProductPage = () => {
 
           {/* Right Side (Product Details) */}
           <div className="lg:w-5/12 flex flex-col gap-6">
-            {/* Price */}
-            <h1 className="text-4xl font-bold">{product.name}</h1>
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-semibold text-red-600">
-                {product.sale_price || product.price} zł
-              </span>
-              {product.sale_price && (
-                <>
-                  <span className="text-sm line-through text-neutral-darkest">
-                    {product.regular_price} zł
-                  </span>
-                  <span className="text-sm text-red-600">Najniższa cena: {product.lowest_price} zł</span>
-                </>
+            {/* Product Name and Price */}
+            <div>
+              <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
+              <div className="flex items-center gap-2">
+                <span className="text-4xl font-bold text-red-700">
+                  {product.sale_price || product.price} zł
+                </span>
+                {product.sale_price && (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-lg line-through text-neutral-darkest">
+                      {product.regular_price} zł
+                    </span>
+                    <span className="text-sm text-red-600">
+                      -{Math.round(((product.regular_price - product.sale_price) / product.regular_price) * 100)}%
+                    </span>
+                  </div>
+                )}
+              </div>
+              {product.lowest_price && (
+                <p className="text-sm text-neutral-dark mt-2">
+                  Najniższa cena w okresie 30 dni przed obniżką: {product.lowest_price} zł
+                </p>
               )}
             </div>
 
-            {/* Color Attribute */}
+            {/* Kolor OK Attribute (Squares with rounded corners in a row) */}
             {colorAttribute && (
               <div>
-                <span className="text-sm font-semibold">Kolor</span>
+                <span className="text-base font-semibold">Kolor:</span>
                 <div className="flex gap-2 mt-2">
                   {colorAttribute.options.map((color: string, index: number) => (
                     <div
                       key={index}
-                      className="w-6 h-6 rounded-full border border-neutral-dark"
-                      style={{ backgroundColor: color }}
+                      className="w-8 h-8 rounded-md border border-neutral-dark"
+                      style={{ backgroundColor: colorMap[color] || '#ccc' }} // Fallback color
                     />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Rozstaw Attribute */}
-            {spreadAttribute && (
-              <div className="mt-4">
-                <span className="text-sm font-semibold">Rozstaw</span>
-                <select className="border rounded w-full mt-2">
-                  {spreadAttribute.options.map((option: string, index: number) => (
-                    <option key={index} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+            {/* Rozstaw Dropdown and Quantity */}
+            <div className="flex items-center mt-4">
+              {spreadAttribute && (
+                <div className="w-7/12 mr-2">
+                  <span className="text-base font-semibold">Rozstaw</span>
+                  <select className="border border-neutral-dark rounded w-full mt-2 py-2 px-3">
+                    {spreadAttribute.options.map((option: string, index: number) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Quantity Control */}
+              <div className="flex items-center w-5/12">
+                <button
+                  className="border border-neutral-dark rounded-full w-8 h-8 flex justify-center items-center"
+                  onClick={() => handleQuantityChange('decrease')}
+                >
+                  -
+                </button>
+                <input
+                  type="text"
+                  value={quantity}
+                  readOnly
+                  className="text-center border border-neutral-dark rounded mx-2 w-12 h-8"
+                />
+                <button
+                  className="border border-neutral-dark rounded-full w-8 h-8 flex justify-center items-center"
+                  onClick={() => handleQuantityChange('increase')}
+                >
+                  +
+                </button>
               </div>
-            )}
+            </div>
 
             {/* Add to Cart and Wishlist */}
-            <div className="mt-4">
-              <input
-                type="number"
-                min="1"
-                defaultValue="1"
-                className="w-16 border rounded text-center"
-              />
-              <button className="w-full py-3 mt-4 text-lg font-semibold text-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors">
+            <div className="flex items-center mt-4">
+              <button className="w-4/5 py-3 text-lg font-semibold text-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors">
                 Dodaj do koszyka
               </button>
-              <button className="mt-4 py-3 w-full text-lg font-semibold text-black border border-neutral-dark rounded-full">
-                Dodaj do listy życzeń
+              <button className="w-1/5 ml-4 text-lg p-3 border rounded-full border-neutral-dark text-neutral-dark hover:text-red-600 hover:border-red-600 flex justify-center items-center">
+                <i className="fas fa-heart"></i>
               </button>
             </div>
 
-            {/* Additional Info */}
-            <ul className="mt-6 list-disc ml-5 text-sm">
-              <li>Wysyłka w 24h</li>
-              <li>30 dni na zwrot</li>
-              <li>Najlepsza jakość gwarantowana</li>
+            {/* Extra Information */}
+            <ul className="mt-6 space-y-2 text-sm text-neutral-dark">
+              <li className="flex items-center">
+                <i className="fas fa-truck mr-2"></i> Wysyłka w 24h
+              </li>
+              <li className="flex items-center">
+                <i className="fas fa-undo mr-2"></i> 30 dni na zwrot
+              </li>
+              <li className="flex items-center">
+                <i className="fas fa-star mr-2"></i> Sprawdź produkty najczęściej kupowane razem
+              </li>
             </ul>
           </div>
         </div>
@@ -187,7 +242,6 @@ const ProductPage = () => {
         <div className="mt-10">
           <h2 className="text-2xl font-semibold mb-4">Najczęściej kupowane razem</h2>
           <div className="flex space-x-4">
-            {/* Displaying products horizontally */}
             {/* Add product preview components here */}
           </div>
         </div>
