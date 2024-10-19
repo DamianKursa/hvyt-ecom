@@ -6,6 +6,7 @@ import Snackbar from '@/components/UI/Snackbar.component';
 import SkeletonProductPage from '@/components/Product/SkeletonProductPage.component';
 import { fetchProductBySlug, fetchMediaById } from '@/utils/api/woocommerce';
 import DOMPurify from 'dompurify'; // For sanitizing HTML
+import Image from 'next/image';
 
 const ProductPage = () => {
   const { query } = useRouter();
@@ -18,6 +19,12 @@ const ProductPage = () => {
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [isExpanded, setIsExpanded] = useState(false); // For expanding Szczegóły produktu
+  const [toggleFields, setToggleFields] = useState({
+    wymiary: false,
+    informacjeDodatkowe: false,
+    karta: false,
+  }); // Toggles for each additional field
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,7 +33,6 @@ const ProductPage = () => {
       try {
         setLoading(true);
 
-        // Fetch product by slug
         const productData = await fetchProductBySlug(slug);
         if (!productData) {
           setErrorMessage('No product found');
@@ -36,7 +42,6 @@ const ProductPage = () => {
           return;
         }
 
-        // Fetch product's featured media (if needed)
         if (productData.featured_media) {
           const featuredImage = await fetchMediaById(productData.featured_media);
           productData.image = featuredImage;
@@ -61,6 +66,17 @@ const ProductPage = () => {
     setQuantity((prevQuantity) =>
       type === 'increase' ? prevQuantity + 1 : prevQuantity > 1 ? prevQuantity - 1 : 1
     );
+  };
+
+  const handleToggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const toggleField = (field: 'wymiary' | 'informacjeDodatkowe' | 'karta') => {
+    setToggleFields((prevState) => ({
+      ...prevState,
+      [field]: !prevState[field],
+    }));
   };
 
   if (loading) {
@@ -89,44 +105,123 @@ const ProductPage = () => {
     );
   }
 
-  // Gallery images
   const galleryImages = product.images?.map((img: any) => img.src) || [product.image];
 
-  // Product attributes
-  const colorAttribute = product.attributes?.find(attr => attr.name === 'pa_kolor');
-  const spreadAttribute = product.attributes?.find(attr => attr.name === 'pa_rozstaw');
+  const colorAttribute = product.attributes?.find((attr) => attr.name === 'pa_kolor');
+  const spreadAttribute = product.attributes?.find((attr) => attr.name === 'pa_rozstaw');
+  const variantAttribute = product.attributes?.find((attr) => attr.name === 'pa_wariant');
 
-  // Helper to map color names to actual color codes (adjust this mapping according to available data)
   const colorMap = {
     Złoty: '#eded87',
     Srebrny: '#c6c6c6',
     Czarny: '#000000',
-    Szary:'#a3a3a3',
-    Różowy:'#edbbd8',
-    Pozostałe:'#c11d51',
-    Niebieski:'#a4dae8',
-    Biały:'#fff'
-
+    Szary: '#a3a3a3',
+    Różowy: '#edbbd8',
+    Pozostałe: '#c11d51',
+    Niebieski: '#a4dae8',
+    Biały: '#fff',
   };
 
   return (
     <Layout title={product.name}>
       <section className="container mx-auto py-12 max-w-grid-desktop px-grid-desktop-margin">
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
-          {/* Left Side (Gallery Section) */}
-          <div className="lg:w-7/12 flex flex-col gap-6">
+          {/* Gallery Section: 80% width */}
+          <div className="lg:w-8/12 flex flex-col gap-6">
             <SingleProductGallery
               images={galleryImages.map((src: string) => ({
-                id: src || "default-id",
-                sourceUrl: src || "/placeholder.jpg",
+                id: src || 'default-id',
+                sourceUrl: src || '/placeholder.jpg',
               }))}
             />
+
+            {/* Szczegóły produktu with Expand/Collapse */}
+            {product.meta_data?.find((meta: any) => meta.key === 'szczegoly_produktu') && (
+              <div className="mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Szczegóły produktu</h2>
+                <div
+                  className={`text-neutral-darkest transition-all ${
+                    isExpanded ? 'max-h-full' : 'max-h-[6rem] overflow-hidden'
+                  }`}
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(
+                      product.meta_data.find((meta: any) => meta.key === 'szczegoly_produktu').value
+                    ),
+                  }}
+                />
+                <button
+                  className="text-black underline mt-2"
+                  onClick={handleToggleExpand}
+                  style={{ background: 'none', border: 'none' }}
+                >
+                  {isExpanded ? 'Zwiń' : 'Rozwiń'}
+                </button>
+              </div>
+            )}
+
+            {/* Toggleable Additional Fields */}
+            <div className="mt-4">
+              {/* Wymiary */}
+              {product.meta_data?.find((meta: any) => meta.key === 'wymiary') && (
+                <>
+                  <div
+                    className="cursor-pointer border-b border-neutral-light pb-2 mb-2"
+                    onClick={() => toggleField('wymiary')}
+                  >
+                    <h3 className="text-lg font-semibold">Wymiary</h3>
+                  </div>
+                  {toggleFields.wymiary && (
+                    <p className="text-neutral-darkest">
+                      {DOMPurify.sanitize(
+                        product.meta_data.find((meta: any) => meta.key === 'wymiary').value
+                      )}
+                    </p>
+                  )}
+                </>
+              )}
+
+              {/* Informacje dodatkowe */}
+              {product.meta_data?.find((meta: any) => meta.key === 'informacje_dodatkowe') && (
+                <>
+                  <div
+                    className="cursor-pointer border-b border-neutral-light pb-2 mb-2"
+                    onClick={() => toggleField('informacjeDodatkowe')}
+                  >
+                    <h3 className="text-lg font-semibold">Informacje dodatkowe</h3>
+                  </div>
+                  {toggleFields.informacjeDodatkowe && (
+                    <p className="text-neutral-darkest">
+                      {DOMPurify.sanitize(
+                        product.meta_data.find((meta: any) => meta.key === 'informacje_dodatkowe').value
+                      )}
+                    </p>
+                  )}
+                </>
+              )}
+
+              {/* Karta produktu i model 3D */}
+              {product.meta_data?.find((meta: any) => meta.key === 'karta') && (
+                <>
+                  <div
+                    className="cursor-pointer border-b border-neutral-light pb-2 mb-2"
+                    onClick={() => toggleField('karta')}
+                  >
+                    <h3 className="text-lg font-semibold">Karta produktu i model 3D</h3>
+                  </div>
+                  {toggleFields.karta && (
+                    <p className="text-neutral-darkest">
+                      {DOMPurify.sanitize(product.meta_data.find((meta: any) => meta.key === 'karta').value)}
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
           </div>
 
-          {/* Right Side (Product Details) */}
-          <div className="lg:w-5/12 flex flex-col gap-6">
+          {/* Product Details Section (right side) */}
+          <div className="lg:w-4/12 flex flex-col gap-6">
             {/* Product Name and Price */}
-            <div>
+            <div className="w-full">
               <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
               <div className="flex items-center gap-2">
                 <span className="text-4xl font-bold text-red-700">
@@ -150,7 +245,7 @@ const ProductPage = () => {
               )}
             </div>
 
-            {/* Kolor OK Attribute (Squares with rounded corners in a row) */}
+            {/* Kolor OK Attribute */}
             {colorAttribute && (
               <div>
                 <span className="text-base font-semibold">Kolor:</span>
@@ -159,16 +254,16 @@ const ProductPage = () => {
                     <div
                       key={index}
                       className="w-8 h-8 rounded-md border border-neutral-dark"
-                      style={{ backgroundColor: colorMap[color] || '#ccc' }} // Fallback color
+                      style={{ backgroundColor: colorMap[color] || '#ccc' }}
                     />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Rozstaw Dropdown and Quantity */}
+            {/* Rozstaw Dropdown or Wariant Fallback */}
             <div className="flex items-center mt-4">
-              {spreadAttribute && (
+              {spreadAttribute ? (
                 <div className="w-7/12 mr-2">
                   <span className="text-base font-semibold">Rozstaw</span>
                   <select className="border border-neutral-dark rounded w-full mt-2 py-2 px-3">
@@ -179,6 +274,19 @@ const ProductPage = () => {
                     ))}
                   </select>
                 </div>
+              ) : (
+                variantAttribute && (
+                  <div className="w-7/12 mr-2">
+                    <span className="text-base font-semibold">Wariant</span>
+                    <select className="border border-neutral-dark rounded w-full mt-2 py-2 px-3">
+                      {variantAttribute.options.map((option: string, index: number) => (
+                        <option key={index} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )
               )}
 
               {/* Quantity Control */}
@@ -205,48 +313,17 @@ const ProductPage = () => {
             </div>
 
             {/* Add to Cart and Wishlist */}
-            <div className="flex items-center mt-4">
-              <button className="w-4/5 py-3 text-lg font-semibold text-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors">
+            <div className="flex items-center mt-4 space-x-4">
+              <button className="w-4/5 py-3 text-lg font-semibold text-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors flex justify-between items-center">
                 Dodaj do koszyka
+                <Image src="/icons/dodaj-do-koszyka.svg" alt="Add to Cart" width={24} height={24} />
               </button>
-              <button className="w-1/5 ml-4 text-lg p-3 border rounded-full border-neutral-dark text-neutral-dark hover:text-red-600 hover:border-red-600 flex justify-center items-center">
-                <i className="fas fa-heart"></i>
+              <button className="w-1/5 p-3 border rounded-full border-neutral-dark text-neutral-dark hover:text-red-600 hover:border-red-600 flex justify-center items-center">
+                <Image src="/icons/wishlist.svg" alt="Wishlist" width={24} height={24} />
               </button>
             </div>
-
-            {/* Extra Information */}
-            <ul className="mt-6 space-y-2 text-sm text-neutral-dark">
-              <li className="flex items-center">
-                <i className="fas fa-truck mr-2"></i> Wysyłka w 24h
-              </li>
-              <li className="flex items-center">
-                <i className="fas fa-undo mr-2"></i> 30 dni na zwrot
-              </li>
-              <li className="flex items-center">
-                <i className="fas fa-star mr-2"></i> Sprawdź produkty najczęściej kupowane razem
-              </li>
-            </ul>
           </div>
         </div>
-
-        {/* Detailed Product Info (Expandable Sections) */}
-        <div className="mt-10">
-          <h2 className="text-2xl font-semibold mb-4">Szczegóły produktu</h2>
-          <div
-            className="text-sm text-neutral-darkest leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.description) }}
-          />
-        </div>
-
-        {/* "Frequently Bought Together" Section */}
-        <div className="mt-10">
-          <h2 className="text-2xl font-semibold mb-4">Najczęściej kupowane razem</h2>
-          <div className="flex space-x-4">
-            {/* Add product preview components here */}
-          </div>
-        </div>
-
-        {/* Snackbar for messages */}
         {showSnackbar && <Snackbar message={snackbarMessage} type={snackbarType} visible={showSnackbar} />}
       </section>
     </Layout>
