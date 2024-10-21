@@ -1,5 +1,3 @@
-// interfaces.ts
-
 export interface ProductAttribute {
   name: string;
   options: string[];
@@ -23,6 +21,11 @@ export interface Product {
       };
     }[];
   };
+  meta_data?: {
+    key: string;
+    value: string;
+  }[];
+  lowest_price?: string;
 }
 
 export interface Kolekcja {

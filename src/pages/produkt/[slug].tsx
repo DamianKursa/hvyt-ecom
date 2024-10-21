@@ -7,24 +7,19 @@ import SkeletonProductPage from '@/components/Product/SkeletonProductPage.compon
 import { fetchProductBySlug, fetchMediaById } from '@/utils/api/woocommerce';
 import DOMPurify from 'dompurify'; // For sanitizing HTML
 import Image from 'next/image';
+import { Product } from '@/utils/functions/interfaces'; // Assuming your interfaces file is in /src/interfaces
 
 const ProductPage = () => {
   const { query } = useRouter();
   const slug = query.slug as string;
 
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [isExpanded, setIsExpanded] = useState(false); // For expanding Szczegóły produktu
-  const [toggleFields, setToggleFields] = useState({
-    wymiary: false,
-    informacjeDodatkowe: false,
-    karta: false,
-  }); // Toggles for each additional field
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,6 +28,7 @@ const ProductPage = () => {
       try {
         setLoading(true);
 
+        // Fetch product by slug
         const productData = await fetchProductBySlug(slug);
         if (!productData) {
           setErrorMessage('No product found');
@@ -42,6 +38,7 @@ const ProductPage = () => {
           return;
         }
 
+        // Fetch product's featured media (if needed)
         if (productData.featured_media) {
           const featuredImage = await fetchMediaById(productData.featured_media);
           productData.image = featuredImage;
@@ -66,17 +63,6 @@ const ProductPage = () => {
     setQuantity((prevQuantity) =>
       type === 'increase' ? prevQuantity + 1 : prevQuantity > 1 ? prevQuantity - 1 : 1
     );
-  };
-
-  const handleToggleExpand = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  const toggleField = (field: 'wymiary' | 'informacjeDodatkowe' | 'karta') => {
-    setToggleFields((prevState) => ({
-      ...prevState,
-      [field]: !prevState[field],
-    }));
   };
 
   if (loading) {
@@ -105,13 +91,15 @@ const ProductPage = () => {
     );
   }
 
-  const galleryImages = product.images?.map((img: any) => img.src) || [product.image];
+  const galleryImages = product.variations?.nodes
+    ?.map((variation) => variation?.image?.sourceUrl)
+    .filter(Boolean) || [product.image];
 
-  const colorAttribute = product.attributes?.find((attr) => attr.name === 'pa_kolor');
-  const spreadAttribute = product.attributes?.find((attr) => attr.name === 'pa_rozstaw');
-  const variantAttribute = product.attributes?.find((attr) => attr.name === 'pa_wariant');
+  const colorAttribute = product.attributes?.nodes?.find((attr) => attr.name === 'Kolor OK');
+  const spreadAttribute = product.attributes?.nodes?.find((attr) => attr.name === 'pa_rozstaw');
+  const variantAttribute = product.attributes?.nodes?.find((attr) => attr.name === 'pa_wariant');
 
-  const colorMap = {
+  const colorMap: { [key: string]: string } = {
     Złoty: '#eded87',
     Srebrny: '#c6c6c6',
     Czarny: '#000000',
@@ -129,111 +117,73 @@ const ProductPage = () => {
           {/* Gallery Section: 80% width */}
           <div className="lg:w-8/12 flex flex-col gap-6">
             <SingleProductGallery
-              images={galleryImages.map((src: string) => ({
+              images={galleryImages.map((src) => ({
                 id: src || 'default-id',
                 sourceUrl: src || '/placeholder.jpg',
               }))}
             />
 
-            {/* Szczegóły produktu with Expand/Collapse */}
-            {product.meta_data?.find((meta: any) => meta.key === 'szczegoly_produktu') && (
+            {/* Szczegóły produktu */}
+            {product.meta_data?.find((meta) => meta.key === 'szczegoly_produktu') && (
               <div className="mt-6">
                 <h2 className="text-2xl font-semibold mb-4">Szczegóły produktu</h2>
-                <div
-                  className={`text-neutral-darkest transition-all ${
-                    isExpanded ? 'max-h-full' : 'max-h-[6rem] overflow-hidden'
-                  }`}
-                  dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(
-                      product.meta_data.find((meta: any) => meta.key === 'szczegoly_produktu').value
-                    ),
-                  }}
-                />
-                <button
-                  className="text-black underline mt-2"
-                  onClick={handleToggleExpand}
-                  style={{ background: 'none', border: 'none' }}
-                >
-                  {isExpanded ? 'Zwiń' : 'Rozwiń'}
-                </button>
+                <p className="text-neutral-darkest">
+                  {DOMPurify.sanitize(
+                    product.meta_data.find((meta) => meta.key === 'szczegoly_produktu')!.value
+                  )}
+                </p>
               </div>
             )}
 
-            {/* Toggleable Additional Fields */}
-            <div className="mt-4">
-              {/* Wymiary */}
-              {product.meta_data?.find((meta: any) => meta.key === 'wymiary') && (
-                <>
-                  <div
-                    className="cursor-pointer border-b border-neutral-light pb-2 mb-2"
-                    onClick={() => toggleField('wymiary')}
-                  >
-                    <h3 className="text-lg font-semibold">Wymiary</h3>
-                  </div>
-                  {toggleFields.wymiary && (
-                    <p className="text-neutral-darkest">
-                      {DOMPurify.sanitize(
-                        product.meta_data.find((meta: any) => meta.key === 'wymiary').value
-                      )}
-                    </p>
-                  )}
-                </>
-              )}
+            {/* Wymiary */}
+            {product.meta_data?.find((meta) => meta.key === 'wymiary') && (
+              <div className="mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Wymiary</h2>
+                <p className="text-neutral-darkest">
+                  {DOMPurify.sanitize(product.meta_data.find((meta) => meta.key === 'wymiary')!.value)}
+                </p>
+              </div>
+            )}
 
-              {/* Informacje dodatkowe */}
-              {product.meta_data?.find((meta: any) => meta.key === 'informacje_dodatkowe') && (
-                <>
-                  <div
-                    className="cursor-pointer border-b border-neutral-light pb-2 mb-2"
-                    onClick={() => toggleField('informacjeDodatkowe')}
-                  >
-                    <h3 className="text-lg font-semibold">Informacje dodatkowe</h3>
-                  </div>
-                  {toggleFields.informacjeDodatkowe && (
-                    <p className="text-neutral-darkest">
-                      {DOMPurify.sanitize(
-                        product.meta_data.find((meta: any) => meta.key === 'informacje_dodatkowe').value
-                      )}
-                    </p>
+            {/* Informacje dodatkowe */}
+            {product.meta_data?.find((meta) => meta.key === 'informacje_dodatkowe') && (
+              <div className="mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Informacje dodatkowe</h2>
+                <p className="text-neutral-darkest">
+                  {DOMPurify.sanitize(
+                    product.meta_data.find((meta) => meta.key === 'informacje_dodatkowe')!.value
                   )}
-                </>
-              )}
+                </p>
+              </div>
+            )}
 
-              {/* Karta produktu i model 3D */}
-              {product.meta_data?.find((meta: any) => meta.key === 'karta') && (
-                <>
-                  <div
-                    className="cursor-pointer border-b border-neutral-light pb-2 mb-2"
-                    onClick={() => toggleField('karta')}
-                  >
-                    <h3 className="text-lg font-semibold">Karta produktu i model 3D</h3>
-                  </div>
-                  {toggleFields.karta && (
-                    <p className="text-neutral-darkest">
-                      {DOMPurify.sanitize(product.meta_data.find((meta: any) => meta.key === 'karta').value)}
-                    </p>
-                  )}
-                </>
-              )}
-            </div>
+            {/* Karta produktu i model 3D */}
+            {product.meta_data?.find((meta) => meta.key === 'karta') && (
+              <div className="mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Karta produktu i model 3D</h2>
+                <p className="text-neutral-darkest">
+                  {DOMPurify.sanitize(product.meta_data.find((meta) => meta.key === 'karta')!.value)}
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* Product Details Section (right side) */}
+          {/* Product Details: 20% width */}
           <div className="lg:w-4/12 flex flex-col gap-6">
             {/* Product Name and Price */}
             <div className="w-full">
               <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
               <div className="flex items-center gap-2">
                 <span className="text-4xl font-bold text-red-700">
-                  {product.sale_price || product.price} zł
+                  {product.salePrice || product.price} zł
                 </span>
-                {product.sale_price && (
+                {product.salePrice && product.regularPrice && (
                   <div className="flex items-center space-x-2">
                     <span className="text-lg line-through text-neutral-darkest">
-                      {product.regular_price} zł
+                      {product.regularPrice} zł
                     </span>
                     <span className="text-sm text-red-600">
-                      -{Math.round(((product.regular_price - product.sale_price) / product.regular_price) * 100)}%
+                      -{Math.round(((+product.regularPrice - +product.salePrice) / +product.regularPrice) * 100)}%
                     </span>
                   </div>
                 )}
@@ -321,6 +271,30 @@ const ProductPage = () => {
               <button className="w-1/5 p-3 border rounded-full border-neutral-dark text-neutral-dark hover:text-red-600 hover:border-red-600 flex justify-center items-center">
                 <Image src="/icons/wishlist.svg" alt="Wishlist" width={24} height={24} />
               </button>
+            </div>
+
+            {/* Extra Information */}
+            <div className="border rounded-md border-biege-dark p-4 mt-6 text-neutral-dark text-lg font-light space-y-4">
+              <ul className="space-y-2">
+                <li className="flex justify-between items-center border-b border-neutral-light w-4/5 pb-2">
+                  <div className="flex items-center">
+                    <Image src="/icons/wysylka-w-24.svg" alt="Wysyłka w 24h" width={24} height={24} />
+                    <span className="ml-4 text-black" style={{ fontSize: '27px', fontWeight: 300 }}>Wysyłka w 24h</span>
+                  </div>
+                </li>
+                <li className="flex justify-between items-center border-b border-neutral-light w-4/5 pb-2">
+                  <div className="flex items-center">
+                    <Image src="/icons/zwrot.svg" alt="Zwrot" width={24} height={24} />
+                    <span className="ml-4 text-black" style={{ fontSize: '27px', fontWeight: 300 }}>30 dni na zwrot</span>
+                  </div>
+                </li>
+                <li className="flex justify-between items-center w-4/5">
+                  <div className="flex items-center">
+                    <Image src="/icons/kupowane-razem.svg" alt="Najczęściej kupowane razem" width={24} height={24} />
+                    <span className="ml-4 text-black" style={{ fontSize: '27px', fontWeight: 300 }}>Najczęściej kupowane razem</span>
+                  </div>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
