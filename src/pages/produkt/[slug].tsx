@@ -5,7 +5,7 @@ import SingleProductGallery from '@/components/Product/SingleProductGallery.comp
 import Snackbar from '@/components/UI/Snackbar.component';
 import SkeletonProductPage from '@/components/Product/SkeletonProductPage.component';
 import { fetchProductBySlug, fetchMediaById } from '@/utils/api/woocommerce';
-import DOMPurify from 'dompurify';
+import DOMPurify from 'dompurify'; // For sanitizing HTML
 import Image from 'next/image';
 import { Product, ProductAttribute } from '@/utils/functions/interfaces';
 
@@ -21,7 +21,7 @@ const ProductPage = () => {
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [selectedAttributes, setSelectedAttributes] = useState<{ [key: string]: string }>({});
-  const [selectedVariation, setSelectedVariation] = useState<any | null>(null);
+  const [selectedVariation, setSelectedVariation] = useState<Product['baselinker_variations'][0] | null>(null); // For selecting variations
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,6 +45,17 @@ const ProductPage = () => {
           const featuredImage = await fetchMediaById(productData.featured_media);
           productData.image = featuredImage;
         }
+
+        // Add variations from baselinker
+        productData.variations = productData.baselinker_variations?.map((variation: Product['baselinker_variations'][0]) => ({
+          id: variation.id,
+          sku: variation.sku,
+          price: variation.price,
+          regular_price: variation.regular_price,
+          sale_price: variation.sale_price,
+          image: variation.image,
+          attributes: variation.attributes,
+        }));
 
         setProduct(productData);
       } catch (error) {
@@ -81,6 +92,12 @@ const ProductPage = () => {
     }
   }, [selectedAttributes, product]);
 
+  const handleQuantityChange = (type: 'increase' | 'decrease') => {
+    setQuantity((prevQuantity) =>
+      type === 'increase' ? prevQuantity + 1 : prevQuantity > 1 ? prevQuantity - 1 : 1
+    );
+  };
+
   if (loading) {
     return (
       <Layout title="Loading...">
@@ -114,6 +131,25 @@ const ProductPage = () => {
     ? product.images.map((img, index) => ({ id: `image-${index}`, sourceUrl: img.src }))
     : [{ id: 'default-id', sourceUrl: product.image }];
 
+  // Find Kolor attribute
+  const colorAttribute: ProductAttribute | undefined = product.attributes.find(
+    (attr: ProductAttribute) => attr.name === 'Kolor OK'
+  );
+
+  // Determine if variations are available
+  const variationsAvailable = product.baselinker_variations && product.baselinker_variations.length > 0;
+
+  const colorMap: { [key: string]: string } = {
+    Złoty: '#eded87',
+    Srebrny: '#c6c6c6',
+    Czarny: '#000000',
+    Szary: '#a3a3a3',
+    Różowy: '#edbbd8',
+    Pozostałe: '#c11d51',
+    Niebieski: '#a4dae8',
+    Biały: '#fff',
+  };
+
   // Find distinct attributes for all variations
   const distinctAttributes = product.baselinker_variations
     ?.flatMap((variation) => variation.attributes.map((attr) => attr.name))
@@ -134,6 +170,54 @@ const ProductPage = () => {
           {/* Gallery Section */}
           <div className="lg:w-8/12 flex flex-col gap-6">
             <SingleProductGallery images={galleryImages} />
+
+            {/* Szczegóły produktu */}
+            {product.meta_data?.find((meta) => meta.key === 'szczegoly_produktu') && (
+              <div className="mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Szczegóły produktu</h2>
+                <p className="text-neutral-darkest">
+                  {DOMPurify.sanitize(
+                    product.meta_data.find((meta) => meta.key === 'szczegoly_produktu')?.value || ''
+                  )}
+                </p>
+              </div>
+            )}
+
+            {/* Wymiary */}
+            {product.meta_data?.find((meta) => meta.key === 'wymiary') && (
+              <div className="mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Wymiary</h2>
+                <p className="text-neutral-darkest">
+                  {DOMPurify.sanitize(
+                    product.meta_data.find((meta) => meta.key === 'wymiary')?.value || ''
+                  )}
+                </p>
+              </div>
+            )}
+
+            {/* Informacje dodatkowe */}
+            {product.meta_data?.find((meta) => meta.key === 'informacje_dodatkowe') && (
+              <div className="mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Informacje dodatkowe</h2>
+                <p className="text-neutral-darkest">
+                  {DOMPurify.sanitize(
+                    product.meta_data.find((meta) => meta.key === 'informacje_dodatkowe')?.value || ''
+                  )}
+                </p>
+              </div>
+            )}
+
+            {/* Karta Produktu */}
+            {product.meta_data?.find((meta) => meta.key === 'karta_produktu') && (
+              <div className="mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Karta Produktu</h2>
+                <p className="text-neutral-darkest">
+                  {DOMPurify.sanitize(
+                    product.meta_data.find((meta) => meta.key === 'karta_produktu')?.value || ''
+                  )}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Product Details */}
