@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout/Layout.component';
 import SingleProductGallery from '@/components/Product/SingleProductGallery.component';
 import Snackbar from '@/components/UI/Snackbar.component';
 import SkeletonProductPage from '@/components/Product/SkeletonProductPage.component';
 import { fetchProductBySlug, fetchMediaById } from '@/utils/api/woocommerce';
-import DOMPurify from 'dompurify'; // For sanitizing HTML
+import DOMPurify from 'dompurify';
 import Image from 'next/image';
-import { Product } from '@/utils/functions/interfaces'; // Assuming your interfaces file is in /src/interfaces
+import { Product, ProductAttribute } from '@/utils/functions/interfaces';
 
 const ProductPage = () => {
   const { query } = useRouter();
@@ -20,6 +20,8 @@ const ProductPage = () => {
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [selectedAttributes, setSelectedAttributes] = useState<{ [key: string]: string }>({});
+  const [selectedVariation, setSelectedVariation] = useState<any | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,11 +61,25 @@ const ProductPage = () => {
     fetchData();
   }, [slug]);
 
-  const handleQuantityChange = (type: 'increase' | 'decrease') => {
-    setQuantity((prevQuantity) =>
-      type === 'increase' ? prevQuantity + 1 : prevQuantity > 1 ? prevQuantity - 1 : 1
-    );
+  // Handle attribute selection change
+  const handleAttributeChange = (attributeName: string, value: string) => {
+    setSelectedAttributes((prev) => ({
+      ...prev,
+      [attributeName]: value,
+    }));
   };
+
+  // Find the matching variation based on selected attributes
+  useEffect(() => {
+    if (product?.baselinker_variations && Object.keys(selectedAttributes).length > 0) {
+      const variation = product.baselinker_variations.find((v) =>
+        v.attributes.every(
+          (attr) => selectedAttributes[attr.name] === attr.option
+        )
+      );
+      setSelectedVariation(variation || null);
+    }
+  }, [selectedAttributes, product]);
 
   if (loading) {
     return (
@@ -91,176 +107,65 @@ const ProductPage = () => {
     );
   }
 
-  const galleryImages = product.variations?.nodes
-    ?.map((variation) => variation?.image?.sourceUrl)
-    .filter(Boolean) || [product.image];
+  // Handle product gallery images
+  const galleryImages = selectedVariation?.image?.src
+    ? [{ id: selectedVariation?.id || 'variation-default', sourceUrl: selectedVariation?.image?.src || '' }]
+    : product.images && product.images.length > 0
+    ? product.images.map((img, index) => ({ id: `image-${index}`, sourceUrl: img.src }))
+    : [{ id: 'default-id', sourceUrl: product.image }];
 
-  const colorAttribute = product.attributes?.nodes?.find((attr) => attr.name === 'Kolor OK');
-  const spreadAttribute = product.attributes?.nodes?.find((attr) => attr.name === 'pa_rozstaw');
-  const variantAttribute = product.attributes?.nodes?.find((attr) => attr.name === 'pa_wariant');
+  // Find distinct attributes for all variations
+  const distinctAttributes = product.baselinker_variations
+    ?.flatMap((variation) => variation.attributes.map((attr) => attr.name))
+    .filter((value, index, self) => self.indexOf(value) === index); // Get distinct attribute names
 
-  const colorMap: { [key: string]: string } = {
-    Złoty: '#eded87',
-    Srebrny: '#c6c6c6',
-    Czarny: '#000000',
-    Szary: '#a3a3a3',
-    Różowy: '#edbbd8',
-    Pozostałe: '#c11d51',
-    Niebieski: '#a4dae8',
-    Biały: '#fff',
+  // Get unique options for each attribute
+  const getUniqueOptions = (attributeName: string) => {
+    const options = product.baselinker_variations
+      ?.flatMap((variation) => variation.attributes.filter((attr) => attr.name === attributeName))
+      .map((attr) => attr.option);
+    return Array.from(new Set(options)); // Remove duplicates
   };
 
   return (
     <Layout title={product.name}>
       <section className="container mx-auto py-12 max-w-grid-desktop px-grid-desktop-margin">
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
-          {/* Gallery Section: 80% width */}
+          {/* Gallery Section */}
           <div className="lg:w-8/12 flex flex-col gap-6">
-            <SingleProductGallery
-              images={galleryImages.map((src) => ({
-                id: src || 'default-id',
-                sourceUrl: src || '/placeholder.jpg',
-              }))}
-            />
-
-            {/* Szczegóły produktu */}
-            {product.meta_data?.find((meta) => meta.key === 'szczegoly_produktu') && (
-              <div className="mt-6">
-                <h2 className="text-2xl font-semibold mb-4">Szczegóły produktu</h2>
-                <p className="text-neutral-darkest">
-                  {DOMPurify.sanitize(
-                    product.meta_data.find((meta) => meta.key === 'szczegoly_produktu')!.value
-                  )}
-                </p>
-              </div>
-            )}
-
-            {/* Wymiary */}
-            {product.meta_data?.find((meta) => meta.key === 'wymiary') && (
-              <div className="mt-6">
-                <h2 className="text-2xl font-semibold mb-4">Wymiary</h2>
-                <p className="text-neutral-darkest">
-                  {DOMPurify.sanitize(product.meta_data.find((meta) => meta.key === 'wymiary')!.value)}
-                </p>
-              </div>
-            )}
-
-            {/* Informacje dodatkowe */}
-            {product.meta_data?.find((meta) => meta.key === 'informacje_dodatkowe') && (
-              <div className="mt-6">
-                <h2 className="text-2xl font-semibold mb-4">Informacje dodatkowe</h2>
-                <p className="text-neutral-darkest">
-                  {DOMPurify.sanitize(
-                    product.meta_data.find((meta) => meta.key === 'informacje_dodatkowe')!.value
-                  )}
-                </p>
-              </div>
-            )}
-
-            {/* Karta produktu i model 3D */}
-            {product.meta_data?.find((meta) => meta.key === 'karta') && (
-              <div className="mt-6">
-                <h2 className="text-2xl font-semibold mb-4">Karta produktu i model 3D</h2>
-                <p className="text-neutral-darkest">
-                  {DOMPurify.sanitize(product.meta_data.find((meta) => meta.key === 'karta')!.value)}
-                </p>
-              </div>
-            )}
+            <SingleProductGallery images={galleryImages} />
           </div>
 
-          {/* Product Details: 20% width */}
+          {/* Product Details */}
           <div className="lg:w-4/12 flex flex-col gap-6">
             {/* Product Name and Price */}
             <div className="w-full">
               <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
               <div className="flex items-center gap-2">
                 <span className="text-4xl font-bold text-red-700">
-                  {product.salePrice || product.price} zł
+                  {selectedVariation?.price || product.price} zł
                 </span>
-                {product.salePrice && product.regularPrice && (
-                  <div className="flex items-center space-x-2">
-                    <span className="text-lg line-through text-neutral-darkest">
-                      {product.regularPrice} zł
-                    </span>
-                    <span className="text-sm text-red-600">
-                      -{Math.round(((+product.regularPrice - +product.salePrice) / +product.regularPrice) * 100)}%
-                    </span>
-                  </div>
-                )}
               </div>
-              {product.lowest_price && (
-                <p className="text-sm text-neutral-dark mt-2">
-                  Najniższa cena w okresie 30 dni przed obniżką: {product.lowest_price} zł
-                </p>
-              )}
             </div>
 
-            {/* Kolor OK Attribute */}
-            {colorAttribute && (
-              <div>
-                <span className="text-base font-semibold">Kolor:</span>
-                <div className="flex gap-2 mt-2">
-                  {colorAttribute.options.map((color: string, index: number) => (
-                    <div
-                      key={index}
-                      className="w-8 h-8 rounded-md border border-neutral-dark"
-                      style={{ backgroundColor: colorMap[color] || '#ccc' }}
-                    />
+            {/* Render Dropdowns for each distinct attribute */}
+            {distinctAttributes?.map((attributeName) => (
+              <div key={attributeName} className="mt-4">
+                <span className="text-base font-semibold">{attributeName}:</span>
+                <select
+                  className="border border-neutral-dark rounded w-full mt-2 py-2 px-3"
+                  onChange={(e) => handleAttributeChange(attributeName, e.target.value)}
+                  value={selectedAttributes[attributeName] || ''}
+                >
+                  <option value="">Wybierz {attributeName}</option>
+                  {getUniqueOptions(attributeName).map((option, index) => (
+                    <option key={`${attributeName}-${index}`} value={option}>
+                      {option}
+                    </option>
                   ))}
-                </div>
+                </select>
               </div>
-            )}
-
-            {/* Rozstaw Dropdown or Wariant Fallback */}
-            <div className="flex items-center mt-4">
-              {spreadAttribute ? (
-                <div className="w-7/12 mr-2">
-                  <span className="text-base font-semibold">Rozstaw</span>
-                  <select className="border border-neutral-dark rounded w-full mt-2 py-2 px-3">
-                    {spreadAttribute.options.map((option: string, index: number) => (
-                      <option key={index} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              ) : (
-                variantAttribute && (
-                  <div className="w-7/12 mr-2">
-                    <span className="text-base font-semibold">Wariant</span>
-                    <select className="border border-neutral-dark rounded w-full mt-2 py-2 px-3">
-                      {variantAttribute.options.map((option: string, index: number) => (
-                        <option key={index} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )
-              )}
-
-              {/* Quantity Control */}
-              <div className="flex items-center w-5/12">
-                <button
-                  className="border border-neutral-dark rounded-full w-8 h-8 flex justify-center items-center"
-                  onClick={() => handleQuantityChange('decrease')}
-                >
-                  -
-                </button>
-                <input
-                  type="text"
-                  value={quantity}
-                  readOnly
-                  className="text-center border border-neutral-dark rounded mx-2 w-12 h-8"
-                />
-                <button
-                  className="border border-neutral-dark rounded-full w-8 h-8 flex justify-center items-center"
-                  onClick={() => handleQuantityChange('increase')}
-                >
-                  +
-                </button>
-              </div>
-            </div>
+            ))}
 
             {/* Add to Cart and Wishlist */}
             <div className="flex items-center mt-4 space-x-4">
@@ -271,30 +176,6 @@ const ProductPage = () => {
               <button className="w-1/5 p-3 border rounded-full border-neutral-dark text-neutral-dark hover:text-red-600 hover:border-red-600 flex justify-center items-center">
                 <Image src="/icons/wishlist.svg" alt="Wishlist" width={24} height={24} />
               </button>
-            </div>
-
-            {/* Extra Information */}
-            <div className="border rounded-md border-biege-dark p-4 mt-6 text-neutral-dark text-lg font-light space-y-4">
-              <ul className="space-y-2">
-                <li className="flex justify-between items-center border-b border-neutral-light w-4/5 pb-2">
-                  <div className="flex items-center">
-                    <Image src="/icons/wysylka-w-24.svg" alt="Wysyłka w 24h" width={24} height={24} />
-                    <span className="ml-4 text-black" style={{ fontSize: '27px', fontWeight: 300 }}>Wysyłka w 24h</span>
-                  </div>
-                </li>
-                <li className="flex justify-between items-center border-b border-neutral-light w-4/5 pb-2">
-                  <div className="flex items-center">
-                    <Image src="/icons/zwrot.svg" alt="Zwrot" width={24} height={24} />
-                    <span className="ml-4 text-black" style={{ fontSize: '27px', fontWeight: 300 }}>30 dni na zwrot</span>
-                  </div>
-                </li>
-                <li className="flex justify-between items-center w-4/5">
-                  <div className="flex items-center">
-                    <Image src="/icons/kupowane-razem.svg" alt="Najczęściej kupowane razem" width={24} height={24} />
-                    <span className="ml-4 text-black" style={{ fontSize: '27px', fontWeight: 300 }}>Najczęściej kupowane razem</span>
-                  </div>
-                </li>
-              </ul>
             </div>
           </div>
         </div>

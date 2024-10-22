@@ -3,6 +3,19 @@ export interface ProductAttribute {
   options: string[];
 }
 
+export interface Variation {
+  id: string;
+  name?: string; // Variations may not always have a name
+  image?: {
+    sourceUrl: string;
+  };
+  attributes?: {
+    id: string;
+    name: string;
+    option: string;
+  }[]; // Some variations may include attributes with options
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -10,22 +23,45 @@ export interface Product {
   salePrice?: string;
   regularPrice?: string;
   description: string;
-  image: string;
-  attributes: {
-    nodes: ProductAttribute[];
-  };
-  variations?: {
-    nodes: {
-      image?: {
-        sourceUrl: string;
-      };
-    }[];
-  };
+  image: string; // Main image
+  images?: {
+    src: string;
+  }[]; // Array of images
+  attributes: ProductAttribute[];
+  variations?: Variation[]; // Array of product variations
   meta_data?: {
     key: string;
     value: string;
   }[];
   lowest_price?: string;
+  baselinker_variations?: Array<{
+    id: number;
+    sku: string;
+    in_stock: boolean;
+    stock_quantity: string;
+    price: number;
+    regular_price: number;
+    sale_price: number;
+    description: string;
+    visible: boolean;
+    manage_stock: boolean;
+    purchasable: boolean;
+    on_sale: boolean;
+    image: {
+      id: number;
+      src: string;
+    };
+    attributes: Array<{
+      id: string;
+      name: string;
+      option: string;
+    }>;
+    weight: string;
+    meta_data: Array<{
+      key: string;
+      value: string;
+    }>;
+  }>;
 }
 
 export interface Kolekcja {
