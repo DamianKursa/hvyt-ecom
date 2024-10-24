@@ -20,7 +20,8 @@ const ProductPage = () => {
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariation, setSelectedVariation] = useState<any | null>(null); // For selecting variations
+  const [selectedAttributes, setSelectedAttributes] = useState<{ [key: string]: string }>({});
+  const [selectedVariation, setSelectedVariation] = useState<Product['baselinker_variations'] extends Array<infer T> ? T | null : null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,19 +46,16 @@ const ProductPage = () => {
           productData.image = featuredImage;
         }
 
-        // Handle baselinker.variations
-        if (productData.baselinker && productData.baselinker.variations) {
-          productData.variations = productData.baselinker_variations?.map((variation: Product['baselinker_variations'][0]) => ({
-            id: variation.id,
-            sku: variation.sku,
-            stock_quantity: variation.stock_quantity,
-            price: variation.price,
-            regularPrice: variation.regular_price,
-            salePrice: variation.sale_price,
-            attributes: variation.attributes,
-            image: variation.image ? { src: variation.image.src } : undefined,
-          }));
-        }
+        // Add variations from baselinker
+        productData.variations = productData.baselinker_variations?.map(variation => ({
+          id: variation.id,
+          sku: variation.sku,
+          price: variation.price,
+          regular_price: variation.regular_price,
+          sale_price: variation.sale_price,
+          image: variation.image,
+          attributes: variation.attributes,
+        }));
 
         setProduct(productData);
       } catch (error) {
@@ -74,18 +72,37 @@ const ProductPage = () => {
     fetchData();
   }, [slug]);
 
+  // Handle attribute selection change
+  const handleAttributeChange = (attributeName: string, value: string) => {
+    setSelectedAttributes((prev) => ({
+      ...prev,
+      [attributeName]: value,
+    }));
+  };
+
+  // Find the matching variation based on selected attributes
+  useEffect(() => {
+    if (product?.baselinker_variations && Object.keys(selectedAttributes).length > 0) {
+      const variation = product.baselinker_variations.find((v) =>
+        v.attributes.every(
+          (attr) => selectedAttributes[attr.name] === attr.option
+        )
+      );
+      setSelectedVariation(variation || null);
+    }
+  }, [selectedAttributes, product]);
+  
+  const kartaProduktu = product?.meta_data?.find((meta) => meta.key === 'karta_produktu');
+  const model3D = product?.meta_data?.find((meta) => meta.key === 'model_3d');
+  
+  console.log('Karta Produktu:', kartaProduktu);
+  console.log('Model 3D:', model3D);
+  
   const handleQuantityChange = (type: 'increase' | 'decrease') => {
     setQuantity((prevQuantity) =>
       type === 'increase' ? prevQuantity + 1 : prevQuantity > 1 ? prevQuantity - 1 : 1
     );
   };
-
-  const handleVariationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedId = e.target.value;
-    const variation = product?.baselinker_variations?.find((v: Product['baselinker_variations'][0]) => String(v.id) === selectedId);
-    setSelectedVariation(variation || null);
-  };
-  
 
   if (loading) {
     return (
@@ -120,13 +137,13 @@ const ProductPage = () => {
     ? product.images.map((img, index) => ({ id: `image-${index}`, sourceUrl: img.src }))
     : [{ id: 'default-id', sourceUrl: product.image }];
 
-  // Find Kolor attribute
+  // Find Kolor attribute and ensure it is placed correctly near the top
   const colorAttribute: ProductAttribute | undefined = product.attributes.find(
     (attr: ProductAttribute) => attr.name === 'Kolor OK'
   );
 
   // Determine if variations are available
-  const variationsAvailable = product.variations && product.variations.length > 0;
+  const variationsAvailable = product.baselinker_variations && product.baselinker_variations.length > 0;
 
   const colorMap: { [key: string]: string } = {
     Złoty: '#eded87',
@@ -137,6 +154,19 @@ const ProductPage = () => {
     Pozostałe: '#c11d51',
     Niebieski: '#a4dae8',
     Biały: '#fff',
+  };
+
+  // Find distinct attributes for all variations
+  const distinctAttributes = product.baselinker_variations
+    ?.flatMap((variation) => variation.attributes.map((attr) => attr.name))
+    .filter((value, index, self) => self.indexOf(value) === index); // Get distinct attribute names
+
+  // Get unique options for each attribute
+  const getUniqueOptions = (attributeName: string) => {
+    const options = product.baselinker_variations
+      ?.flatMap((variation) => variation.attributes.filter((attr) => attr.name === attributeName))
+      .map((attr) => attr.option);
+    return Array.from(new Set(options)); // Remove duplicates
   };
 
   return (
@@ -164,7 +194,9 @@ const ProductPage = () => {
               <div className="mt-6">
                 <h2 className="text-2xl font-semibold mb-4">Wymiary</h2>
                 <p className="text-neutral-darkest">
-                  {DOMPurify.sanitize(product.meta_data.find((meta) => meta.key === 'wymiary')?.value || '')}
+                  {DOMPurify.sanitize(
+                    product.meta_data.find((meta) => meta.key === 'wymiary')?.value || ''
+                  )}
                 </p>
               </div>
             )}
@@ -181,16 +213,30 @@ const ProductPage = () => {
               </div>
             )}
 
-            {/* Karta produktu */}
+
+            {/* Karta Produktu - Render text and images */}
             {product.meta_data?.find((meta) => meta.key === 'karta') && (
               <div className="mt-6">
-                <h2 className="text-2xl font-semibold mb-4">Karta produktu</h2>
-                <p className="text-neutral-darkest">
-                  {DOMPurify.sanitize(product.meta_data.find((meta) => meta.key === 'karta')?.value || '')}
-                </p>
+                <h2 className="text-2xl font-semibold mb-4">Karta Produktu</h2>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(
+                      product.meta_data.find((meta) => meta.key === 'karta')?.value || ''
+                    ),
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Model 3D */}
+            {product.meta_data?.find((meta) => meta.key === 'model_3d') && (
+              <div className="mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Model 3D</h2>
+                <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.meta_data.find((meta) => meta.key === 'model_3d')?.value || '') }} />
               </div>
             )}
           </div>
+
 
           {/* Product Details */}
           <div className="lg:w-4/12 flex flex-col gap-6">
@@ -199,27 +245,12 @@ const ProductPage = () => {
               <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
               <div className="flex items-center gap-2">
                 <span className="text-4xl font-bold text-red-700">
-                  {product.salePrice || product.price} zł
+                  {selectedVariation?.price || product.price} zł
                 </span>
-                {product.salePrice && (
-                  <div className="flex items-center space-x-2">
-                    <span className="text-lg line-through text-neutral-darkest">
-                      {product.regularPrice} zł
-                    </span>
-                    <span className="text-sm text-red-600">
-                      -{Math.round(((parseFloat(product?.regularPrice ?? '0') || 0) - (parseFloat(product?.salePrice ?? '0') || 0)) / (parseFloat(product?.regularPrice ?? '1') || 1) * 100)}%
-                    </span>
-                  </div>
-                )}
               </div>
-              {product.lowest_price && (
-                <p className="text-sm text-neutral-dark mt-2">
-                  Najniższa cena w okresie 30 dni przed obniżką: {product.lowest_price} zł
-                </p>
-              )}
             </div>
 
-            {/* Kolor OK Attribute */}
+            {/* Kolor Attribute (Restored to correct position) */}
             {colorAttribute && (
               <div>
                 <span className="text-base font-semibold">Kolor:</span>
@@ -228,35 +259,31 @@ const ProductPage = () => {
                     <div
                       key={index}
                       className="w-8 h-8 rounded-md border border-neutral-dark"
-                      style={{ backgroundColor: colorMap[color] || '#ccc' }}
+                      style={{ backgroundColor: colorMap[color] || '#ccc' }} 
                     />
                   ))}
                 </div>
               </div>
             )}
 
-{product.baselinker_variations && product.baselinker_variations.length > 0 && (
-  <div className="mt-4">
-    <span className="text-base font-semibold">Wariant:</span>
-    <select
-      className="border border-neutral-dark rounded w-full mt-2 py-2 px-3"
-      onChange={handleVariationChange}
-      value={selectedVariation?.id || ''}
-    >
-      <option value="">Wybierz Wariant</option> {/* Default option */}
-      {product.baselinker_variations.map((variation) => (
-        <option key={variation.id} value={variation.id}>
-{product.baselinker_variations?.map((variation: Product['baselinker_variations'][0]) => (
-  variation.attributes.length
-    ? `${variation.attributes.map((attr: { name: string; option: string }) => `${attr.name}: ${attr.option}`).join(', ')} - ${variation.price} zł`
-    : `Wariant ${variation.id}`
-))}
-
-        </option>
-      ))}
-    </select>
-  </div>
-)}
+            {/* Render Dropdowns for each distinct attribute */}
+            {distinctAttributes?.map((attributeName) => (
+              <div key={attributeName} className="mt-4">
+                <span className="text-base font-semibold">{attributeName}:</span>
+                <select
+                  className="border border-neutral-dark rounded w-full mt-2 py-2 px-3"
+                  onChange={(e) => handleAttributeChange(attributeName, e.target.value)}
+                  value={selectedAttributes[attributeName] || ''}
+                >
+                  <option value="">Wybierz {attributeName}</option>
+                  {getUniqueOptions(attributeName).map((option, index) => (
+                    <option key={`${attributeName}-${index}`} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
 
             {/* Add to Cart and Wishlist */}
             <div className="flex items-center mt-4 space-x-4">
