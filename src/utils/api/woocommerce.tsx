@@ -165,3 +165,24 @@ export const fetchProductsByAttribute = async (kolekcja: string) => {
     throw error;
   }
 };
+
+// In api/woocommerce.ts or woocommerce.js
+
+export const fetchInstagramPosts = async () => {
+  const token = process.env.NEXT_PUBLIC_INSTAGRAM_ACCESS_TOKEN;
+  
+  if (!token) {
+    throw new Error('Instagram access token is not defined in the environment variables');
+  }
+
+  const response = await fetch(
+    `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink,thumbnail_url,timestamp&access_token=${token}`
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch Instagram posts');
+  }
+
+  const data = await response.json();
+  return data.data; // Return the array of Instagram posts
+};
