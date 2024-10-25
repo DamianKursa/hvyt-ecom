@@ -6,7 +6,7 @@ interface MobileMenuProps {
   toggleMenu: () => void;
 }
 
-const MobileMenu: React.FC<MobileMenuProps> = ({ menuOpen }) => {
+const MobileMenu: React.FC<MobileMenuProps> = ({ menuOpen, toggleMenu }) => {
   return (
     <div
       className={`fixed inset-0 bg-white z-50 w-full transition-transform duration-300 ease-in-out p-4 ${
@@ -17,25 +17,39 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ menuOpen }) => {
       <div className="rounded-[25px] bg-[#E9E5DF] p-[16px] mt-[78px]">
         <ul className="space-y-6 text-xl">
           <li className="font-bold">
-            <Link href="/kategoria/uchwyty-meblowe">Uchwyty</Link>
+            <Link href="/kategoria/uchwyty-meblowe" onClick={toggleMenu}>
+              Uchwyty
+            </Link>
           </li>
           <li className="font-bold">
-            <Link href="/kategoria/klamki">Klamki</Link>
+            <Link href="/kategoria/klamki" onClick={toggleMenu}>
+              Klamki
+            </Link>
           </li>
           <li className="font-bold">
-            <Link href="/kategoria/wieszaki">Wieszaki</Link>
+            <Link href="/kategoria/wieszaki" onClick={toggleMenu}>
+              Wieszaki
+            </Link>
           </li>
           <li className="font-bold">
-            <Link href="/hvyt-objects">Hvyt Objects</Link>
+            <Link href="/hvyt-objects" onClick={toggleMenu}>
+              Hvyt Objects
+            </Link>
           </li>
           <li className="font-bold">
-            <Link href="/kolekcje">Kolekcje</Link>
+            <Link href="/kolekcje" onClick={toggleMenu}>
+              Kolekcje
+            </Link>
           </li>
           <li className="font-bold">
-            <Link href="/o-nas">O nas</Link>
+            <Link href="/o-nas" onClick={toggleMenu}>
+              O nas
+            </Link>
           </li>
           <li className="font-bold">
-            <Link href="/kontakt">Kontakt</Link>
+            <Link href="/kontakt" onClick={toggleMenu}>
+              Kontakt
+            </Link>
           </li>
         </ul>
       </div>
@@ -44,7 +58,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ menuOpen }) => {
       <div className="mt-10 space-y-6 text-xl rounded-[25px] bg-[#E9E5DF] p-[16px]">
         <ul className="space-y-6 text-xl">
           <li>
-            <Link className="font-bold" href="/login">
+            <Link href="/login" onClick={toggleMenu} className="font-bold">
               <div className="flex items-center">
                 <img src="/icons/user.svg" alt="User" className="h-6 mr-3" />
                 Zaloguj się
@@ -52,7 +66,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ menuOpen }) => {
             </Link>
           </li>
           <li>
-            <Link className="font-bold" href="/wishlist">
+            <Link href="/wishlist" onClick={toggleMenu} className="font-bold">
               <div className="flex items-center">
                 <img src="/icons/heart.svg" alt="Wishlist" className="h-6 mr-3" />
                 Ulubione

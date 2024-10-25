@@ -1,4 +1,3 @@
-// Imports
 import { ReactNode, useContext, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
@@ -35,7 +34,7 @@ const Layout = ({ children, title }: ILayoutProps) => {
   const router = useRouter();
 
   // Define the pages that should not have a margin
-  const noMarginPages = ['/', '/o-nas','/hvyt-objects'];
+  const noMarginPages = ['/', '/o-nas', '/hvyt-objects'];
 
   // Check if the current page should have a margin or not
   const hasMargin = !noMarginPages.includes(router.pathname);
@@ -47,7 +46,6 @@ const Layout = ({ children, title }: ILayoutProps) => {
       const updatedCart = getFormattedCart(data);
 
       if (!updatedCart && !data?.cart?.contents?.nodes.length) {
-        // Should we clear the localStorage if we have no remote cart?
         return;
       }
 
@@ -67,8 +65,8 @@ const Layout = ({ children, title }: ILayoutProps) => {
       {/* Header */}
       <Header title={title} />
       
-      {/* Main content area with conditional margin-top */}
-      <main className={hasMargin ? 'mt-[120px]' : ''}>
+      {/* Main content area with conditional margin-top and responsive padding */}
+      <main className={`${hasMargin ? 'mt-[120px]' : ''} px-4 md:px-0`}>
         {children}
       </main>
       

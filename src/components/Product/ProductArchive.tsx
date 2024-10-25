@@ -30,8 +30,8 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({ categoryId, filters, so
 
   return (
     <div>
-      {/* Row with Product Previews */}
-      <div className="grid grid-cols-3 gap-8">
+      {/* Product Previews Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {loading
           ? Array.from({ length: 6 }).map((_, index) => <SkeletonProductPreview key={index} />)
           : products.map((product) => <ProductPreview key={product.id} product={product} />)}

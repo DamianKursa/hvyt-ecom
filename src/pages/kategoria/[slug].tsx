@@ -27,6 +27,7 @@ const CategoryPage = () => {
   const [activeFilters, setActiveFilters] = useState<{ name: string; value: string }[]>([]);
   const [sortingOption, setSortingOption] = useState('default'); // Default sorting
   const [isArrowDown, setIsArrowDown] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -49,6 +50,13 @@ const CategoryPage = () => {
     };
 
     fetchData();
+
+    // Media query for detecting mobile
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const handleResize = () => setIsMobile(mediaQuery.matches);
+    mediaQuery.addEventListener('change', handleResize);
+    handleResize(); // Initial check
+    return () => mediaQuery.removeEventListener('change', handleResize);
   }, [slug]);
 
   const handleFilterChange = (selectedFilters: { name: string; value: string }[]) => {
@@ -118,6 +126,7 @@ const CategoryPage = () => {
           {getCategoryIcon()}
         </div>
 
+        {/* FiltersControls */}
         <FiltersControls
           filtersVisible={filtersVisible}
           toggleFilters={toggleFilters}
@@ -127,10 +136,12 @@ const CategoryPage = () => {
           onRemoveFilter={handleRemoveFilter}
           isArrowDown={isArrowDown}
           setIsArrowDown={setIsArrowDown}
+          isMobile={isMobile}
         />
 
         <div className="flex">
-          {filtersVisible && (
+          {/* Filters Section for Desktop */}
+          {!isMobile && filtersVisible && (
             <div className="w-1/4 pr-8">
               {attributes.length ? (
                 <Filters
@@ -145,7 +156,8 @@ const CategoryPage = () => {
             </div>
           )}
 
-          <div className={`${filtersVisible ? 'w-3/4' : 'w-full'} pl-8`}>
+          {/* Product Archive */}
+          <div className={`${filtersVisible && !isMobile ? 'lg:w-3/4' : 'w-full'} w-full lg:pl-8`}>
             <ProductArchive
               categoryId={category?.id}
               filters={activeFilters}
@@ -154,6 +166,24 @@ const CategoryPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Mobile Filters Modal */}
+      {isMobile && filtersVisible && (
+        <div className="fixed inset-0 bg-white z-50 p-4 rounded-lg overflow-y-scroll">
+          <div className="flex justify-between items-center">
+            <h2 className="text-[24px] font-semibold">Filtry</h2>
+            <button onClick={toggleFilters} className="text-[24px]">&times;</button>
+          </div>
+          <div className="mt-4">
+            <Filters
+              attributes={attributes}
+              errorMessage={errorMessage || undefined}
+              onFilterChange={handleFilterChange}
+              activeFilters={activeFilters}
+            />
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
