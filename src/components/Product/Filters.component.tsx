@@ -5,15 +5,20 @@ import Snackbar from '../UI/Snackbar.component';
 interface FiltersProps {
   attributes: { name: string; options?: string[] }[];
   errorMessage?: string;
+  activeFilters: { name: string; value: string }[]; // Add activeFilters prop
   onFilterChange: (selectedFilters: { name: string; value: string }[]) => void;
 }
 
-const Filters = ({ attributes, errorMessage, onFilterChange }: FiltersProps) => {
+const Filters = ({ attributes, errorMessage, activeFilters, onFilterChange }: FiltersProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showError, setShowError] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState<{ [key: string]: boolean }>({});
   const [moreOptionsVisible, setMoreOptionsVisible] = useState<{ [key: string]: boolean }>({});
-  const [selectedFilters, setSelectedFilters] = useState<{ name: string; value: string }[]>([]);
+  const [selectedFilters, setSelectedFilters] = useState<{ name: string; value: string }[]>(activeFilters);
+
+  useEffect(() => {
+    setSelectedFilters(activeFilters); // Update selected filters when activeFilters changes
+  }, [activeFilters]);
 
   useEffect(() => {
     if (errorMessage) {
@@ -83,19 +88,35 @@ const Filters = ({ attributes, errorMessage, onFilterChange }: FiltersProps) => 
 
           {expandedFilters[attribute.name] && attribute.options && attribute.options.length > 0 && (
             <div className="pl-0">
-              {attribute.options.slice(0, moreOptionsVisible[attribute.name] ? attribute.options.length : 4).map((option) => (
-                <div key={option} className="flex items-center mb-2">
-                  <input
-                    type="checkbox"
-                    id={option}
-                    name={option}
-                    value={option}
-                    className="w-5 h-5 mr-2 rounded-tl-[4px] border-gray-300"
-                    onChange={(e) => handleFilterChange(attribute.name, option, e.target.checked)}
-                  />
-                  <label htmlFor={option}>{option}</label>
-                </div>
-              ))}
+              {attribute.options.slice(0, moreOptionsVisible[attribute.name] ? attribute.options.length : 4).map((option) => {
+                const isChecked = selectedFilters.some(
+                  (filter) => filter.name === attribute.name && filter.value === option
+                );
+                return (
+                  <div key={option} className="flex items-center mb-2">
+                    <input
+                      type="checkbox"
+                      id={option}
+                      name={option}
+                      value={option}
+                      className="hidden"
+                      checked={isChecked}
+                      onChange={(e) => handleFilterChange(attribute.name, option, e.target.checked)}
+                    />
+                    <label
+                      htmlFor={option}
+                      className={`flex items-center cursor-pointer w-5 h-5 border rounded ${
+                        isChecked ? 'bg-black' : 'border-gray-300 bg-white'
+                      }`}
+                    >
+                      {isChecked && (
+                        <img src="/icons/check.svg" alt="check" className="w-4 h-4 text-white" />
+                      )}
+                    </label>
+                    <span className="ml-2">{option}</span>
+                  </div>
+                );
+              })}
               {attribute.options.length > 4 && (
                 <button
                   className="underline text-[14px]"

@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import ProductPreview from './ProductPreview.component'; // Assuming you already have this component
-import SkeletonProductPreview from './SkeletonProductPreview.component'; // Assuming you already have this component
-import { fetchProductsByCategoryId } from '../../utils/api/woocommerce'; // Your API fetching logic
+import ProductPreview from './ProductPreview.component';
+import SkeletonProductPreview from './SkeletonProductPreview.component';
+import { fetchProductsByCategoryId } from '../../utils/api/woocommerce';
 
 interface ProductArchiveProps {
   categoryId: number;
   filters: { name: string; value: string }[];
   sortingOption: string;
+  onRemoveFilter: (filter: { name: string; value: string }) => void;
 }
 
-const ProductArchive: React.FC<ProductArchiveProps> = ({ categoryId, filters, sortingOption }) => {
+const ProductArchive: React.FC<ProductArchiveProps> = ({ categoryId, filters, sortingOption, onRemoveFilter }) => {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sorting, setSorting] = useState('default'); // Default sorting option
-  const [isArrowDown, setIsArrowDown] = useState(true); // Arrow direction for sorting button
+  const [sorting, setSorting] = useState('default');
+  const [isArrowDown, setIsArrowDown] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -33,7 +34,6 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({ categoryId, filters, so
   const handleSortingChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSorting(e.target.value);
     setIsArrowDown(!isArrowDown);
-    // Add your sorting logic here
   };
 
   return (
@@ -42,12 +42,17 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({ categoryId, filters, so
       <div className="flex justify-between items-center mb-4">
         {/* Active Filters */}
         <div className="flex gap-2">
-          {filters.length > 0 &&
-            filters.map((filter) => (
-              <span key={filter.name} className="bg-gray-200 px-3 py-1 rounded-full text-sm">
-                {filter.name}: {filter.value}
-              </span>
-            ))}
+          {filters.map((filter) => (
+            <span key={`${filter.name}-${filter.value}`} className="flex items-center text-[14px]">
+              {filter.value}
+              <button
+                onClick={() => onRemoveFilter(filter)}
+                className="ml-1 text-gray-500 hover:text-red-500"
+              >
+                &times;
+              </button>
+            </span>
+          ))}
         </div>
 
         {/* Sorting Button */}

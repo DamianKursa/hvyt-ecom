@@ -53,6 +53,14 @@ const CategoryPage = () => {
     setActiveFilters(selectedFilters);
   };
 
+  const handleRemoveFilter = (filterToRemove: { name: string; value: string }) => {
+    setActiveFilters((currentFilters) =>
+      currentFilters.filter(
+        (filter) => filter.name !== filterToRemove.name || filter.value !== filterToRemove.value
+      )
+    );
+  };
+
   const toggleFilters = () => setFiltersVisible(!filtersVisible);
 
   const getCategoryIcon = () => {
@@ -126,10 +134,11 @@ const CategoryPage = () => {
               {attributes.length ? (
                 <Filters
                   attributes={attributes}
-                  errorMessage={errorMessage || undefined} // Ensure it's either string or undefined
+                  errorMessage={errorMessage || undefined}
                   onFilterChange={handleFilterChange}
+                  activeFilters={activeFilters} // Pass active filters to Filters
                 />
-
+                            
               ) : (
                 <FilterSkeleton />
               )}
@@ -141,6 +150,7 @@ const CategoryPage = () => {
               categoryId={category?.id}
               filters={activeFilters}
               sortingOption={sortingOption}
+              onRemoveFilter={handleRemoveFilter}
             />
           </div>
         </div>
