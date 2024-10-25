@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
 import Filters from '@/components/Product/Filters.component';
 import ProductArchive from '@/components/Product/ProductArchive';
+import FiltersControls from '@/components/Product/FiltersControls';
 import FilterSkeleton from '@/components/Product/SkeletonFilter.component';
 import Snackbar from '@/components/UI/Snackbar.component';
 import { fetchCategoryBySlug, fetchProductAttributesWithTerms } from '../../utils/api/woocommerce';
@@ -24,7 +25,8 @@ const CategoryPage = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [activeFilters, setActiveFilters] = useState<{ name: string; value: string }[]>([]);
-  const [sortingOption, setSortingOption] = useState('default'); // Default sorting
+  const [sortingOption, setSortingOption] = useState('default');
+  const [isArrowDown, setIsArrowDown] = useState(true);
 
   useEffect(() => {
     if (!slug) return;
@@ -116,17 +118,16 @@ const CategoryPage = () => {
           {getCategoryIcon()}
         </div>
 
-        <button
-          onClick={toggleFilters}
-          className="filters-toggle border rounded-[24px] w-[352px] text-[24px] p-[7px_16px] flex justify-between items-center cursor-pointer mb-4"
-        >
-          <span className="font-semibold">Filtry</span>
-          <img
-            src={filtersVisible ? '/icons/arrow-left-black.svg' : '/icons/arrow-right-black.svg'}
-            alt="Toggle Filters"
-            className="w-[24px] h-[24px]"
-          />
-        </button>
+        <FiltersControls
+          filtersVisible={filtersVisible}
+          toggleFilters={toggleFilters}
+          filters={activeFilters}
+          sorting={sortingOption}
+          onSortingChange={(e) => setSortingOption(e.target.value)}
+          onRemoveFilter={handleRemoveFilter}
+          isArrowDown={isArrowDown}
+          setIsArrowDown={setIsArrowDown}
+        />
 
         <div className="flex">
           {filtersVisible && (
@@ -136,9 +137,8 @@ const CategoryPage = () => {
                   attributes={attributes}
                   errorMessage={errorMessage || undefined}
                   onFilterChange={handleFilterChange}
-                  activeFilters={activeFilters} // Pass active filters to Filters
+                  activeFilters={activeFilters}
                 />
-                            
               ) : (
                 <FilterSkeleton />
               )}
