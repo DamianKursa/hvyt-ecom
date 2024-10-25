@@ -25,7 +25,7 @@ const CategoryPage = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [activeFilters, setActiveFilters] = useState<{ name: string; value: string }[]>([]);
-  const [sortingOption, setSortingOption] = useState('default');
+  const [sortingOption, setSortingOption] = useState('default'); // Default sorting
   const [isArrowDown, setIsArrowDown] = useState(true);
 
   useEffect(() => {
@@ -150,7 +150,6 @@ const CategoryPage = () => {
               categoryId={category?.id}
               filters={activeFilters}
               sortingOption={sortingOption}
-              onRemoveFilter={handleRemoveFilter}
             />
           </div>
         </div>

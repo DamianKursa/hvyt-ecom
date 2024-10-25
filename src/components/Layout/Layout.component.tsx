@@ -74,7 +74,6 @@ const Layout = ({ children, title }: ILayoutProps) => {
       
       {/* Footer and Sticky Navigation */}
       <Footer />
-      <Stickynav />
     </>
   );
 };
