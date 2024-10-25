@@ -37,6 +37,14 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Wishlist Button */}
+      <button
+        className="absolute top-2 right-2 w-10 h-10 bg-[#F8F6F7]/50 rounded-full shadow-lg flex items-center justify-center z-20"
+        aria-label="Add to wishlist"
+      >
+        <Image src="/icons/wishlist.svg" alt="Add to wishlist" width={24} height={24} />
+      </button>
+
       <div className="relative w-full h-[350px] overflow-hidden rounded-lg shadow-lg flex justify-center items-center">
         {isLoading && (
           <div className="absolute inset-0 bg-gradient-to-r from-gray-300 to-gray-100 animate-pulse"></div>

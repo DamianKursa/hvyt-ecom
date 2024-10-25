@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
 import Filters from '@/components/Product/Filters.component';
 import ProductPreview from '@/components/Product/ProductPreview.component';
@@ -7,6 +8,12 @@ import SkeletonProductPreview from '@/components/Product/SkeletonProductPreview.
 import FilterSkeleton from '@/components/Product/SkeletonFilter.component';
 import Snackbar from '@/components/UI/Snackbar.component';
 import { fetchCategoryBySlug, fetchProductsByCategoryId, fetchProductAttributesWithTerms } from '../../utils/api/woocommerce';
+
+const icons: { [key: string]: string } = {
+  'uchwyty-meblowe': '/icons/uchwyty-kształty.svg',
+  klamki: '/icons/klamki-kształty.svg',
+  wieszaki: '/icons/wieszaki-kształty.svg',
+};
 
 const CategoryPage = () => {
   const router = useRouter();
@@ -17,6 +24,7 @@ const CategoryPage = () => {
   const [attributes, setAttributes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [filtersVisible, setFiltersVisible] = useState(true);
 
   useEffect(() => {
     if (!slug) return;
@@ -24,15 +32,12 @@ const CategoryPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch category by slug
         const categoryData = await fetchCategoryBySlug(slug as string);
         setCategory(categoryData);
 
-        // Fetch products by category ID
         const productsData = await fetchProductsByCategoryId(categoryData.id);
         setProducts(productsData);
 
-        // Fetch attributes with terms
         const attributesData = await fetchProductAttributesWithTerms();
         setAttributes(attributesData);
 
@@ -46,6 +51,23 @@ const CategoryPage = () => {
 
     fetchData();
   }, [slug]);
+
+  const toggleFilters = () => setFiltersVisible(!filtersVisible);
+
+  const getCategoryIcon = () => {
+    if (icons[slug as string]) {
+      return (
+        <Image
+          src={icons[slug as string]}
+          alt={`${slug} icon`}
+          width={54}
+          height={24}
+          className="ml-2"
+        />
+      );
+    }
+    return null;
+  };
 
   if (loading) {
     return (
@@ -87,23 +109,48 @@ const CategoryPage = () => {
 
   return (
     <Layout title={category?.name || 'Category'}>
-      <div className="container mx-auto flex">
-        <div className="w-1/4 pr-8">
-          {attributes.length ? (
-            <Filters attributes={attributes} />
-          ) : (
-            <FilterSkeleton />
-          )}
+      <div className="container mx-auto">
+        <nav className="breadcrumbs">
+          {/* Breadcrumbs component if applicable */}
+        </nav>
+        
+        <div className="flex items-center mb-8">
+          <h1 className="text-[40px] font-bold text-[#661F30]">{category?.name}</h1>
+          {getCategoryIcon()}
         </div>
 
-        <div className="w-3/4 grid grid-cols-3 gap-8">
-          {products.length ? (
-            products.map((product: any) => (
-              <ProductPreview key={product.id} product={product} />
-            ))
-          ) : (
-            <Snackbar message="No products found in this category" type="error" visible={true} />
+        <button
+          onClick={toggleFilters}
+          className="filters-toggle border rounded-[24px] w-[352px] text-[24px] p-[7px_16px] flex justify-between items-center cursor-pointer mb-4"
+        >
+          <span className="font-semibold">Filtry</span>
+          <img
+            src={filtersVisible ? '/icons/arrow-left-black.svg' : '/icons/arrow-right-black.svg'}
+            alt="Toggle Filters"
+            className="w-[24px] h-[24px]"
+          />
+        </button>
+
+        <div className="flex">
+          {filtersVisible && (
+            <div className="w-1/4 pr-8">
+              {attributes.length ? (
+                <Filters attributes={attributes} />
+              ) : (
+                <FilterSkeleton />
+              )}
+            </div>
           )}
+
+          <div className={`${filtersVisible ? "w-3/4" : "w-full"} grid grid-cols-3 gap-8 pl-8`}>
+            {products.length ? (
+              products.map((product: any) => (
+                <ProductPreview key={product.id} product={product} />
+              ))
+            ) : (
+              <Snackbar message="No products found in this category" type="error" visible={true} />
+            )}
+          </div>
         </div>
       </div>
     </Layout>
