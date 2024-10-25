@@ -5,7 +5,10 @@ export interface ProductAttribute {
 
 export interface Variation {
   id: string;
-  name?: string; // Variations may not always have a name
+  name?: string;
+  price?: string;
+  regular_price?: string;
+  sale_price?: string;
   image?: {
     sourceUrl: string;
   };
@@ -13,8 +16,9 @@ export interface Variation {
     id: string;
     name: string;
     option: string;
-  }[]; // Some variations may include attributes with options
+  }[];
 }
+
 
 export interface Product {
   id: string;

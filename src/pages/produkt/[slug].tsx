@@ -7,7 +7,12 @@ import SkeletonProductPage from '@/components/Product/SkeletonProductPage.compon
 import { fetchProductBySlug, fetchMediaById } from '@/utils/api/woocommerce';
 import DOMPurify from 'dompurify'; // For sanitizing HTML
 import Image from 'next/image';
-import { Product, ProductAttribute } from '@/utils/functions/interfaces';
+import { Product, ProductAttribute, Variation } from '@/utils/functions/interfaces';
+
+// Define the cleanHTML function here
+const cleanHTML = (html: string) => {
+  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
+};
 
 const ProductPage = () => {
   const { query } = useRouter();
@@ -21,7 +26,9 @@ const ProductPage = () => {
   const [showSnackbar, setShowSnackbar] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [selectedAttributes, setSelectedAttributes] = useState<{ [key: string]: string }>({});
-  const [selectedVariation, setSelectedVariation] = useState<Product['baselinker_variations'] extends Array<infer T> ? T | null : null>(null);
+  
+  // Point 2: Set selectedVariation type to Variation | null
+  const [selectedVariation, setSelectedVariation] = useState<Variation | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,17 +53,49 @@ const ProductPage = () => {
           productData.image = featuredImage;
         }
 
-        // Add variations from baselinker
-        productData.variations = productData.baselinker_variations?.map(variation => ({
-          id: variation.id,
-          sku: variation.sku,
-          price: variation.price,
-          regular_price: variation.regular_price,
-          sale_price: variation.sale_price,
-          image: variation.image,
-          attributes: variation.attributes,
+        productData.variations = productData.baselinker_variations?.map((variation: {
+          id: number;
+          sku: string;
+          in_stock: boolean;
+          stock_quantity: string;
+          price: number;
+          regular_price: number;
+          sale_price: number;
+          description: string;
+          visible: boolean;
+          manage_stock: boolean;
+          purchasable: boolean;
+          on_sale: boolean;
+          image: {
+            id: number;
+            src: string;
+          };
+          attributes: {
+            id: string;
+            name: string;
+            option: string;
+          }[];
+          weight: string;
+          meta_data: {
+            key: string;
+            value: string;
+          }[];
+        }) => ({
+          id: variation.id.toString(),
+          name: variation.description,
+          price: variation.price.toString(),
+          regular_price: variation.regular_price.toString(),
+          sale_price: variation.sale_price.toString(),
+          image: {
+            sourceUrl: variation.image.src,
+          },
+          attributes: variation.attributes.map((attr) => ({
+            id: attr.id,
+            name: attr.name,
+            option: attr.option,
+          })),
         }));
-
+                
         setProduct(productData);
       } catch (error) {
         console.error('Error fetching product:', error);
@@ -80,23 +119,30 @@ const ProductPage = () => {
     }));
   };
 
-  // Find the matching variation based on selected attributes
+  // Point 3: Find the matching variation based on selected attributes
   useEffect(() => {
     if (product?.baselinker_variations && Object.keys(selectedAttributes).length > 0) {
-      const variation = product.baselinker_variations.find((v) =>
-        v.attributes.every(
-          (attr) => selectedAttributes[attr.name] === attr.option
-        )
+      const matchedVariation = product.baselinker_variations.find((v) =>
+        v.attributes.every((attr) => selectedAttributes[attr.name] === attr.option)
       );
-      setSelectedVariation(variation || null);
+
+      setSelectedVariation(matchedVariation ? {
+        id: matchedVariation.id.toString(),
+        name: matchedVariation.description,
+        price: matchedVariation.price.toString(),
+        regular_price: matchedVariation.regular_price.toString(),
+        sale_price: matchedVariation.sale_price.toString(),
+        image: {
+          sourceUrl: matchedVariation.image.src,
+        },
+        attributes: matchedVariation.attributes.map((attr) => ({
+          id: attr.id,
+          name: attr.name,
+          option: attr.option,
+        })),
+      } : null);
     }
   }, [selectedAttributes, product]);
-  
-  const kartaProduktu = product?.meta_data?.find((meta) => meta.key === 'karta_produktu');
-  const model3D = product?.meta_data?.find((meta) => meta.key === 'model_3d');
-  
-  console.log('Karta Produktu:', kartaProduktu);
-  console.log('Model 3D:', model3D);
   
   const handleQuantityChange = (type: 'increase' | 'decrease') => {
     setQuantity((prevQuantity) =>
@@ -131,8 +177,8 @@ const ProductPage = () => {
   }
 
   // Handle product gallery images
-  const galleryImages = selectedVariation?.image?.src
-    ? [{ id: selectedVariation?.id || 'variation-default', sourceUrl: selectedVariation?.image?.src || '' }]
+  const galleryImages = selectedVariation?.image?.sourceUrl
+    ? [{ id: selectedVariation.id, sourceUrl: selectedVariation.image.sourceUrl }]
     : product.images && product.images.length > 0
     ? product.images.map((img, index) => ({ id: `image-${index}`, sourceUrl: img.src }))
     : [{ id: 'default-id', sourceUrl: product.image }];
@@ -181,11 +227,11 @@ const ProductPage = () => {
             {product.meta_data?.find((meta) => meta.key === 'szczegoly_produktu') && (
               <div className="mt-6">
                 <h2 className="text-2xl font-semibold mb-4">Szczegóły produktu</h2>
-                <p className="text-neutral-darkest">
-                  {DOMPurify.sanitize(
-                    product.meta_data.find((meta) => meta.key === 'szczegoly_produktu')?.value || ''
-                  )}
-                </p>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: cleanHTML(product.meta_data.find((meta) => meta.key === 'szczegoly_produktu')?.value || '')
+                  }}
+                />
               </div>
             )}
 
@@ -193,11 +239,11 @@ const ProductPage = () => {
             {product.meta_data?.find((meta) => meta.key === 'wymiary') && (
               <div className="mt-6">
                 <h2 className="text-2xl font-semibold mb-4">Wymiary</h2>
-                <p className="text-neutral-darkest">
-                  {DOMPurify.sanitize(
-                    product.meta_data.find((meta) => meta.key === 'wymiary')?.value || ''
-                  )}
-                </p>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: cleanHTML(product.meta_data.find((meta) => meta.key === 'wymiary')?.value || '')
+                  }}
+                />
               </div>
             )}
 
@@ -205,24 +251,22 @@ const ProductPage = () => {
             {product.meta_data?.find((meta) => meta.key === 'informacje_dodatkowe') && (
               <div className="mt-6">
                 <h2 className="text-2xl font-semibold mb-4">Informacje dodatkowe</h2>
-                <p className="text-neutral-darkest">
-                  {DOMPurify.sanitize(
-                    product.meta_data.find((meta) => meta.key === 'informacje_dodatkowe')?.value || ''
-                  )}
-                </p>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: cleanHTML(product.meta_data.find((meta) => meta.key === 'informacje_dodatkowe')?.value || '')
+                  }}
+                />
               </div>
             )}
-
 
             {/* Karta Produktu - Render text and images */}
             {product.meta_data?.find((meta) => meta.key === 'karta') && (
               <div className="mt-6">
                 <h2 className="text-2xl font-semibold mb-4">Karta Produktu</h2>
                 <div
+                  className="formatted-content" // Added a class for additional styling if needed
                   dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(
-                      product.meta_data.find((meta) => meta.key === 'karta')?.value || ''
-                    ),
+                    __html: cleanHTML(product.meta_data.find((meta) => meta.key === 'karta')?.value || '')
                   }}
                 />
               </div>
@@ -232,11 +276,15 @@ const ProductPage = () => {
             {product.meta_data?.find((meta) => meta.key === 'model_3d') && (
               <div className="mt-6">
                 <h2 className="text-2xl font-semibold mb-4">Model 3D</h2>
-                <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(product.meta_data.find((meta) => meta.key === 'model_3d')?.value || '') }} />
+                <div
+                  className="w-full" // Ensures the container takes full width
+                  dangerouslySetInnerHTML={{
+                    __html: cleanHTML(product.meta_data.find((meta) => meta.key === 'model_3d')?.value || '')
+                  }}
+                />
               </div>
             )}
           </div>
-
 
           {/* Product Details */}
           <div className="lg:w-4/12 flex flex-col gap-6">
