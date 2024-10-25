@@ -3,11 +3,10 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
 import Filters from '@/components/Product/Filters.component';
-import ProductPreview from '@/components/Product/ProductPreview.component';
-import SkeletonProductPreview from '@/components/Product/SkeletonProductPreview.component';
+import ProductArchive from '@/components/Product/ProductArchive';
 import FilterSkeleton from '@/components/Product/SkeletonFilter.component';
 import Snackbar from '@/components/UI/Snackbar.component';
-import { fetchCategoryBySlug, fetchProductsByCategoryId, fetchProductAttributesWithTerms } from '../../utils/api/woocommerce';
+import { fetchCategoryBySlug, fetchProductAttributesWithTerms } from '../../utils/api/woocommerce';
 
 const icons: { [key: string]: string } = {
   'uchwyty-meblowe': '/icons/uchwyty-kształty.svg',
@@ -20,11 +19,12 @@ const CategoryPage = () => {
   const { slug } = router.query;
 
   const [category, setCategory] = useState<any>(null);
-  const [products, setProducts] = useState<any[]>([]);
   const [attributes, setAttributes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [filtersVisible, setFiltersVisible] = useState(true);
+  const [activeFilters, setActiveFilters] = useState<{ name: string; value: string }[]>([]);
+  const [sortingOption, setSortingOption] = useState('default'); // Default sorting
 
   useEffect(() => {
     if (!slug) return;
@@ -34,9 +34,6 @@ const CategoryPage = () => {
       try {
         const categoryData = await fetchCategoryBySlug(slug as string);
         setCategory(categoryData);
-
-        const productsData = await fetchProductsByCategoryId(categoryData.id);
-        setProducts(productsData);
 
         const attributesData = await fetchProductAttributesWithTerms();
         setAttributes(attributesData);
@@ -51,6 +48,10 @@ const CategoryPage = () => {
 
     fetchData();
   }, [slug]);
+
+  const handleFilterChange = (selectedFilters: { name: string; value: string }[]) => {
+    setActiveFilters(selectedFilters);
+  };
 
   const toggleFilters = () => setFiltersVisible(!filtersVisible);
 
@@ -76,12 +77,10 @@ const CategoryPage = () => {
           <div className="w-1/4 pr-8">
             <FilterSkeleton />
             <FilterSkeleton />
-            <FilterSkeleton />
-            <FilterSkeleton />
           </div>
           <div className="w-3/4 grid grid-cols-3 gap-8">
             {Array.from({ length: 6 }).map((_, index) => (
-              <SkeletonProductPreview key={index} />
+              <div key={index} className="skeleton-product" />
             ))}
           </div>
         </div>
@@ -93,16 +92,6 @@ const CategoryPage = () => {
     return (
       <Layout title="Error">
         <Snackbar message={errorMessage} type="error" visible={true} />
-        <div className="container mx-auto flex">
-          <div className="w-1/4 pr-8">
-            <FilterSkeleton />
-          </div>
-          <div className="w-3/4 grid grid-cols-3 gap-8">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <SkeletonProductPreview key={index} />
-            ))}
-          </div>
-        </div>
       </Layout>
     );
   }
@@ -111,9 +100,9 @@ const CategoryPage = () => {
     <Layout title={category?.name || 'Category'}>
       <div className="container mx-auto">
         <nav className="breadcrumbs">
-          {/* Breadcrumbs component if applicable */}
+          {/* Breadcrumbs component */}
         </nav>
-        
+
         <div className="flex items-center mb-8">
           <h1 className="text-[40px] font-bold text-[#661F30]">{category?.name}</h1>
           {getCategoryIcon()}
@@ -135,21 +124,24 @@ const CategoryPage = () => {
           {filtersVisible && (
             <div className="w-1/4 pr-8">
               {attributes.length ? (
-                <Filters attributes={attributes} />
+                <Filters
+                  attributes={attributes}
+                  errorMessage={errorMessage || undefined} // Ensure it's either string or undefined
+                  onFilterChange={handleFilterChange}
+                />
+
               ) : (
                 <FilterSkeleton />
               )}
             </div>
           )}
 
-          <div className={`${filtersVisible ? "w-3/4" : "w-full"} grid grid-cols-3 gap-8 pl-8`}>
-            {products.length ? (
-              products.map((product: any) => (
-                <ProductPreview key={product.id} product={product} />
-              ))
-            ) : (
-              <Snackbar message="No products found in this category" type="error" visible={true} />
-            )}
+          <div className={`${filtersVisible ? 'w-3/4' : 'w-full'} pl-8`}>
+            <ProductArchive
+              categoryId={category?.id}
+              filters={activeFilters}
+              sortingOption={sortingOption}
+            />
           </div>
         </div>
       </div>

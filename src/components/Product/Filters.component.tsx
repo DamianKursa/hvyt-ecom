@@ -5,13 +5,15 @@ import Snackbar from '../UI/Snackbar.component';
 interface FiltersProps {
   attributes: { name: string; options?: string[] }[];
   errorMessage?: string;
+  onFilterChange: (selectedFilters: { name: string; value: string }[]) => void;
 }
 
-const Filters = ({ attributes, errorMessage }: FiltersProps) => {
+const Filters = ({ attributes, errorMessage, onFilterChange }: FiltersProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showError, setShowError] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState<{ [key: string]: boolean }>({});
   const [moreOptionsVisible, setMoreOptionsVisible] = useState<{ [key: string]: boolean }>({});
+  const [selectedFilters, setSelectedFilters] = useState<{ name: string; value: string }[]>([]);
 
   useEffect(() => {
     if (errorMessage) {
@@ -25,6 +27,15 @@ const Filters = ({ attributes, errorMessage }: FiltersProps) => {
       setExpandedFilters(defaultExpanded);
     }
   }, [errorMessage, attributes]);
+
+  const handleFilterChange = (attributeName: string, optionValue: string, checked: boolean) => {
+    const updatedFilters = checked
+      ? [...selectedFilters, { name: attributeName, value: optionValue }]
+      : selectedFilters.filter(filter => !(filter.name === attributeName && filter.value === optionValue));
+
+    setSelectedFilters(updatedFilters);
+    onFilterChange(updatedFilters);
+  };
 
   const toggleFilter = (name: string) => {
     setExpandedFilters((prev) => ({
@@ -64,7 +75,7 @@ const Filters = ({ attributes, errorMessage }: FiltersProps) => {
           >
             {attribute.name}
             <img
-              src={expandedFilters[attribute.name] ? '/icons/arrow-up.svg' : '/icons/arrow-right-black.svg'}
+              src={expandedFilters[attribute.name] ? '/icons/arrow-up.svg' : '/icons/arrow-down.svg'}
               alt={expandedFilters[attribute.name] ? 'Arrow up' : 'Arrow down'}
               className="w-4 h-4"
             />
@@ -80,6 +91,7 @@ const Filters = ({ attributes, errorMessage }: FiltersProps) => {
                     name={option}
                     value={option}
                     className="w-5 h-5 mr-2 rounded-tl-[4px] border-gray-300"
+                    onChange={(e) => handleFilterChange(attribute.name, option, e.target.checked)}
                   />
                   <label htmlFor={option}>{option}</label>
                 </div>
