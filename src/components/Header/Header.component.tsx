@@ -64,7 +64,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       {/* Menu toggle button */}
                       <button onClick={toggleMobileMenu}>
                         <img
-                          src={menuOpen ? '/icons/close-menu.svg' : '/icons/menu.svg'}
+                          src={menuOpen ? '/icons/close-button.svg' : '/icons/menu.svg'}
                           alt="Menu"
                           className="h-6"
                         />
