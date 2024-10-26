@@ -9,7 +9,18 @@ import FilterSkeleton from '@/components/Product/SkeletonFilter.component';
 import Snackbar from '@/components/UI/Snackbar.component';
 import { fetchCategoryBySlug, fetchProductAttributesWithTerms } from '../../utils/api/woocommerce';
 
-const icons = {
+interface Attribute {
+  id: number;
+  name: string;
+  options?: any[];
+}
+
+interface Category {
+  id: number;
+  name: string;
+}
+
+const icons: Record<string, string> = {
   'uchwyty-meblowe': '/icons/uchwyty-kształty.svg',
   klamki: '/icons/klamki-kształty.svg',
   wieszaki: '/icons/wieszaki-kształty.svg',
@@ -17,14 +28,14 @@ const icons = {
 
 const CategoryPage = () => {
   const router = useRouter();
-  const { slug } = router.query;
+  const slug = Array.isArray(router.query.slug) ? router.query.slug[0] : router.query.slug;
 
-  const [category, setCategory] = useState(null);
-  const [attributes, setAttributes] = useState([]);
+  const [category, setCategory] = useState<Category | null>(null);
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [filtersVisible, setFiltersVisible] = useState(false);
-  const [activeFilters, setActiveFilters] = useState([]);
+  const [activeFilters, setActiveFilters] = useState<{ name: string; value: string }[]>([]);
   const [sortingOption, setSortingOption] = useState('default');
   const [isArrowDown, setIsArrowDown] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -35,14 +46,14 @@ const CategoryPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const categoryData = await fetchCategoryBySlug(slug);
+        const categoryData = await fetchCategoryBySlug(slug as string);
         setCategory(categoryData);
 
-        const attributesData = await fetchProductAttributesWithTerms();
+        const attributesData: Attribute[] = await fetchProductAttributesWithTerms();
         setAttributes(attributesData);
 
         setLoading(false);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error loading category data:', error);
         setErrorMessage(error.message || 'Error loading category data');
         setLoading(false);
@@ -51,20 +62,18 @@ const CategoryPage = () => {
 
     fetchData();
 
-    // Detect mobile view
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
+    // Media query for detecting mobile
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [slug]);
 
-  const handleFilterChange = (selectedFilters) => {
+  const handleFilterChange = (selectedFilters: { name: string; value: string }[]) => {
     setActiveFilters(selectedFilters);
   };
 
-  const handleRemoveFilter = (filterToRemove) => {
+  const handleRemoveFilter = (filterToRemove: { name: string; value: string }) => {
     setActiveFilters(currentFilters =>
       currentFilters.filter(
         filter => filter.name !== filterToRemove.name || filter.value !== filterToRemove.value
@@ -75,10 +84,10 @@ const CategoryPage = () => {
   const toggleFilters = () => setFiltersVisible(!filtersVisible);
 
   const getCategoryIcon = () => {
-    if (icons[slug]) {
+    if (slug && icons[slug as string]) {
       return (
         <Image
-          src={icons[slug]}
+          src={icons[slug as string]}
           alt={`${slug} icon`}
           width={54}
           height={24}
@@ -160,7 +169,7 @@ const CategoryPage = () => {
           {/* Product Archive */}
           <div className={`${filtersVisible && !isMobile ? 'lg:w-3/4' : 'w-full'} w-full lg:pl-8`}>
             <ProductArchive
-              categoryId={category?.id}
+              categoryId={category?.id || 0}
               filters={activeFilters}
               sortingOption={sortingOption}
             />
