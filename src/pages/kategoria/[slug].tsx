@@ -46,7 +46,7 @@ const CategoryPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const categoryData = await fetchCategoryBySlug(slug as string);
+        const categoryData = await fetchCategoryBySlug(slug);
         setCategory(categoryData);
 
         const attributesData: Attribute[] = await fetchProductAttributesWithTerms();
@@ -62,8 +62,9 @@ const CategoryPage = () => {
 
     fetchData();
 
-    // Media query for detecting mobile
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -84,10 +85,10 @@ const CategoryPage = () => {
   const toggleFilters = () => setFiltersVisible(!filtersVisible);
 
   const getCategoryIcon = () => {
-    if (slug && icons[slug as string]) {
+    if (slug && icons[slug]) {
       return (
         <Image
-          src={icons[slug as string]}
+          src={icons[slug]}
           alt={`${slug} icon`}
           width={54}
           height={24}
@@ -150,7 +151,6 @@ const CategoryPage = () => {
         />
 
         <div className="flex">
-          {/* Filters Section for Desktop */}
           {!isMobile && filtersVisible && (
             <div className="w-1/4 pr-8">
               {attributes.length ? (
@@ -166,7 +166,6 @@ const CategoryPage = () => {
             </div>
           )}
 
-          {/* Product Archive */}
           <div className={`${filtersVisible && !isMobile ? 'lg:w-3/4' : 'w-full'} w-full lg:pl-8`}>
             <ProductArchive
               categoryId={category?.id || 0}
@@ -177,14 +176,15 @@ const CategoryPage = () => {
         </div>
       </div>
 
-      {/* Mobile Filters Modal */}
       {isMobile && filtersVisible && (
-        <div className="fixed inset-0 bg-white z-50 p-4 rounded-lg overflow-y-scroll">
-          <div className="flex justify-between items-center">
+        <div className="fixed inset-0 bg-white z-50 p-4 flex flex-col rounded-lg">
+          <div className="flex justify-between items-center mb-4">
             <h2 className="text-[24px] font-semibold">Filtry</h2>
             <button onClick={toggleFilters} className="text-[24px]">&times;</button>
           </div>
-          <div className="mt-4">
+
+          {/* Scrollable Filters */}
+          <div className="flex-grow overflow-y-auto mb-4">
             <Filters
               attributes={attributes}
               errorMessage={errorMessage || undefined}
@@ -192,11 +192,19 @@ const CategoryPage = () => {
               activeFilters={activeFilters}
             />
           </div>
-          <div className="flex justify-end gap-4 mt-4">
-            <button onClick={toggleFilters} className="border px-4 py-2 rounded-lg">
+
+          {/* Fixed Buttons at Bottom */}
+          <div className="fixed bottom-0 left-0 w-full bg-white p-4 flex flex-col gap-4">
+            <button
+              onClick={() => setActiveFilters([])}
+              className="inline-block w-full px-6 py-4 text-lg text-black bg-white border border-black rounded-full hover:bg-gray-100 transition-colors"
+            >
               Wyczysc filtry
             </button>
-            <button onClick={toggleFilters} className="bg-black text-white px-4 py-2 rounded-lg">
+            <button
+              onClick={toggleFilters}
+              className="inline-block w-full px-6 py-4 text-lg text-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors"
+            >
               Pokaż produkty
             </button>
           </div>
