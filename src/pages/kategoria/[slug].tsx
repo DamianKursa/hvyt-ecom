@@ -9,7 +9,7 @@ import FilterSkeleton from '@/components/Product/SkeletonFilter.component';
 import Snackbar from '@/components/UI/Snackbar.component';
 import { fetchCategoryBySlug, fetchProductAttributesWithTerms } from '../../utils/api/woocommerce';
 
-const icons: { [key: string]: string } = {
+const icons = {
   'uchwyty-meblowe': '/icons/uchwyty-kształty.svg',
   klamki: '/icons/klamki-kształty.svg',
   wieszaki: '/icons/wieszaki-kształty.svg',
@@ -19,13 +19,13 @@ const CategoryPage = () => {
   const router = useRouter();
   const { slug } = router.query;
 
-  const [category, setCategory] = useState<any>(null);
-  const [attributes, setAttributes] = useState<any[]>([]);
+  const [category, setCategory] = useState(null);
+  const [attributes, setAttributes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [filtersVisible, setFiltersVisible] = useState(true);
-  const [activeFilters, setActiveFilters] = useState<{ name: string; value: string }[]>([]);
-  const [sortingOption, setSortingOption] = useState('default'); // Default sorting
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [filtersVisible, setFiltersVisible] = useState(false);
+  const [activeFilters, setActiveFilters] = useState([]);
+  const [sortingOption, setSortingOption] = useState('default');
   const [isArrowDown, setIsArrowDown] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -35,14 +35,14 @@ const CategoryPage = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const categoryData = await fetchCategoryBySlug(slug as string);
+        const categoryData = await fetchCategoryBySlug(slug);
         setCategory(categoryData);
 
         const attributesData = await fetchProductAttributesWithTerms();
         setAttributes(attributesData);
 
         setLoading(false);
-      } catch (error: any) {
+      } catch (error) {
         console.error('Error loading category data:', error);
         setErrorMessage(error.message || 'Error loading category data');
         setLoading(false);
@@ -51,22 +51,23 @@ const CategoryPage = () => {
 
     fetchData();
 
-    // Media query for detecting mobile
-    const mediaQuery = window.matchMedia('(max-width: 768px)');
-    const handleResize = () => setIsMobile(mediaQuery.matches);
-    mediaQuery.addEventListener('change', handleResize);
-    handleResize(); // Initial check
-    return () => mediaQuery.removeEventListener('change', handleResize);
+    // Detect mobile view
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [slug]);
 
-  const handleFilterChange = (selectedFilters: { name: string; value: string }[]) => {
+  const handleFilterChange = (selectedFilters) => {
     setActiveFilters(selectedFilters);
   };
 
-  const handleRemoveFilter = (filterToRemove: { name: string; value: string }) => {
-    setActiveFilters((currentFilters) =>
+  const handleRemoveFilter = (filterToRemove) => {
+    setActiveFilters(currentFilters =>
       currentFilters.filter(
-        (filter) => filter.name !== filterToRemove.name || filter.value !== filterToRemove.value
+        filter => filter.name !== filterToRemove.name || filter.value !== filterToRemove.value
       )
     );
   };
@@ -74,10 +75,10 @@ const CategoryPage = () => {
   const toggleFilters = () => setFiltersVisible(!filtersVisible);
 
   const getCategoryIcon = () => {
-    if (icons[slug as string]) {
+    if (icons[slug]) {
       return (
         <Image
-          src={icons[slug as string]}
+          src={icons[slug]}
           alt={`${slug} icon`}
           width={54}
           height={24}
@@ -181,6 +182,14 @@ const CategoryPage = () => {
               onFilterChange={handleFilterChange}
               activeFilters={activeFilters}
             />
+          </div>
+          <div className="flex justify-end gap-4 mt-4">
+            <button onClick={toggleFilters} className="border px-4 py-2 rounded-lg">
+              Wyczysc filtry
+            </button>
+            <button onClick={toggleFilters} className="bg-black text-white px-4 py-2 rounded-lg">
+              Pokaż produkty
+            </button>
           </div>
         </div>
       )}

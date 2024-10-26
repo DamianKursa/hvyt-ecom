@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import Breadcrumbs from '../UI/Breadcrumbs.component'; // Import Breadcrumbs
-import useIsMobile from '@/utils/hooks/useIsMobile'; // Hook to check mobile view
-import MobileMenu from './MobileMenu'; // Import MobileMenu component
+import Breadcrumbs from '../UI/Breadcrumbs.component';
+import useIsMobile from '@/utils/hooks/useIsMobile';
+import MobileMenu from './MobileMenu';
 
 interface IHeaderProps {
   title?: string;
 }
 
 const Navbar: React.FC<IHeaderProps> = ({ title }) => {
-  const [menuOpen, setMenuOpen] = useState(false); // State to handle mobile menu
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (title) {
-      document.title = title; // Dynamically update document title
+      document.title = title;
     }
   }, [title]);
 
@@ -23,17 +23,17 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const isHomePage = router.pathname === '/';
 
   const toggleMobileMenu = () => {
-    setMenuOpen(!menuOpen); // Toggle mobile menu
+    setMenuOpen(!menuOpen);
   };
 
   return (
     <>
       {/* MobileMenu Component */}
-      {isMobile && (
+      {isMobile && menuOpen && (
         <MobileMenu menuOpen={menuOpen} toggleMenu={toggleMobileMenu} />
       )}
 
-      <header className="fixed w-full top-0 z-50 bg-transparent px-4"> {/* Added 16px padding */}
+      <header className="fixed w-full top-0 z-50 bg-transparent px-4">
         <nav className="w-full h-full">
           <div className="container mx-auto max-w-grid-desktop h-full flex flex-col justify-center items-center">
             <div className="w-full h-[78px] flex justify-between items-center">
@@ -46,11 +46,70 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                 </Link>
               </div>
 
+              {/* Center Navigation Links for Desktop with Styling */}
+              {!isMobile && (
+                <div className="flex-none mx-auto max-w-[630px] w-full">
+                  <div className="hidden md:flex md:items-center rounded-full justify-center h-[50px]" style={{ backgroundColor: '#E9E5DFCC' }}>
+                    <ul className="flex items-center text-base text-neutral-darkest w-full justify-between text-[16px] whitespace-nowrap">
+                      <li>
+                        <Link href="/kategoria/uchwyty-meblowe">
+                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                            Uchwyty
+                          </span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/kategoria/klamki">
+                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                            Klamki
+                          </span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/kategoria/wieszaki">
+                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                            Wieszaki
+                          </span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/hvyt-objects">
+                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                            Hvyt Objects
+                          </span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/kolekcje">
+                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                            Kolekcje
+                          </span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/o-nas">
+                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                            O nas
+                          </span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/kontakt">
+                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                            Kontakt
+                          </span>
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+
               {/* Right Icons (Cart, Wishlist, Menu) */}
               <div className="flex-none">
                 <div
                   className="flex items-center space-x-4 px-6 py-2 rounded-full h-[50px]"
-                  style={{ backgroundColor: '#E9E5DFCC' }} // Semi-transparent background
+                  style={{ backgroundColor: '#E9E5DFCC' }}
                 >
                   {isMobile ? (
                     // Mobile Icons and Menu Button
@@ -64,14 +123,14 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       {/* Menu toggle button */}
                       <button onClick={toggleMobileMenu}>
                         <img
-                          src={menuOpen ? '/icons/close-button.svg' : '/icons/menu.svg'}
+                          src={menuOpen ? '/icons/close-button.svg' : '/icons/menu-icon.svg'}
                           alt="Menu"
                           className="h-6"
                         />
                       </button>
                     </div>
                   ) : (
-                    // Desktop Layout
+                    // Desktop Right Icons Layout, always visible
                     <div className="flex items-center space-x-4">
                       <Link href="/search">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
