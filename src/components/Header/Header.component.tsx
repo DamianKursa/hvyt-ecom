@@ -53,7 +53,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
 
               {/* Center Navigation Links for Desktop with Styling */}
               {!isMobile && (
-                <div className="flex-none mx-auto max-w-[630px] w-full">
+                <div className="flex-none mx-auto max-w-[530px] w-full">
                   <div className="hidden md:flex md:items-center rounded-full justify-center h-[50px]" style={{ backgroundColor: '#E9E5DFCC' }}>
                     <ul className="flex items-center text-base w-full justify-center text-[16px] whitespace-nowrap">
                       <li>

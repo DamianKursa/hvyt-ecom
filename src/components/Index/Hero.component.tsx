@@ -39,7 +39,10 @@ const Hero: React.FC<HeroProps> = ({
   return (
     <section
       id="hero"
-      className={`relative flex items-center w-full min-h-[795px] mx-auto overflow-hidden ${bgColor}`}
+      className={`relative flex items-center w-full min-h-[795px] mx-auto overflow-hidden`}
+      style={{
+        background: bgColor,
+      }}
     >
       <div className="container mx-auto max-w-grid-desktop h-full flex justify-between items-center">
         {/* Background boxes for animation */}
@@ -78,8 +81,8 @@ const Hero: React.FC<HeroProps> = ({
             <h1 className="text-6xl font-bold leading-tight text-dark-pastel-red mb-4">
               {title}
             </h1>
-            <p className="text-lg leading-relaxed text-neutral-darkest mb-6">
-              {description}
+            <p className="text-lg font-normal leading-relaxed text-neutral-darkest mb-6">
+            Od eleganckich, nowoczesnych wzorów uchwytów <br /> meblowych po ponadczasowe klasyki. Sprawdź jak <br /> nasze Hvyty mogą odmienić Twoje wnętrze.
             </p>
 
             <div className="flex space-x-4">
@@ -88,6 +91,12 @@ const Hero: React.FC<HeroProps> = ({
                 href={buttonLink}
               >
                 {buttonText}
+              </a>
+              <a
+                className="inline-block  px-6 py-3 text-lg border border-black align-center text-black rounded-full hover:border-dark-pastel-red hover:bg-transparent hover:text-dark-pastel-red transition-colors"
+                href={buttonLink}
+              >
+                Zobacz gałki
               </a>
             </div>
           </div>
