@@ -31,6 +31,8 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
       : 'hover:bg-[#DAD3C8] text-neutral-darkest';
   };
 
+  const iconClass = "w-6 h-6"; // Uniform icon dimensions
+
   return (
     <>
       {/* MobileMenu Component */}
@@ -112,35 +114,35 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                   {isMobile ? (
                     <div className="flex items-center space-x-4">
                       <Link href="/search">
-                        <img src="/icons/search.svg" alt="Search" className="h-6" />
+                        <img src="/icons/search.svg" alt="Search" className={iconClass} />
                       </Link>
                       <Link href="/cart">
-                        <img src="/icons/cart.svg" alt="Cart" className="h-6" />
+                        <img src="/icons/cart.svg" alt="Cart" className={iconClass} />
                       </Link>
                       <button onClick={toggleMobileMenu}>
-                        <img src={menuOpen ? '/icons/close-button.svg' : '/icons/menu-icon.svg'} alt="Menu" className="h-6" />
+                        <img src={menuOpen ? '/icons/close-button.svg' : '/icons/menu-icon.svg'} alt="Menu" className={iconClass} />
                       </button>
                     </div>
                   ) : (
                     <div className="flex items-center space-x-4">
                       <Link href="/search">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img src="/icons/search.svg" alt="Search" className="h-6" />
+                          <img src="/icons/search.svg" alt="Search" className={iconClass} />
                         </span>
                       </Link>
                       <Link href="/wishlist">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img src="/icons/wishlist.svg" alt="Wishlist" className="h-6" />
+                          <img src="/icons/wishlist.svg" alt="Wishlist" className={iconClass} />
                         </span>
                       </Link>
                       <Link href="/profile">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img src="/icons/user.svg" alt="User" className="h-6" />
+                          <img src="/icons/user.svg" alt="User" className={iconClass} />
                         </span>
                       </Link>
                       <Link href="/cart">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img src="/icons/cart.svg" alt="Cart" className="h-6" />
+                          <img src="/icons/cart.svg" alt="Cart" className={iconClass} />
                         </span>
                       </Link>
                     </div>
