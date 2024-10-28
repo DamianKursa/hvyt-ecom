@@ -34,11 +34,11 @@ const CategoryPage = () => {
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [filtersVisible, setFiltersVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [filtersVisible, setFiltersVisible] = useState(!isMobile); // Initially visible on Desktop, hidden on Mobile
   const [activeFilters, setActiveFilters] = useState<{ name: string; value: string }[]>([]);
   const [sortingOption, setSortingOption] = useState('default');
   const [isArrowDown, setIsArrowDown] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -63,8 +63,11 @@ const CategoryPage = () => {
     fetchData();
 
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
+      const isCurrentlyMobile = window.innerWidth <= 768;
+      setIsMobile(isCurrentlyMobile);
+      setFiltersVisible(!isCurrentlyMobile); // Show on Desktop, hide on Mobile
     };
+
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -143,7 +146,7 @@ const CategoryPage = () => {
           toggleFilters={toggleFilters}
           filters={activeFilters}
           sorting={sortingOption}
-          onSortingChange={(e) => setSortingOption(e.target.value)}
+          onSortingChange={setSortingOption} // Directly pass the sorting value
           onRemoveFilter={handleRemoveFilter}
           isArrowDown={isArrowDown}
           setIsArrowDown={setIsArrowDown}
