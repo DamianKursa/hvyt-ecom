@@ -166,7 +166,7 @@ const CategoryPage = () => {
             </div>
           )}
 
-          <div className={`${filtersVisible && !isMobile ? 'lg:w-3/4' : 'w-full'} w-full lg:pl-8`}>
+          <div className={`${filtersVisible && !isMobile ? 'lg:w-3/4' : 'w-full'} w-full`}>
             <ProductArchive
               categoryId={category?.id || 0}
               filters={activeFilters}

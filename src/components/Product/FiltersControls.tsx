@@ -23,11 +23,11 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
   setIsArrowDown,
   isMobile,
 }) => (
-  <div className={`flex ${isMobile ? 'justify-center' : 'justify-between'} items-center mb-4`}>
+  <div className={`flex ${isMobile ? 'justify-between' : 'justify-between'} items-center mb-4`}>
     {/* Filtry Button */}
     <button
       onClick={toggleFilters}
-      className={`filters-toggle border rounded-[24px] ${isMobile ? 'w-1/2 text-[18px]' : 'w-[352px] text-[24px]'} p-[7px_16px] flex justify-center items-center cursor-pointer ${isMobile ? '' : 'justify-between'}`}
+      className={`filters-toggle border rounded-[24px] ${isMobile ? 'w-1/2' : 'w-[352px] text-[16px]'} p-[7px_16px] mr-[32px] font-bold flex justify-between items-center`}
     >
       <span className="font-semibold text-center">Filtry</span>
       {!isMobile && (
@@ -56,10 +56,10 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
       </div>
     )}
 
-    {/* Sorting Button */}
-    <div className={`relative ${isMobile ? 'w-1/2' : 'w-[340px] ml-auto'}`}>
+    {/* Sorting Button with Text Left-Aligned and Icon on Right */}
+    <div className={`relative ${isMobile ? 'w-1/2' : 'w-[352px] ml-auto'}`}>
       <button
-        className={`border rounded-[24px] ${isMobile ? 'w-full text-[18px]' : 'w-[340px] text-[16px]'} p-[7px_16px] font-bold flex justify-between items-center`}
+        className={`border rounded-[24px] w-full text-[16px] p-[7px_16px] font-bold flex justify-between items-center`}
         onClick={() => setIsArrowDown(!isArrowDown)}
       >
         <span className="text-left">Sortowanie</span>

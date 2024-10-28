@@ -11,6 +11,9 @@ interface IHeaderProps {
 
 const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
+  const isMobile = useIsMobile();
+  const isHomePage = router.pathname === '/';
 
   useEffect(() => {
     if (title) {
@@ -18,12 +21,14 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
     }
   }, [title]);
 
-  const isMobile = useIsMobile();
-  const router = useRouter();
-  const isHomePage = router.pathname === '/';
-
   const toggleMobileMenu = () => {
     setMenuOpen(!menuOpen);
+  };
+
+  const getActiveClass = (path: string) => {
+    return router.asPath === path
+      ? 'bg-white text-[#661F30]'
+      : 'hover:bg-[#DAD3C8] text-neutral-darkest';
   };
 
   return (
@@ -50,52 +55,45 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               {!isMobile && (
                 <div className="flex-none mx-auto max-w-[630px] w-full">
                   <div className="hidden md:flex md:items-center rounded-full justify-center h-[50px]" style={{ backgroundColor: '#E9E5DFCC' }}>
-                    <ul className="flex items-center text-base text-neutral-darkest w-full justify-between text-[16px] whitespace-nowrap">
+                    <ul className="flex items-center text-base w-full justify-center text-[16px] whitespace-nowrap">
                       <li>
                         <Link href="/kategoria/uchwyty-meblowe">
-                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/uchwyty-meblowe')}`}>
                             Uchwyty
                           </span>
                         </Link>
                       </li>
                       <li>
                         <Link href="/kategoria/klamki">
-                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/klamki')}`}>
                             Klamki
                           </span>
                         </Link>
                       </li>
                       <li>
                         <Link href="/kategoria/wieszaki">
-                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/wieszaki')}`}>
                             Wieszaki
                           </span>
                         </Link>
                       </li>
                       <li>
-                        <Link href="/hvyt-objects">
-                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
-                            Hvyt Objects
-                          </span>
-                        </Link>
-                      </li>
-                      <li>
                         <Link href="/kolekcje">
-                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kolekcje')}`}>
                             Kolekcje
                           </span>
                         </Link>
                       </li>
                       <li>
                         <Link href="/o-nas">
-                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/o-nas')}`}>
                             O nas
                           </span>
                         </Link>
                       </li>
                       <li>
                         <Link href="/kontakt">
-                          <span className="px-3 py-2 font-semibold rounded-full hover:bg-[#DAD3C8] transition-all">
+                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kontakt')}`}>
                             Kontakt
                           </span>
                         </Link>
@@ -112,7 +110,6 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                   style={{ backgroundColor: '#E9E5DFCC' }}
                 >
                   {isMobile ? (
-                    // Mobile Icons and Menu Button
                     <div className="flex items-center space-x-4">
                       <Link href="/search">
                         <img src="/icons/search.svg" alt="Search" className="h-6" />
@@ -120,17 +117,11 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       <Link href="/cart">
                         <img src="/icons/cart.svg" alt="Cart" className="h-6" />
                       </Link>
-                      {/* Menu toggle button */}
                       <button onClick={toggleMobileMenu}>
-                        <img
-                          src={menuOpen ? '/icons/close-button.svg' : '/icons/menu-icon.svg'}
-                          alt="Menu"
-                          className="h-6"
-                        />
+                        <img src={menuOpen ? '/icons/close-button.svg' : '/icons/menu-icon.svg'} alt="Menu" className="h-6" />
                       </button>
                     </div>
                   ) : (
-                    // Desktop Right Icons Layout, always visible
                     <div className="flex items-center space-x-4">
                       <Link href="/search">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
