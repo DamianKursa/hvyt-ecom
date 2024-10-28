@@ -17,7 +17,7 @@ const CustomSlider = () => {
     {
       id: 3,
       image: '/images/03.png',
-      title: 'Jeśli natomiast masz już dość „starych” mebli.< /br> Gałki i uchwyty meblowe to doskonały pomysł na odświeżenie starej komody, szafki nocnej czy kuchni',
+      title: 'Jeśli natomiast masz już dość „starych” mebli. Gałki i uchwyty meblowe to doskonały pomysł na odświeżenie starej komody, szafki nocnej czy kuchni',
     },
     {
       id: 4,

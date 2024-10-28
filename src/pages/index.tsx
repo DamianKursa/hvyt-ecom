@@ -38,24 +38,3 @@ const Index: NextPage = () => (
 )
 
 export default Index;
-
-/* 
-// Uncomment this if you need to fetch products in the future
-// GraphQL
-import { FETCH_ALL_PRODUCTS_QUERY } from '@/utils/gql/GQL_QUERIES';
-import client from '@/utils/apollo/ApolloClient';
-
-export const getStaticProps: GetStaticProps = async () => {
-  const { data, loading, networkStatus } = await client.query({
-    query: FETCH_ALL_PRODUCTS_QUERY,
-  });
-
-  return {
-    props: {
-      products: data.products.nodes,
-      loading,
-      networkStatus,
-    },
-    revalidate: 60,
-  };
-}; */
