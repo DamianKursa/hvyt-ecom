@@ -26,7 +26,7 @@ const Index: NextPage = () => (
     buttonLink="#"
     imageSrc="/images/hero-overlay.png"
     imageAlt="Hvyt Hero Image"
-    bgColor="bg-beige"
+    bgColor="color-neon-yellow"
   />
     <NewArrivals />
     <Bestsellers />
