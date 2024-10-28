@@ -1,34 +1,33 @@
-// ResponsiveSlider.tsx
-
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 
-interface SliderItem {
-  src: string;
-  alt: string;
-  title?: string;
-}
-
-interface ResponsiveSliderProps<T extends SliderItem> {
+interface ResponsiveSliderProps<T> {
   items: T[];
-  renderItem: (item: T) => JSX.Element;
+  renderItem: (item: T) => React.ReactNode;
   showTitle?: boolean;
 }
 
-const ResponsiveSlider = <T extends SliderItem>({
+const ResponsiveSlider = <T extends { title?: string } = any>({
   items,
   renderItem,
   showTitle = true,
 }: ResponsiveSliderProps<T>) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSlideChange = (swiper: any) => {
     setActiveIndex(swiper.realIndex);
   };
 
+  if (!isClient) return null;
+
   return (
-    <div className="relative">
+    <div className="container mx-auto max-w-full px-4 relative">
       <Swiper
         spaceBetween={16}
         slidesPerView={1.2}
@@ -36,10 +35,10 @@ const ResponsiveSlider = <T extends SliderItem>({
         className="w-full"
       >
         {items.map((item, index) => (
-          <SwiperSlide key={index}>
-            <div className="relative">
+          <SwiperSlide key={index} className="overflow-hidden relative">
+            <div className="relative w-full h-[350px] rounded-lg overflow-hidden">
               {renderItem(item)}
-              {showTitle && item.title && (
+              {showTitle && 'title' in item && item.title && (
                 <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                   {item.title}
                 </div>
@@ -49,13 +48,13 @@ const ResponsiveSlider = <T extends SliderItem>({
         ))}
       </Swiper>
 
-      {/* Custom Pagination Control - Positioned below the slider */}
-      <div className="flex mt-8">
+      {/* Custom Pagination Control - Positioned 30px below the boxes */}
+      <div className="absolute left-0 right-0 bottom-[-30px] h-[1px] bg-pastel-beige flex">
         {items.map((_, index) => (
           <div
             key={index}
-            className={`h-[1.5px] flex-1 transition-all duration-500 ${
-              index === activeIndex ? 'bg-dark-pastel-red' : 'bg-neutral-light'
+            className={`h-full transition-all duration-500 ${
+              index === activeIndex ? 'bg-dark-pastel-red flex-grow' : 'bg-neutral-light flex-1'
             }`}
           />
         ))}
