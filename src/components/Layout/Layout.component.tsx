@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 // Components
 import Header from '@/components/Header/Header.component';
 import Footer from '@/components/Footer/Footer.component';
-import Stickynav from '@/components/Footer/Stickynav.component';
 
 // State
 import { CartContext } from '@/stores/CartProvider';
@@ -33,16 +32,15 @@ const Layout = ({ children, title }: ILayoutProps) => {
   const { setCart } = useContext(CartContext);
   const router = useRouter();
 
-  // Define the pages that should not have a margin
+  // Define the pages that should have the Hero as full width
   const noMarginPages = ['/', '/o-nas', '/hvyt-objects'];
 
-  // Check if the current page should have a margin or not
-  const hasMargin = !noMarginPages.includes(router.pathname);
+  // Determine if the current page should have the full-width Hero
+  const isFullWidthHero = noMarginPages.includes(router.pathname);
 
   const { data, refetch } = useQuery(GET_CART, {
     notifyOnNetworkStatusChange: true,
     onCompleted: () => {
-      // Update cart in the localStorage.
       const updatedCart = getFormattedCart(data);
 
       if (!updatedCart && !data?.cart?.contents?.nodes.length) {
@@ -50,8 +48,6 @@ const Layout = ({ children, title }: ILayoutProps) => {
       }
 
       localStorage.setItem('woocommerce-cart', JSON.stringify(updatedCart));
-
-      // Update cart data in React Context.
       setCart(updatedCart);
     },
   });
@@ -64,11 +60,19 @@ const Layout = ({ children, title }: ILayoutProps) => {
     <>
       {/* Header */}
       <Header title={title} />
-      
-      {/* Main content area with conditional margin-top and responsive padding */}
-      <main className={`${hasMargin ? 'mt-[120px]' : ''} px-4 md:px-0`}>
-        {children}
-      </main>
+
+      {/* Conditionally apply max-width based on isFullWidthHero */}
+      {isFullWidthHero ? (
+        <main className={`${hasMargin ? 'mt-[120px]' : ''} px-4 md:px-0`}>
+          {children}
+        </main>
+      ) : (
+        <div className="max-w-[1440px] mx-auto">
+          <main className={`${hasMargin ? 'mt-[120px]' : ''} px-4 md:px-0`}>
+            {children}
+          </main>
+        </div>
+      )}
       
       {/* Footer and Sticky Navigation */}
       <Footer />

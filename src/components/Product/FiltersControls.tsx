@@ -9,7 +9,7 @@ interface FiltersControlsProps {
   onRemoveFilter: (filter: { name: string; value: string }) => void;
   isArrowDown: boolean;
   setIsArrowDown: React.Dispatch<React.SetStateAction<boolean>>;
-  isMobile: boolean; // Ensure this is defined here
+  isMobile: boolean;
 }
 
 const FiltersControls: React.FC<FiltersControlsProps> = ({
@@ -39,36 +39,9 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
       )}
     </button>
 
-    {/* Sorting Button */}
-    <div className={`relative ${isMobile ? 'w-1/2' : 'w-[340px]'}`}>
-      <button
-        className={`border rounded-[24px] ${isMobile ? 'w-full text-[18px]' : 'w-[340px] text-[16px]'} p-[7px_16px] font-bold flex justify-center items-center`}
-        onClick={() => setIsArrowDown(!isArrowDown)}
-      >
-        Sortowanie
-        {!isMobile && (
-          <img
-            src={isArrowDown ? '/icons/arrow-down.svg' : '/icons/arrow-up.svg'}
-            alt="Arrow"
-            className="w-[16px] h-[16px]"
-          />
-        )}
-      </button>
-      <select
-        className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-10"
-        value={sorting}
-        onChange={onSortingChange}
-      >
-        <option value="bestsellers">Bestsellers</option>
-        <option value="newest">Najnowsze produkty</option>
-        <option value="price-desc">Najwyższa cena</option>
-        <option value="price-asc">Najniższa cena</option>
-      </select>
-    </div>
-
     {/* Active Filters for Desktop */}
     {!isMobile && (
-      <div className="flex gap-2">
+      <div className="flex gap-2 ml-4 flex-wrap">
         {filters.map((filter) => (
           <span key={`${filter.name}-${filter.value}`} className="flex items-center text-[14px]">
             {filter.value}
@@ -82,6 +55,31 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
         ))}
       </div>
     )}
+
+    {/* Sorting Button */}
+    <div className={`relative ${isMobile ? 'w-1/2' : 'w-[340px] ml-auto'}`}>
+      <button
+        className={`border rounded-[24px] ${isMobile ? 'w-full text-[18px]' : 'w-[340px] text-[16px]'} p-[7px_16px] font-bold flex justify-between items-center`}
+        onClick={() => setIsArrowDown(!isArrowDown)}
+      >
+        <span className="text-left">Sortowanie</span>
+        <img
+          src={isArrowDown ? '/icons/arrow-down.svg' : '/icons/arrow-up.svg'}
+          alt="Arrow"
+          className="w-[16px] h-[16px]"
+        />
+      </button>
+      <select
+        className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-10"
+        value={sorting}
+        onChange={onSortingChange}
+      >
+        <option value="bestsellers">Bestsellers</option>
+        <option value="newest">Najnowsze produkty</option>
+        <option value="price-desc">Najwyższa cena</option>
+        <option value="price-asc">Najniższa cena</option>
+      </select>
+    </div>
   </div>
 );
 
