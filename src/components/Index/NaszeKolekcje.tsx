@@ -36,7 +36,7 @@ const NaszeKolekcje = () => {
 
   return (
     <section
-      className="w-full pt-[88px] py-16"
+      className="w-full pt-[88px] py-16 px-4 sm:px-4 md:px-0"
       style={{ backgroundColor: 'var(--color-beige)' }}
     >
       <div className="container mx-auto max-w-grid-desktop">
@@ -57,54 +57,59 @@ const NaszeKolekcje = () => {
               Zobacz wszystkie kolekcje →
             </Link>
           </div>
-
+  
           {/* Image Grid */}
           <div className="grid grid-cols-4 gap-6">
             {kolekcjePosts.slice(0, 4).map((kolekcja) => (
-                <a  href={`/kolekcje/${kolekcja.slug}`} key={kolekcja.id} className="relative w-full" style={{ height: '445px' }}>
-                  <Image
-                    src={kolekcja.imageUrl || '/placeholder.jpg'}
-                    alt={kolekcja.title.rendered}
-                    layout="fill"
-                    objectFit="cover"
-                    quality={100}
-                    className="rounded-lg h-full"
-                  />
-                  <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red">
-                    {kolekcja.title.rendered}
-                  </div>
-                </a>
+              <a
+                href={`/kolekcje/${kolekcja.slug}`}
+                key={kolekcja.id}
+                className="relative w-full"
+                style={{ height: '445px' }}
+              >
+                <Image
+                  src={kolekcja.imageUrl || '/placeholder.jpg'}
+                  alt={kolekcja.title.rendered}
+                  layout="fill"
+                  objectFit="cover"
+                  quality={100}
+                  className="rounded-lg h-full"
+                />
+                <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red">
+                  {kolekcja.title.rendered}
+                </div>
+              </a>
             ))}
           </div>
         </div>
-
+  
         {/* Mobile View: Swiper */}
         <div className="md:hidden">
           <Swiper spaceBetween={16} slidesPerView={1.2}>
             {kolekcjePosts.map((kolekcja) => (
               <SwiperSlide key={kolekcja.id}>
-                  <a href={`/kolekcje/${kolekcja.slug}`} className="relative w-full">
-                    <Image
-                      src={kolekcja.imageUrl || '/placeholder.jpg'}
-                      alt={kolekcja.title.rendered}
-                      width={400}
-                      height={446}
-                      layout="responsive"
-                      objectFit="cover"
-                      quality={100}
-                      className="rounded-lg"
-                    />
-                    <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                      {kolekcja.title.rendered}
-                    </div>
-                  </a>
+                <a href={`/kolekcje/${kolekcja.slug}`} className="relative w-full">
+                  <Image
+                    src={kolekcja.imageUrl || '/placeholder.jpg'}
+                    alt={kolekcja.title.rendered}
+                    width={400}
+                    height={446}
+                    layout="responsive"
+                    objectFit="cover"
+                    quality={100}
+                    className="rounded-lg"
+                  />
+                  <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest">
+                    {kolekcja.title.rendered}
+                  </div>
+                </a>
               </SwiperSlide>
             ))}
           </Swiper>
         </div>
       </div>
     </section>
-  );
+  );  
 };
 
 export default NaszeKolekcje;

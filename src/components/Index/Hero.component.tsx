@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
 
 interface HeroProps {
   title: string;
@@ -39,7 +38,7 @@ const Hero: React.FC<HeroProps> = ({
   return (
     <section
       id="hero"
-      className={`relative flex items-center w-full min-h-[795px] mx-auto overflow-hidden`}
+      className="relative flex items-center w-full min-h-[795px] overflow-hidden px-4 md:px-0"
       style={{
         background: bgColor,
       }}
@@ -82,7 +81,7 @@ const Hero: React.FC<HeroProps> = ({
               {title}
             </h1>
             <p className="text-lg font-normal leading-relaxed text-neutral-darkest mb-6">
-            Od eleganckich, nowoczesnych wzorów uchwytów <br /> meblowych po ponadczasowe klasyki. Sprawdź jak <br /> nasze Hvyty mogą odmienić Twoje wnętrze.
+              {description}
             </p>
 
             <div className="flex space-x-4">
@@ -93,7 +92,7 @@ const Hero: React.FC<HeroProps> = ({
                 {buttonText}
               </a>
               <a
-                className="inline-block  px-6 py-3 text-lg border border-black align-center text-black rounded-full hover:border-dark-pastel-red hover:bg-transparent hover:text-dark-pastel-red transition-colors"
+                className="inline-block px-6 py-3 text-lg border border-black text-black rounded-full hover:border-dark-pastel-red hover:bg-transparent hover:text-dark-pastel-red transition-colors"
                 href={buttonLink}
               >
                 Zobacz gałki

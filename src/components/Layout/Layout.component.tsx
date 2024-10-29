@@ -21,22 +21,12 @@ interface ILayoutProps {
   title: string;
 }
 
-/**
- * Renders layout for each page. Also passes along the title to the Header component.
- * @function Layout
- * @param {ReactNode} children - Children to be rendered by Layout component
- * @param {TTitle} title - Title for the page. Is set in <title>{title}</title>
- * @returns {JSX.Element} - Rendered component
- */
-
 const Layout = ({ children, title }: ILayoutProps) => {
   const { setCart } = useContext(CartContext);
   const router = useRouter();
 
   // Define the pages that should have the Hero as full width
   const noMarginPages = ['/', '/o-nas', '/hvyt-objects'];
-
-  // Determine if the current page should have the full-width Hero or a margin
   const isFullWidthHero = noMarginPages.includes(router.pathname);
   const hasMargin = !isFullWidthHero;
 
@@ -60,21 +50,18 @@ const Layout = ({ children, title }: ILayoutProps) => {
 
   return (
     <>
-      {/* Header */}
       <Header title={title} />
-
-      {/* Conditionally apply max-width based on isFullWidthHero */}
+      
       {isFullWidthHero ? (
-        <main className="px-4 md:px-0">{children}</main>
+        <main className="w-full sm:px-4 md:px-0">{children}</main>
       ) : (
         <div className="max-w-[1440px] mx-auto">
-          <main className={`${hasMargin ? 'mt-[120px]' : ''} px-4 md:px-0`}>
+          <main className={`${hasMargin ? 'mt-[120px]' : ''} sm:mx-4 md:mx-0`}>
             {children}
           </main>
         </div>
       )}
       
-      {/* Footer and Sticky Navigation */}
       <Footer />
     </>
   );

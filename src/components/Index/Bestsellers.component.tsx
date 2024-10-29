@@ -76,7 +76,7 @@ const Bestsellers = () => {
   };
 
   return (
-    <section className="container mx-auto max-w-grid-desktop py-16">
+    <section className="container max-w-grid-desktop py-16 sm:px-4 md:px-0 mx-auto">
       <div className="flex justify-between mb-[40px]">
         <div className="flex flex-col h-full">
           <h2 className="font-size-h2 font-bold text-neutral-darkest">Bestsellers</h2>
