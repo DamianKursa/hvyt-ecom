@@ -347,6 +347,14 @@ const ProductPage = () => {
         </div>
         {showSnackbar && <Snackbar message={snackbarMessage} type={snackbarType} visible={showSnackbar} />}
       </section>
+      <section>
+        <div>
+          Lorem ipsum dolor sit amet consectetur adipisicing elit. At unde voluptatem mollitia nam sint amet ad, obcaecati, et officiis assumenda dolorum possimus incidunt vero dolorem! Atque maxime esse itaque explicabo.
+        </div>
+        <div>
+          <Image src="/images/karta-produktu-opis-kategorii.png" alt="Wishlist" width={24} height={24} />
+        </div>
+      </section>
     </Layout>
   );
 };

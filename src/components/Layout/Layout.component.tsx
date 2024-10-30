@@ -56,7 +56,7 @@ const Layout = ({ children, title }: ILayoutProps) => {
         <main className="w-full sm:px-4 md:px-0">{children}</main>
       ) : (
         <div className="max-w-[1440px] mx-auto">
-          <main className={`${hasMargin ? 'mt-[120px]' : ''} sm:mx-4 md:mx-0`}>
+          <main className={`${hasMargin ? 'mt-[120px]' : ''}`}>
             {children}
           </main>
         </div>
