@@ -71,15 +71,19 @@ const Bestsellers = () => {
 
   const handleNext = () => {
     if (canGoNext) {
-      setCurrentIndex((prevIndex) => Math.min(prevIndex + 1, totalItems - itemsPerPage));
+      setCurrentIndex((prevIndex) =>
+        Math.min(prevIndex + 1, totalItems - itemsPerPage),
+      );
     }
   };
 
   return (
     <section className="container max-w-grid-desktop py-16 sm:px-4 md:px-0 mx-auto">
       <div className="flex justify-between mb-[40px]">
-        <div className="flex flex-col h-full">
-          <h2 className="font-size-h2 font-bold text-neutral-darkest">Bestsellers</h2>
+        <div className="flex px-[16px] lg:px-0 flex-col h-full">
+          <h2 className="font-size-h2 font-bold text-neutral-darkest">
+            Bestsellers
+          </h2>
           <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
             Poznaj nasze najpopularniejsze modele.
           </p>
@@ -90,16 +94,24 @@ const Bestsellers = () => {
           <button
             onClick={handlePrev}
             className={`p-3 rounded-full shadow-lg ${
-              canGoPrev ? 'bg-black text-white' : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
+              canGoPrev
+                ? 'bg-black text-white'
+                : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
             }`}
             disabled={!canGoPrev}
           >
-            <img src="/icons/arrow-left.svg" alt="Previous" className="h-6 w-6" />
+            <img
+              src="/icons/arrow-left.svg"
+              alt="Previous"
+              className="h-6 w-6"
+            />
           </button>
           <button
             onClick={handleNext}
             className={`p-3 rounded-full shadow-lg ${
-              canGoNext ? 'bg-black text-white' : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
+              canGoNext
+                ? 'bg-black text-white'
+                : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
             }`}
             disabled={!canGoNext}
           >
@@ -126,7 +138,9 @@ const Bestsellers = () => {
                 transition: 'all 0.3s ease',
               }}
             >
-              <ProductPreview product={{ ...product, images: [{ src: product.image.src }] }} />
+              <ProductPreview
+                product={{ ...product, images: [{ src: product.image.src }] }}
+              />
             </div>
           ))}
         </div>
@@ -137,7 +151,9 @@ const Bestsellers = () => {
         <ResponsiveSlider
           items={products}
           renderItem={(product: Product) => (
-            <ProductPreview product={{ ...product, images: [{ src: product.image.src }] }} />
+            <ProductPreview
+              product={{ ...product, images: [{ src: product.image.src }] }}
+            />
           )}
           showTitle={false}
         />

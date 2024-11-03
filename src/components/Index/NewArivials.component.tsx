@@ -10,8 +10,16 @@ interface NewArrivalItem {
 
 const NewArrivalsSection = () => {
   const newArrivalsItems: NewArrivalItem[] = [
-    { src: '/images/new-arrivals-1.png', alt: 'New Arrival 1', title: 'Nowość 1' },
-    { src: '/images/new-arrivals-2.png', alt: 'New Arrival 2', title: 'Nowość 2' },
+    {
+      src: '/images/new-arrivals-1.png',
+      alt: 'New Arrival 1',
+      title: 'Nowość 1',
+    },
+    {
+      src: '/images/new-arrivals-2.png',
+      alt: 'New Arrival 2',
+      title: 'Nowość 2',
+    },
     { src: '/images/new-arrivals-3.png', alt: 'New Arrival 3' },
     { src: '/images/new-arrivals-4.png', alt: 'New Arrival 4' },
   ];
@@ -19,7 +27,7 @@ const NewArrivalsSection = () => {
   return (
     <section className="container mx-auto max-w-grid-desktop mt-[115px] py-16">
       {/* Heading, Description, and Button - Visible on both Desktop and Mobile */}
-      <div className="flex flex-col items-start mb-8 md:hidden">
+      <div className=" px-[16px] flex flex-col items-start mb-8 md:hidden">
         <h2 className="font-size-h2 font-bold text-neutral-darkest">
           Zobacz nasze nowości
         </h2>

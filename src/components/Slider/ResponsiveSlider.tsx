@@ -8,7 +8,11 @@ interface ResponsiveSliderProps<T> {
   showTitle?: boolean; // Control title overlay
 }
 
-const ResponsiveSlider = <T extends {}>({ items, renderItem, showTitle = false }: ResponsiveSliderProps<T>) => {
+const ResponsiveSlider = <T extends {}>({
+  items,
+  renderItem,
+  showTitle = false,
+}: ResponsiveSliderProps<T>) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isClient, setIsClient] = useState(false);
 
@@ -46,12 +50,14 @@ const ResponsiveSlider = <T extends {}>({ items, renderItem, showTitle = false }
       </Swiper>
 
       {/* Custom Pagination Control - Positioned 30px below the boxes */}
-      <div className="absolute left-0 right-0 bottom-[-30px] h-[1px] bg-pastel-beige flex">
+      <div className="px-[16px] absolute left-0 right-0 bottom-[-30px] h-[1px] bg-pastel-beige flex">
         {items.map((_, index) => (
           <div
             key={index}
             className={`h-full transition-all duration-500 ${
-              index === activeIndex ? 'bg-dark-pastel-red flex-grow' : 'bg-neutral-light flex-1'
+              index === activeIndex
+                ? 'bg-dark-pastel-red flex-grow'
+                : 'bg-neutral-light flex-1'
             }`}
           />
         ))}
