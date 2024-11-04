@@ -4,7 +4,12 @@ import Layout from '@/components/Layout/Layout.component';
 import { Kolekcja } from '../../utils/functions/interfaces';
 import SkeletonCollectionPage from '@/components/Product/SkeletonCollectionPage';
 import ProductPreview from '../../components/Product/ProductPreview.component';
-import { fetchCategoryBySlug, fetchProductsByCategoryId, fetchKolekcjePostsWithImages, fetchMediaById } from '../../utils/api/woocommerce';
+import {
+  fetchCategoryBySlug,
+  fetchProductsByCategoryId,
+  fetchKolekcjePostsWithImages,
+  fetchMediaById,
+} from '../../utils/api/woocommerce';
 import { useRouter } from 'next/router';
 
 const CollectionPage = () => {
@@ -13,7 +18,10 @@ const CollectionPage = () => {
 
   const slugString = Array.isArray(slug) ? slug[0] : slug;
 
-  const [products, setProducts] = useState<any[]>([]);
+  const [productsData, setProductsData] = useState<{
+    products: any[];
+    totalProducts: number;
+  } | null>(null);
   const [kolekcjeData, setKolekcjeData] = useState<Kolekcja[] | null>(null);
   const [featuredImage, setFeaturedImage] = useState<string | null>(null);
   const [content, setContent] = useState<string | null>(null);
@@ -35,21 +43,29 @@ const CollectionPage = () => {
         // Fetch category by slug
         const categoryData = await fetchCategoryBySlug(slugString);
 
-        // Fetch products by category ID (fetch all products, no limit)
-        const fetchedProducts = await fetchProductsByCategoryId(categoryData.id);
-        setProducts(fetchedProducts);
+        // Fetch products by category ID
+        const fetchedProducts = await fetchProductsByCategoryId(
+          categoryData.id,
+        );
+        setProductsData(fetchedProducts); // Assuming fetchedProducts has { products: any[], totalProducts: number }
 
         // Fetch Kolekcje data for the slider
         const fetchedKolekcje = await fetchKolekcjePostsWithImages();
         setKolekcjeData(fetchedKolekcje);
 
         // Fetch Kolekcja details like content and featured image
-        const currentKolekcja = fetchedKolekcje.find((kolekcja: Kolekcja) => kolekcja.slug === slugString);
-        setContent(stripHTML(currentKolekcja?.content.rendered || 'Opis kolekcji.'));
+        const currentKolekcja = fetchedKolekcje.find(
+          (kolekcja: Kolekcja) => kolekcja.slug === slugString,
+        );
+        setContent(
+          stripHTML(currentKolekcja?.content.rendered || 'Opis kolekcji.'),
+        );
 
         // Fetch the featured image
         if (currentKolekcja?.featured_media) {
-          const featuredImageUrl = await fetchMediaById(currentKolekcja.featured_media);
+          const featuredImageUrl = await fetchMediaById(
+            currentKolekcja.featured_media,
+          );
           setFeaturedImage(featuredImageUrl);
         }
 
@@ -65,7 +81,7 @@ const CollectionPage = () => {
   }, [slugString]);
 
   const handleCollectionClick = (kolekcjaSlug: string) => {
-    setLoading(true); // Set loading to true when user clicks on a collection box
+    setLoading(true);
     router.push(`/kolekcje/${kolekcjaSlug}`);
   };
 
@@ -94,10 +110,12 @@ const CollectionPage = () => {
           {/* First Section: Title, Content, Featured Image */}
           <div
             className="grid grid-cols-2 gap-8 mb-12 rounded-lg"
-            style={{ minHeight: '521px', backgroundColor: '#E9E5DF' }} // Background color and rounded corners
+            style={{ minHeight: '521px', backgroundColor: '#E9E5DF' }}
           >
             <div className="flex flex-col justify-end p-6">
-              <h1 className="font-size-h1 font-bold text-dark-pastel-red">{slugString}</h1>
+              <h1 className="font-size-h1 font-bold text-dark-pastel-red">
+                {slugString}
+              </h1>
               <p className="font-size-text-medium text-neutral-darkest">
                 {content}
               </p>
@@ -108,7 +126,7 @@ const CollectionPage = () => {
                   src={featuredImage}
                   alt={slugString as string}
                   layout="fill"
-                  objectFit="cover" // Ensure the image covers the full container
+                  objectFit="cover"
                   className="rounded-lg h-full"
                 />
               )}
@@ -122,7 +140,7 @@ const CollectionPage = () => {
                 key={kolekcja.id}
                 className="relative h-[205px] w-full transition-transform duration-300 transform hover:scale-105 rounded-lg overflow-hidden"
                 style={{ backgroundColor: 'var(--color-beige)' }}
-                onClick={() => handleCollectionClick(kolekcja.slug)} // Trigger loading on click
+                onClick={() => handleCollectionClick(kolekcja.slug)}
               >
                 <Image
                   src={kolekcja.imageUrl || '/placeholder.jpg'}
@@ -140,7 +158,7 @@ const CollectionPage = () => {
 
           {/* Third Section: Product Preview (3 Columns) */}
           <div className="grid grid-cols-3 gap-6">
-            {products.map((product) => (
+            {productsData?.products.map((product) => (
               <ProductPreview key={product.id} product={product} />
             ))}
           </div>
