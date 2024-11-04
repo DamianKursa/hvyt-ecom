@@ -2,7 +2,6 @@ import axios from 'axios';
 import { Kolekcja } from '../functions/interfaces'; // Adjust the import path
 // woocommerce.tsx
 
-
 // Setup the WooCommerce API instance with the necessary credentials.
 const WooCommerceAPI = axios.create({
   baseURL: process.env.NEXT_PUBLIC_REST_API, // WooCommerce REST API base URL
@@ -22,10 +21,10 @@ interface Attribute {
 export const fetchCategoryBySlug = async (slug: string) => {
   try {
     const response = await WooCommerceAPI.get('/products/categories', {
-      params: { 
+      params: {
         slug,
         per_page: 50, // Adjust as necessary
-       },
+      },
     });
     if (response.data.length === 0) {
       throw new Error('Category not found');
@@ -51,16 +50,29 @@ export const fetchProductBySlug = async (slug: string) => {
   }
 };
 
-// Fetch products by category ID
-export const fetchProductsByCategoryId = async (categoryId: number) => {
+// utils/api/woocommerce.ts
+export const fetchProductsByCategoryId = async (
+  categoryId: number,
+  page = 1,
+  perPage = 12,
+) => {
   try {
     const response = await WooCommerceAPI.get('/products', {
       params: {
         category: categoryId,
-        per_page: 50, // Adjust as necessary
+        page,
+        per_page: perPage,
       },
     });
-    return response.data;
+
+    if (!response.data) {
+      throw new Error('No data returned from API');
+    }
+
+    return {
+      products: response.data,
+      totalProducts: parseInt(response.headers['x-wp-total'] || '0', 10),
+    };
   } catch (error) {
     console.error('Error fetching products:', error);
     throw error;
@@ -70,7 +82,9 @@ export const fetchProductsByCategoryId = async (categoryId: number) => {
 // Fetch media by ID
 export const fetchMediaById = async (mediaId: number) => {
   try {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_WP_REST_API}/media/${mediaId}`);
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_WP_REST_API}/media/${mediaId}`,
+    );
     return response.data.source_url; // Return the image URL
   } catch (error) {
     console.error('Error fetching media:', error);
@@ -78,15 +92,17 @@ export const fetchMediaById = async (mediaId: number) => {
   }
 };
 
-
 export const fetchKolekcjePostsWithImages = async () => {
   try {
     // Fetch Kolekcje posts
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`, {
-      params: {
-        per_page: 50, // Adjust as necessary
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`,
+      {
+        params: {
+          per_page: 50, // Adjust as necessary
+        },
       },
-    });
+    );
 
     const kolekcje: Kolekcja[] = response.data;
 
@@ -98,10 +114,15 @@ export const fetchKolekcjePostsWithImages = async () => {
         // Fetch the featured media if available
         if (kolekcja.featured_media) {
           try {
-            const mediaResponse = await axios.get(`${process.env.NEXT_PUBLIC_WP_REST_API}/media/${kolekcja.featured_media}`);
+            const mediaResponse = await axios.get(
+              `${process.env.NEXT_PUBLIC_WP_REST_API}/media/${kolekcja.featured_media}`,
+            );
             imageUrl = mediaResponse.data.source_url;
           } catch (error) {
-            console.error(`Error fetching media for Kolekcja ${kolekcja.id}:`, error);
+            console.error(
+              `Error fetching media for Kolekcja ${kolekcja.id}:`,
+              error,
+            );
           }
         } else if (kolekcja.yoast_head_json?.og_image?.[0]?.url) {
           imageUrl = kolekcja.yoast_head_json.og_image[0].url; // Fallback to Yoast's og:image
@@ -113,7 +134,7 @@ export const fetchKolekcjePostsWithImages = async () => {
           imageUrl, // Add imageUrl field to the kolekcja object
           description: kolekcja.content?.rendered || 'No description available', // Example fallback
         };
-      })
+      }),
     );
 
     return kolekcjeWithImages;
@@ -122,7 +143,6 @@ export const fetchKolekcjePostsWithImages = async () => {
     throw error;
   }
 };
-
 
 export const fetchProductAttributesWithTerms = async () => {
   try {
@@ -133,12 +153,14 @@ export const fetchProductAttributesWithTerms = async () => {
     // Fetch terms for each attribute
     const attributesWithTerms = await Promise.all(
       attributes.map(async (attribute: Attribute) => {
-        const termsResponse = await WooCommerceAPI.get(`/products/attributes/${attribute.id}/terms`);
+        const termsResponse = await WooCommerceAPI.get(
+          `/products/attributes/${attribute.id}/terms`,
+        );
         return {
           ...attribute,
           options: termsResponse.data.map((term: any) => term.name),
         };
-      })
+      }),
     );
 
     return attributesWithTerms;
@@ -147,7 +169,6 @@ export const fetchProductAttributesWithTerms = async () => {
     throw error;
   }
 };
-
 
 // Fetch products by kolekcja attribute
 export const fetchProductsByAttribute = async (kolekcja: string) => {
@@ -170,13 +191,15 @@ export const fetchProductsByAttribute = async (kolekcja: string) => {
 
 export const fetchInstagramPosts = async () => {
   const token = process.env.NEXT_PUBLIC_INSTAGRAM_ACCESS_TOKEN;
-  
+
   if (!token) {
-    throw new Error('Instagram access token is not defined in the environment variables');
+    throw new Error(
+      'Instagram access token is not defined in the environment variables',
+    );
   }
 
   const response = await fetch(
-    `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink,thumbnail_url,timestamp&access_token=${token}`
+    `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink,thumbnail_url,timestamp&access_token=${token}`,
   );
 
   if (!response.ok) {

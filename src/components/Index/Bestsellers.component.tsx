@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
 import ProductPreview from '../Product/ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import { fetchProductsByCategoryId } from '../../utils/api/woocommerce';
@@ -32,26 +34,27 @@ const Bestsellers = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 3.8;
   const gutter = 24;
-  const [products, setProducts] = useState<Product[]>(fallbackBestsellers);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBestsellers = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-        const categoryId = 123;
-        const fetchedProducts = await fetchProductsByCategoryId(categoryId);
+        const categoryId = 123; // Replace with actual category ID
+        const { products: fetchedProducts } =
+          await fetchProductsByCategoryId(categoryId);
         const formattedProducts = fetchedProducts.map((product: any) => ({
           id: product.id,
           slug: product.slug,
           name: product.name,
           price: product.price,
-          image: { src: product.images[0]?.src || '/placeholder.jpg' },
+          image: { src: product.images[0]?.src || '/fallback-image.jpg' },
         }));
         setProducts(formattedProducts.slice(0, 12));
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching Bestsellers:', error);
+      } finally {
         setLoading(false);
       }
     };
@@ -63,19 +66,8 @@ const Bestsellers = () => {
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < totalItems - itemsPerPage;
 
-  const handlePrev = () => {
-    if (canGoPrev) {
-      setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-    }
-  };
-
-  const handleNext = () => {
-    if (canGoNext) {
-      setCurrentIndex((prevIndex) =>
-        Math.min(prevIndex + 1, totalItems - itemsPerPage),
-      );
-    }
-  };
+  const handlePrev = () => canGoPrev && setCurrentIndex(currentIndex - 1);
+  const handleNext = () => canGoNext && setCurrentIndex(currentIndex + 1);
 
   return (
     <section className="container max-w-grid-desktop py-16 sm:px-4 md:px-0 mx-auto">
@@ -129,7 +121,7 @@ const Bestsellers = () => {
             gap: `${gutter}px`,
           }}
         >
-          {products.map((product) => (
+          {(loading ? fallbackBestsellers : products).map((product) => (
             <div
               key={product.id}
               className="flex-none"
@@ -149,7 +141,7 @@ const Bestsellers = () => {
       {/* Mobile View: Responsive Slider */}
       <div className="md:hidden">
         <ResponsiveSlider
-          items={products}
+          items={loading ? fallbackBestsellers : products}
           renderItem={(product: Product) => (
             <ProductPreview
               product={{ ...product, images: [{ src: product.image.src }] }}

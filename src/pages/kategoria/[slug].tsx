@@ -5,9 +5,8 @@ import Layout from '@/components/Layout/Layout.component';
 import Filters from '@/components/Product/Filters.component';
 import ProductArchive from '@/components/Product/ProductArchive';
 import FiltersControls from '@/components/Product/FiltersControls';
-import FilterSkeleton from '@/components/Product/SkeletonFilter.component';
 import Snackbar from '@/components/UI/Snackbar.component';
-import CategoryDescription from '@/components/Category/CateogryDescription.component';
+import CategoryDescription from '@/components/Category/CategoryDescription.component';
 import {
   fetchCategoryBySlug,
   fetchProductAttributesWithTerms,
@@ -38,10 +37,9 @@ const CategoryPage = () => {
 
   const [category, setCategory] = useState<Category | null>(null);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
-  const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [filtersVisible, setFiltersVisible] = useState(!isMobile); // Initially visible on Desktop, hidden on Mobile
+  const [filtersVisible, setFiltersVisible] = useState(!isMobile);
   const [activeFilters, setActiveFilters] = useState<
     { name: string; value: string }[]
   >([]);
@@ -52,7 +50,6 @@ const CategoryPage = () => {
     if (!slug) return;
 
     const fetchData = async () => {
-      setLoading(true);
       try {
         const categoryData = await fetchCategoryBySlug(slug);
         setCategory(categoryData);
@@ -60,12 +57,9 @@ const CategoryPage = () => {
         const attributesData: Attribute[] =
           await fetchProductAttributesWithTerms();
         setAttributes(attributesData);
-
-        setLoading(false);
       } catch (error: any) {
         console.error('Error loading category data:', error);
         setErrorMessage(error.message || 'Error loading category data');
-        setLoading(false);
       }
     };
 
@@ -74,7 +68,7 @@ const CategoryPage = () => {
     const handleResize = () => {
       const isCurrentlyMobile = window.innerWidth <= 768;
       setIsMobile(isCurrentlyMobile);
-      setFiltersVisible(!isCurrentlyMobile); // Show on Desktop, hide on Mobile
+      setFiltersVisible(!isCurrentlyMobile);
     };
 
     handleResize();
@@ -118,24 +112,6 @@ const CategoryPage = () => {
     return null;
   };
 
-  if (loading) {
-    return (
-      <Layout title="Loading...">
-        <div className="container mx-auto flex">
-          <div className="w-1/4 pr-8">
-            <FilterSkeleton />
-            <FilterSkeleton />
-          </div>
-          <div className="w-3/4 grid grid-cols-3 gap-8">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="skeleton-product" />
-            ))}
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
   if (errorMessage) {
     return (
       <Layout title="Error">
@@ -172,16 +148,12 @@ const CategoryPage = () => {
         <div className="flex">
           {!isMobile && filtersVisible && (
             <div className="w-1/4 pr-8">
-              {attributes.length ? (
-                <Filters
-                  attributes={attributes}
-                  errorMessage={errorMessage || undefined}
-                  onFilterChange={handleFilterChange}
-                  activeFilters={activeFilters}
-                />
-              ) : (
-                <FilterSkeleton />
-              )}
+              <Filters
+                attributes={attributes}
+                errorMessage={errorMessage || undefined}
+                onFilterChange={handleFilterChange}
+                activeFilters={activeFilters}
+              />
             </div>
           )}
 
@@ -211,7 +183,6 @@ const CategoryPage = () => {
             </button>
           </div>
 
-          {/* Scrollable Filters */}
           <div className="flex-grow overflow-y-auto mb-4">
             <Filters
               attributes={attributes}
@@ -221,7 +192,6 @@ const CategoryPage = () => {
             />
           </div>
 
-          {/* Fixed Buttons at Bottom */}
           <div className="fixed bottom-0 left-0 w-full bg-white p-4 flex flex-col gap-4">
             <button
               onClick={() => setActiveFilters([])}

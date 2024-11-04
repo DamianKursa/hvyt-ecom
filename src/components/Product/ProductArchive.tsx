@@ -9,32 +9,67 @@ interface ProductArchiveProps {
   sortingOption: string;
 }
 
-const ProductArchive: React.FC<ProductArchiveProps> = ({ categoryId, filters, sortingOption }) => {
+const ProductArchive: React.FC<ProductArchiveProps> = ({
+  categoryId,
+  filters,
+  sortingOption,
+}) => {
   const [products, setProducts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const perPage = 12;
 
   useEffect(() => {
     const fetchProducts = async () => {
-      setLoading(true);
+      setIsLoaded(false); // Keep skeleton visible
       try {
-        const productsData = await fetchProductsByCategoryId(categoryId);
-        setProducts(productsData);
+        const { products: fetchedProducts, totalProducts } =
+          await fetchProductsByCategoryId(categoryId, page, perPage);
+
+        setProducts(fetchedProducts);
+        setTotalPages(Math.ceil(totalProducts / perPage));
       } catch (error) {
         console.error('Error fetching products:', error);
+      } finally {
+        setIsLoaded(true); // Hide skeleton only after data is set
       }
-      setLoading(false);
     };
 
     fetchProducts();
-  }, [categoryId, filters, sortingOption]);
+  }, [categoryId, filters, sortingOption, page]);
 
   return (
     <div>
-      {/* Product Previews Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {loading
-          ? Array.from({ length: 6 }).map((_, index) => <SkeletonProductPreview key={index} />)
-          : products.map((product) => <ProductPreview key={product.id} product={product} />)}
+        {isLoaded
+          ? products.map((product) => (
+              <ProductPreview key={product.id} product={product} />
+            ))
+          : Array.from({ length: perPage }).map((_, index) => (
+              <SkeletonProductPreview key={index} />
+            ))}
+      </div>
+
+      <div className="flex justify-between items-center mt-8">
+        <button
+          onClick={() => setPage(page - 1)}
+          disabled={page === 1}
+          className="px-4 py-2 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <span className="text-gray-700">
+          Page {page} of {totalPages}
+        </span>
+        <button
+          onClick={() => setPage(page + 1)}
+          disabled={page === totalPages}
+          className="px-4 py-2 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
