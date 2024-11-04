@@ -5,13 +5,11 @@ import 'swiper/css';
 interface ResponsiveSliderProps<T> {
   items: T[];
   renderItem: (item: T) => React.ReactNode;
-  showTitle?: boolean; // Control title overlay
 }
 
 const ResponsiveSlider = <T extends {}>({
   items,
   renderItem,
-  showTitle = false,
 }: ResponsiveSliderProps<T>) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isClient, setIsClient] = useState(false);
@@ -36,20 +34,14 @@ const ResponsiveSlider = <T extends {}>({
       >
         {items.map((item, index) => (
           <SwiperSlide key={index} className="overflow-hidden relative">
-            <div className="relative w-full h-[350px] rounded-lg overflow-hidden">
+            <div className="relative w-full h-auto rounded-lg">
               {renderItem(item)}
-              {/* Only show title if `showTitle` is true and item has a `title` property */}
-              {showTitle && (item as any).title && (
-                <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                  {(item as any).title}
-                </div>
-              )}
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
 
-      {/* Custom Pagination Control - Positioned 30px below the boxes */}
+      {/* Custom Pagination Control */}
       <div className="px-[16px] absolute left-0 right-0 bottom-[-30px] h-[1px] bg-pastel-beige flex">
         {items.map((_, index) => (
           <div

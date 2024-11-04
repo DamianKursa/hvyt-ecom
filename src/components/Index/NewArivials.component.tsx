@@ -25,7 +25,7 @@ const NewArrivalsSection = () => {
   ];
 
   return (
-    <section className="container mx-auto max-w-grid-desktop mt-[115px] py-16">
+    <section className="container mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] py-16">
       {/* Heading, Description, and Button - Visible on both Desktop and Mobile */}
       <div className=" px-[16px] flex flex-col items-start mb-8 md:hidden">
         <h2 className="font-size-h2 font-bold text-neutral-darkest">

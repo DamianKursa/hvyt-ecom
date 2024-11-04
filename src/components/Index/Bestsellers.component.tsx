@@ -155,7 +155,6 @@ const Bestsellers = () => {
               product={{ ...product, images: [{ src: product.image.src }] }}
             />
           )}
-          showTitle={false}
         />
       </div>
     </section>
