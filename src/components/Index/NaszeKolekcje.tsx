@@ -31,18 +31,14 @@ const NaszeKolekcje = () => {
     return <SkeletonNaszeKolekcje />;
   }
 
-  if (!kolekcjePosts.length) {
-    return <p>No collections available.</p>; // Debug message in case data is empty
-  }
-
   return (
     <section
-      className="w-full pt-[88px] py-16 px-4 sm:px-4 md:px-0"
+      className="w-full pt-[88px] py-16 sm:px-4 md:px-0"
       style={{ backgroundColor: 'var(--color-beige)' }}
     >
       <div className="container mx-auto max-w-grid-desktop">
-        {/* Title and Description */}
-        <div className="flex flex-col items-start mb-8 md:flex-row md:justify-between md:items-center">
+        {/* Title, Description, and Button */}
+        <div className=" px-[16px] lg:px-0  flex flex-col items-start mb-8 md:flex-row md:justify-between md:items-center">
           <div>
             <h2 className="font-size-h2 font-bold text-neutral-darkest">
               Sprawdź nasze kolekcje
@@ -51,9 +47,16 @@ const NaszeKolekcje = () => {
               Zobacz co ostatnio nowego dodaliśmy dla Ciebie.
             </p>
           </div>
+          {/* Button for both desktop and mobile */}
+          <Link
+            href="/kolekcje"
+            className="block w-full md:w-auto px-6 py-3 mt-6 md:mt-0 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
+          >
+            Zobacz wszystkie kolekcje →
+          </Link>
         </div>
 
-        {/* Desktop View: Grid */}
+        {/* Desktop View */}
         <div className="hidden md:grid grid-cols-4 gap-6">
           {kolekcjePosts.slice(0, 4).map((kolekcja) => (
             <a
@@ -84,32 +87,24 @@ const NaszeKolekcje = () => {
             renderItem={(kolekcja) => (
               <a
                 href={`/kolekcje/${kolekcja.slug}`}
-                className="relative w-full h-[445px]"
+                className="relative w-full"
               >
-                <Image
-                  src={kolekcja.imageUrl || '/placeholder.jpg'}
-                  alt={kolekcja.title.rendered}
-                  width={500}
-                  height={445}
-                  quality={100}
-                  className="rounded-lg"
-                />
-                <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                  {kolekcja.title.rendered}
+                <div className="relative w-full h-[445px]">
+                  <Image
+                    src={kolekcja.imageUrl || '/placeholder.jpg'}
+                    alt={kolekcja.title.rendered}
+                    layout="fill"
+                    objectFit="cover"
+                    quality={100}
+                    className="rounded-lg"
+                  />
+                  <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
+                    {kolekcja.title.rendered}
+                  </div>
                 </div>
               </a>
             )}
           />
-
-          {/* Button positioned after slider navigation */}
-          <div className="mt-8 flex justify-center">
-            <Link
-              href="/kolekcje"
-              className="px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
-            >
-              Zobacz wszystkie kolekcje →
-            </Link>
-          </div>
         </div>
       </div>
     </section>

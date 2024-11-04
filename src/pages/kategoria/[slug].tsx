@@ -7,7 +7,11 @@ import ProductArchive from '@/components/Product/ProductArchive';
 import FiltersControls from '@/components/Product/FiltersControls';
 import FilterSkeleton from '@/components/Product/SkeletonFilter.component';
 import Snackbar from '@/components/UI/Snackbar.component';
-import { fetchCategoryBySlug, fetchProductAttributesWithTerms } from '../../utils/api/woocommerce';
+import CategoryDescription from '@/components/Category/CateogryDescription.component';
+import {
+  fetchCategoryBySlug,
+  fetchProductAttributesWithTerms,
+} from '../../utils/api/woocommerce';
 
 interface Attribute {
   id: number;
@@ -28,7 +32,9 @@ const icons: Record<string, string> = {
 
 const CategoryPage = () => {
   const router = useRouter();
-  const slug = Array.isArray(router.query.slug) ? router.query.slug[0] : router.query.slug;
+  const slug = Array.isArray(router.query.slug)
+    ? router.query.slug[0]
+    : router.query.slug;
 
   const [category, setCategory] = useState<Category | null>(null);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
@@ -36,7 +42,9 @@ const CategoryPage = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(!isMobile); // Initially visible on Desktop, hidden on Mobile
-  const [activeFilters, setActiveFilters] = useState<{ name: string; value: string }[]>([]);
+  const [activeFilters, setActiveFilters] = useState<
+    { name: string; value: string }[]
+  >([]);
   const [sortingOption, setSortingOption] = useState('default');
   const [isArrowDown, setIsArrowDown] = useState(true);
 
@@ -49,7 +57,8 @@ const CategoryPage = () => {
         const categoryData = await fetchCategoryBySlug(slug);
         setCategory(categoryData);
 
-        const attributesData: Attribute[] = await fetchProductAttributesWithTerms();
+        const attributesData: Attribute[] =
+          await fetchProductAttributesWithTerms();
         setAttributes(attributesData);
 
         setLoading(false);
@@ -73,15 +82,22 @@ const CategoryPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, [slug]);
 
-  const handleFilterChange = (selectedFilters: { name: string; value: string }[]) => {
+  const handleFilterChange = (
+    selectedFilters: { name: string; value: string }[],
+  ) => {
     setActiveFilters(selectedFilters);
   };
 
-  const handleRemoveFilter = (filterToRemove: { name: string; value: string }) => {
-    setActiveFilters(currentFilters =>
+  const handleRemoveFilter = (filterToRemove: {
+    name: string;
+    value: string;
+  }) => {
+    setActiveFilters((currentFilters) =>
       currentFilters.filter(
-        filter => filter.name !== filterToRemove.name || filter.value !== filterToRemove.value
-      )
+        (filter) =>
+          filter.name !== filterToRemove.name ||
+          filter.value !== filterToRemove.value,
+      ),
     );
   };
 
@@ -131,12 +147,12 @@ const CategoryPage = () => {
   return (
     <Layout title={category?.name || 'Category'}>
       <div className="container mx-auto">
-        <nav className="breadcrumbs">
-          {/* Breadcrumbs component */}
-        </nav>
+        <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
 
         <div className="flex items-center mb-8">
-          <h1 className="text-[40px] font-bold text-[#661F30]">{category?.name}</h1>
+          <h1 className="text-[40px] font-bold text-[#661F30]">
+            {category?.name}
+          </h1>
           {getCategoryIcon()}
         </div>
 
@@ -146,7 +162,7 @@ const CategoryPage = () => {
           toggleFilters={toggleFilters}
           filters={activeFilters}
           sorting={sortingOption}
-          onSortingChange={setSortingOption} // Directly pass the sorting value
+          onSortingChange={setSortingOption}
           onRemoveFilter={handleRemoveFilter}
           isArrowDown={isArrowDown}
           setIsArrowDown={setIsArrowDown}
@@ -169,7 +185,9 @@ const CategoryPage = () => {
             </div>
           )}
 
-          <div className={`${filtersVisible && !isMobile ? 'lg:w-3/4' : 'w-full'} w-full`}>
+          <div
+            className={`${filtersVisible && !isMobile ? 'lg:w-3/4' : 'w-full'} w-full`}
+          >
             <ProductArchive
               categoryId={category?.id || 0}
               filters={activeFilters}
@@ -179,11 +197,18 @@ const CategoryPage = () => {
         </div>
       </div>
 
+      {/* Category Description Section */}
+      <div className="w-full bg-[#F5F5F5] mt-12 p-8 rounded-lg">
+        <CategoryDescription category={slug || ''} />
+      </div>
+
       {isMobile && filtersVisible && (
         <div className="fixed inset-0 bg-white z-50 p-4 flex flex-col rounded-lg">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-[24px] font-semibold">Filtry</h2>
-            <button onClick={toggleFilters} className="text-[24px]">&times;</button>
+            <button onClick={toggleFilters} className="text-[24px]">
+              &times;
+            </button>
           </div>
 
           {/* Scrollable Filters */}
