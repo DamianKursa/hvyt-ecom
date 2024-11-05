@@ -57,64 +57,32 @@
   --grid-gutter-mobile: 20px;
 }
 
+/* Ensure global font family and line height */
 body {
   font-family: var(--font-family-primary);
   line-height: var(--line-height-base);
   color: var(--color-neutral-darkest);
 }
 
-h1 { 
-  font-size: var(--font-size-h1); 
-  line-height: var(--line-height-tight); 
+/* Override Tailwind's heading styles */
+h1, h2, h3, h4 {
+  font-family: var(--font-family-primary);
   font-weight: 700;
 }
 
-h2 { 
-  font-size: var(--font-size-h2); 
-  line-height: var(--line-height-tight); 
-  font-weight: 700;
-}
+h1 { font-size: var(--font-size-h1); line-height: var(--line-height-tight); }
+h2 { font-size: var(--font-size-h2); line-height: var(--line-height-tight); }
+h3 { font-size: var(--font-size-h3); line-height: var(--line-height-loose); font-weight: 600; }
+h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font-weight: 600; }
 
-h3 { 
-  font-size: var(--font-size-h3); 
-  line-height: var(--line-height-loose); 
-  font-weight: 600;
-}
+/* Text styles for various classes */
+.text-large { font-size: var(--font-size-text-large); line-height: var(--line-height-loose); }
+.text-medium { font-size: var(--font-size-text-medium); line-height: var(--line-height-loose); }
+.text-regular { font-size: var(--font-size-text-regular); line-height: var(--line-height-loose); }
+.text-small { font-size: var(--font-size-text-small); line-height: var(--line-height-loose); }
+.text-extra-small { font-size: var(--font-size-text-extra-small); line-height: var(--line-height-loose); }
 
-h4 { 
-  font-size: var(--font-size-h4); 
-  line-height: var(--line-height-loose); 
-  font-weight: 600;
-}
-.light{
-  font-weight: 300;
-}
-/* Typography for text */
-.text-large { 
-  font-size: var(--font-size-text-large); 
-  line-height: var(--line-height-loose); 
-}
-
-.text-medium { 
-  font-size: var(--font-size-text-medium); 
-  line-height: var(--line-height-loose); 
-}
-
-.text-regular { 
-  font-size: var(--font-size-text-regular); 
-  line-height: var(--line-height-loose); 
-}
-
-.text-small { 
-  font-size: var(--font-size-text-small); 
-  line-height: var(--line-height-loose); 
-}
-.text-extra-small { 
-  font-size: var(--font-size-text-extra-small); 
-  line-height: var(--line-height-loose); 
-}
-
-/* Mobile styles */
+/* Mobile Responsive Font Sizes */
 @media (max-width: 768px) {
   h1 { font-size: var(--font-size-h1-mobile); }
   h2 { font-size: var(--font-size-h2-mobile); }
@@ -126,10 +94,12 @@ h4 {
   .text-small { font-size: var(--font-size-text-small-mobile); }
 }
 
-.bg-biege {
-  background-color: #E9E5DF;
+/* Additional utility class for background color */
+.bg-beige {
+  background-color: var(--color-beige);
 }
 
+/* Custom Modal Styles */
 .modal {
   display: flex;
   justify-content: center;
@@ -148,20 +118,17 @@ h4 {
   max-height: 90%;
   border-radius: 8px;
 }
+
+/* Styling for content inside formatted-content */
 .formatted-content p {
   margin-bottom: 1rem;
   line-height: 1.5;
 }
 
-.formatted-content h2 {
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-  font-size: 1.75rem;
-}
-
 .formatted-content ul {
   list-style: disc;
-  margin-left: 2rem;
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .formatted-content li {

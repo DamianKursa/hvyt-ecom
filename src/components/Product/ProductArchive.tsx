@@ -23,7 +23,7 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
 
   useEffect(() => {
     const fetchProducts = async () => {
-      setIsLoaded(false); // Keep skeleton visible
+      setIsLoaded(false);
       try {
         const { products: fetchedProducts, totalProducts } =
           await fetchProductsByCategoryId(categoryId, page, perPage);
@@ -33,12 +33,30 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
-        setIsLoaded(true); // Hide skeleton only after data is set
+        setIsLoaded(true);
       }
     };
 
     fetchProducts();
   }, [categoryId, filters, sortingOption, page]);
+
+  const handlePageClick = (pageNum: number) => {
+    setPage(pageNum);
+  };
+
+  const renderPageNumbers = () => {
+    return Array.from({ length: totalPages }, (_, index) => (
+      <button
+        key={index + 1}
+        onClick={() => handlePageClick(index + 1)}
+        className={`px-2 ${
+          page === index + 1 ? 'font-bold text-black' : 'text-gray-500'
+        }`}
+      >
+        {index + 1}
+      </button>
+    ));
+  };
 
   return (
     <div>
@@ -52,23 +70,44 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
             ))}
       </div>
 
-      <div className="flex justify-between items-center mt-8">
+      {/* Pagination */}
+      <div className="flex justify-end items-center mt-8 space-x-2">
         <button
-          onClick={() => setPage(page - 1)}
+          onClick={() => setPage((prevPage) => Math.max(prevPage - 1, 1))}
           disabled={page === 1}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+          className="p-2"
+          aria-label="Previous page"
         >
-          Previous
+          <img
+            src={
+              page === 1
+                ? '/icons/arrow-left-pagination.svg'
+                : '/icons/arrow-left-black-pagination.svg'
+            }
+            alt="Previous"
+            className="w-4 h-4"
+          />
         </button>
-        <span className="text-gray-700">
-          Page {page} of {totalPages}
-        </span>
+
+        {renderPageNumbers()}
+
         <button
-          onClick={() => setPage(page + 1)}
+          onClick={() =>
+            setPage((prevPage) => Math.min(prevPage + 1, totalPages))
+          }
           disabled={page === totalPages}
-          className="px-4 py-2 bg-gray-200 text-gray-700 rounded disabled:opacity-50"
+          className="p-2"
+          aria-label="Next page"
         >
-          Next
+          <img
+            src={
+              page === totalPages
+                ? '/icons/arrow-right-pagination.svg'
+                : '/icons/arrow-right-black-pagination.svg'
+            }
+            alt="Next"
+            className="w-4 h-4"
+          />
         </button>
       </div>
     </div>

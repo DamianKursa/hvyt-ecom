@@ -169,9 +169,9 @@ const CategoryPage = () => {
         </div>
       </div>
 
-      {/* Category Description Section */}
-      <div className="w-full bg-[#F5F5F5] mt-12 p-8 rounded-lg">
-        <CategoryDescription category={slug || ''} />
+      {/* Full-width Category Description Section */}
+      <div className="w-full">
+        <CategoryDescription fullWidth category={slug || ''} />
       </div>
 
       {isMobile && filtersVisible && (

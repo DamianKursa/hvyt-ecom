@@ -1,19 +1,18 @@
-import { ReactNode, useContext, useEffect } from 'react';
+import React, {
+  ReactNode,
+  useContext,
+  useEffect,
+  Children,
+  isValidElement,
+} from 'react';
 import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
-// Components
 import Header from '@/components/Header/Header.component';
 import Footer from '@/components/Footer/Footer.component';
-import Stickynav from '@/components/Footer/Stickynav.component';
 
-// State
 import { CartContext } from '@/stores/CartProvider';
-
-// Utils
 import { getFormattedCart } from '@/utils/functions/functions';
-
-// GraphQL
 import { GET_CART } from '@/utils/gql/GQL_QUERIES';
 
 interface ILayoutProps {
@@ -21,26 +20,26 @@ interface ILayoutProps {
   title: string;
 }
 
+interface LayoutChildProps {
+  fullWidth?: boolean;
+}
+
 const Layout = ({ children, title }: ILayoutProps) => {
   const { setCart } = useContext(CartContext);
   const router = useRouter();
 
-  // Define the pages that should have the Hero as full width
   const noMarginPages = ['/', '/o-nas', '/hvyt-objects'];
   const isFullWidthHero = noMarginPages.includes(router.pathname);
-  const hasMargin = !isFullWidthHero;
 
   const { data, refetch } = useQuery(GET_CART, {
     notifyOnNetworkStatusChange: true,
     onCompleted: () => {
       const updatedCart = getFormattedCart(data);
 
-      if (!updatedCart && !data?.cart?.contents?.nodes.length) {
-        return;
+      if (updatedCart && data?.cart?.contents?.nodes.length) {
+        localStorage.setItem('woocommerce-cart', JSON.stringify(updatedCart));
+        setCart(updatedCart);
       }
-
-      localStorage.setItem('woocommerce-cart', JSON.stringify(updatedCart));
-      setCart(updatedCart);
     },
   });
 
@@ -51,17 +50,18 @@ const Layout = ({ children, title }: ILayoutProps) => {
   return (
     <>
       <Header title={title} />
-      
-      {isFullWidthHero ? (
-        <main className="w-full sm:px-4 md:px-0">{children}</main>
-      ) : (
-        <div className="max-w-[1440px] mx-auto">
-          <main className={`${hasMargin ? 'mt-[120px]' : ''}`}>
-            {children}
-          </main>
-        </div>
-      )}
-      
+      <main
+        className={
+          isFullWidthHero ||
+          Children.toArray(children).some(
+            (child) => isValidElement(child) && child.props.fullWidth,
+          )
+            ? 'w-full'
+            : 'container mx-auto max-w-[1440px] py-16'
+        }
+      >
+        {children}
+      </main>
       <Footer />
     </>
   );
