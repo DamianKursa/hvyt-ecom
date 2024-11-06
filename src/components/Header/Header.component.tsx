@@ -31,7 +31,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
       : 'hover:bg-[#DAD3C8] text-neutral-darkest';
   };
 
-  const iconClass = "w-6 h-6"; // Uniform icon dimensions
+  const iconClass = 'w-6 h-6'; // Uniform icon dimensions
 
   return (
     <>
@@ -48,7 +48,11 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               <div className="flex items-center flex-none h-full">
                 <Link href="/">
                   <span className="flex items-center text-xl font-bold tracking-wide text-neutral-dark no-underline hover:no-underline">
-                    <img src="/icons/Logo.svg" alt="HVYT Logo" className="h-10" />
+                    <img
+                      src="/icons/Logo.svg"
+                      alt="HVYT Logo"
+                      className="h-10"
+                    />
                   </span>
                 </Link>
               </div>
@@ -56,46 +60,61 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               {/* Center Navigation Links for Desktop with Styling */}
               {!isMobile && (
                 <div className="flex-none mx-auto max-w-[530px] w-full">
-                  <div className="hidden md:flex md:items-center rounded-full justify-center h-[50px]" style={{ backgroundColor: '#E9E5DFCC' }}>
+                  <div
+                    className="hidden md:flex md:items-center rounded-full justify-center h-[50px]"
+                    style={{ backgroundColor: '#E9E5DFCC' }}
+                  >
                     <ul className="flex items-center text-base w-full justify-center text-[16px] whitespace-nowrap">
                       <li>
                         <Link href="/kategoria/uchwyty-meblowe">
-                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/uchwyty-meblowe')}`}>
+                          <span
+                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/uchwyty-meblowe')}`}
+                          >
                             Uchwyty
                           </span>
                         </Link>
                       </li>
                       <li>
                         <Link href="/kategoria/klamki">
-                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/klamki')}`}>
+                          <span
+                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/klamki')}`}
+                          >
                             Klamki
                           </span>
                         </Link>
                       </li>
                       <li>
                         <Link href="/kategoria/wieszaki">
-                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/wieszaki')}`}>
+                          <span
+                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/wieszaki')}`}
+                          >
                             Wieszaki
                           </span>
                         </Link>
                       </li>
                       <li>
                         <Link href="/kolekcje">
-                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kolekcje')}`}>
+                          <span
+                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kolekcje')}`}
+                          >
                             Kolekcje
                           </span>
                         </Link>
                       </li>
                       <li>
                         <Link href="/o-nas">
-                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/o-nas')}`}>
+                          <span
+                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/o-nas')}`}
+                          >
                             O nas
                           </span>
                         </Link>
                       </li>
                       <li>
                         <Link href="/kontakt">
-                          <span className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kontakt')}`}>
+                          <span
+                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kontakt')}`}
+                          >
                             Kontakt
                           </span>
                         </Link>
@@ -114,35 +133,67 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                   {isMobile ? (
                     <div className="flex items-center space-x-4">
                       <Link href="/search">
-                        <img src="/icons/search.svg" alt="Search" className={iconClass} />
+                        <img
+                          src="/icons/search.svg"
+                          alt="Search"
+                          className={iconClass}
+                        />
                       </Link>
                       <Link href="/cart">
-                        <img src="/icons/cart.svg" alt="Cart" className={iconClass} />
+                        <img
+                          src="/icons/cart.svg"
+                          alt="Cart"
+                          className={iconClass}
+                        />
                       </Link>
                       <button onClick={toggleMobileMenu}>
-                        <img src={menuOpen ? '/icons/close-button.svg' : '/icons/menu-icon.svg'} alt="Menu" className={iconClass} />
+                        <img
+                          src={
+                            menuOpen
+                              ? '/icons/close-button.svg'
+                              : '/icons/menu-icon.svg'
+                          }
+                          alt="Menu"
+                          className={iconClass}
+                        />
                       </button>
                     </div>
                   ) : (
                     <div className="flex items-center space-x-4">
                       <Link href="/search">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img src="/icons/search.svg" alt="Search" className={iconClass} />
+                          <img
+                            src="/icons/search.svg"
+                            alt="Search"
+                            className={iconClass}
+                          />
                         </span>
                       </Link>
                       <Link href="/wishlist">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img src="/icons/wishlist.svg" alt="Wishlist" className={iconClass} />
+                          <img
+                            src="/icons/wishlist.svg"
+                            alt="Wishlist"
+                            className={iconClass}
+                          />
                         </span>
                       </Link>
                       <Link href="/profile">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img src="/icons/user.svg" alt="User" className={iconClass} />
+                          <img
+                            src="/icons/user.svg"
+                            alt="User"
+                            className={iconClass}
+                          />
                         </span>
                       </Link>
                       <Link href="/cart">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img src="/icons/cart.svg" alt="Cart" className={iconClass} />
+                          <img
+                            src="/icons/cart.svg"
+                            alt="Cart"
+                            className={iconClass}
+                          />
                         </span>
                       </Link>
                     </div>

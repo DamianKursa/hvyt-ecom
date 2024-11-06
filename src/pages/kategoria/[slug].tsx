@@ -122,7 +122,7 @@ const CategoryPage = () => {
 
   return (
     <Layout title={category?.name || 'Category'}>
-      <div className="container  max-w-[1440px] mt-[88px] lg:mt-[115px] mx-auto">
+      <div className="container px-4 max-w-[1440px] mt-[88px] lg:mt-[115px] mx-auto">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
 
         <div className="flex items-center mb-8">

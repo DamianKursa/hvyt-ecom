@@ -24,15 +24,20 @@ const Hero: React.FC<HeroProps> = ({
   const boxesRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    if (imageRef.current) {
-      imageRef.current.style.animation = 'overlayAnimation 2000ms ease-in-out forwards';
-    }
+    const isMobile = window.innerWidth < 768; // Check if screen width is below 768px
 
-    boxesRef.current.forEach((box, index) => {
-      if (box) {
-        box.style.animation = `boxMoveAnimation 2000ms ease-in-out ${index * 0.3}s forwards`;
+    if (!isMobile) {
+      if (imageRef.current) {
+        imageRef.current.style.animation =
+          'overlayAnimation 2000ms ease-in-out forwards';
       }
-    });
+
+      boxesRef.current.forEach((box, index) => {
+        if (box) {
+          box.style.animation = `boxMoveAnimation 2000ms ease-in-out ${index * 0.3}s forwards`;
+        }
+      });
+    }
   }, []);
 
   return (
@@ -63,7 +68,10 @@ const Hero: React.FC<HeroProps> = ({
         </div>
 
         {/* Overlay Image centered with animation */}
-        <div className="absolute inset-0 flex justify-center items-center" style={{ transformOrigin: 'center center' }}>
+        <div
+          className="absolute inset-0 flex justify-center items-center"
+          style={{ transformOrigin: 'center center' }}
+        >
           <Image
             src={imageSrc}
             alt={imageAlt}
@@ -103,60 +111,62 @@ const Hero: React.FC<HeroProps> = ({
       </div>
 
       <style jsx>{`
-        @keyframes overlayAnimation {
-          0% {
-            transform: rotate(0deg);
-            width: 1270px;
-            height: 698px;
-            opacity: 0;
+        @media (min-width: 768px) {
+          @keyframes overlayAnimation {
+            0% {
+              transform: rotate(0deg);
+              width: 1270px;
+              height: 698px;
+              opacity: 0;
+            }
+            25% {
+              transform: rotate(10deg);
+              opacity: 0.4;
+            }
+            50% {
+              transform: rotate(-10deg);
+              opacity: 0.7;
+            }
+            75% {
+              transform: rotate(0deg);
+              opacity: 1;
+              width: 1450px;
+              height: 750px;
+            }
+            100% {
+              transform: rotate(0deg);
+              width: 1995.75px;
+              height: 1096.88px;
+            }
           }
-          25% {
-            transform: rotate(10deg);
-            opacity: 0.4;
-          }
-          50% {
-            transform: rotate(-10deg);
-            opacity: 0.7;
-          }
-          75% {
-            transform: rotate(0deg);
-            opacity: 1;
-            width: 1450px;
-            height: 750px;
-          }
-          100% {
-            transform: rotate(0deg);
-            width: 1995.75px;
-            height: 1096.88px;
-          }
-        }
 
-        @keyframes boxMoveAnimation {
-          0% {
-            transform: translate(200px, 200px) scale(0.5);
-            opacity: 0;
+          @keyframes boxMoveAnimation {
+            0% {
+              transform: translate(200px, 200px) scale(0.5);
+              opacity: 0;
+            }
+            25% {
+              transform: translate(150px, 150px) scale(0.7);
+              opacity: 0.3;
+            }
+            50% {
+              transform: translate(100px, 100px) scale(0.8);
+              opacity: 0.6;
+            }
+            75% {
+              transform: translate(50px, 50px) scale(0.9);
+              opacity: 0.8;
+            }
+            100% {
+              transform: translate(0, 0) scale(1);
+              opacity: 1;
+            }
           }
-          25% {
-            transform: translate(150px, 150px) scale(0.7);
-            opacity: 0.3;
-          }
-          50% {
-            transform: translate(100px, 100px) scale(0.8);
-            opacity: 0.6;
-          }
-          75% {
-            transform: translate(50px, 50px) scale(0.9);
-            opacity: 0.8;
-          }
-          100% {
-            transform: translate(0, 0) scale(1);
-            opacity: 1;
-          }
-        }
 
-        .animate-overlay {
-          max-width: 100%;
-          object-fit: cover;
+          .animate-overlay {
+            max-width: 100%;
+            object-fit: cover;
+          }
         }
       `}</style>
     </section>
