@@ -24,6 +24,7 @@
   "dependencies": {
     "@apollo/client": "^3.11.4",
     "@types/react": "^18.3.4",
+    "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "algoliasearch": "^4.24.0",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
@@ -52,6 +53,7 @@
     "@types/nprogress": "^0.2.3",
     "@types/react-instantsearch-dom": "^6.12.8",
     "@types/uuid": "^10.0.0",
+    "@types/woocommerce__woocommerce-rest-api": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "^8.2.0",
     "@typescript-eslint/parser": "^8.2.0",
     "babel-plugin-styled-components": "^2.1.4",
