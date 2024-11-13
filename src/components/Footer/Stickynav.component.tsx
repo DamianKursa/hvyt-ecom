@@ -1,7 +1,6 @@
 import Link from 'next/link';
 
 import Cart from '@/components/Header/Cart.component';
-import Search from '@/components/AlgoliaSearch/AlgoliaSearchBox.component';
 import SVGMobileSearchIcon from '@/components/SVG/SVGMobileSearchIcon.component';
 
 import Hamburger from './Hamburger.component';
@@ -11,10 +10,7 @@ import Hamburger from './Hamburger.component';
  * Includes mobile menu.
  */
 const Stickynav = () => (
-  <nav
-    id="footer"
-    className="fixed bottom-0 z-50 w-full md:hidden"
-  >
+  <nav id="footer" className="fixed bottom-0 z-50 w-full md:hidden">
     <div className="container flex flex-wrap items-center justify-between px-6 py-3 mx-auto mt-0 md:min-w-96 bg-blue-800">
       <Hamburger />
       <div
@@ -39,7 +35,6 @@ const Stickynav = () => (
         </ul>
       </div>
       <div className="flex items-center order-2 md:order-3" id="nav-content">
-        <Search />
         <SVGMobileSearchIcon />
         <Cart stickyNav />
       </div>

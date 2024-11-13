@@ -170,6 +170,39 @@ export const fetchProductAttributesWithTerms = async () => {
   }
 };
 
+// Fetch the latest "Kolekcja" with featured image
+export const fetchLatestKolekcja = async () => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`, // Adjust this endpoint if necessary
+      {
+        params: {
+          per_page: 1, // Get only the latest post
+          orderby: 'date',
+          order: 'desc',
+        },
+      },
+    );
+
+    const latestKolekcja = response.data[0];
+
+    // Check if a featured image is available and fetch it if so
+    if (latestKolekcja && latestKolekcja.featured_media) {
+      const mediaResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_WP_REST_API}/media/${latestKolekcja.featured_media}`,
+      );
+      latestKolekcja.imageUrl = mediaResponse.data.source_url;
+    } else {
+      latestKolekcja.imageUrl = '/placeholder.jpg'; // Fallback image
+    }
+
+    return latestKolekcja;
+  } catch (error) {
+    console.error('Error fetching latest Kolekcja:', error);
+    throw error;
+  }
+};
+
 // Fetch products by kolekcja attribute
 export const fetchProductsByAttribute = async (kolekcja: string) => {
   try {
@@ -215,6 +248,22 @@ export const fetchCrossSellProducts = async (productId: string) => {
   } catch (error) {
     console.error('Error fetching cross-sell products:', error);
     return { products: [] };
+  }
+};
+
+export const searchProducts = async (query: string, perPage = 10) => {
+  try {
+    const response = await WooCommerceAPI.get('/products', {
+      params: {
+        search: query,
+        per_page: perPage,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error searching for products:', error);
+    throw error;
   }
 };
 

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import Breadcrumbs from '../UI/Breadcrumbs.component';
 import useIsMobile from '@/utils/hooks/useIsMobile';
 import MobileMenu from './MobileMenu';
+import SearchComponent from '../Search/SearchResults.component'; // Import the SearchComponent
 
 interface IHeaderProps {
   title?: string;
@@ -11,6 +12,7 @@ interface IHeaderProps {
 
 const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false); // State for the search modal
   const router = useRouter();
   const isMobile = useIsMobile();
   const isHomePage = router.pathname === '/';
@@ -25,6 +27,10 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
     setMenuOpen(!menuOpen);
   };
 
+  const toggleSearch = () => {
+    setSearchOpen(!searchOpen); // Toggle search modal visibility
+  };
+
   const getActiveClass = (path: string) => {
     return router.asPath === path
       ? 'bg-white text-[#661F30]'
@@ -35,7 +41,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
 
   return (
     <>
-      {/* MobileMenu Component */}
+      {/* Mobile Menu Component */}
       {isMobile && menuOpen && (
         <MobileMenu menuOpen={menuOpen} toggleMenu={toggleMobileMenu} />
       )}
@@ -132,13 +138,13 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                 >
                   {isMobile ? (
                     <div className="flex items-center space-x-4">
-                      <Link href="/search">
+                      <button onClick={toggleSearch}>
                         <img
                           src="/icons/search.svg"
                           alt="Search"
                           className={iconClass}
                         />
-                      </Link>
+                      </button>
                       <Link href="/cart">
                         <img
                           src="/icons/cart.svg"
@@ -160,15 +166,16 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                     </div>
                   ) : (
                     <div className="flex items-center space-x-4">
-                      <Link href="/search">
-                        <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img
-                            src="/icons/search.svg"
-                            alt="Search"
-                            className={iconClass}
-                          />
-                        </span>
-                      </Link>
+                      <button
+                        onClick={toggleSearch}
+                        className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all"
+                      >
+                        <img
+                          src="/icons/search.svg"
+                          alt="Search"
+                          className={iconClass}
+                        />
+                      </button>
                       <Link href="/wishlist">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
                           <img
@@ -211,6 +218,9 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
           </div>
         </nav>
       </header>
+
+      {/* Conditionally Render Search Component */}
+      {searchOpen && <SearchComponent onClose={toggleSearch} />}
     </>
   );
 };
