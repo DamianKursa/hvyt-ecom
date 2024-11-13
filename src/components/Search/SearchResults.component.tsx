@@ -97,7 +97,9 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
         ) : (
           query.length >= 3 && (
             <div className="mt-6 text-center text-black text-regular">
-              <p>Niestety nie znaleziono żadnych wyników dla "{query}".</p>
+              <p>
+                Niestety nie znaleziono żadnych wyników dla &quot;{query}&quot;.
+              </p>
               <p>
                 Spróbuj ponownie używając innej pisowni lub słów kluczowych.
               </p>
