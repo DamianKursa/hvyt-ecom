@@ -26,7 +26,7 @@ const Instagram = () => {
   }, []);
 
   if (loading) {
-    return <p>Loading Instagram feed...</p>;
+    return <p>Ładowanie...</p>;
   }
 
   return (
@@ -35,9 +35,12 @@ const Instagram = () => {
       <div className="hidden md:block">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h2 className="font-size-h2 font-bold text-neutral-darkest">Hvyt w waszych domach</h2>
+            <h2 className="font-size-h2 font-bold text-neutral-darkest">
+              Hvyt w waszych domach
+            </h2>
             <p className="font-size-text-medium text-neutral-darkest">
-              Zainspiruj się i zobacz jak nasze produkty sprawdzają się u innych.
+              Zainspiruj się i zobacz jak nasze produkty sprawdzają się u
+              innych.
             </p>
           </div>
         </div>
@@ -49,7 +52,7 @@ const Instagram = () => {
               <Image
                 src={post.media_url}
                 alt={post.caption || 'Instagram Post'}
-                layout="fill"
+                layout="fill" // Forces the image to fill the container
                 objectFit="cover"
                 className="rounded-lg"
               />
@@ -64,7 +67,11 @@ const Instagram = () => {
             className="px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all flex items-center space-x-2"
           >
             <span>Zobacz nasz Instagram</span>
-            <img src="/icons/Instagram.svg" alt="Instagram Icon" className="h-5 w-5" />
+            <img
+              src="/icons/Instagram.svg"
+              alt="Instagram Icon"
+              className="h-5 w-5"
+            />
           </Link>
         </div>
       </div>
@@ -78,7 +85,9 @@ const Instagram = () => {
                 <Image
                   src={post.media_url}
                   alt={post.caption || 'Instagram Post'}
-                  layout="fill"
+                  width={350}
+                  height={350}
+                  layout="fixed"
                   objectFit="cover"
                   className="rounded-lg"
                 />

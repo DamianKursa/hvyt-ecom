@@ -42,6 +42,7 @@
     "react-hook-form": "^7.52.2",
     "react-instantsearch-dom": "^6.40.4",
     "react-range": "^1.10.0",
+    "sharp": "^0.33.5",
     "swiper": "^11.1.14",
     "uuid": "^10.0.0"
   },

@@ -187,7 +187,36 @@ export const fetchProductsByAttribute = async (kolekcja: string) => {
   }
 };
 
-// In api/woocommerce.ts or woocommerce.js
+// utils/api/woocommerce.ts
+
+export const fetchCrossSellProducts = async (productId: string) => {
+  try {
+    // Fetch the main product to get cross-sell IDs
+    const productResponse = await WooCommerceAPI.get(`/products/${productId}`);
+    const productData = productResponse.data;
+
+    // Log the cross-sell IDs to ensure they are present
+    console.log('Cross-sell IDs:', productData.cross_sell_ids);
+
+    const crossSellIds = productData.cross_sell_ids;
+    if (!crossSellIds || crossSellIds.length === 0) {
+      return { products: [] };
+    }
+
+    // Fetch details for each cross-sell product by ID
+    const crossSellProducts = await Promise.all(
+      crossSellIds.map(async (id: string) => {
+        const response = await WooCommerceAPI.get(`/products/${id}`);
+        return response.data;
+      }),
+    );
+
+    return { products: crossSellProducts };
+  } catch (error) {
+    console.error('Error fetching cross-sell products:', error);
+    return { products: [] };
+  }
+};
 
 export const fetchInstagramPosts = async () => {
   const token = process.env.NEXT_PUBLIC_INSTAGRAM_ACCESS_TOKEN;

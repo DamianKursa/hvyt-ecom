@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout/Layout.component';
+import NajczęściejKupowaneRazem from '@/components/Product/NajczęściejKupowaneRazem';
 import SingleProductGallery from '@/components/Product/SingleProductGallery.component';
 import Snackbar from '@/components/UI/Snackbar.component';
 import SkeletonProductPage from '@/components/Product/SkeletonProductPage.component';
@@ -8,6 +9,7 @@ import SingleProductDetails from '@/components/Product/SingleProductDetails';
 import { fetchProductBySlug, fetchMediaById } from '@/utils/api/woocommerce';
 import Image from 'next/image';
 import { Product, Variation } from '@/utils/functions/interfaces';
+import Instagram from '@/components/Index/Instagram';
 
 const ProductPage = () => {
   const { query } = useRouter();
@@ -360,6 +362,7 @@ const ProductPage = () => {
             </div>
           </div>
         </div>
+
         {showSnackbar && (
           <Snackbar
             message={snackbarMessage}
@@ -367,6 +370,17 @@ const ProductPage = () => {
             visible={showSnackbar}
           />
         )}
+      </section>
+
+      <section>
+        <div>
+          <NajczęściejKupowaneRazem productId={product?.id} />
+        </div>
+      </section>
+      <section>
+        <div>
+          <Instagram />
+        </div>
       </section>
     </Layout>
   );
