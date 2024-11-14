@@ -1,6 +1,5 @@
 // Layout.tsx
 import React, { ReactNode, useContext, useEffect } from 'react';
-import { useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 
 // Components
@@ -9,41 +8,40 @@ import Footer from '@/components/Footer/Footer.component';
 
 // State
 import { CartContext } from '@/stores/CartProvider';
-import { getFormattedCart } from '@/utils/functions/functions';
-import { GET_CART } from '@/utils/gql/GQL_QUERIES';
 
 interface ILayoutProps {
   children?: ReactNode;
   title: string;
 }
 
-const Layout = ({ children, title }: ILayoutProps) => {
-  const { setCart } = useContext(CartContext);
+const Layout: React.FC<ILayoutProps> = ({ children, title }) => {
+  const { cart, addCartItem } = useContext(CartContext);
   const router = useRouter();
 
-  // Define fixed pages and dynamic category slugs for full width
+  // Define routes for full-width or modified layout
   const noMarginPages = ['/', '/o-nas', '/hvyt-objects'];
-  const fullWidthCategories = ['uchwyty-meblowe', 'klamki', 'wieszaki']; // Add category slugs here
+  const fullWidthCategories = ['uchwyty-meblowe', 'klamki', 'wieszaki'];
 
-  // Check if the current route should have full-width hero or layout
   const isFullWidthHero =
     noMarginPages.includes(router.pathname) ||
     fullWidthCategories.some((slug) => router.asPath.includes(`/${slug}`));
 
-  const { data, refetch } = useQuery(GET_CART, {
-    notifyOnNetworkStatusChange: true,
-    onCompleted: () => {
-      const updatedCart = getFormattedCart(data);
-      if (updatedCart) {
-        localStorage.setItem('woocommerce-cart', JSON.stringify(updatedCart));
-        setCart(updatedCart);
-      }
-    },
-  });
-
+  // Load cart from localStorage and sync with context if needed
   useEffect(() => {
-    refetch();
-  }, [refetch]);
+    if (!cart) {
+      const storedCart = localStorage.getItem('woocommerce-cart');
+      if (storedCart) {
+        const parsedCart = JSON.parse(storedCart);
+
+        // Check if parsedCart.products is an array and add items to the cart
+        if (Array.isArray(parsedCart.products)) {
+          parsedCart.products.forEach((product: any) => {
+            addCartItem(product);
+          });
+        }
+      }
+    }
+  }, [cart, addCartItem]);
 
   return (
     <>

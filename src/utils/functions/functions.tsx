@@ -2,10 +2,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { RootObject, Product } from '@/stores/CartProvider';
-
 import { ChangeEvent } from 'react';
-import { IVariationNodes } from '@/components/Product/AddToCart.component';
 
 /* Interface for products*/
 
@@ -48,7 +45,6 @@ export interface IProductRootObject {
   __typename: string;
   key: string;
   product: IProduct;
-  variation?: IVariationNodes;
   quantity: number;
   total: string;
   subtotal: string;
@@ -129,85 +125,6 @@ export const filteredVariantPrice = (price: string, side: string) => {
   }
 
   return price.substring(0, price.indexOf('-')).replace('-', '');
-};
-
-/**
- * Returns cart data in the required format.
- * @param {String} data Cart data
- */
-
-export const getFormattedCart = (data: IFormattedCartProps) => {
-  const formattedCart: RootObject = {
-    products: [],
-    totalProductsCount: 0,
-    totalProductsPrice: 0,
-  };
-
-  if (!data) {
-    return;
-  }
-  const givenProducts = data.cart.contents.nodes;
-
-  // Create an empty object.
-  formattedCart.products = [];
-
-  const product: Product = {
-    productId: 0,
-    cartKey: '',
-    name: '',
-    qty: 0,
-    price: 0,
-    totalPrice: '0',
-    image: { sourceUrl: '', srcSet: '', title: '' },
-  };
-
-  let totalProductsCount = 0;
-  let i = 0;
-
-  if (!givenProducts.length) {
-    return;
-  }
-
-  givenProducts.forEach(() => {
-    const givenProduct = givenProducts[Number(i)].product.node;
-
-    // Convert price to a float value
-    const convertedCurrency = givenProducts[Number(i)].total.replace(
-      /[^0-9.-]+/g,
-      '',
-    );
-
-    product.productId = givenProduct.productId;
-    product.cartKey = givenProducts[Number(i)].key;
-    product.name = givenProduct.name;
-    product.qty = givenProducts[Number(i)].quantity;
-    product.price = Number(convertedCurrency) / product.qty;
-    product.totalPrice = givenProducts[Number(i)].total;
-
-    // Ensure we can add products without images to the cart
-
-    product.image = givenProduct.image.sourceUrl
-      ? {
-          sourceUrl: givenProduct.image.sourceUrl,
-          srcSet: givenProduct.image.srcSet,
-          title: givenProduct.image.title,
-        }
-      : {
-          sourceUrl: process.env.NEXT_PUBLIC_PLACEHOLDER_SMALL_IMAGE_URL,
-          srcSet: process.env.NEXT_PUBLIC_PLACEHOLDER_SMALL_IMAGE_URL,
-          title: givenProduct.name,
-        };
-
-    totalProductsCount += givenProducts[Number(i)].quantity;
-
-    // Push each item into the products array.
-    formattedCart.products.push(product);
-    i++;
-  });
-  formattedCart.totalProductsCount = totalProductsCount;
-  formattedCart.totalProductsPrice = data.cart.total;
-
-  return formattedCart;
 };
 
 export const createCheckoutData = (order: ICheckoutDataProps) => ({

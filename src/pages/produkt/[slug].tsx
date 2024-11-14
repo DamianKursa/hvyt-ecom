@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout/Layout.component';
 import NajczęściejKupowaneRazem from '@/components/Product/NajczęściejKupowaneRazem';
@@ -8,17 +8,20 @@ import SkeletonProductPage from '@/components/Product/SkeletonProductPage.compon
 import SingleProductDetails from '@/components/Product/SingleProductDetails';
 import { fetchProductBySlug, fetchMediaById } from '@/utils/api/woocommerce';
 import Image from 'next/image';
+import { CartContext } from '@/stores/CartProvider';
 import { Product, Variation } from '@/utils/functions/interfaces';
 import Instagram from '@/components/Index/Instagram';
+import CartModal from '@/components/Cart/CartModal';
 
 const ProductPage = () => {
   const { query } = useRouter();
   const slug = query.slug as string;
-
+  const { addCartItem } = useContext(CartContext);
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [showModal, setShowModal] = useState(false);
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>(
     'success',
   );
@@ -131,6 +134,27 @@ const ProductPage = () => {
     );
   };
 
+  const handleAddToCart = () => {
+    if (!product) return;
+
+    const cartItem = {
+      cartKey: product.id.toString(),
+      name: product.name,
+      qty: quantity,
+      price: parseFloat(selectedVariation?.price || product.price), // Ensure it's a number
+      totalPrice:
+        quantity * parseFloat(selectedVariation?.price || product.price), // Keep as number
+      image: { sourceUrl: product.image, title: product.name },
+      productId: parseInt(product.id.toString(), 10),
+      attributes: selectedAttributes,
+    };
+
+    addCartItem(cartItem); // Add item to cart using addCartItem from CartContext
+    setShowModal(true); // Show modal instead of Snackbar
+  };
+
+  const handleCloseModal = () => setShowModal(false);
+
   if (loading) {
     return (
       <Layout title="Loading...">
@@ -198,6 +222,23 @@ const ProductPage = () => {
                 </span>
               </div>
             </div>
+            {/* Render CartModal when showModal is true */}
+            {showModal && (
+              <CartModal
+                product={{
+                  name: product.name,
+                  image:
+                    galleryImages[0]?.sourceUrl || '/path/to/default/image.png', // Use the first image in galleryImages
+                  price: selectedVariation?.price || product.price,
+                }}
+                quantity={quantity}
+                total={(
+                  quantity *
+                  parseFloat(selectedVariation?.price || product.price)
+                ).toFixed(2)}
+                onClose={handleCloseModal}
+              />
+            )}
 
             {/* Kolor Attribute (Restored to correct position) */}
             {colorAttribute && (
@@ -301,7 +342,10 @@ const ProductPage = () => {
 
             {/* Add to Cart and Wishlist */}
             <div className="flex items-center mt-4 space-x-4">
-              <button className="w-4/5 py-3 text-lg font-semibold text-white bg-black rounded-full flex justify-center items-center hover:bg-dark-pastel-red transition-colors">
+              <button
+                onClick={handleAddToCart}
+                className="w-4/5 py-3 text-lg font-semibold text-white bg-black rounded-full flex justify-center items-center hover:bg-dark-pastel-red transition-colors"
+              >
                 Dodaj do koszyka
                 <Image
                   src="/icons/dodaj-do-koszyka.svg"
@@ -311,6 +355,7 @@ const ProductPage = () => {
                   className="ml-2"
                 />
               </button>
+
               <button className="w-1/5 p-3 border rounded-full border-neutral-dark text-neutral-dark hover:text-red-600 hover:border-red-600 flex justify-center items-center">
                 <Image
                   src="/icons/wishlist.svg"

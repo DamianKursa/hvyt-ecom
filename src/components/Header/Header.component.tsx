@@ -145,7 +145,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           className={iconClass}
                         />
                       </button>
-                      <Link href="/cart">
+                      <Link href="/koszyk">
                         <img
                           src="/icons/cart.svg"
                           alt="Cart"
@@ -194,7 +194,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           />
                         </span>
                       </Link>
-                      <Link href="/cart">
+                      <Link href="/koszyk">
                         <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
                           <img
                             src="/icons/cart.svg"
