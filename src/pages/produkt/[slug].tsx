@@ -4,7 +4,7 @@ import Layout from '@/components/Layout/Layout.component';
 import NajczęściejKupowaneRazem from '@/components/Product/NajczęściejKupowaneRazem';
 import SingleProductGallery from '@/components/Product/SingleProductGallery.component';
 import Snackbar from '@/components/UI/Snackbar.component';
-import SkeletonProductPage from '@/components/Product/SkeletonProductPage.component';
+import SkeletonProductPage from '@/components/Skeletons/SkeletonProductPage.component';
 import SingleProductDetails from '@/components/Product/SingleProductDetails';
 import { fetchProductBySlug, fetchMediaById } from '@/utils/api/woocommerce';
 import Image from 'next/image';

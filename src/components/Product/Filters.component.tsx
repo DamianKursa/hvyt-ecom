@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import SkeletonFilter from '../Product/SkeletonFilter.component';
+import SkeletonFilter from '../Skeletons/SkeletonFilter.component';
 import Snackbar from '../UI/Snackbar.component';
 
 interface FiltersProps {

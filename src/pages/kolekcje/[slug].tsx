@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
 import { Kolekcja } from '../../utils/functions/interfaces';
-import SkeletonCollectionPage from '@/components/Product/SkeletonCollectionPage';
+import SkeletonCollectionPage from '@/components/Skeletons/SkeletonCollectionPage';
 import ProductPreview from '../../components/Product/ProductPreview.component';
 import {
   fetchCategoryBySlug,

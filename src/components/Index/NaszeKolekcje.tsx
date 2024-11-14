@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import { fetchKolekcjePostsWithImages } from '@/utils/api/woocommerce';
-import SkeletonNaszeKolekcje from '@/components/Product/SkeletonNaszeKolekcje';
+import SkeletonNaszeKolekcje from '@/components/Skeletons/SkeletonNaszeKolekcje';
 
 const NaszeKolekcje = () => {
   const [kolekcjePosts, setKolekcjePosts] = useState<any[]>([]);
