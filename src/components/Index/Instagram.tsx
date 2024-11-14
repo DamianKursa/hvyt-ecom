@@ -4,7 +4,6 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import Image from 'next/image';
 import Link from 'next/link';
-import { fetchInstagramPosts } from '@/utils/api/woocommerce'; // Import the fetch function
 
 const Instagram = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -13,8 +12,10 @@ const Instagram = () => {
   useEffect(() => {
     const getInstagramPosts = async () => {
       try {
-        const fetchedPosts = await fetchInstagramPosts(); // Call the API fetch function
-        setPosts(fetchedPosts);
+        const response = await fetch('/api/instagram');
+        if (!response.ok) throw new Error('Failed to fetch Instagram posts');
+        const data = await response.json();
+        setPosts(data.data || []);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching Instagram posts:', error);
@@ -52,7 +53,7 @@ const Instagram = () => {
               <Image
                 src={post.media_url}
                 alt={post.caption || 'Instagram Post'}
-                layout="fill" // Forces the image to fill the container
+                layout="fill"
                 objectFit="cover"
                 className="rounded-lg"
               />
