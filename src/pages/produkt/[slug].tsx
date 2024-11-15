@@ -2,10 +2,10 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout/Layout.component';
 import NajczęściejKupowaneRazem from '@/components/Product/NajczęściejKupowaneRazem';
-import SingleProductGallery from '@/components/Product/SingleProductGallery.component';
+import SingleProductGallery from '@/components/SingleProduct/SingleProductGallery.component';
 import Snackbar from '@/components/UI/Snackbar.component';
 import SkeletonProductPage from '@/components/Skeletons/SkeletonProductPage.component';
-import SingleProductDetails from '@/components/Product/SingleProductDetails';
+import SingleProductDetails from '@/components/SingleProduct/SingleProductDetails';
 import { fetchProductBySlug, fetchMediaById } from '@/utils/api/woocommerce';
 import Image from 'next/image';
 import { CartContext } from '@/stores/CartProvider';
@@ -226,12 +226,13 @@ const ProductPage = () => {
             {showModal && (
               <CartModal
                 product={{
+                  id: product.id.toString(),
                   name: product.name,
                   image:
-                    galleryImages[0]?.sourceUrl || '/path/to/default/image.png', // Use the first image in galleryImages
+                    galleryImages[0]?.sourceUrl || '/path/to/default/image.png',
                   price: selectedVariation?.price || product.price,
                 }}
-                quantity={quantity}
+                quantity={quantity} // Ensure this is passed
                 total={(
                   quantity *
                   parseFloat(selectedVariation?.price || product.price)
