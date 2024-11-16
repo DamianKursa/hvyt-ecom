@@ -19,7 +19,6 @@ interface CartModalProps {
     image: string;
     price: string;
   };
-  quantity: number;
   total: string;
   onClose: () => void;
   crossSellProducts: RecommendedProduct[]; // Cross-sell products from the hook
@@ -28,8 +27,6 @@ interface CartModalProps {
 
 const CartModal: React.FC<CartModalProps> = ({
   product,
-  quantity,
-  total,
   onClose,
   crossSellProducts,
   loading,

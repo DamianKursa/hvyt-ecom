@@ -6,7 +6,7 @@ export interface Product {
   qty: number;
   price: number;
   totalPrice: number;
-  image: { sourceUrl?: string; title: string };
+  image: string | { sourceUrl?: string; title: string };
   productId: number;
   attributes?: { [key: string]: string };
 }
@@ -22,6 +22,7 @@ interface CartContextProps {
   addCartItem: (product: Product) => void;
   updateCartItem: (cartKey: string, quantity: number) => void;
   removeCartItem: (cartKey: string) => void;
+  clearCart: () => void;
 }
 
 export const CartContext = createContext<CartContextProps>({
@@ -29,6 +30,7 @@ export const CartContext = createContext<CartContextProps>({
   addCartItem: () => {},
   updateCartItem: () => {},
   removeCartItem: () => {},
+  clearCart: () => {},
 });
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
@@ -40,12 +42,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     totalProductsPrice: 0,
   });
 
-  // Save cart to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('woocommerce-cart', JSON.stringify(cart));
-  }, [cart]);
-
-  // Load cart from localStorage on mount
   useEffect(() => {
     const storedCart = localStorage.getItem('woocommerce-cart');
     if (storedCart) {
@@ -53,7 +49,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  // Recalculate total price and count
+  useEffect(() => {
+    localStorage.setItem('woocommerce-cart', JSON.stringify(cart));
+  }, [cart]);
+
   const recalculateCartTotals = (updatedCart: Cart) => {
     const totalProductsPrice = updatedCart.products.reduce(
       (total, product) => total + product.totalPrice,
@@ -67,18 +66,27 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     return { ...updatedCart, totalProductsPrice, totalProductsCount };
   };
 
+  const normalizeProductImage = (image: string | { sourceUrl?: string }) =>
+    typeof image === 'string'
+      ? image
+      : image?.sourceUrl || '/fallback-image.jpg';
+
   const addCartItem = (product: Product) => {
     setCart((prevCart) => {
       const updatedCart = { ...prevCart };
+      const normalizedProduct = {
+        ...product,
+        image: normalizeProductImage(product.image),
+      };
       const existingProduct = updatedCart.products.find(
         (item) => item.cartKey === product.cartKey,
       );
 
       if (existingProduct) {
-        existingProduct.qty += product.qty;
-        existingProduct.totalPrice += product.totalPrice;
+        existingProduct.qty += normalizedProduct.qty;
+        existingProduct.totalPrice += normalizedProduct.totalPrice;
       } else {
-        updatedCart.products.push(product);
+        updatedCart.products.push(normalizedProduct);
       }
 
       return recalculateCartTotals(updatedCart);
@@ -112,9 +120,23 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     });
   };
 
+  const clearCart = () => {
+    setCart({
+      products: [],
+      totalProductsCount: 0,
+      totalProductsPrice: 0,
+    });
+  };
+
   return (
     <CartContext.Provider
-      value={{ cart, addCartItem, updateCartItem, removeCartItem }}
+      value={{
+        cart,
+        addCartItem,
+        updateCartItem,
+        removeCartItem,
+        clearCart,
+      }}
     >
       {children}
     </CartContext.Provider>

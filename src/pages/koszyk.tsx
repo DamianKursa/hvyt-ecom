@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
-import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component';
 import { CartContext, Product } from '@/stores/CartProvider';
+import CartProgress from '@/components/Cart/CartProgress';
+import CartItems from '@/components/Cart/CartItems';
 
 const Koszyk: React.FC = () => {
   const { cart, updateCartItem, removeCartItem } = useContext(CartContext);
@@ -25,68 +26,15 @@ const Koszyk: React.FC = () => {
 
   return (
     <Layout title="Koszyk">
-      <section className="container mx-auto mt-12 px-4 md:px-0">
-        <header className="flex justify-between items-center mb-8">
-          <Link href="/produkty">Wróć do produktów</Link>
-          <h1 className="text-3xl font-bold">Koszyk</h1>
-        </header>
-
+      <section className="container mx-auto px-4 md:px-0">
+        <CartProgress />
         {/* Cart Items */}
         <div className="flex flex-col lg:flex-row gap-8">
-          <div className="lg:w-8/12 bg-white shadow rounded-lg p-6">
-            {cart?.products.length ? (
-              cart.products.map((product) => (
-                <div
-                  key={product.cartKey}
-                  className="flex items-center justify-between mb-6 border-b pb-4"
-                >
-                  <div className="flex items-center">
-                    <img
-                      src={product.image.sourceUrl}
-                      alt={product.name}
-                      className="w-20 h-20 rounded-md"
-                    />
-                    <div className="ml-4">
-                      <h2 className="text-xl font-semibold">{product.name}</h2>
-                      <p className="text-sm text-gray-500">
-                        Rozstaw: {product.attributes?.rozstaw || 'N/A'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      className="p-2 bg-gray-100 rounded"
-                      onClick={() => handleDecreaseQuantity(product)}
-                    >
-                      -
-                    </button>
-                    <span>{product.qty}</span>
-                    <button
-                      className="p-2 bg-gray-100 rounded"
-                      onClick={() => handleIncreaseQuantity(product)}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <p className="text-xl font-semibold">
-                    {formatPrice(product.totalPrice)} zł
-                  </p>
-                  <button
-                    onClick={() => handleRemoveItem(product)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <img
-                      src="/icons/trash.svg"
-                      alt="Remove Icon"
-                      className="w-6 h-6 hover:bg-color-red-700"
-                    />
-                  </button>
-                </div>
-              ))
-            ) : (
-              <p className="text-center text-lg">Twój koszyk jest pusty</p>
-            )}
-          </div>
+          <CartItems
+            onIncreaseQuantity={handleIncreaseQuantity}
+            onDecreaseQuantity={handleDecreaseQuantity}
+            onRemoveItem={handleRemoveItem}
+          />
 
           {/* Summary Section */}
           <aside className="lg:w-4/12 bg-gray-100 p-6 rounded-lg shadow">

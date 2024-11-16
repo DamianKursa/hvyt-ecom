@@ -8,30 +8,29 @@ import HeroOnas from '@/components/Onas/HeroOnas.component';
 
 const OnasPage = () => {
   return (
-    <Layout title="O nas"> {/* Using Layout to maintain consistency */}
+    <Layout title="O nas">
+      {' '}
+      {/* Using Layout to maintain consistency */}
       {/* Hero Section */}
-        <HeroOnas/> 
+      <HeroOnas />
       {/* Slider Section */}
-      <section className="py-16 bg-white w-full">
+      <section className="py-16 w-full">
         <div className="container mx-auto max-w-grid-desktop">
           <Slider />
         </div>
       </section>
-
       {/* Nasze Kolekcje Section */}
       <section className="py-16 bg-beige w-full">
         <div className="container mx-auto max-w-grid-desktop">
           <NaszeKolekcje />
         </div>
       </section>
-
       {/* New Arrivals Section */}
-      <section className="py-16 bg-white w-full">
+      <section className="py-16 w-full">
         <div className="container mx-auto max-w-grid-desktop">
           <NewArrivalsSection />
         </div>
       </section>
-
       {/* Footer Section */}
       <Footer />
     </Layout>
