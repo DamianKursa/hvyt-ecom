@@ -1,73 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import ProductPreview from '../Product/ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
-import { fetchCrossSellProducts } from '../../utils/api/woocommerce';
 
-interface Product {
+interface RecommendedProduct {
   id: string;
   slug: string;
   name: string;
   price: string;
-  image: { src: string };
+  images: { src: string }[];
 }
 
-const fallbackProducts: Product[] = [
+interface NajczesciejKupowaneProps {
+  products: RecommendedProduct[]; // Cross-sell products from the hook
+  loading: boolean; // Loading state from the hook
+}
+
+const fallbackProducts: RecommendedProduct[] = [
   {
     id: '1',
     slug: 'product-slug-1',
     name: 'Sample Product 1',
     price: '15,90',
-    image: { src: 'https://via.placeholder.com/300' },
+    images: [{ src: 'https://via.placeholder.com/300' }],
   },
   {
     id: '2',
     slug: 'product-slug-2',
     name: 'Sample Product 2',
     price: '15,90',
-    image: { src: 'https://via.placeholder.com/300' },
+    images: [{ src: 'https://via.placeholder.com/300' }],
   },
 ];
 
-interface FrequentlyBoughtTogetherProps {
-  productId: string;
-}
-
-const NajczesciejKupowane = ({ productId }: FrequentlyBoughtTogetherProps) => {
+const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
+  products,
+  loading,
+}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 3.8;
   const gutter = 24;
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const { products: fetchedProducts } =
-          await fetchCrossSellProducts(productId);
-        const formattedProducts = fetchedProducts.map((product: any) => ({
-          id: product.id,
-          slug: product.slug,
-          name: product.name,
-          price: product.price,
-          image: { src: product.images[0]?.src || '/fallback-image.jpg' },
-        }));
-        setProducts(formattedProducts.slice(0, 12));
-      } catch (error) {
-        console.error(
-          'Error fetching frequently bought together products:',
-          error,
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+  const displayedProducts = loading ? fallbackProducts : products;
 
-    fetchProducts();
-  }, [productId]);
-
-  const totalItems = products.length;
+  const totalItems = displayedProducts.length;
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < totalItems - itemsPerPage;
 
@@ -126,7 +102,7 @@ const NajczesciejKupowane = ({ productId }: FrequentlyBoughtTogetherProps) => {
             gap: `${gutter}px`,
           }}
         >
-          {(loading ? fallbackProducts : products).map((product) => (
+          {displayedProducts.map((product) => (
             <div
               key={product.id}
               className="flex-none"
@@ -136,7 +112,10 @@ const NajczesciejKupowane = ({ productId }: FrequentlyBoughtTogetherProps) => {
               }}
             >
               <ProductPreview
-                product={{ ...product, images: [{ src: product.image.src }] }}
+                product={{
+                  ...product,
+                  images: [{ src: product.images[0].src }],
+                }}
               />
             </div>
           ))}
@@ -146,10 +125,10 @@ const NajczesciejKupowane = ({ productId }: FrequentlyBoughtTogetherProps) => {
       {/* Mobile View: Responsive Slider */}
       <div className="md:hidden">
         <ResponsiveSlider
-          items={loading ? fallbackProducts : products}
-          renderItem={(product: Product) => (
+          items={displayedProducts}
+          renderItem={(product: RecommendedProduct) => (
             <ProductPreview
-              product={{ ...product, images: [{ src: product.image.src }] }}
+              product={{ ...product, images: [{ src: product.images[0].src }] }}
             />
           )}
         />

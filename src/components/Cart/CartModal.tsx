@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { CartContext } from '@/stores/CartProvider';
 import ProductPreview from '@/components/Product/ProductPreview.component';
-import { fetchCrossSellProducts } from '@/utils/api/woocommerce';
 
 interface RecommendedProduct {
   id: string;
@@ -23,6 +22,8 @@ interface CartModalProps {
   quantity: number;
   total: string;
   onClose: () => void;
+  crossSellProducts: RecommendedProduct[]; // Cross-sell products from the hook
+  loading: boolean; // Loading state from the hook
 }
 
 const CartModal: React.FC<CartModalProps> = ({
@@ -30,46 +31,14 @@ const CartModal: React.FC<CartModalProps> = ({
   quantity,
   total,
   onClose,
+  crossSellProducts,
+  loading,
 }) => {
   const router = useRouter();
-  const { cart } = useContext(CartContext);
-  const [recommendedProducts, setRecommendedProducts] = useState<
-    RecommendedProduct[]
-  >([]);
+  const { cart } = React.useContext(CartContext);
 
   const totalItemCount = cart?.totalProductsCount || 0;
   const totalPrice = cart?.totalProductsPrice.toFixed(2) || '0.00';
-
-  useEffect(() => {
-    const fetchRecommendedProducts = async () => {
-      if (!product.id) return;
-      try {
-        const fetchedProducts = await fetchCrossSellProducts(product.id);
-
-        if (Array.isArray(fetchedProducts)) {
-          const formattedProducts = fetchedProducts.map((item: any) => ({
-            id: item.id,
-            slug: item.slug || '',
-            name: item.name,
-            price: item.price,
-            images: [
-              { src: item.images?.[0]?.src || '/path/to/fallback-image.jpg' },
-            ],
-          }));
-          setRecommendedProducts(formattedProducts.slice(0, 3));
-        } else {
-          console.error(
-            'Unexpected structure for fetched products:',
-            fetchedProducts,
-          );
-        }
-      } catch (error) {
-        console.error('Error fetching cross-sell products:', error);
-      }
-    };
-
-    fetchRecommendedProducts();
-  }, [product.id]);
 
   return (
     <div className="fixed inset-0 bg-[#363132] bg-opacity-50 flex items-center justify-center z-50">
@@ -137,10 +106,12 @@ const CartModal: React.FC<CartModalProps> = ({
         <div className="pt-10 border-t border-[#DAD3C8]">
           <h3 className="text-lg font-semibold mb-4">Uzupełnij zamówienie</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {recommendedProducts.length > 0 ? (
-              recommendedProducts.map((item) => (
-                <ProductPreview key={item.id} product={item} />
-              ))
+            {loading ? (
+              <p className="text-center text-gray-500">Ładowanie...</p>
+            ) : crossSellProducts.slice(0, 3).length > 0 ? ( // Display only the first 3 products
+              crossSellProducts
+                .slice(0, 3)
+                .map((item) => <ProductPreview key={item.id} product={item} />)
             ) : (
               <p className="text-center text-gray-500">Brak rekomendacji</p>
             )}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/router';
+import useCrossSellProducts from '@/utils/hooks/useCrossSellProducts';
 import Layout from '@/components/Layout/Layout.component';
 import NajczęściejKupowaneRazem from '@/components/Product/NajczęściejKupowaneRazem';
 import SingleProductGallery from '@/components/SingleProduct/SingleProductGallery.component';
@@ -37,6 +38,10 @@ const ProductPage = () => {
     {},
   );
   const [selectedColor, setSelectedColor] = useState<string | null>(null); // State to manage selected color
+
+  const productId = product?.id?.toString() || null;
+  const { products: crossSellProducts, loading: crossSellLoading } =
+    useCrossSellProducts(productId);
 
   const colorMap: { [key: string]: string } = {
     Złoty: '#eded87',
@@ -232,12 +237,14 @@ const ProductPage = () => {
                     galleryImages[0]?.sourceUrl || '/path/to/default/image.png',
                   price: selectedVariation?.price || product.price,
                 }}
-                quantity={quantity} // Ensure this is passed
+                quantity={quantity}
                 total={(
                   quantity *
                   parseFloat(selectedVariation?.price || product.price)
                 ).toFixed(2)}
                 onClose={handleCloseModal}
+                crossSellProducts={crossSellProducts}
+                loading={crossSellLoading} // Pass loading state here
               />
             )}
 
@@ -420,7 +427,10 @@ const ProductPage = () => {
 
       <section>
         <div>
-          <NajczęściejKupowaneRazem productId={product?.id} />
+          <NajczęściejKupowaneRazem
+            products={crossSellProducts} // Pass cross-sell products here
+            loading={crossSellLoading}
+          />
         </div>
       </section>
       <section>
