@@ -18,12 +18,14 @@ interface ProductPreviewProps {
   product: Product;
   containerClass?: string;
   imageClass?: string;
+  isSmall?: boolean; // New prop to support smaller dimensions
 }
 
 const ProductPreview: React.FC<ProductPreviewProps> = ({
   product,
   containerClass = '',
   imageClass = '',
+  isSmall = false, // Default to false
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
@@ -42,9 +44,13 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
       ? `${product.name.substring(0, 25)}...`
       : product.name;
 
+  // Adjust styles dynamically based on `isSmall` prop
+  const imageSize = isSmall ? 250 : 350;
+  const cardHeight = isSmall ? '300px' : '400px';
+
   return (
     <div
-      className={`relative w-full h-[400px] flex flex-col justify-between group ${containerClass}`}
+      className={`relative w-full h-[${cardHeight}] flex flex-col justify-between group ${containerClass}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -63,7 +69,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
 
       {/* Image Container */}
       <div
-        className={`relative w-full h-[350px] overflow-hidden rounded-lg shadow-lg flex justify-center items-center ${imageClass}`}
+        className={`relative w-full h-[${imageSize}px] overflow-hidden rounded-lg shadow-lg flex justify-center items-center ${imageClass}`}
       >
         {isLoading && (
           <div className="absolute inset-0 bg-gradient-to-r from-gray-300 to-gray-100 animate-pulse"></div>
@@ -72,9 +78,10 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
         <Image
           src={isHovered ? secondImage : firstImage}
           alt={product.name}
-          width={350}
-          height={350}
-          className="object-cover w-full h-full transition-all duration-300 ease-in-out"
+          layout="fill"
+          objectFit="cover" // Ensures the image covers the entire box
+          quality={100} // Ensures high-quality images
+          className="transition-all duration-300 ease-in-out"
           onLoad={() => setIsLoading(false)}
           onError={() => setIsLoading(false)} // Optional: add error handling if needed
         />

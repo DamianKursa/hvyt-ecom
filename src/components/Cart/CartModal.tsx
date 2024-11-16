@@ -111,7 +111,9 @@ const CartModal: React.FC<CartModalProps> = ({
             ) : crossSellProducts.slice(0, 3).length > 0 ? ( // Display only the first 3 products
               crossSellProducts
                 .slice(0, 3)
-                .map((item) => <ProductPreview key={item.id} product={item} />)
+                .map((item) => (
+                  <ProductPreview key={item.id} isSmall product={item} />
+                ))
             ) : (
               <p className="text-center text-gray-500">Brak rekomendacji</p>
             )}
