@@ -22,7 +22,7 @@ const CartProgress: React.FC = () => {
       </div>
 
       {/* Steps */}
-      <div className="flex items-center w-full rounded-full border border-[#E0D6CD]">
+      <div className="flex items-center w-full rounded-full border border-[#E0D6CD] bg-[#F8F5F1]">
         {steps.map((step, index) => (
           <div
             key={index}
@@ -43,7 +43,7 @@ const CartProgress: React.FC = () => {
 
             {/* Icon and label */}
             <img src={step.icon} alt={step.label} className="w-5 h-5" />
-            <span>{step.label}</span>
+            <span className="hidden md:inline">{step.label}</span>
           </div>
         ))}
       </div>

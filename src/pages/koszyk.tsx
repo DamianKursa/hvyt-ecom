@@ -3,6 +3,7 @@ import Layout from '@/components/Layout/Layout.component';
 import { CartContext, Product } from '@/stores/CartProvider';
 import CartProgress from '@/components/Cart/CartProgress';
 import CartItems from '@/components/Cart/CartItems';
+import CartSummary from '@/components/Cart/CartSummary';
 
 const Koszyk: React.FC = () => {
   const { cart, updateCartItem, removeCartItem } = useContext(CartContext);
@@ -11,6 +12,10 @@ const Koszyk: React.FC = () => {
     updateCartItem(product.cartKey, product.qty + 1);
   };
 
+  const handleCheckout = () => {
+    console.log('Przechodze do checkout...');
+    // Add your checkout logic here, e.g., redirecting to a checkout page
+  };
   const handleDecreaseQuantity = (product: Product) => {
     if (product.qty > 1) {
       updateCartItem(product.cartKey, product.qty - 1);
@@ -36,29 +41,10 @@ const Koszyk: React.FC = () => {
             onRemoveItem={handleRemoveItem}
           />
 
-          {/* Summary Section */}
-          <aside className="lg:w-4/12 bg-gray-100 p-6 rounded-lg shadow">
-            <h2 className="text-2xl font-bold mb-4">Podsumowanie</h2>
-            <div className="flex justify-between text-lg mb-2">
-              <span>Razem produkty</span>
-              <span>{formatPrice(cart?.totalProductsPrice || 0)} zł</span>
-            </div>
-            <div className="flex items-center justify-between text-lg mb-4">
-              <span>Posiadasz kod rabatowy?</span>
-              <input
-                type="text"
-                placeholder="Wpisz kod"
-                className="border p-2 rounded w-full mt-2"
-              />
-            </div>
-            <div className="flex justify-between text-xl font-bold mb-4">
-              <span>Suma</span>
-              <span>{formatPrice(cart?.totalProductsPrice || 0)} zł</span>
-            </div>
-            <button className="w-full py-3 bg-black text-white rounded-lg text-center">
-              Przejdź do kasy
-            </button>
-          </aside>
+          <CartSummary
+            totalProductsPrice={cart?.totalProductsPrice || 0}
+            onCheckout={handleCheckout}
+          />
         </div>
       </section>
     </Layout>
