@@ -237,7 +237,6 @@ const ProductPage = () => {
                     galleryImages[0]?.sourceUrl || '/path/to/default/image.png',
                   price: selectedVariation?.price || product.price,
                 }}
-                quantity={quantity}
                 total={(
                   quantity *
                   parseFloat(selectedVariation?.price || product.price)
