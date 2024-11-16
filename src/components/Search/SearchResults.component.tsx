@@ -4,6 +4,7 @@ import {
   fetchLatestKolekcja,
 } from '../../utils/api/woocommerce';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const SearchComponent = ({ onClose }: { onClose: () => void }) => {
   const [query, setQuery] = useState('');
@@ -82,7 +83,9 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
                     onClick={onClose} // Close the modal when clicking on a product
                   >
                     <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
-                      <img
+                      <Image
+                        height={140}
+                        width={140}
                         src={product.images[0]?.src}
                         alt={product.name}
                         className="w-full h-full object-cover rounded-lg"
@@ -121,9 +124,11 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
                   className="flex flex-col items-center text-center"
                 >
                   <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
-                    <img
+                    <Image
                       src={item.images[0]?.src}
                       alt={item.name}
+                      height={140}
+                      width={140}
                       className="w-full h-full object-cover rounded-lg"
                     />
                   </div>
@@ -143,7 +148,9 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
                   onClick={onClose} // Close the modal when clicking on the latest Kolekcja
                 >
                   <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
-                    <img
+                    <Image
+                      height={140}
+                      width={140}
                       src={latestKolekcja.imageUrl}
                       alt={latestKolekcja.title.rendered}
                       className="w-full h-full object-cover rounded-lg"

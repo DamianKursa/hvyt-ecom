@@ -75,7 +75,11 @@ const Koszyk: React.FC = () => {
                     onClick={() => handleRemoveItem(product)}
                     className="text-red-500 hover:text-red-700"
                   >
-                    🗑
+                    <img
+                      src="/icons/trash.svg"
+                      alt="Remove Icon"
+                      className="w-6 h-6 hover:bg-color-red-700"
+                    />
                   </button>
                 </div>
               ))

@@ -1,14 +1,16 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { CartContext } from '@/stores/CartProvider';
+import ProductPreview from '@/components/Product/ProductPreview.component';
 import { fetchCrossSellProducts } from '@/utils/api/woocommerce';
 
 interface RecommendedProduct {
   id: string;
+  slug: string;
   name: string;
   price: string;
-  image: { src: string };
+  images: { src: string }[];
 }
 
 interface CartModalProps {
@@ -18,53 +20,76 @@ interface CartModalProps {
     image: string;
     price: string;
   };
-  quantity: number; // Ensure this is defined
+  quantity: number;
   total: string;
   onClose: () => void;
 }
 
-const CartModal: React.FC<CartModalProps> = ({ product, onClose }) => {
+const CartModal: React.FC<CartModalProps> = ({
+  product,
+  quantity,
+  total,
+  onClose,
+}) => {
   const router = useRouter();
   const { cart } = useContext(CartContext);
-
   const [recommendedProducts, setRecommendedProducts] = useState<
     RecommendedProduct[]
   >([]);
-  const [loading, setLoading] = useState(true);
+
+  const totalItemCount = cart?.totalProductsCount || 0;
+  const totalPrice = cart?.totalProductsPrice.toFixed(2) || '0.00';
 
   useEffect(() => {
     const fetchRecommendedProducts = async () => {
-      setLoading(true);
+      if (!product.id) return;
       try {
-        const { products: fetchedProducts } = await fetchCrossSellProducts(
-          product.id,
-        );
-        const formattedProducts: RecommendedProduct[] = fetchedProducts.map(
-          (prod: any) => ({
-            id: prod.id,
-            name: prod.name,
-            price: prod.price,
-            image: { src: prod.images[0]?.src || '/fallback-image.jpg' },
-          }),
-        );
-        setRecommendedProducts(formattedProducts.slice(0, 4)); // Limit to 4 products
+        const fetchedProducts = await fetchCrossSellProducts(product.id);
+
+        if (Array.isArray(fetchedProducts)) {
+          // Map to the expected structure for ProductPreview
+          const formattedProducts = fetchedProducts.map((item: any) => ({
+            id: item.id,
+            slug: item.slug || '',
+            name: item.name,
+            price: item.price,
+            images: [
+              { src: item.images?.[0]?.src || '/path/to/fallback-image.jpg' },
+            ],
+          }));
+          setRecommendedProducts(formattedProducts.slice(0, 3)); // Limit to 3 products
+        } else if (fetchedProducts && Array.isArray(fetchedProducts.products)) {
+          // Handle nested structure (e.g., { products: [...] })
+          const formattedProducts = fetchedProducts.products.map(
+            (item: any) => ({
+              id: item.id,
+              slug: item.slug || '',
+              name: item.name,
+              price: item.price,
+              images: [
+                { src: item.images?.[0]?.src || '/path/to/fallback-image.jpg' },
+              ],
+            }),
+          );
+          setRecommendedProducts(formattedProducts.slice(0, 3)); // Limit to 3 products
+        } else {
+          console.error(
+            'Unexpected structure for fetched products:',
+            fetchedProducts,
+          );
+        }
       } catch (error) {
-        console.error('Error fetching recommended products:', error);
-      } finally {
-        setLoading(false);
+        console.error('Error fetching cross-sell products:', error);
       }
     };
 
     fetchRecommendedProducts();
   }, [product.id]);
 
-  const totalItemCount = cart?.totalProductsCount || 0;
-  const totalPrice = cart?.totalProductsPrice?.toFixed(2) || '0.00';
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-8 max-w-lg w-full relative shadow-lg min-w-[830px]">
-        {/* Header with Title and Close Button */}
+    <div className="fixed inset-0 bg-[#363132] bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl p-8 md:p-12 w-full max-w-[830px] min-w-[90%] md:min-w-[830px] relative shadow-lg">
+        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Twój koszyk</h2>
           <button
@@ -109,16 +134,16 @@ const CartModal: React.FC<CartModalProps> = ({ product, onClose }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-between mb-8">
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
           <button
             onClick={onClose}
-            className="w-[48%] py-3 border border-black text-black font-semibold rounded-full hover:bg-gray-100 transition"
+            className="w-full md:w-1/2 py-3 border border-black text-black font-semibold rounded-full hover:bg-gray-100 transition"
           >
             Kontynuuj zakupy
           </button>
           <button
             onClick={() => router.push('/koszyk')}
-            className="w-[48%] py-3 bg-black text-white font-semibold rounded-full hover:bg-gray-800 transition"
+            className="w-full md:w-1/2 py-3 bg-black text-white font-semibold rounded-full hover:bg-gray-800 transition"
           >
             Przejdź do koszyka
           </button>
@@ -127,23 +152,13 @@ const CartModal: React.FC<CartModalProps> = ({ product, onClose }) => {
         {/* Recommended Products */}
         <div>
           <h3 className="text-lg font-semibold mb-4">Uzupełnij zamówienie</h3>
-          <div className="grid grid-cols-4 gap-2">
-            {loading ? (
-              <p>Ładowanie...</p>
-            ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {recommendedProducts.length > 0 ? (
               recommendedProducts.map((item) => (
-                <div key={item.id} className="flex flex-col items-center">
-                  <Image
-                    src={item.image.src}
-                    alt={item.name}
-                    width={80}
-                    height={80}
-                    className="rounded-lg"
-                  />
-                  <p className="text-sm mt-2 text-center">{item.name}</p>
-                  <p className="text-sm font-semibold">{item.price} zł</p>
-                </div>
+                <ProductPreview key={item.id} product={item} />
               ))
+            ) : (
+              <p className="text-center text-gray-500">Brak rekomendacji</p>
             )}
           </div>
         </div>

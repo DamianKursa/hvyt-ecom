@@ -16,22 +16,35 @@ interface Product {
 
 interface ProductPreviewProps {
   product: Product;
+  containerClass?: string;
+  imageClass?: string;
 }
 
-const ProductPreview: React.FC<ProductPreviewProps> = ({ product }) => {
+const ProductPreview: React.FC<ProductPreviewProps> = ({
+  product,
+  containerClass = '',
+  imageClass = '',
+}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
 
   const firstImage = product.images?.[0]?.src || '/fallback-image.jpg';
   const secondImage = product.images?.[1]?.src || firstImage;
 
+  // Display discounted or base price depending on product variations
   const productPrice = product?.variations?.nodes?.length
     ? `od ${parseFloat(product.variations.nodes[0].price || '0').toFixed(2)} zł`
     : `${parseFloat(product.price || '0').toFixed(2)} zł`;
 
+  // Truncate long product names for better display
+  const truncatedName =
+    product.name.length > 25
+      ? `${product.name.substring(0, 25)}...`
+      : product.name;
+
   return (
     <div
-      className="relative w-full h-[400px] flex flex-col justify-between group"
+      className={`relative w-full h-[400px] flex flex-col justify-between group ${containerClass}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -49,7 +62,9 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product }) => {
       </button>
 
       {/* Image Container */}
-      <div className="relative w-full h-[350px] overflow-hidden rounded-lg shadow-lg flex justify-center items-center">
+      <div
+        className={`relative w-full h-[350px] overflow-hidden rounded-lg shadow-lg flex justify-center items-center ${imageClass}`}
+      >
         {isLoading && (
           <div className="absolute inset-0 bg-gradient-to-r from-gray-300 to-gray-100 animate-pulse"></div>
         )}
@@ -61,13 +76,17 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({ product }) => {
           height={350}
           className="object-cover w-full h-full transition-all duration-300 ease-in-out"
           onLoad={() => setIsLoading(false)}
+          onError={() => setIsLoading(false)} // Optional: add error handling if needed
         />
       </div>
 
       {/* Title and Price */}
-      <div className="mt-2 text-left ">
-        <h3 className="text-[16px] font-semibold text-neutral-darkest">
-          {product.name}
+      <div className="mt-2 text-left">
+        <h3
+          className="text-[16px] font-semibold text-neutral-darkest"
+          title={product.name}
+        >
+          {truncatedName}
         </h3>
         <p className="text-base font-light text-neutral-darkest">
           {productPrice}
