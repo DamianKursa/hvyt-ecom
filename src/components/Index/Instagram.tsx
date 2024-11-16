@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
-import 'swiper/css/pagination';
 import Image from 'next/image';
 import Link from 'next/link';
+import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 
 const Instagram = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -15,7 +14,7 @@ const Instagram = () => {
         const response = await fetch('/api/instagram');
         if (!response.ok) throw new Error('Failed to fetch Instagram posts');
         const data = await response.json();
-        setPosts(data.data || []);
+        setPosts(data.data.slice(0, 4) || []); // Limit to 4 posts immediately
         setLoading(false);
       } catch (error) {
         console.error('Error fetching Instagram posts:', error);
@@ -31,24 +30,21 @@ const Instagram = () => {
   }
 
   return (
-    <section className="container mx-auto max-w-grid-desktop mt-[115px] py-16">
+    <section className="container mx-auto max-w-grid-desktop mt-[115px] py-16 md:px-0">
+      {/* Heading and Description */}
+      <div className="px-4 md:px-0 mb-8">
+        <h2 className="font-size-h2 font-bold text-neutral-darkest text-left">
+          Hvyt w waszych domach
+        </h2>
+        <p className="font-size-text-medium text-neutral-darkest text-left">
+          Zainspiruj się i zobacz jak nasze produkty sprawdzają się u innych.
+        </p>
+      </div>
+
       {/* Desktop View */}
       <div className="hidden md:block">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h2 className="font-size-h2 font-bold text-neutral-darkest">
-              Hvyt w waszych domach
-            </h2>
-            <p className="font-size-text-medium text-neutral-darkest">
-              Zainspiruj się i zobacz jak nasze produkty sprawdzają się u
-              innych.
-            </p>
-          </div>
-        </div>
-
-        {/* Image Grid */}
         <div className="grid grid-cols-4 gap-6">
-          {posts.slice(0, 4).map((post, index) => (
+          {posts.map((post, index) => (
             <div key={index} className="relative w-full h-[350px] col-span-1">
               <Image
                 src={post.media_url}
@@ -77,25 +73,22 @@ const Instagram = () => {
         </div>
       </div>
 
-      {/* Mobile View: Swiper */}
+      {/* Mobile View: Responsive Slider */}
       <div className="md:hidden">
-        <Swiper spaceBetween={16} slidesPerView={1.2}>
-          {posts.map((post, index) => (
-            <SwiperSlide key={index}>
-              <div className="relative w-full h-[350px]">
-                <Image
-                  src={post.media_url}
-                  alt={post.caption || 'Instagram Post'}
-                  width={350}
-                  height={350}
-                  layout="fixed"
-                  objectFit="cover"
-                  className="rounded-lg"
-                />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        <ResponsiveSlider
+          items={posts} // Posts are already limited to 4
+          renderItem={(post: any) => (
+            <div className="relative w-full h-[350px]">
+              <Image
+                src={post.media_url}
+                alt={post.caption || 'Instagram Post'}
+                layout="fill"
+                objectFit="cover"
+                className="rounded-lg"
+              />
+            </div>
+          )}
+        />
       </div>
     </section>
   );

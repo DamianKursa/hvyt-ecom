@@ -47,7 +47,6 @@ const CartModal: React.FC<CartModalProps> = ({
         const fetchedProducts = await fetchCrossSellProducts(product.id);
 
         if (Array.isArray(fetchedProducts)) {
-          // Map to the expected structure for ProductPreview
           const formattedProducts = fetchedProducts.map((item: any) => ({
             id: item.id,
             slug: item.slug || '',
@@ -57,21 +56,7 @@ const CartModal: React.FC<CartModalProps> = ({
               { src: item.images?.[0]?.src || '/path/to/fallback-image.jpg' },
             ],
           }));
-          setRecommendedProducts(formattedProducts.slice(0, 3)); // Limit to 3 products
-        } else if (fetchedProducts && Array.isArray(fetchedProducts.products)) {
-          // Handle nested structure (e.g., { products: [...] })
-          const formattedProducts = fetchedProducts.products.map(
-            (item: any) => ({
-              id: item.id,
-              slug: item.slug || '',
-              name: item.name,
-              price: item.price,
-              images: [
-                { src: item.images?.[0]?.src || '/path/to/fallback-image.jpg' },
-              ],
-            }),
-          );
-          setRecommendedProducts(formattedProducts.slice(0, 3)); // Limit to 3 products
+          setRecommendedProducts(formattedProducts.slice(0, 3));
         } else {
           console.error(
             'Unexpected structure for fetched products:',
@@ -88,69 +73,68 @@ const CartModal: React.FC<CartModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-[#363132] bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-8 md:p-12 w-full max-w-[830px] min-w-[90%] md:min-w-[830px] relative shadow-lg">
+      <div className="bg-beige-light rounded-2xl px-8 py-10 md:px-12 md:py-14 w-full max-w-[830px] min-w-[90%] md:min-w-[830px] relative shadow-lg">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold">Twój koszyk</h2>
-          <button
-            className="text-2xl font-bold text-gray-500"
-            onClick={onClose}
-          >
+          <button className="text-2xl font-bold text-black" onClick={onClose}>
             &times;
           </button>
         </div>
 
         {/* Product Summary */}
-        <div className="flex items-center mb-6">
-          <Image
-            src={product.image}
-            alt={product.name}
-            width={64}
-            height={64}
-            className="rounded-md"
-          />
+        <div className="flex items-center mb-4">
+          <div className="w-[90px] h-[90px] relative">
+            <Image
+              src={product.image}
+              alt={product.name}
+              layout="fill"
+              objectFit="cover"
+              className="rounded-md"
+            />
+          </div>
           <div className="ml-4">
-            <p className="font-semibold text-lg">{product.name}</p>
+            <p className="font-semibold text-normal">{product.name}</p>
           </div>
         </div>
 
         {/* Cart Summary */}
-        <div className="flex items-center mb-6 space-x-3">
-          <div className="flex items-center bg-gray-100 p-2 rounded-full">
+        <div className="flex items-center mb-8 space-x-3">
+          <div className="flex font-semibold items-center bg-beige-dark p-2 rounded-full">
             <Image
               src="/icons/cart.svg"
               alt="Cart Icon"
-              width={20}
-              height={20}
+              width={24}
+              height={24}
             />
-            <span className="text-sm font-semibold ml-2">
+            <span className="text-medium font-bold ml-1">
               ({totalItemCount})
             </span>
           </div>
-          <span className="text-lg font-semibold text-gray-700">
+          <span className="text-regular font-light text-black">
             Suma produktów w koszyku:
           </span>
-          <span className="text-lg font-bold">{totalPrice}zł</span>
+          <span className="text-regular font-light">{totalPrice}zł</span>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="flex flex-col md:flex-row gap-4 mb-10">
           <button
             onClick={onClose}
-            className="w-full md:w-1/2 py-3 border border-black text-black font-semibold rounded-full hover:bg-gray-100 transition"
+            className="w-full md:w-1/2 py-3 border border-black text-black rounded-full hover:bg-gray-100 transition"
           >
             Kontynuuj zakupy
           </button>
           <button
             onClick={() => router.push('/koszyk')}
-            className="w-full md:w-1/2 py-3 bg-black text-white font-semibold rounded-full hover:bg-gray-800 transition"
+            className="w-full md:w-1/2 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition"
           >
             Przejdź do koszyka
           </button>
         </div>
 
         {/* Recommended Products */}
-        <div>
+        <div className="pt-10 border-t border-[#DAD3C8]">
           <h3 className="text-lg font-semibold mb-4">Uzupełnij zamówienie</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {recommendedProducts.length > 0 ? (
