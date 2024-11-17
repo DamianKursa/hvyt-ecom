@@ -33,21 +33,27 @@ const fallbackProducts: RecommendedProduct[] = [
 ];
 
 const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
-  products,
+  products = [],
   loading,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 3.8;
-  const gutter = 24;
+  const itemsPerPage = 3.8; // Number of items per full slider view
+  const gutter = 24; // Gap between products in pixels
 
-  const displayedProducts = loading ? fallbackProducts : products;
-
+  // Fallback products if loading or products array is empty
+  const displayedProducts = loading ? fallbackProducts : products || [];
   const totalItems = displayedProducts.length;
+
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < totalItems - itemsPerPage;
 
-  const handlePrev = () => canGoPrev && setCurrentIndex(currentIndex - 1);
-  const handleNext = () => canGoNext && setCurrentIndex(currentIndex + 1);
+  const handlePrev = () => {
+    if (canGoPrev) setCurrentIndex((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (canGoNext) setCurrentIndex((prev) => prev + 1);
+  };
 
   return (
     <section className="container max-w-grid-desktop py-16 sm:px-4 md:px-0 mx-auto">
@@ -71,6 +77,7 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
                 : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
             }`}
             disabled={!canGoPrev}
+            aria-disabled={!canGoPrev}
           >
             <img
               src="/icons/arrow-left.svg"
@@ -86,6 +93,7 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
                 : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
             }`}
             disabled={!canGoNext}
+            aria-disabled={!canGoNext}
           >
             <img src="/icons/arrow-right.svg" alt="Next" className="h-6 w-6" />
           </button>
@@ -97,7 +105,7 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
         <div
           className="flex transition-transform duration-300"
           style={{
-            transform: `translateX(-${(currentIndex % totalItems) * (100 / itemsPerPage)}%)`,
+            transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)`,
             gap: `${gutter}px`,
           }}
         >
@@ -113,7 +121,13 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
               <ProductPreview
                 product={{
                   ...product,
-                  images: [{ src: product.images[0].src }],
+                  images: [
+                    {
+                      src:
+                        product.images?.[0]?.src ||
+                        'https://via.placeholder.com/300',
+                    },
+                  ],
                 }}
               />
             </div>
@@ -127,7 +141,16 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
           items={displayedProducts}
           renderItem={(product: RecommendedProduct) => (
             <ProductPreview
-              product={{ ...product, images: [{ src: product.images[0].src }] }}
+              product={{
+                ...product,
+                images: [
+                  {
+                    src:
+                      product.images?.[0]?.src ||
+                      'https://via.placeholder.com/300',
+                  },
+                ],
+              }}
             />
           )}
         />
