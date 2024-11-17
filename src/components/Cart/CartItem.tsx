@@ -29,9 +29,9 @@ const CartItem: React.FC<CartItemProps> = ({
         <div className="w-[90px] h-[90px] relative rounded-lg overflow-hidden">
           <Image
             src={product.image as string}
-            alt={product.name || 'Product image'}
-            layout="fill"
-            objectFit="cover"
+            alt={product.name}
+            fill
+            style={{ objectFit: 'cover' }}
             className="rounded-md"
           />
         </div>

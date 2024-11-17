@@ -49,8 +49,8 @@ const Instagram = () => {
               <Image
                 src={post.media_url}
                 alt={post.caption || 'Instagram Post'}
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: 'cover' }}
                 className="rounded-lg"
               />
             </div>
@@ -82,8 +82,8 @@ const Instagram = () => {
               <Image
                 src={post.media_url}
                 alt={post.caption || 'Instagram Post'}
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: 'cover' }}
                 className="rounded-lg"
               />
             </div>

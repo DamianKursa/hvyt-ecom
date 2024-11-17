@@ -140,7 +140,10 @@ const ProductPage = () => {
   };
 
   const handleAddToCart = () => {
-    if (!product) return;
+    if (!product) {
+      console.error('No product available to add to cart');
+      return;
+    }
 
     const cartItem = {
       cartKey: product.id.toString(),
@@ -148,14 +151,16 @@ const ProductPage = () => {
       qty: quantity,
       price: parseFloat(selectedVariation?.price || product.price), // Ensure it's a number
       totalPrice:
-        quantity * parseFloat(selectedVariation?.price || product.price), // Keep as number
-      image: { sourceUrl: product.image, title: product.name },
+        quantity * parseFloat(selectedVariation?.price || product.price), // Ensure it's calculated
+      image: product.images?.[0]?.src || '/fallback-image.jpg', // Fallback if no image
       productId: parseInt(product.id.toString(), 10),
-      attributes: selectedAttributes,
+      attributes: selectedAttributes, // Pass selected attributes
     };
 
-    addCartItem(cartItem); // Add item to cart using addCartItem from CartContext
-    setShowModal(true); // Show modal instead of Snackbar
+    console.log('CartItem to Add:', cartItem); // Debugging
+
+    addCartItem(cartItem); // Add item to cart
+    setShowModal(true); // Show modal on success
   };
 
   const handleCloseModal = () => setShowModal(false);

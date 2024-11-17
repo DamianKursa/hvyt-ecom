@@ -58,10 +58,11 @@ const WybierzColor = () => {
               <Image
                 src="/images/6.png"
                 alt="Srebro"
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: 'cover' }}
                 className="rounded-lg"
               />
+
               <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                 Srebro
               </div>
@@ -74,10 +75,11 @@ const WybierzColor = () => {
               <Image
                 src="/images/5.png"
                 alt="Czerń"
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: 'cover' }}
                 className="rounded-lg"
               />
+
               <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                 Czerń
               </div>
@@ -92,10 +94,11 @@ const WybierzColor = () => {
               <Image
                 src="/images/zloto.png"
                 alt="Złoto"
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: 'cover' }}
                 className="rounded-lg"
               />
+
               <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                 Złoto
               </div>
@@ -108,10 +111,11 @@ const WybierzColor = () => {
               <Image
                 src="/images/4.png"
                 alt="Kolory"
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: 'cover' }}
                 className="rounded-lg"
               />
+
               <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                 Kolory
               </div>
@@ -129,10 +133,11 @@ const WybierzColor = () => {
               <Image
                 src={item.src}
                 alt={item.alt}
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: 'cover' }}
                 className="rounded-lg"
               />
+
               <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                 {item.title}
               </div>

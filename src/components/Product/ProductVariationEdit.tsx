@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 
 interface ProductVariationEditProps {
-  variationName: string;
-  currentValue: string;
-  variationOptions: string[];
-  onSave: (newValue: string) => void;
+  variationName: string; // The name of the variation (e.g., "Rozstaw")
+  currentValue: string; // The current value of the variation
+  variationOptions: string[]; // List of available variation options
+  onSave: (newValue: string) => void; // Callback to save the updated value
 }
 
 const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({

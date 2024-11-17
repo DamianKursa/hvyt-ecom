@@ -49,8 +49,9 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
           <Image
             src={firstImage.sourceUrl}
             alt="Full Product Image"
-            layout="fill"
-            objectFit="cover"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'cover' }}
             className="rounded-lg cursor-pointer"
           />
         </div>
@@ -70,8 +71,9 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
               <Image
                 src={image.sourceUrl}
                 alt={`Product Image ${image.id}`}
-                layout="fill"
-                objectFit="cover"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                style={{ objectFit: 'cover' }}
                 className="rounded-lg cursor-pointer"
               />
             </div>
@@ -88,8 +90,9 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
           <Image
             src={fullWidthImageThird.sourceUrl}
             alt="Full Product Image"
-            layout="fill"
-            objectFit="cover"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            style={{ objectFit: 'cover' }}
             className="rounded-lg cursor-pointer"
           />
         </div>
@@ -105,10 +108,12 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
             <Image
               src={remainingImages[0].sourceUrl}
               alt={`Product Image ${remainingImages[0].id}`}
-              layout="fill"
-              objectFit="cover"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              style={{ objectFit: 'cover' }}
               className="rounded-lg cursor-pointer"
             />
+
             {!isExpanded && (
               <div
                 className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white to-transparent pointer-events-none"
@@ -145,8 +150,9 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
               <Image
                 src={image.sourceUrl}
                 alt={`Product Image ${image.id}`}
-                layout="fill"
-                objectFit="cover"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                style={{ objectFit: 'cover' }}
                 className="rounded-lg cursor-pointer"
               />
             </div>

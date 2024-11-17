@@ -78,8 +78,8 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
         <Image
           src={isHovered ? secondImage : firstImage}
           alt={product.name}
-          layout="fill"
-          objectFit="cover" // Ensures the image covers the entire box
+          fill
+          style={{ objectFit: 'cover' }}
           quality={100} // Ensures high-quality images
           className="transition-all duration-300 ease-in-out"
           onLoad={() => setIsLoading(false)}

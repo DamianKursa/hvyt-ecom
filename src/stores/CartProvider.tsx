@@ -6,10 +6,10 @@ export interface Product {
   qty: number;
   price: number;
   totalPrice: number;
-  image: string | { sourceUrl?: string; title: string };
-  productId: number;
+  image: string; // Ensure this is a string
+  productId: number; // Ensure this is a number
   attributes?: { [key: string]: string };
-  variationOptions?: { [key: string]: string[] }; // Added for variations
+  variationOptions?: { [key: string]: string[] };
 }
 
 export interface Cart {
@@ -79,23 +79,37 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       : image?.sourceUrl || '/fallback-image.jpg';
 
   const addCartItem = (product: Product) => {
-    console.log('Adding Product to Cart:', product); // Debugging log
+    console.log('Adding Product to Cart:', product); // Debugging
+
     setCart((prevCart) => {
       const updatedCart = { ...prevCart };
-      const normalizedProduct = {
-        ...product,
-        image: normalizeProductImage(product.image),
-        variationOptions: product.variationOptions || {}, // Ensure variation options are passed
-      };
+
       const existingProduct = updatedCart.products.find(
         (item) => item.cartKey === product.cartKey,
       );
 
       if (existingProduct) {
-        existingProduct.qty += normalizedProduct.qty;
-        existingProduct.totalPrice += normalizedProduct.totalPrice;
+        existingProduct.qty += product.qty;
+        existingProduct.totalPrice += product.totalPrice;
       } else {
-        updatedCart.products.push(normalizedProduct);
+        updatedCart.products.push(product);
+      }
+
+      console.log('Updated Cart:', updatedCart); // Debugging
+      return recalculateCartTotals(updatedCart);
+    });
+  };
+
+  const updateCartItem = (cartKey: string, quantity: number) => {
+    setCart((prevCart) => {
+      const updatedCart = { ...prevCart };
+      const product = updatedCart.products.find(
+        (item) => item.cartKey === cartKey,
+      );
+
+      if (product) {
+        product.qty = quantity;
+        product.totalPrice = product.price * quantity;
       }
 
       return recalculateCartTotals(updatedCart);
@@ -107,7 +121,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     name: string,
     newVariation: string,
   ) => {
-    console.log(`Updating variation for ${name} to ${newVariation}`); // Debugging log
     setCart((prevCart) => {
       const updatedCart = { ...prevCart };
       const product = updatedCart.products.find(
@@ -121,7 +134,26 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         };
       }
 
+      return updatedCart;
+    });
+  };
+
+  const removeCartItem = (cartKey: string) => {
+    setCart((prevCart) => {
+      const updatedCart = {
+        ...prevCart,
+        products: prevCart.products.filter((item) => item.cartKey !== cartKey),
+      };
+
       return recalculateCartTotals(updatedCart);
+    });
+  };
+
+  const clearCart = () => {
+    setCart({
+      products: [],
+      totalProductsCount: 0,
+      totalProductsPrice: 0,
     });
   };
 
@@ -130,9 +162,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       value={{
         cart,
         addCartItem,
-        updateCartItem: () => {},
-        removeCartItem: () => {},
-        clearCart: () => {},
+        updateCartItem,
+        removeCartItem,
+        clearCart,
         updateCartVariation,
       }}
     >

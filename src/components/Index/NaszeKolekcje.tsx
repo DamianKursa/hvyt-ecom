@@ -68,11 +68,12 @@ const NaszeKolekcje = () => {
               <Image
                 src={kolekcja.imageUrl || '/placeholder.jpg'}
                 alt={kolekcja.title.rendered}
-                layout="fill"
-                objectFit="cover"
+                fill
+                style={{ objectFit: 'cover' }}
                 quality={100}
                 className="rounded-lg h-full"
               />
+
               <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red">
                 {kolekcja.title.rendered}
               </div>

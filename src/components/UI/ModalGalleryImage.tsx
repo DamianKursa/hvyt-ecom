@@ -51,10 +51,9 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
           <Image
             src={images[currentIndex]}
             alt={`Image ${currentIndex + 1}`}
-            layout="intrinsic"
             width={800} // Adjust based on typical image width
             height={600} // Adjust to maintain aspect ratio
-            objectFit="contain"
+            style={{ objectFit: 'contain' }}
             className="rounded-lg"
             priority
           />
