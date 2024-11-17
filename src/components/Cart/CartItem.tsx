@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import Image from 'next/image';
-import { Product } from '@/stores/CartProvider';
+import { CartContext, Product } from '@/stores/CartProvider';
 import QuantityChanger from '@/components/UI/QuantityChanger';
+import ProductVariationEdit from '@/components/Product/ProductVariationEdit';
 
 interface CartItemProps {
   product: Product;
@@ -16,8 +17,11 @@ const CartItem: React.FC<CartItemProps> = ({
   onDecreaseQuantity,
   onRemoveItem,
 }) => {
-  // Utility function to format prices
-  const formatPrice = (price: number) => price.toFixed(2);
+  const { updateCartVariation } = useContext(CartContext);
+
+  const handleSaveVariation = (name: string, newValue: string) => {
+    updateCartVariation(product.cartKey, name, newValue);
+  };
 
   return (
     <div className="flex items-center justify-between mb-6 border-b pb-4 last:border-none last:pb-0">
@@ -35,14 +39,16 @@ const CartItem: React.FC<CartItemProps> = ({
           <h3 className="text-lg font-semibold text-neutral-darkest">
             {product.name}
           </h3>
-          {product.attributes?.rozstaw && (
-            <p className="text-sm text-gray-500">
-              Rozstaw: {product.attributes.rozstaw}{' '}
-              <button className="text-sm text-blue-500 underline ml-2">
-                edytuj
-              </button>
-            </p>
-          )}
+          {product.attributes &&
+            Object.entries(product.attributes).map(([name, value]) => (
+              <ProductVariationEdit
+                key={name}
+                variationName={name}
+                currentValue={value}
+                variationOptions={product.variationOptions?.[name] || []}
+                onSave={(newValue) => handleSaveVariation(name, newValue)}
+              />
+            ))}
         </div>
       </div>
 
@@ -54,7 +60,7 @@ const CartItem: React.FC<CartItemProps> = ({
 
       <div className="flex flex-col items-end">
         <p className="text-xl font-bold text-neutral-darkest">
-          {formatPrice(product.totalPrice)} zł
+          {product.totalPrice.toFixed(2)} zł
         </p>
       </div>
 

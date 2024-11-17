@@ -26,7 +26,7 @@ const CartProgress: React.FC = () => {
         {steps.map((step, index) => (
           <div
             key={index}
-            className={`flex items-center py-4 px-4 gap-3 flex-1 text-sm font-medium relative ${
+            className={`flex items-center justify-center py-4 px-4 gap-3 flex-1 text-sm font-medium relative ${
               step.active ? 'bg-[#E0D6CD] font-semibold' : 'bg-transparent'
             } ${
               index === 0
@@ -43,7 +43,7 @@ const CartProgress: React.FC = () => {
 
             {/* Icon and label */}
             <img src={step.icon} alt={step.label} className="w-5 h-5" />
-            <span className="hidden md:inline">{step.label}</span>
+            <span>{step.label}</span>
           </div>
         ))}
       </div>
