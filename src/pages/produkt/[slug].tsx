@@ -10,6 +10,7 @@ import CartModal from '@/components/Cart/CartModal';
 import ColorSwitcher from '@/components/SingleProduct/ColorSwitcher.component';
 import DeliveryReturnInfo from '@/components/SingleProduct/DeliveryReturnInfo.component';
 import AttributeSwitcher from '@/components/UI/AttributeSwitcher.component';
+import Reviews from '@/components/Reviews/Reviews';
 import QuantityChanger from '@/components/UI/QuantityChanger';
 import { useProductState } from '@/utils/hooks/useProductState';
 import { fetchProductBySlug } from '@/utils/api/woocommerce';
@@ -316,9 +317,9 @@ const ProductPage = () => {
             />
           </div>
         </div>
-        <NajczęściejKupowaneRazem products={[]} loading={false} />{' '}
-        {/* Replace with your cross-sell data */}
+        <NajczęściejKupowaneRazem products={[]} loading={false} />
         <Instagram />
+        {product && <Reviews productId={Number(product.id)} />}
       </section>
     </Layout>
   );

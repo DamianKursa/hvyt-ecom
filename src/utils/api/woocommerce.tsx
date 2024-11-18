@@ -287,3 +287,41 @@ export const fetchInstagramPosts = async () => {
   const data = await response.json();
   return data.data; // Return the array of Instagram posts
 };
+
+// Fetch reviews for a specific product
+export const fetchProductReviews = async (productId: number) => {
+  try {
+    const response = await fetch(`/api/reviews?productId=${productId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch reviews');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching product reviews:', error);
+    return [];
+  }
+};
+
+// Submit a review for a specific product
+export const submitProductReview = async (
+  productId: number,
+  name: string,
+  email: string,
+  content: string,
+  rating: number,
+) => {
+  try {
+    const response = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId, name, email, content, rating }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to submit review');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error submitting product review:', error);
+    throw error;
+  }
+};
