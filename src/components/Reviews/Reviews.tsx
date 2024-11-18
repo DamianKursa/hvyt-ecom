@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import ReviewForm from '@/components/Reviews/ReviewForm';
+import ResponsiveSlider from '@/components/Slider/ResponsiveSlider'; // Import your slider component
+import ReviewItem from './ReviewItem'; // Import the ReviewItem component
+import ReviewForm from './ReviewForm'; // Import the ReviewForm component
 import { fetchProductReviews } from '@/utils/api/woocommerce';
-import Image from 'next/image';
 
 interface Review {
   id: number;
@@ -11,15 +12,36 @@ interface Review {
   date_created: string;
 }
 
+const fallbackReviews: Review[] = [
+  {
+    id: 1,
+    reviewer: 'Sample Reviewer 1',
+    review: 'This is a sample review. It shows how a review will appear.',
+    rating: 5,
+    date_created: '2024-11-01',
+  },
+  {
+    id: 2,
+    reviewer: 'Sample Reviewer 2',
+    review: 'Another review to showcase the slider functionality.',
+    rating: 4,
+    date_created: '2024-11-02',
+  },
+];
+
 const Reviews = ({ productId }: { productId: number }) => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const itemsPerPage = 2.8; // Number of reviews per slider view
+  const gutter = 24; // Gap between reviews in pixels
 
   useEffect(() => {
     const loadReviews = async () => {
       try {
+        setLoading(true);
         const data = await fetchProductReviews(productId);
         setReviews(data);
       } catch (error) {
@@ -49,78 +71,125 @@ const Reviews = ({ productId }: { productId: number }) => {
     refreshReviews();
   };
 
-  if (loading) return <p>Loading reviews...</p>;
+  const displayedReviews = loading ? fallbackReviews : reviews || [];
+  const totalItems = displayedReviews.length;
+
+  const canGoPrev = currentIndex > 0;
+  const canGoNext = currentIndex < totalItems - itemsPerPage;
+
+  const handlePrev = () => {
+    if (canGoPrev) setCurrentIndex((prev) => prev - 1);
+  };
+
+  const handleNext = () => {
+    if (canGoNext) setCurrentIndex((prev) => prev + 1);
+  };
 
   return (
-    <section className="bg-light py-12">
-      <div className="container mx-auto">
-        <h2 className="text-3xl font-bold">Klienci o HVYT</h2>
-        <p className="text-lg mb-6">
-          Sprawdź co mówią osoby, które kupiły nasze produkty lub podziel się
-          swoją opinią.
-        </p>
-        {reviews.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {reviews.map((review) => (
-              <div
-                key={review.id}
-                className="border rounded-lg p-6 bg-white shadow-sm"
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <div className="flex items-center gap-2">
-                    <Image
-                      src="/placeholder-user.jpg" // Replace with user images if available
-                      alt={review.reviewer}
-                      width={50}
-                      height={50}
-                      className="rounded-full"
-                    />
-                    <div>
-                      <h4 className="font-semibold">{review.reviewer}</h4>
-                      <p className="text-sm text-gray-500">
-                        {new Date(review.date_created).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                  <div>
-                    {Array.from({ length: 5 }, (_, index) => (
-                      <span
-                        key={index}
-                        className={
-                          index < review.rating
-                            ? 'text-yellow-400'
-                            : 'text-gray-300'
-                        }
-                      >
-                        ★
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <p className="text-sm">{review.review}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p>No reviews available for this product.</p>
-        )}
-        {submitted && (
-          <div className="mt-6 p-4 bg-green-100 text-green-700 rounded-lg">
-            Dziękujemy za podzielenie się Twoją opinią.
-          </div>
-        )}
+    <section className="container max-w-grid-desktop py-16 sm:px-4 md:px-0 mx-auto">
+      <div className="flex justify-between mb-[40px]">
+        <div className="flex px-[16px] lg:px-0 flex-col h-full">
+          <h2 className="font-size-h2 font-bold text-neutral-darkest">
+            Opinie Klientów
+          </h2>
+          <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
+            Sprawdź, co nasi klienci myślą o naszych produktach.
+          </p>
+        </div>
+
+        {/* Custom Navigation - Desktop Only */}
+        <div className="hidden md:flex items-center space-x-4">
+          <button
+            onClick={handlePrev}
+            className={`p-3 rounded-full shadow-lg ${
+              canGoPrev
+                ? 'bg-black text-white'
+                : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
+            }`}
+            disabled={!canGoPrev}
+            aria-disabled={!canGoPrev}
+          >
+            <img
+              src="/icons/arrow-left.svg"
+              alt="Previous"
+              className="h-6 w-6"
+            />
+          </button>
+          <button
+            onClick={handleNext}
+            className={`p-3 rounded-full shadow-lg ${
+              canGoNext
+                ? 'bg-black text-white'
+                : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
+            }`}
+            disabled={!canGoNext}
+            aria-disabled={!canGoNext}
+          >
+            <img src="/icons/arrow-right.svg" alt="Next" className="h-6 w-6" />
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop View */}
+      <div className="hidden md:flex overflow-hidden">
+        <div
+          className="flex transition-transform duration-300"
+          style={{
+            transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)`,
+            gap: `${gutter}px`,
+          }}
+        >
+          {displayedReviews.map((review) => (
+            <div
+              key={review.id}
+              className="flex-none"
+              style={{
+                width: `calc((100% / ${itemsPerPage}) - ${gutter}px)`,
+                transition: 'all 0.3s ease',
+              }}
+            >
+              <ReviewItem review={review} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Mobile View: Responsive Slider */}
+      <div className="md:hidden">
+        <ResponsiveSlider
+          items={displayedReviews}
+          renderItem={(review: Review) => <ReviewItem review={review} />}
+        />
+      </div>
+
+      {/* Success Message */}
+      {submitted && (
+        <div className="mt-6 p-4 bg-green-100 text-green-700 rounded-lg text-center">
+          Dziękujemy za podzielenie się Twoją opinią.
+        </div>
+      )}
+
+      {/* Add Review Button */}
+      <div className="flex justify-center mt-6">
         <button
           onClick={() => setShowForm(!showForm)}
-          className="mt-6 px-4 py-2 bg-black text-white rounded-full"
+          className="px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all flex items-center space-x-2"
         >
-          {showForm ? 'Schowaj formularz' : 'Dodaj swoją opinię'}
+          <span>{showForm ? 'Schowaj formularz' : 'Dodaj swoją opinię'}</span>
+          <img
+            src="/icons/plus.svg" // Update with your desired icon
+            alt="Add Icon"
+            className="h-5 w-5"
+          />
         </button>
-        {showForm && (
-          <div className="mt-6">
-            <ReviewForm productId={productId} onSubmit={handleReviewSubmit} />
-          </div>
-        )}
       </div>
+
+      {/* Review Form */}
+      {showForm && (
+        <div className="mt-6">
+          <ReviewForm productId={productId} onSubmit={handleReviewSubmit} />
+        </div>
+      )}
     </section>
   );
 };
