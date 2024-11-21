@@ -70,7 +70,7 @@ const CategoryPage = ({
 
   useEffect(() => {
     const fetchFilteredProducts = async () => {
-      if (!slug) return;
+      if (!slug || !category) return;
 
       try {
         console.log('Fetching filtered products with params:', {
@@ -96,11 +96,11 @@ const CategoryPage = ({
     };
 
     fetchFilteredProducts();
-  }, [activeFilters, sortingOption, category.id, slug]);
+  }, [activeFilters, sortingOption, category, slug]);
 
   useEffect(() => {
     const fetchAttributes = async () => {
-      if (!slug) return;
+      if (!slug || !category) return;
 
       try {
         console.log('Fetching attributes for category:', category.id);
@@ -114,7 +114,7 @@ const CategoryPage = ({
     };
 
     fetchAttributes();
-  }, [category.id, slug]);
+  }, [category, slug]);
 
   useEffect(() => {
     // Parse filters from URL

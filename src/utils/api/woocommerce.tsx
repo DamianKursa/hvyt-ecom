@@ -51,6 +51,7 @@ export const fetchProductBySlug = async (slug: string) => {
 };
 
 // Fetch products by category ID
+// Fetch products by category ID
 export const fetchProductsByCategoryId = async (
   categoryId: number,
   page = 1,
@@ -75,7 +76,9 @@ export const fetchProductsByCategoryId = async (
 
     // Add filters to params
     filters.forEach((filter) => {
-      params[`attribute_${filter.name}`] = filter.value;
+      if (filter.name && filter.value) {
+        params[`attribute_${filter.name}`] = filter.value; // Ensure this matches the API's expected structure
+      }
     });
 
     // Add sorting option to params
@@ -176,11 +179,7 @@ export const fetchProductAttributesWithTerms = async (categoryId: number) => {
       attributes.map(async (attribute: Attribute) => {
         const termsResponse = await WooCommerceAPI.get(
           `/products/attributes/${attribute.id}/terms`,
-          {
-            params: {
-              category: categoryId,
-            },
-          },
+          { params: { category: categoryId } }, // Ensure categoryId is used
         );
         console.log(
           `Terms response for attribute ${attribute.name}:`,
