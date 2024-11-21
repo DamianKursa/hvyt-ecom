@@ -7,29 +7,56 @@ interface ProductArchiveProps {
   categoryId: number;
   filters: { name: string; value: string }[];
   sortingOption: string;
+  initialProducts: any[];
+  totalProducts: number;
 }
 
 const ProductArchive: React.FC<ProductArchiveProps> = ({
   categoryId,
   filters,
   sortingOption,
+  initialProducts,
+  totalProducts: initialTotalProducts,
 }) => {
-  const [products, setProducts] = useState<any[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-
   const perPage = 12;
+
+  const [products, setProducts] = useState<any[]>(initialProducts || []);
+  const [isLoaded, setIsLoaded] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(initialTotalProducts);
+  const [totalPages, setTotalPages] = useState(
+    Math.ceil(initialTotalProducts / perPage),
+  );
 
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoaded(false);
       try {
-        const { products: fetchedProducts, totalProducts } =
-          await fetchProductsByCategoryId(categoryId, page, perPage);
+        console.log('Fetching products with params:', {
+          categoryId,
+          page,
+          perPage,
+          filters,
+          sortingOption,
+        });
 
-        setProducts(fetchedProducts);
-        setTotalPages(Math.ceil(totalProducts / perPage));
+        const {
+          products: fetchedProducts,
+          totalProducts: fetchedTotalProducts,
+        } = await fetchProductsByCategoryId(
+          categoryId,
+          page,
+          perPage,
+          filters,
+          sortingOption,
+        );
+
+        console.log('Fetched products:', fetchedProducts);
+        console.log('Fetched total products:', fetchedTotalProducts);
+
+        setProducts(fetchedProducts || []);
+        setTotalProducts(fetchedTotalProducts);
+        setTotalPages(Math.ceil(fetchedTotalProducts / perPage));
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
