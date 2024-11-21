@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+/*import { NextApiRequest, NextApiResponse } from 'next';
 import {
   fetchCategoryBySlug,
   fetchProductAttributesWithTerms,
@@ -25,4 +25,4 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error('Error fetching category data:', error);
     res.status(500).json({ error: 'Error fetching category data' });
   }
-}
+}*/
