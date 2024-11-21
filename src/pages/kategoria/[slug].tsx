@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
-import Filters from '../../components/Filter/Filter.component';
+import Filters from '../../components/Filter/Filters.component';
 import ProductArchive from '@/components/Product/ProductArchive';
 import FiltersControls from '@/components/Filter/FiltersControls';
 import Snackbar from '@/components/UI/Snackbar.component';

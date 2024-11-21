@@ -1,5 +1,5 @@
 import React from 'react';
-import Filters from './Filter.component';
+import Filters from './Filters.component';
 
 interface FilterModalProps {
   isOpen: boolean;
