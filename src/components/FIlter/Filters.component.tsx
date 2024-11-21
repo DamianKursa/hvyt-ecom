@@ -29,7 +29,7 @@ const Filters = ({
     setSelectedFilters(activeFilters);
   }, [activeFilters]);
 
-  // Set default expanded filters on mount
+  // Set default expanded filters on mount and when attributes change
   useEffect(() => {
     if (errorMessage) {
       setShowError(true);
@@ -53,6 +53,8 @@ const Filters = ({
           (filter) =>
             !(filter.name === attributeName && filter.value === optionValue),
         );
+
+    console.log('Updated filters:', updatedFilters);
 
     setSelectedFilters(updatedFilters);
     onFilterChange(updatedFilters);

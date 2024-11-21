@@ -27,11 +27,13 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
 
   const handleSortSelect = (value: string) => {
     onSortingChange(value); // Directly pass the string value
-    setDropdownOpen(false);  // Close dropdown after selection
+    setDropdownOpen(false); // Close dropdown after selection
   };
 
   return (
-    <div className={`flex ${isMobile ? 'justify-between' : 'justify-between'} items-center mb-4`}>
+    <div
+      className={`flex ${isMobile ? 'justify-between' : 'justify-between'} items-center mb-4`}
+    >
       {/* Filtry Button */}
       <button
         onClick={toggleFilters}
@@ -40,7 +42,11 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
         <span className="font-semibold text-center">Filtry</span>
         {!isMobile && (
           <img
-            src={filtersVisible ? '/icons/arrow-left-black.svg' : '/icons/arrow-right-black.svg'}
+            src={
+              filtersVisible
+                ? '/icons/arrow-left-black.svg'
+                : '/icons/arrow-right-black.svg'
+            }
             alt="Toggle Filters"
             className="w-[24px] h-[24px]"
           />
@@ -51,7 +57,10 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
       {!isMobile && (
         <div className="flex gap-2 ml-4 flex-wrap">
           {filters.map((filter) => (
-            <span key={`${filter.name}-${filter.value}`} className="flex items-center text-[14px]">
+            <span
+              key={`${filter.name}-${filter.value}`}
+              className="flex items-center text-[14px]"
+            >
               {filter.value}
               <button
                 onClick={() => onRemoveFilter(filter)}

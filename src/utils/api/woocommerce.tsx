@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { Kolekcja } from '../functions/interfaces'; // Adjust the import path
-// woocommerce.tsx
 
 // Setup the WooCommerce API instance with the necessary credentials.
 const WooCommerceAPI = axios.create({
@@ -35,6 +34,7 @@ export const fetchCategoryBySlug = async (slug: string) => {
     throw error;
   }
 };
+
 // Fetch product by slug
 export const fetchProductBySlug = async (slug: string) => {
   try {
@@ -50,27 +50,44 @@ export const fetchProductBySlug = async (slug: string) => {
   }
 };
 
-// utils/api/woocommerce.ts
+// Fetch products by category ID
 export const fetchProductsByCategoryId = async (
   categoryId: number,
   page = 1,
   perPage = 12,
+  filters: { name: string; value: string }[] = [],
+  sortingOption: string = 'default',
 ) => {
   try {
-    const response = await WooCommerceAPI.get('/products', {
-      params: {
-        category: categoryId,
-        page,
-        per_page: perPage,
-      },
+    console.log('Fetching products with params:', {
+      categoryId,
+      page,
+      perPage,
+      filters,
+      sortingOption,
     });
 
-    if (!response.data) {
-      throw new Error('No data returned from API');
+    const params: any = {
+      category: categoryId,
+      page,
+      per_page: perPage,
+    };
+
+    // Add filters to params
+    filters.forEach((filter) => {
+      params[`attribute_${filter.name}`] = filter.value;
+    });
+
+    // Add sorting option to params
+    if (sortingOption !== 'default') {
+      params.orderby = sortingOption;
     }
 
+    const response = await WooCommerceAPI.get('/products', { params });
+    console.log('Products response:', response.data);
+
     return {
-      products: response.data,
+      products: response.data || [],
       totalProducts: parseInt(response.headers['x-wp-total'] || '0', 10),
     };
   } catch (error) {
@@ -92,6 +109,7 @@ export const fetchMediaById = async (mediaId: number) => {
   }
 };
 
+// Fetch Kolekcje posts with images
 export const fetchKolekcjePostsWithImages = async () => {
   try {
     // Fetch Kolekcje posts
@@ -144,17 +162,29 @@ export const fetchKolekcjePostsWithImages = async () => {
   }
 };
 
-export const fetchProductAttributesWithTerms = async () => {
+// Fetch product attributes with terms
+export const fetchProductAttributesWithTerms = async (categoryId: number) => {
   try {
-    // Fetch the product attributes first
+    console.log(
+      `Fetching product attributes with terms for category ID: ${categoryId}`,
+    );
     const attributesResponse = await WooCommerceAPI.get('/products/attributes');
-    const attributes: Attribute[] = attributesResponse.data; // Explicitly typed as Attribute[]
+    const attributes: Attribute[] = attributesResponse.data;
+    console.log('Attributes response:', attributes);
 
-    // Fetch terms for each attribute
     const attributesWithTerms = await Promise.all(
       attributes.map(async (attribute: Attribute) => {
         const termsResponse = await WooCommerceAPI.get(
           `/products/attributes/${attribute.id}/terms`,
+          {
+            params: {
+              category: categoryId,
+            },
+          },
+        );
+        console.log(
+          `Terms response for attribute ${attribute.name}:`,
+          termsResponse.data,
         );
         return {
           ...attribute,
@@ -163,7 +193,9 @@ export const fetchProductAttributesWithTerms = async () => {
       }),
     );
 
-    return attributesWithTerms;
+    return attributesWithTerms.filter(
+      (attribute) => attribute.options.length > 0,
+    );
   } catch (error) {
     console.error('Error fetching attributes with terms:', error);
     throw error;
@@ -220,8 +252,7 @@ export const fetchProductsByAttribute = async (kolekcja: string) => {
   }
 };
 
-// utils/api/woocommerce.ts
-
+// Fetch cross-sell products
 export const fetchCrossSellProducts = async (productId: string) => {
   try {
     // Fetch the main product to get cross-sell IDs
@@ -251,6 +282,7 @@ export const fetchCrossSellProducts = async (productId: string) => {
   }
 };
 
+// Search products
 export const searchProducts = async (query: string, perPage = 10) => {
   try {
     const response = await WooCommerceAPI.get('/products', {
@@ -267,6 +299,7 @@ export const searchProducts = async (query: string, perPage = 10) => {
   }
 };
 
+// Fetch Instagram posts
 export const fetchInstagramPosts = async () => {
   const token = process.env.INSTAGRAM_ACCESS_TOKEN;
 
@@ -322,6 +355,39 @@ export const submitProductReview = async (
     return await response.json();
   } catch (error) {
     console.error('Error submitting product review:', error);
+    throw error;
+  }
+};
+
+// Combined fetch function
+export const fetchCategoryData = async (
+  slug: string,
+  page = 1,
+  perPage = 12,
+  filters: { name: string; value: string }[] = [],
+  sortingOption: string = 'default',
+) => {
+  try {
+    const category = await fetchCategoryBySlug(slug);
+    const [attributes, { products, totalProducts }] = await Promise.all([
+      fetchProductAttributesWithTerms(category.id),
+      fetchProductsByCategoryId(
+        category.id,
+        page,
+        perPage,
+        filters,
+        sortingOption,
+      ),
+    ]);
+
+    return {
+      category,
+      attributes,
+      products,
+      totalProducts,
+    };
+  } catch (error) {
+    console.error('Error fetching category data:', error);
     throw error;
   }
 };

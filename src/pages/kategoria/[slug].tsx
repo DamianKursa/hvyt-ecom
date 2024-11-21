@@ -1,16 +1,14 @@
+import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
-import Filters from '@/components/FIlter/Filters.component';
+import Filters from '@/components/Filter/Filters.component';
 import ProductArchive from '@/components/Product/ProductArchive';
-import FiltersControls from '@/components/FIlter/FiltersControls';
+import FiltersControls from '@/components/Filter/FiltersControls';
 import Snackbar from '@/components/UI/Snackbar.component';
 import CategoryDescription from '@/components/Category/CategoryDescription.component';
-import {
-  fetchCategoryBySlug,
-  fetchProductAttributesWithTerms,
-} from '../../utils/api/woocommerce';
+import { fetchCategoryData } from '../../utils/api/woocommerce';
 
 interface Attribute {
   id: number;
@@ -23,20 +21,31 @@ interface Category {
   name: string;
 }
 
+interface CategoryPageProps {
+  category: Category;
+  attributes: Attribute[];
+  initialProducts: any[];
+  totalProducts: number;
+}
+
 const icons: Record<string, string> = {
   'uchwyty-meblowe': '/icons/uchwyty-kształty.svg',
   klamki: '/icons/klamki-kształty.svg',
   wieszaki: '/icons/wieszaki-kształty.svg',
 };
 
-const CategoryPage = () => {
+const CategoryPage = ({
+  category,
+  attributes,
+  initialProducts,
+  totalProducts,
+}: CategoryPageProps) => {
   const router = useRouter();
   const slug = Array.isArray(router.query.slug)
     ? router.query.slug[0]
     : router.query.slug;
 
-  const [category, setCategory] = useState<Category | null>(null);
-  const [attributes, setAttributes] = useState<Attribute[]>([]);
+  const [products, setProducts] = useState(initialProducts);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(!isMobile);
@@ -45,26 +54,9 @@ const CategoryPage = () => {
   >([]);
   const [sortingOption, setSortingOption] = useState('default');
   const [isArrowDown, setIsArrowDown] = useState(true);
+  const [currentAttributes, setCurrentAttributes] = useState(attributes);
 
   useEffect(() => {
-    if (!slug) return;
-
-    const fetchData = async () => {
-      try {
-        const categoryData = await fetchCategoryBySlug(slug);
-        setCategory(categoryData);
-
-        const attributesData: Attribute[] =
-          await fetchProductAttributesWithTerms();
-        setAttributes(attributesData);
-      } catch (error: any) {
-        console.error('Error loading category data:', error);
-        setErrorMessage(error.message || 'Error loading category data');
-      }
-    };
-
-    fetchData();
-
     const handleResize = () => {
       const isCurrentlyMobile = window.innerWidth <= 768;
       setIsMobile(isCurrentlyMobile);
@@ -74,25 +66,106 @@ const CategoryPage = () => {
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [slug]);
+  }, []);
+
+  useEffect(() => {
+    const fetchFilteredProducts = async () => {
+      if (!slug) return;
+
+      try {
+        console.log('Fetching filtered products with params:', {
+          categoryId: category.id,
+          filters: activeFilters,
+          sortingOption,
+        });
+
+        const data = await fetchCategoryData(
+          slug,
+          1,
+          12,
+          activeFilters,
+          sortingOption,
+        );
+        console.log('Fetched filtered products:', data.products);
+        setProducts(data.products || []);
+      } catch (error: any) {
+        console.error('Error fetching filtered products:', error);
+        setErrorMessage(error.message || 'Error fetching filtered products');
+        setProducts([]);
+      }
+    };
+
+    fetchFilteredProducts();
+  }, [activeFilters, sortingOption, category.id, slug]);
+
+  useEffect(() => {
+    const fetchAttributes = async () => {
+      if (!slug) return;
+
+      try {
+        console.log('Fetching attributes for category:', category.id);
+        const data = await fetchCategoryData(slug);
+        console.log('Fetched attributes:', data.attributes);
+        setCurrentAttributes(data.attributes);
+      } catch (error: any) {
+        console.error('Error fetching attributes:', error);
+        setErrorMessage(error.message || 'Error fetching attributes');
+      }
+    };
+
+    fetchAttributes();
+  }, [category.id, slug]);
+
+  useEffect(() => {
+    // Parse filters from URL
+    const queryFilters = router.query.filters;
+    if (queryFilters) {
+      try {
+        const parsedFilters = JSON.parse(queryFilters as string);
+        setActiveFilters(parsedFilters);
+      } catch (error) {
+        console.error('Error parsing filters from URL:', error);
+      }
+    }
+  }, [router.query.filters]);
 
   const handleFilterChange = (
     selectedFilters: { name: string; value: string }[],
   ) => {
+    console.log('Filter change:', selectedFilters);
     setActiveFilters(selectedFilters);
+
+    // Update URL with filters
+    const query = {
+      ...router.query,
+      filters: JSON.stringify(selectedFilters),
+    };
+    router.push({
+      pathname: router.pathname,
+      query,
+    });
   };
 
   const handleRemoveFilter = (filterToRemove: {
     name: string;
     value: string;
   }) => {
-    setActiveFilters((currentFilters) =>
-      currentFilters.filter(
-        (filter) =>
-          filter.name !== filterToRemove.name ||
-          filter.value !== filterToRemove.value,
-      ),
+    const updatedFilters = activeFilters.filter(
+      (filter) =>
+        filter.name !== filterToRemove.name ||
+        filter.value !== filterToRemove.value,
     );
+    setActiveFilters(updatedFilters);
+
+    // Update URL with filters
+    const query = {
+      ...router.query,
+      filters: JSON.stringify(updatedFilters),
+    };
+    router.push({
+      pathname: router.pathname,
+      query,
+    });
   };
 
   const toggleFilters = () => setFiltersVisible(!filtersVisible);
@@ -149,7 +222,7 @@ const CategoryPage = () => {
           {!isMobile && filtersVisible && (
             <div className="w-1/4 pr-8">
               <Filters
-                attributes={attributes}
+                attributes={currentAttributes}
                 errorMessage={errorMessage || undefined}
                 onFilterChange={handleFilterChange}
                 activeFilters={activeFilters}
@@ -164,6 +237,8 @@ const CategoryPage = () => {
               categoryId={category?.id || 0}
               filters={activeFilters}
               sortingOption={sortingOption}
+              initialProducts={products}
+              totalProducts={totalProducts}
             />
           </div>
         </div>
@@ -185,7 +260,7 @@ const CategoryPage = () => {
 
           <div className="flex-grow overflow-y-auto mb-4">
             <Filters
-              attributes={attributes}
+              attributes={currentAttributes}
               errorMessage={errorMessage || undefined}
               onFilterChange={handleFilterChange}
               activeFilters={activeFilters}
@@ -210,6 +285,34 @@ const CategoryPage = () => {
       )}
     </Layout>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { slug } = context.params as { slug: string };
+
+  try {
+    const data = await fetchCategoryData(slug);
+
+    return {
+      props: {
+        category: data.category,
+        attributes: data.attributes,
+        initialProducts: data.products,
+        totalProducts: data.totalProducts,
+      },
+    };
+  } catch (error: any) {
+    console.error('Error loading category data:', error);
+    return {
+      props: {
+        category: null,
+        attributes: [],
+        initialProducts: [],
+        totalProducts: 0,
+        errorMessage: error.message || 'Error loading category data',
+      },
+    };
+  }
 };
 
 export default CategoryPage;
