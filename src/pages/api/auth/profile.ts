@@ -8,12 +8,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 
-  // Validate environment variables
   if (!process.env.WORDPRESS_API_URL) {
     return res.status(500).json({ message: 'Server misconfiguration: Missing API URL' });
   }
 
-  // Parse cookies
   const cookies = req.headers.cookie ? parse(req.headers.cookie) : {};
   const token = cookies.token;
 

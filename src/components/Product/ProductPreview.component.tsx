@@ -69,7 +69,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
 
       {/* Image Container */}
       <div
-        className={`relative w-full h-[${imageSize}px] overflow-hidden rounded-lg shadow-lg flex justify-center items-center ${imageClass}`}
+        className={`relative w-full h-[${imageSize}px] overflow-hidden rounded-lg  flex justify-center items-center ${imageClass}`}
       >
         {isLoading && (
           <div className="absolute inset-0 bg-gradient-to-r from-gray-300 to-gray-100 animate-pulse"></div>

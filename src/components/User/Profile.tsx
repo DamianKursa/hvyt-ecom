@@ -14,11 +14,11 @@ const Profile = () => {
           const data = await response.json();
           setUser(data);
         } else {
-          router.push('/'); // Redirect to home or login if not authenticated
+          router.push('/logowanie'); // Redirect to login if not authenticated
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        router.push('/'); // Redirect to home or login if there's an error
+        router.push('/logowanie'); // Redirect to login if there's an error
       } finally {
         setLoading(false);
       }
