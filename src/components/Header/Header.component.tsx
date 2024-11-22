@@ -21,37 +21,40 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const isMobile = useIsMobile();
   const isHomePage = router.pathname === '/';
 
-  // Check login state on component mount
   useEffect(() => {
-    if (title) {
-      document.title = title;
-    }
-
     const verifyLoginState = async () => {
       try {
+        console.log('Checking token in cookies...');
         const cookies = parseCookies(document.cookie);
-        const token = cookies.token;
+        console.log('Parsed cookies:', cookies);
 
-        if (token) {
+        if (cookies.token) {
+          console.log('Token found, verifying...');
           const response = await fetch('/api/auth/verify', {
-            headers: { Authorization: `Bearer ${token}` },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include', // Ensure cookies are sent
           });
 
           if (response.ok) {
-            setIsLoggedIn(true); // Token is valid, user is logged in
+            console.log('Token is valid');
+            setIsLoggedIn(true);
           } else {
-            setIsLoggedIn(false); // Token invalid or expired
+            console.log('Token is invalid');
+            setIsLoggedIn(false);
           }
         } else {
-          setIsLoggedIn(false); // No token found
+          console.log('No token found');
+          setIsLoggedIn(false);
         }
       } catch (error) {
-        setIsLoggedIn(false); // Error in validation
+        console.error('Error verifying login state:', error);
+        setIsLoggedIn(false);
       }
     };
 
     verifyLoginState();
-  }, [title]);
+  }, []);
 
   const toggleMobileMenu = () => {
     setMenuOpen(!menuOpen);
