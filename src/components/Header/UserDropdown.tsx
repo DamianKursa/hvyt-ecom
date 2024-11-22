@@ -3,48 +3,53 @@ import Link from 'next/link';
 
 interface UserDropdownProps {
   onLogout: () => void;
+  userName: string | null;
 }
 
-const UserDropdown: React.FC<UserDropdownProps> = ({ onLogout }) => {
+const UserDropdown: React.FC<UserDropdownProps> = ({ onLogout, userName }) => {
   return (
-    <div className="absolute right-0 top-12 bg-white shadow-lg rounded-lg w-48">
-      {/* User Greeting */}
-      <div className="p-4 text-sm">
-        <p className="font-bold text-[#661F30]">Anna,</p>
-        <p className="text-xs text-gray-500">Fajnie, że jesteś z nami!</p>
+    <div className="bg-white shadow-lg rounded-[24px] p-4 w-[250px] text-sm">
+      {/* Greeting Section */}
+      <div className="mb-4">
+        <p className="font-bold text-[#661F30] text-[18px]">
+          {userName || 'Użytkownik'}
+        </p>
+        <p className="text-gray-500 text-[14px]">Fajnie, że jesteś z nami!</p>
       </div>
 
       {/* Navigation Links */}
-      <ul className="divide-y divide-gray-200 text-sm">
+      <ul className="space-y-2">
         <li>
           <Link href="/moje-konto">
-            <span className="block px-4 py-2 hover:bg-gray-100">
+            <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Moje zamówienia
             </span>
           </Link>
         </li>
         <li>
           <Link href="/kupione-produkty">
-            <span className="block px-4 py-2 hover:bg-gray-100">
+            <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Kupione produkty
             </span>
           </Link>
         </li>
         <li>
           <Link href="/moje-dane">
-            <span className="block px-4 py-2 hover:bg-gray-100">Moje dane</span>
+            <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
+              Moje dane
+            </span>
           </Link>
         </li>
         <li>
           <Link href="/moje-adresy">
-            <span className="block px-4 py-2 hover:bg-gray-100">
+            <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Moje adresy
             </span>
           </Link>
         </li>
         <li>
           <Link href="/dane-do-faktury">
-            <span className="block px-4 py-2 hover:bg-gray-100">
+            <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Dane do faktury
             </span>
           </Link>
@@ -54,7 +59,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onLogout }) => {
       {/* Logout Button */}
       <button
         onClick={onLogout}
-        className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+        className="block w-full text-left mt-4 text-red-500 px-4 py-2 border-t border-gray-200 rounded-[24px] hover:bg-beige-dark text-[18px]"
       >
         Wyloguj się
       </button>

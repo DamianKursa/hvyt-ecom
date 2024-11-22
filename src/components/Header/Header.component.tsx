@@ -6,7 +6,6 @@ import useIsMobile from '@/utils/hooks/useIsMobile';
 import MobileMenu from './MobileMenu';
 import SearchComponent from '../Search/SearchResults.component';
 import UserDropdown from './UserDropdown';
-import { parseCookies } from '@/utils/cookies';
 
 interface IHeaderProps {
   title?: string;
@@ -17,6 +16,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
   const isMobile = useIsMobile();
   const isHomePage = router.pathname === '/';
@@ -24,64 +24,72 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   useEffect(() => {
     const verifyLoginState = async () => {
       try {
-        console.log('Verifying token with server...');
+        console.log('Verifying login state...');
         const response = await fetch('/api/auth/verify', {
           method: 'POST',
-          credentials: 'include', // Ensures cookies are sent with the request
+          credentials: 'include',
         });
 
         if (response.ok) {
-          console.log('Token is valid');
           setIsLoggedIn(true);
+
+          // Fetch user profile details
+          const userResponse = await fetch('/api/user-profile', {
+            method: 'GET',
+            credentials: 'include',
+          });
+
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            setUserName(userData.name || userData.username || 'Użytkownik');
+          } else {
+            console.error('Failed to fetch user profile');
+          }
         } else {
-          console.log('Token is invalid');
+          console.warn('Invalid login state');
           setIsLoggedIn(false);
+          setUserName(null);
         }
       } catch (error) {
-        console.error('Error verifying token:', error);
+        console.error('Error verifying login state:', error);
         setIsLoggedIn(false);
+        setUserName(null);
       }
     };
 
     verifyLoginState();
   }, []);
 
-  const toggleMobileMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+  const toggleMobileMenu = () => setMenuOpen((prev) => !prev);
 
-  const toggleSearch = () => {
-    setSearchOpen(!searchOpen);
-  };
+  const toggleSearch = () => setSearchOpen((prev) => !prev);
 
   const handleUserClick = () => {
     if (!isLoggedIn) {
-      router.push('/logowanie'); // Redirect to login page if not logged in
+      router.push('/logowanie');
     }
   };
 
   const handleMouseEnter = () => {
     if (isLoggedIn) {
-      setDropdownOpen(true); // Show dropdown on hover if logged in
+      setDropdownOpen(true);
     }
   };
 
-  const handleMouseLeave = () => {
-    setDropdownOpen(false); // Hide dropdown when leaving the icon or dropdown
-  };
+  const handleMouseLeave = () => setDropdownOpen(false);
 
   const handleLogout = () => {
-    console.log('Logging out, clearing token cookie...');
-    document.cookie = 'token=; Max-Age=0; path=/'; // Clear the token
+    console.log('Logging out...');
+    document.cookie = 'token=; Max-Age=0; path=/';
     setIsLoggedIn(false);
+    setUserName(null);
     router.push('/logowanie');
   };
 
-  const getActiveClass = (path: string) => {
-    return router.asPath === path
+  const getActiveClass = (path: string) =>
+    router.asPath === path
       ? 'bg-white text-[#661F30]'
       : 'hover:bg-[#DAD3C8] text-neutral-darkest';
-  };
 
   const iconClass = 'w-6 h-6';
 
@@ -176,7 +184,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               )}
 
               {/* Right Icons */}
-              <div className="flex-none">
+              <div className="flex-none relative">
                 <div
                   className="flex items-center space-x-4 px-6 py-2 rounded-full h-[50px]"
                   style={{ backgroundColor: '#E9E5DFCC' }}
@@ -209,7 +217,12 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       />
                     </button>
                     {dropdownOpen && isLoggedIn && (
-                      <UserDropdown onLogout={handleLogout} />
+                      <div className="absolute left-[-155px] top-12">
+                        <UserDropdown
+                          onLogout={handleLogout}
+                          userName={userName}
+                        />
+                      </div>
                     )}
                   </div>
                   <Link href="/koszyk">
