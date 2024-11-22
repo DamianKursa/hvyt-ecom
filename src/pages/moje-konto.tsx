@@ -1,5 +1,5 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
-import Profile from '../../components/User/Profile';
+import Profile from '../components/User/Profile';
 import { parseCookies } from '@/utils/cookies';
 import Layout from '@/components/Layout/Layout.component';
 export const getServerSideProps: GetServerSideProps = async (

@@ -5,8 +5,8 @@ import Breadcrumbs from '../UI/Breadcrumbs.component';
 import useIsMobile from '@/utils/hooks/useIsMobile';
 import MobileMenu from './MobileMenu';
 import SearchComponent from '../Search/SearchResults.component';
-import LoginRegisterModal from '../User/LoginRegisterModal';
-import { parseCookies } from '@/utils/cookies'; // Helper to parse cookies
+import UserDropdown from './UserDropdown';
+import { parseCookies } from '@/utils/cookies';
 
 interface IHeaderProps {
   title?: string;
@@ -15,20 +15,42 @@ interface IHeaderProps {
 const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track user login status
-  const [modalOpen, setModalOpen] = useState(false); // State to manage modal visibility
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
   const isMobile = useIsMobile();
   const isHomePage = router.pathname === '/';
 
+  // Check login state on component mount
   useEffect(() => {
     if (title) {
       document.title = title;
     }
 
-    // Check if the user is logged in by checking for a token in cookies
-    const cookies = parseCookies(document.cookie);
-    setIsLoggedIn(!!cookies.token); // Set login status based on token presence
+    const verifyLoginState = async () => {
+      try {
+        const cookies = parseCookies(document.cookie);
+        const token = cookies.token;
+
+        if (token) {
+          const response = await fetch('/api/auth/verify', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (response.ok) {
+            setIsLoggedIn(true); // Token is valid, user is logged in
+          } else {
+            setIsLoggedIn(false); // Token invalid or expired
+          }
+        } else {
+          setIsLoggedIn(false); // No token found
+        }
+      } catch (error) {
+        setIsLoggedIn(false); // Error in validation
+      }
+    };
+
+    verifyLoginState();
   }, [title]);
 
   const toggleMobileMenu = () => {
@@ -39,16 +61,26 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
     setSearchOpen(!searchOpen);
   };
 
-  const toggleModal = () => {
-    setModalOpen(!modalOpen);
+  const handleUserClick = () => {
+    if (!isLoggedIn) {
+      router.push('/logowanie'); // Redirect to login page if not logged in
+    }
   };
 
-  const handleProfileClick = () => {
+  const handleMouseEnter = () => {
     if (isLoggedIn) {
-      router.push('/user/moje-konto'); // Redirect to profile page
-    } else {
-      toggleModal(); // Open the login/register modal
+      setDropdownOpen(true); // Show dropdown on hover if logged in
     }
+  };
+
+  const handleMouseLeave = () => {
+    setDropdownOpen(false); // Hide dropdown when leaving the icon or dropdown
+  };
+
+  const handleLogout = async () => {
+    document.cookie = 'token=; Max-Age=0; path=/'; // Clear the token
+    setIsLoggedIn(false); // Update state
+    router.push('/logowanie'); // Redirect to login page
   };
 
   const getActiveClass = (path: string) => {
@@ -155,66 +187,44 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                   className="flex items-center space-x-4 px-6 py-2 rounded-full h-[50px]"
                   style={{ backgroundColor: '#E9E5DFCC' }}
                 >
-                  {isMobile ? (
-                    <div className="flex items-center space-x-4">
-                      <button onClick={toggleSearch}>
-                        <img
-                          src="/icons/search.svg"
-                          alt="Search"
-                          className={iconClass}
-                        />
-                      </button>
-                      <Link href="/koszyk">
-                        <img
-                          src="/icons/cart.svg"
-                          alt="Cart"
-                          className={iconClass}
-                        />
-                      </Link>
-                      <button onClick={toggleMobileMenu}>
-                        <img
-                          src={
-                            menuOpen
-                              ? '/icons/close-button.svg'
-                              : '/icons/menu-icon.svg'
-                          }
-                          alt="Menu"
-                          className={iconClass}
-                        />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center space-x-4">
-                      <button onClick={toggleSearch}>
-                        <img
-                          src="/icons/search.svg"
-                          alt="Search"
-                          className={iconClass}
-                        />
-                      </button>
-                      <Link href="/wishlist">
-                        <img
-                          src="/icons/wishlist.svg"
-                          alt="Wishlist"
-                          className={iconClass}
-                        />
-                      </Link>
-                      <button onClick={handleProfileClick}>
-                        <img
-                          src="/icons/user.svg"
-                          alt="User"
-                          className={iconClass}
-                        />
-                      </button>
-                      <Link href="/koszyk">
-                        <img
-                          src="/icons/cart.svg"
-                          alt="Cart"
-                          className={iconClass}
-                        />
-                      </Link>
-                    </div>
-                  )}
+                  <button onClick={toggleSearch}>
+                    <img
+                      src="/icons/search.svg"
+                      alt="Search"
+                      className={iconClass}
+                    />
+                  </button>
+                  <Link href="/wishlist">
+                    <img
+                      src="/icons/wishlist.svg"
+                      alt="Wishlist"
+                      className={iconClass}
+                    />
+                  </Link>
+                  <div
+                    onClick={handleUserClick}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    className="relative"
+                  >
+                    <button>
+                      <img
+                        src="/icons/user.svg"
+                        alt="User"
+                        className={iconClass}
+                      />
+                    </button>
+                    {dropdownOpen && isLoggedIn && (
+                      <UserDropdown onLogout={handleLogout} />
+                    )}
+                  </div>
+                  <Link href="/koszyk">
+                    <img
+                      src="/icons/cart.svg"
+                      alt="Cart"
+                      className={iconClass}
+                    />
+                  </Link>
                 </div>
               </div>
             </div>
@@ -229,9 +239,6 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
       </header>
 
       {searchOpen && <SearchComponent onClose={toggleSearch} />}
-      {modalOpen && (
-        <LoginRegisterModal isOpen={modalOpen} onClose={toggleModal} />
-      )}
     </>
   );
 };

@@ -4,9 +4,11 @@ import { NextApiResponse } from 'next';
 /**
  * Parse cookies from the request header
  */
-export const parseCookies = (cookieHeader?: string) => {
-  return cookieHeader ? parse(cookieHeader) : {};
+export const parseCookies = (cookieHeader: string) => {
+  if (!cookieHeader) return {};
+  return parse(cookieHeader);
 };
+
 
 /**
  * Set a cookie on the response

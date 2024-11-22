@@ -32,11 +32,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ menuOpen, toggleMenu }) => {
             </Link>
           </li>
           <li className="font-bold">
-            <Link href="/hvyt-objects" onClick={toggleMenu}>
-              Hvyt Objects
-            </Link>
-          </li>
-          <li className="font-bold">
             <Link href="/kolekcje" onClick={toggleMenu}>
               Kolekcje
             </Link>
@@ -58,7 +53,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ menuOpen, toggleMenu }) => {
       <div className="mt-10 space-y-6 text-xl rounded-[25px] bg-[#E9E5DF] p-[16px]">
         <ul className="space-y-6 text-xl">
           <li>
-            <Link href="/login" onClick={toggleMenu} className="font-bold">
+            <Link href="/logowanie" onClick={toggleMenu} className="font-bold">
               <div className="flex items-center">
                 <img src="/icons/user.svg" alt="User" className="h-6 mr-3" />
                 Zaloguj się
@@ -68,7 +63,11 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ menuOpen, toggleMenu }) => {
           <li>
             <Link href="/wishlist" onClick={toggleMenu} className="font-bold">
               <div className="flex items-center">
-                <img src="/icons/heart.svg" alt="Wishlist" className="h-6 mr-3" />
+                <img
+                  src="/icons/heart.svg"
+                  alt="Wishlist"
+                  className="h-6 mr-3"
+                />
                 Ulubione
               </div>
             </Link>
