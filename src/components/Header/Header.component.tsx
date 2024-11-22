@@ -4,7 +4,9 @@ import { useRouter } from 'next/router';
 import Breadcrumbs from '../UI/Breadcrumbs.component';
 import useIsMobile from '@/utils/hooks/useIsMobile';
 import MobileMenu from './MobileMenu';
-import SearchComponent from '../Search/SearchResults.component'; // Import the SearchComponent
+import SearchComponent from '../Search/SearchResults.component';
+import LoginRegisterModal from '../User/LoginRegisterModal';
+import { parseCookies } from '@/utils/cookies'; // Helper to parse cookies
 
 interface IHeaderProps {
   title?: string;
@@ -12,7 +14,9 @@ interface IHeaderProps {
 
 const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false); // State for the search modal
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track user login status
+  const [modalOpen, setModalOpen] = useState(false); // State to manage modal visibility
   const router = useRouter();
   const isMobile = useIsMobile();
   const isHomePage = router.pathname === '/';
@@ -21,6 +25,10 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
     if (title) {
       document.title = title;
     }
+
+    // Check if the user is logged in by checking for a token in cookies
+    const cookies = parseCookies(document.cookie);
+    setIsLoggedIn(!!cookies.token); // Set login status based on token presence
   }, [title]);
 
   const toggleMobileMenu = () => {
@@ -28,7 +36,19 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   };
 
   const toggleSearch = () => {
-    setSearchOpen(!searchOpen); // Toggle search modal visibility
+    setSearchOpen(!searchOpen);
+  };
+
+  const toggleModal = () => {
+    setModalOpen(!modalOpen);
+  };
+
+  const handleProfileClick = () => {
+    if (isLoggedIn) {
+      router.push('/user/moje-konto'); // Redirect to profile page
+    } else {
+      toggleModal(); // Open the login/register modal
+    }
   };
 
   const getActiveClass = (path: string) => {
@@ -37,11 +57,10 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
       : 'hover:bg-[#DAD3C8] text-neutral-darkest';
   };
 
-  const iconClass = 'w-6 h-6'; // Uniform icon dimensions
+  const iconClass = 'w-6 h-6';
 
   return (
     <>
-      {/* Mobile Menu Component */}
       {isMobile && menuOpen && (
         <MobileMenu menuOpen={menuOpen} toggleMenu={toggleMobileMenu} />
       )}
@@ -63,7 +82,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                 </Link>
               </div>
 
-              {/* Center Navigation Links for Desktop with Styling */}
+              {/* Center Navigation Links */}
               {!isMobile && (
                 <div className="flex-none mx-auto max-w-[530px] w-full">
                   <div
@@ -130,7 +149,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                 </div>
               )}
 
-              {/* Right Icons (Cart, Wishlist, Menu) */}
+              {/* Right Icons */}
               <div className="flex-none">
                 <div
                   className="flex items-center space-x-4 px-6 py-2 rounded-full h-[50px]"
@@ -166,10 +185,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                     </div>
                   ) : (
                     <div className="flex items-center space-x-4">
-                      <button
-                        onClick={toggleSearch}
-                        className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all"
-                      >
+                      <button onClick={toggleSearch}>
                         <img
                           src="/icons/search.svg"
                           alt="Search"
@@ -177,31 +193,25 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                         />
                       </button>
                       <Link href="/wishlist">
-                        <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img
-                            src="/icons/wishlist.svg"
-                            alt="Wishlist"
-                            className={iconClass}
-                          />
-                        </span>
+                        <img
+                          src="/icons/wishlist.svg"
+                          alt="Wishlist"
+                          className={iconClass}
+                        />
                       </Link>
-                      <Link href="/profile">
-                        <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img
-                            src="/icons/user.svg"
-                            alt="User"
-                            className={iconClass}
-                          />
-                        </span>
-                      </Link>
+                      <button onClick={handleProfileClick}>
+                        <img
+                          src="/icons/user.svg"
+                          alt="User"
+                          className={iconClass}
+                        />
+                      </button>
                       <Link href="/koszyk">
-                        <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img
-                            src="/icons/cart.svg"
-                            alt="Cart"
-                            className={iconClass}
-                          />
-                        </span>
+                        <img
+                          src="/icons/cart.svg"
+                          alt="Cart"
+                          className={iconClass}
+                        />
                       </Link>
                     </div>
                   )}
@@ -209,7 +219,6 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               </div>
             </div>
 
-            {/* Breadcrumbs */}
             {!isHomePage && !isMobile && (
               <div className="w-full">
                 <Breadcrumbs />
@@ -219,8 +228,10 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
         </nav>
       </header>
 
-      {/* Conditionally Render Search Component */}
       {searchOpen && <SearchComponent onClose={toggleSearch} />}
+      {modalOpen && (
+        <LoginRegisterModal isOpen={modalOpen} onClose={toggleModal} />
+      )}
     </>
   );
 };

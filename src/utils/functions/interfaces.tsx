@@ -3,6 +3,12 @@ export interface ProductAttribute {
   options: string[];
 }
 
+export interface User {
+  name?: string;
+  username?: string;
+  email?: string;
+}
+
 export interface Variation {
   id: string;
   name?: string;
@@ -18,7 +24,6 @@ export interface Variation {
     option: string;
   }[];
 }
-
 
 export interface Product {
   id: string;
