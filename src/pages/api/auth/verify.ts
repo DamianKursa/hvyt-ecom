@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
-import { AxiosError } from 'axios';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   console.log('Received token verification request', { cookies: req.cookies });
@@ -24,9 +23,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log('Token is valid');
     res.status(200).json({ valid: true });
-  }
-  catch (error) {
-    const err = error as AxiosError; // Cast error to AxiosError type
+  } catch (error) {
+    const err = error as any;
     console.error('Token validation error:', err.response?.data || err.message);
     res.status(401).json({ message: 'Invalid token' });
   }

@@ -24,31 +24,21 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   useEffect(() => {
     const verifyLoginState = async () => {
       try {
-        console.log('Checking token in cookies...');
-        const cookies = parseCookies(document.cookie);
-        console.log('Parsed cookies:', cookies);
+        console.log('Verifying token with server...');
+        const response = await fetch('/api/auth/verify', {
+          method: 'POST',
+          credentials: 'include', // Ensures cookies are sent with the request
+        });
 
-        if (cookies.token) {
-          console.log('Token found, verifying...');
-          const response = await fetch('/api/auth/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'include', // Ensure cookies are sent
-          });
-
-          if (response.ok) {
-            console.log('Token is valid');
-            setIsLoggedIn(true);
-          } else {
-            console.log('Token is invalid');
-            setIsLoggedIn(false);
-          }
+        if (response.ok) {
+          console.log('Token is valid');
+          setIsLoggedIn(true);
         } else {
-          console.log('No token found');
+          console.log('Token is invalid');
           setIsLoggedIn(false);
         }
       } catch (error) {
-        console.error('Error verifying login state:', error);
+        console.error('Error verifying token:', error);
         setIsLoggedIn(false);
       }
     };
@@ -80,10 +70,11 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
     setDropdownOpen(false); // Hide dropdown when leaving the icon or dropdown
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
+    console.log('Logging out, clearing token cookie...');
     document.cookie = 'token=; Max-Age=0; path=/'; // Clear the token
-    setIsLoggedIn(false); // Update state
-    router.push('/logowanie'); // Redirect to login page
+    setIsLoggedIn(false);
+    router.push('/logowanie');
   };
 
   const getActiveClass = (path: string) => {

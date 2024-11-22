@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 
 interface UserDropdownProps {
   onLogout: () => void;
@@ -19,29 +18,35 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onLogout }) => {
       <ul className="divide-y divide-gray-200 text-sm">
         <li>
           <Link href="/moje-konto">
-            <a className="block px-4 py-2 hover:bg-gray-100">Moje zamówienia</a>
+            <span className="block px-4 py-2 hover:bg-gray-100">
+              Moje zamówienia
+            </span>
           </Link>
         </li>
         <li>
           <Link href="/kupione-produkty">
-            <a className="block px-4 py-2 hover:bg-gray-100">
+            <span className="block px-4 py-2 hover:bg-gray-100">
               Kupione produkty
-            </a>
+            </span>
           </Link>
         </li>
         <li>
           <Link href="/moje-dane">
-            <a className="block px-4 py-2 hover:bg-gray-100">Moje dane</a>
+            <span className="block px-4 py-2 hover:bg-gray-100">Moje dane</span>
           </Link>
         </li>
         <li>
           <Link href="/moje-adresy">
-            <a className="block px-4 py-2 hover:bg-gray-100">Moje adresy</a>
+            <span className="block px-4 py-2 hover:bg-gray-100">
+              Moje adresy
+            </span>
           </Link>
         </li>
         <li>
           <Link href="/dane-do-faktury">
-            <a className="block px-4 py-2 hover:bg-gray-100">Dane do faktury</a>
+            <span className="block px-4 py-2 hover:bg-gray-100">
+              Dane do faktury
+            </span>
           </Link>
         </li>
       </ul>

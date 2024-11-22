@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { AxiosError } from 'axios';
 import axios from 'axios';
 import { serialize } from 'cookie';
 
@@ -14,16 +13,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { username, password } = req.body;
 
   try {
-    // Authenticate with WordPress API
     console.log('Authenticating with WordPress API...');
     const response = await axios.post(`${process.env.WORDPRESS_API_URL}/wp-json/jwt-auth/v1/token`, {
       username,
       password,
     });
 
-    console.log('WordPress API response:', response.data);
-
     const { token } = response.data;
+
+    console.log('WordPress API response:', response.data);
 
     // Set token in cookies
     res.setHeader(
@@ -31,17 +29,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       serialize('token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'lax',
         path: '/',
-        maxAge: 60 * 60 * 24,
+        maxAge: 60 * 60 * 24, // 1 day
       })
     );
 
-    console.log('Cookie set successfully');
+    console.log('Set-Cookie Header:', res.getHeader('Set-Cookie'));
     res.status(200).json({ message: 'Login successful' });
-  } 
-  catch (error) {
-    const err = error as AxiosError; // Cast error to AxiosError type
+  } catch (error) {
+    const err = error as any;
     console.error('Login error:', err.response?.data || err.message);
     res.status(401).json({ message: 'Invalid credentials' });
   }
