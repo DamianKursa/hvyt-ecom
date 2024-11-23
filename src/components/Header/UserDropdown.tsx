@@ -1,18 +1,21 @@
+// src/components/User/UserDropdown.tsx
 import React from 'react';
 import Link from 'next/link';
+import { useUser } from '../../context/UserContext';
 
 interface UserDropdownProps {
   onLogout: () => void;
-  userName: string | null;
 }
 
-const UserDropdown: React.FC<UserDropdownProps> = ({ onLogout, userName }) => {
+const UserDropdown: React.FC<UserDropdownProps> = ({ onLogout }) => {
+  const { user } = useUser();
+
   return (
     <div className="bg-white shadow-lg rounded-[24px] p-4 w-[250px] text-sm">
       {/* Greeting Section */}
       <div className="mb-4">
         <p className="font-bold text-[#661F30] text-[18px]">
-          {userName || 'Użytkownik'}
+          {user?.name || 'Użytkownik'}
         </p>
         <p className="text-gray-500 text-[14px]">Fajnie, że jesteś z nami!</p>
       </div>
@@ -20,35 +23,35 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ onLogout, userName }) => {
       {/* Navigation Links */}
       <ul className="space-y-2">
         <li>
-          <Link href="/moje-konto">
+          <Link href="/moje-konto/moje-konto">
             <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Moje zamówienia
             </span>
           </Link>
         </li>
         <li>
-          <Link href="/kupione-produkty">
+          <Link href="/moje-konto/kupione-produkty">
             <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Kupione produkty
             </span>
           </Link>
         </li>
         <li>
-          <Link href="/moje-dane">
+          <Link href="/moje-konto/moje-dane">
             <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Moje dane
             </span>
           </Link>
         </li>
         <li>
-          <Link href="/moje-adresy">
+          <Link href="/moje-konto/moje-adresy">
             <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Moje adresy
             </span>
           </Link>
         </li>
         <li>
-          <Link href="/dane-do-faktury">
+          <Link href="/moje-konto/dane-do-faktury">
             <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Dane do faktury
             </span>

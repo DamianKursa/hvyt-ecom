@@ -3,8 +3,9 @@ import Router from 'next/router';
 import NProgress from 'nprogress';
 import { ApolloProvider } from '@apollo/client';
 
-// State import
+// Context Providers
 import { CartProvider } from '@/stores/CartProvider';
+import { UserProvider } from '../context/UserContext';
 import client from '@/utils/apollo/ApolloClient';
 
 // Types
@@ -23,7 +24,11 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ApolloProvider client={client}>
       <CartProvider>
-        <Component {...pageProps} />
+        <UserProvider>
+          {' '}
+          {/* Wrap your app with UserProvider */}
+          <Component {...pageProps} />
+        </UserProvider>
       </CartProvider>
     </ApolloProvider>
   );
