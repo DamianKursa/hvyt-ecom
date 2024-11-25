@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Breadcrumbs from '../UI/Breadcrumbs.component';
@@ -19,7 +19,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const router = useRouter();
   const isMobile = useIsMobile();
   const isHomePage = router.pathname === '/';
-  const { user, logout } = useUserContext();
+  const { user, logout, fetchUser } = useUserContext();
 
   let dropdownTimeout: ReturnType<typeof setTimeout>;
 
@@ -28,8 +28,12 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
       document.title = title;
     }
 
-    return () => clearTimeout(dropdownTimeout);
-  }, [title]);
+    if (!user) {
+      fetchUser();
+    }
+
+    return () => clearTimeout(dropdownTimeout); // Cleanup timeout on unmount
+  }, [title, user, fetchUser]);
 
   const toggleMobileMenu = () => setMenuOpen((prev) => !prev);
 
@@ -41,18 +45,21 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
     }
   };
 
-  const handleMouseEnter = () => {
+  const handleMouseEnter = useCallback(() => {
     if (user) {
-      clearTimeout(dropdownTimeout);
-      setDropdownOpen(true);
+      clearTimeout(dropdownTimeout); // Clear any existing timeout
+      dropdownTimeout = setTimeout(() => {
+        setDropdownOpen(true);
+      }, 200); // Add 200ms delay before opening
     }
-  };
+  }, [user]);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
+    clearTimeout(dropdownTimeout); // Clear any existing timeout
     dropdownTimeout = setTimeout(() => {
       setDropdownOpen(false);
-    }, 200);
-  };
+    }, 200); // Add 200ms delay before closing
+  }, []);
 
   const getActiveClass = (path: string) =>
     router.asPath === path

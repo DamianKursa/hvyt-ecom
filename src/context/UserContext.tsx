@@ -5,6 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
+import { useRouter } from 'next/router';
 
 interface User {
   name: string | null;
@@ -23,8 +24,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   const fetchUser = async () => {
+    if (user) return; // Avoid redundant API calls if user is already loaded
     try {
       console.log('Verifying token...');
       const validateResponse = await fetch('/api/auth/verify', {
@@ -33,7 +36,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       });
 
       if (!validateResponse.ok) {
-        console.warn('Token invalid. Clearing user data.');
+        console.warn('Token invalid. User is not authenticated.');
         setUser(null);
         return;
       }
@@ -46,40 +49,40 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched user profile:', data);
         setUser({ name: data.name, email: data.email });
+        localStorage.setItem(
+          'user',
+          JSON.stringify({ name: data.name, email: data.email }),
+        ); // Persist user data
+        console.log('Fetched user profile:', data);
       } else {
-        console.warn('Failed to fetch user profile:', response.status);
         setUser(null);
       }
     } catch (error) {
-      console.error('Error in fetchUser:', error);
+      console.error('Error fetching user:', error);
       setUser(null);
     }
   };
 
   const logout = async () => {
     try {
-      console.log('Logging out...');
-      const response = await fetch('/api/auth/logout', { method: 'POST' });
-      if (response.ok) {
-        setUser(null); // Clear the user state
-        console.log('Logged out successfully');
-      } else {
-        console.error('Failed to log out:', response.statusText);
-      }
+      await fetch('/api/auth/logout', { method: 'POST' });
+      setUser(null);
+      localStorage.removeItem('user'); // Clear persisted user data
+      router.push('/logowanie'); // Redirect to logowanie after logout
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Failed to logout:', error);
     }
   };
 
   useEffect(() => {
-    fetchUser();
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser)); // Restore user from localStorage
+    } else {
+      fetchUser();
+    }
   }, []);
-
-  useEffect(() => {
-    console.log('Updated user state:', user);
-  }, [user]);
 
   return (
     <UserContext.Provider value={{ user, fetchUser, logout }}>

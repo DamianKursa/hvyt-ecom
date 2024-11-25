@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { useUserContext } from '../../context/UserContext';
+import { useUserContext } from '@/context/UserContext';
 
 interface UserDropdownProps {
   onLogout: () => void;
@@ -15,7 +15,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
 }) => {
   const { user } = useUserContext();
 
-  console.log('User in UserDropdown:', user); // Debug user data in the dropdown
+  console.log('User in UserDropdown:', user);
 
   return (
     <div
@@ -26,11 +26,9 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       {/* Greeting Section */}
       <div className="mb-4">
         <p className="font-bold text-[#661F30] text-[18px]">
-          {user?.name ? user.name : 'Użytkownik'}
+          {user?.name || 'Użytkownik'}
         </p>
-        <p className="text-gray-500 text-[14px]">
-          {user?.name ? `Witaj, ${user.name}!` : 'Fajnie, że jesteś z nami!'}
-        </p>
+        <p className="text-gray-500 text-[14px]">Fajnie, że jesteś z nami!</p>
       </div>
 
       {/* Navigation Links */}
