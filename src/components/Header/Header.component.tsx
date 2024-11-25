@@ -6,6 +6,7 @@ import useIsMobile from '@/utils/hooks/useIsMobile';
 import MobileMenu from './MobileMenu';
 import SearchComponent from '../Search/SearchResults.component';
 import UserDropdown from './UserDropdown';
+import { useUserContext } from '@/context/UserContext';
 
 interface IHeaderProps {
   title?: string;
@@ -14,83 +15,43 @@ interface IHeaderProps {
 const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
   const isMobile = useIsMobile();
   const isHomePage = router.pathname === '/';
+  const { user, logout } = useUserContext();
+
+  let dropdownTimeout: ReturnType<typeof setTimeout>;
 
   useEffect(() => {
-    const verifyLoginState = async () => {
-      try {
-        console.log('Verifying login state...');
-        const response = await fetch('/api/auth/verify', {
-          method: 'POST',
-          credentials: 'include',
-        });
+    if (title) {
+      document.title = title;
+    }
 
-        if (response.ok) {
-          setIsLoggedIn(true);
-
-          // Fetch user profile details
-          const userResponse = await fetch('/api/user-profile', {
-            method: 'GET',
-            credentials: 'include',
-          });
-
-          if (userResponse.ok) {
-            const userData = await userResponse.json();
-            setUserName(userData.name || userData.username || 'Użytkownik');
-          } else {
-            console.error('Failed to fetch user profile');
-          }
-        } else {
-          console.warn('Invalid login state');
-          setIsLoggedIn(false);
-          setUserName(null);
-        }
-      } catch (error) {
-        console.error('Error verifying login state:', error);
-        setIsLoggedIn(false);
-        setUserName(null);
-      }
-    };
-
-    verifyLoginState();
-  }, []);
+    return () => clearTimeout(dropdownTimeout);
+  }, [title]);
 
   const toggleMobileMenu = () => setMenuOpen((prev) => !prev);
 
   const toggleSearch = () => setSearchOpen((prev) => !prev);
 
   const handleUserClick = () => {
-    if (!isLoggedIn) {
+    if (!user) {
       router.push('/logowanie');
     }
   };
 
-  let hideDropdownTimeout: ReturnType<typeof setTimeout>;
-
   const handleMouseEnter = () => {
-    if (isLoggedIn) {
-      clearTimeout(hideDropdownTimeout);
+    if (user) {
+      clearTimeout(dropdownTimeout);
       setDropdownOpen(true);
     }
   };
 
   const handleMouseLeave = () => {
-    hideDropdownTimeout = setTimeout(() => {
+    dropdownTimeout = setTimeout(() => {
       setDropdownOpen(false);
     }, 200);
-  };
-
-  const handleLogout = () => {
-    console.log('Logging out...');
-    document.cookie = 'token=; Max-Age=0; path=/';
-    setIsLoggedIn(false);
-    setUserName(null);
-    router.push('/logowanie');
   };
 
   const getActiveClass = (path: string) =>
@@ -102,6 +63,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
 
   return (
     <>
+      {/* Mobile Menu Component */}
       {isMobile && menuOpen && (
         <MobileMenu menuOpen={menuOpen} toggleMenu={toggleMobileMenu} />
       )}
@@ -123,7 +85,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                 </Link>
               </div>
 
-              {/* Center Navigation Links */}
+              {/* Center Navigation Links for Desktop */}
               {!isMobile && (
                 <div className="flex-none mx-auto max-w-[530px] w-full">
                   <div
@@ -191,55 +153,94 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               )}
 
               {/* Right Icons */}
-              <div className="flex-none relative">
+              <div className="flex-none">
                 <div
                   className="flex items-center space-x-4 px-6 py-2 rounded-full h-[50px]"
                   style={{ backgroundColor: '#E9E5DFCC' }}
                 >
-                  <button onClick={toggleSearch}>
-                    <img
-                      src="/icons/search.svg"
-                      alt="Search"
-                      className={iconClass}
-                    />
-                  </button>
-                  <Link href="/wishlist">
-                    <img
-                      src="/icons/wishlist.svg"
-                      alt="Wishlist"
-                      className={iconClass}
-                    />
-                  </Link>
-                  <div
-                    onClick={handleUserClick}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                    className="relative"
-                  >
-                    <button>
-                      <img
-                        src="/icons/user.svg"
-                        alt="User"
-                        className={iconClass}
-                      />
-                    </button>
-                    {dropdownOpen && isLoggedIn && (
-                      <div className="absolute left-[-155px] top-12">
-                        <UserDropdown
-                          onLogout={handleLogout}
-                          onMouseEnter={handleMouseEnter}
-                          onMouseLeave={handleMouseLeave}
+                  {isMobile ? (
+                    <div className="flex items-center space-x-4">
+                      <button onClick={toggleSearch}>
+                        <img
+                          src="/icons/search.svg"
+                          alt="Search"
+                          className={iconClass}
                         />
+                      </button>
+                      <Link href="/koszyk">
+                        <img
+                          src="/icons/cart.svg"
+                          alt="Cart"
+                          className={iconClass}
+                        />
+                      </Link>
+                      <button onClick={toggleMobileMenu}>
+                        <img
+                          src={
+                            menuOpen
+                              ? '/icons/close-button.svg'
+                              : '/icons/menu-icon.svg'
+                          }
+                          alt="Menu"
+                          className={iconClass}
+                        />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-4">
+                      <button
+                        onClick={toggleSearch}
+                        className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all"
+                      >
+                        <img
+                          src="/icons/search.svg"
+                          alt="Search"
+                          className={iconClass}
+                        />
+                      </button>
+                      <Link href="/wishlist">
+                        <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
+                          <img
+                            src="/icons/wishlist.svg"
+                            alt="Wishlist"
+                            className={iconClass}
+                          />
+                        </span>
+                      </Link>
+                      <div
+                        onClick={handleUserClick}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                        className="relative"
+                      >
+                        <button>
+                          <img
+                            src="/icons/user.svg"
+                            alt="User"
+                            className={iconClass}
+                          />
+                        </button>
+                        {dropdownOpen && user && (
+                          <div className="absolute left-[-155px] top-12 z-50">
+                            <UserDropdown
+                              onLogout={logout}
+                              onMouseEnter={handleMouseEnter}
+                              onMouseLeave={handleMouseLeave}
+                            />
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <Link href="/koszyk">
-                    <img
-                      src="/icons/cart.svg"
-                      alt="Cart"
-                      className={iconClass}
-                    />
-                  </Link>
+                      <Link href="/koszyk">
+                        <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
+                          <img
+                            src="/icons/cart.svg"
+                            alt="Cart"
+                            className={iconClass}
+                          />
+                        </span>
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

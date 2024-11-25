@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
 import { serialize } from 'cookie';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -8,30 +7,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: `Method ${req.method} Not Allowed` });
   }
 
-  const { username, password } = req.body;
-
   try {
-    const response = await axios.post(`${process.env.WORDPRESS_API_URL}/wp-json/jwt-auth/v1/token`, {
-      username,
-      password,
-    });
-
-    const { token, user_display_name } = response.data;
-
-    // Set the token as an HTTP-only cookie
+    // Clear the token by setting an expired cookie
     res.setHeader(
       'Set-Cookie',
-      serialize('token', token, {
+      serialize('token', '', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
-        maxAge: 60 * 60 * 24, // 1 day
+        expires: new Date(0), // Expire immediately
       })
     );
 
-    res.status(200).json({ message: 'Login successful', name: user_display_name });
+    return res.status(200).json({ message: 'Logged out successfully' });
   } catch (error) {
-    res.status(401).json({ message: 'Invalid credentials' });
+    console.error('Logout error:', error);
+    return res.status(500).json({ message: 'Failed to log out' });
   }
 }
