@@ -70,13 +70,20 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
     }
   };
 
+  let hideDropdownTimeout: ReturnType<typeof setTimeout>;
+
   const handleMouseEnter = () => {
     if (isLoggedIn) {
+      clearTimeout(hideDropdownTimeout);
       setDropdownOpen(true);
     }
   };
 
-  const handleMouseLeave = () => setDropdownOpen(false);
+  const handleMouseLeave = () => {
+    hideDropdownTimeout = setTimeout(() => {
+      setDropdownOpen(false);
+    }, 200);
+  };
 
   const handleLogout = () => {
     console.log('Logging out...');
@@ -220,7 +227,8 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       <div className="absolute left-[-155px] top-12">
                         <UserDropdown
                           onLogout={handleLogout}
-                          userName={userName}
+                          onMouseEnter={handleMouseEnter}
+                          onMouseLeave={handleMouseLeave}
                         />
                       </div>
                     )}

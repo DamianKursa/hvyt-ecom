@@ -1,17 +1,27 @@
 // src/components/User/UserDropdown.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUser } from '../../context/UserContext';
 
 interface UserDropdownProps {
   onLogout: () => void;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
 }
 
-const UserDropdown: React.FC<UserDropdownProps> = ({ onLogout }) => {
+const UserDropdown: React.FC<UserDropdownProps> = ({
+  onLogout,
+  onMouseEnter,
+  onMouseLeave,
+}) => {
   const { user } = useUser();
 
   return (
-    <div className="bg-white shadow-lg rounded-[24px] p-4 w-[250px] text-sm">
+    <div
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      className="bg-white shadow-lg rounded-[24px] p-4 w-[250px] text-sm"
+    >
       {/* Greeting Section */}
       <div className="mb-4">
         <p className="font-bold text-[#661F30] text-[18px]">
