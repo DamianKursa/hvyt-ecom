@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (!token) {
     console.log('No token found in cookies');
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: 'Unauthorized: No token found' });
   }
 
   try {
@@ -25,7 +25,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({ valid: true });
   } catch (error) {
     const err = error as any;
-    console.error('Token validation error:', err.response?.data || err.message);
-    res.status(401).json({ message: 'Invalid token' });
+    const statusCode = err.response?.status || 500;
+    const message = err.response?.data?.message || err.message || 'Validation failed';
+
+    console.error('Token validation error:', { statusCode, message });
+    res.status(statusCode).json({ message: `Invalid token: ${message}` });
   }
 }

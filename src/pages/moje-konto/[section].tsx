@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 interface ContentData {
   id: number;
-  [key: string]: any; // Flexible type for API data
+  [key: string]: any;
 }
 
 const SectionPage = () => {
@@ -23,36 +23,24 @@ const SectionPage = () => {
       try {
         setLoading(true);
 
-        // Get the user's token from cookies
-        const token = document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('token='))
-          ?.split('=')[1];
-
-        if (!token) {
-          setError('Brak autoryzacji.');
-          router.push('/logowanie'); // Redirect to login if no token
-          return;
-        }
-
         const response = await fetch(`/api/moje-konto/${section}`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`, // Pass the token for authorization
-          },
+          credentials: 'include', // Automatically includes cookies
         });
 
         if (response.ok) {
           const data = await response.json();
           setContent(data);
           setError(null);
+        } else if (response.status === 401) {
+          setError('Unauthorized. Redirecting to login...');
+          router.push('/logowanie');
         } else {
-          setError('Nie znaleziono danych dla tej sekcji.');
+          setError('Data not found for this section.');
         }
       } catch (error) {
         console.error('Error fetching section data:', error);
-        setError('Wystąpił błąd podczas ładowania danych.');
+        setError('An error occurred while loading data.');
       } finally {
         setLoading(false);
       }
@@ -87,7 +75,7 @@ const SectionPage = () => {
     return (
       <MojeKonto>
         <div className="text-center text-gray-500">
-          Brak danych do wyświetlenia dla tej sekcji.
+          No data available for this section.
         </div>
       </MojeKonto>
     );
@@ -98,20 +86,20 @@ const SectionPage = () => {
       case 'moje-zamowienia':
         return (
           <div>
-            <h2 className="text-xl font-semibold mb-4">Moje zamówienia</h2>
+            <h2 className="text-xl font-semibold mb-4">My Orders</h2>
             <ul className="space-y-4">
-              {content.map((order: any) => (
+              {content.map((order) => (
                 <li key={order.id} className="border p-4 rounded-lg">
-                  <p>Numer zamówienia: {order.id}</p>
-                  <p>Data: {order.date_created}</p>
-                  <p>Status płatności: {order.payment_status}</p>
-                  <p>Status zamówienia: {order.status}</p>
-                  <p>Razem: {order.total} zł</p>
+                  <p>Order Number: {order.id}</p>
+                  <p>Date: {order.date_created}</p>
+                  <p>Payment Status: {order.payment_status}</p>
+                  <p>Order Status: {order.status}</p>
+                  <p>Total: {order.total} zł</p>
                   <Link
                     className="mt-2 inline-block px-4 py-2 bg-primary text-white rounded-lg"
                     href={`/moje-konto/moje-zamowienia/${order.id}`}
                   >
-                    Szczegóły
+                    Details
                   </Link>
                 </li>
               ))}
@@ -121,64 +109,20 @@ const SectionPage = () => {
       case 'kupione-produkty':
         return (
           <div>
-            <h2 className="text-xl font-semibold mb-4">Kupione produkty</h2>
+            <h2 className="text-xl font-semibold mb-4">Purchased Products</h2>
             <ul className="space-y-4">
-              {content.map((product: any) => (
+              {content.map((product) => (
                 <li key={product.id} className="border p-4 rounded-lg">
-                  <p>Produkt: {product.name}</p>
-                  <p>Cena: {product.price} zł</p>
+                  <p>Product: {product.name}</p>
+                  <p>Price: {product.price} zł</p>
                 </li>
               ))}
             </ul>
           </div>
         );
-      case 'moje-dane':
-        return (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Moje dane</h2>
-            <p>Email: {content[0]?.email}</p>
-            <p>Imię i nazwisko: {content[0]?.name}</p>
-            <Link
-              className="mt-4 inline-block px-4 py-2 bg-primary text-white rounded-lg"
-              href="/moje-konto/zmien-haslo"
-            >
-              Zmień hasło
-            </Link>
-          </div>
-        );
-      case 'moje-adresy':
-        return (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Moje adresy</h2>
-            <ul className="space-y-4">
-              {content.map((address: any) => (
-                <li key={address.id} className="border p-4 rounded-lg">
-                  <p>
-                    Adres: {address.street}, {address.city}
-                  </p>
-                  <p>Kraj: {address.country}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      case 'dane-do-faktury':
-        return (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Dane do faktury</h2>
-            <ul className="space-y-4">
-              {content.map((billing: any) => (
-                <li key={billing.id} className="border p-4 rounded-lg">
-                  <p>Nazwa: {billing.name}</p>
-                  <p>NIP: {billing.tax_id}</p>
-                  <p>Adres: {billing.address}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
+      // Add more cases for other sections...
       default:
-        return <p>Nieznana sekcja.</p>;
+        return <p>Unknown section.</p>;
     }
   };
 

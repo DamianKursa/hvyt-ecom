@@ -27,7 +27,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const router = useRouter();
 
   const fetchUser = async () => {
-    if (user) return; // Avoid redundant API calls if user is already loaded
+    if (user) return; // Avoid redundant API calls if the user is already loaded
     try {
       console.log('Verifying token...');
       const validateResponse = await fetch('/api/auth/verify', {
@@ -36,19 +36,20 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       });
 
       if (!validateResponse.ok) {
-        console.warn('Token invalid. User is not authenticated.');
+        console.warn('Token is invalid. User is not authenticated.');
         setUser(null);
+        localStorage.removeItem('user'); // Clear stale user data
         return;
       }
 
       console.log('Fetching user profile...');
-      const response = await fetch('/api/auth/profile', {
+      const profileResponse = await fetch('/api/auth/profile', {
         method: 'GET',
         credentials: 'include',
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      if (profileResponse.ok) {
+        const data = await profileResponse.json();
         setUser({ name: data.name, email: data.email });
         localStorage.setItem(
           'user',
@@ -57,10 +58,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         console.log('Fetched user profile:', data);
       } else {
         setUser(null);
+        localStorage.removeItem('user');
       }
     } catch (error) {
       console.error('Error fetching user:', error);
       setUser(null);
+      localStorage.removeItem('user');
     }
   };
 
@@ -71,7 +74,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       localStorage.removeItem('user'); // Clear persisted user data
       router.push('/logowanie'); // Redirect to logowanie after logout
     } catch (error) {
-      console.error('Failed to logout:', error);
+      console.error('Failed to log out:', error);
     }
   };
 
@@ -80,7 +83,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     if (savedUser) {
       setUser(JSON.parse(savedUser)); // Restore user from localStorage
     } else {
-      fetchUser();
+      fetchUser(); // Fetch user if not found in localStorage
     }
   }, []);
 
