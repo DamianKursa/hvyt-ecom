@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import MojeKonto from './index';
 import Link from 'next/link';
+import LoadingModal from '@/components/UI/LoadingModal'; // Import the LoadingModal component
 
 interface ContentData {
   id: number;
@@ -52,13 +53,10 @@ const SectionPage = () => {
   if (loading) {
     return (
       <MojeKonto>
-        <div className="flex justify-center items-center h-full">
-          <img
-            src="/icons/spinner.gif"
-            alt="Loading..."
-            className="h-10 w-10 animate-spin"
-          />
-        </div>
+        <LoadingModal
+          title="Ładowanie..."
+          description="Proszę czekać, trwa ładowanie danych..."
+        />
       </MojeKonto>
     );
   }

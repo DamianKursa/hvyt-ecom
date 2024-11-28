@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Layout from '@/components/Layout/Layout.component';
 import Link from 'next/link';
 import Image from 'next/image';
+import LoadingModal from '@/components/UI/LoadingModal'; // Import the LoadingModal component
 
 const endpoints = [
   {
@@ -73,14 +74,11 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <img
-          src="/icons/spinner.gif"
-          alt="Loading..."
-          className="h-10 w-10 animate-spin"
-        />
-      </div>
-    );
+      <LoadingModal
+        title="Logowanie"
+        description="Za chwilę przekierujemy Cię do Twojego konta"
+      />
+    ); // Display the LoadingModal while loading
   }
 
   if (!user) {
@@ -91,7 +89,7 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
     <Layout title="Moje konto">
       <div className="container mx-auto py-8  flex">
         {/* Sidebar */}
-        <aside className="w-1/4 bg-beige p-8  max-h-[410px]  rounded-[25px]">
+        <aside className="w-1/4 bg-beige p-8 max-h-[410px] rounded-[25px]">
           <div className="mb-6">
             <h2 className="text-2xl font-semibold mb-4">Moje konto</h2>
           </div>
