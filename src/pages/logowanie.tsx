@@ -8,7 +8,7 @@ const Logowanie = () => {
 
   return (
     <Layout title="Logowanie">
-      <div className="bg-[#F9F6F2] flex justify-center items-center h-screen">
+      <div className="bg-[#F9F6F2] flex justify-center items-center ">
         <div
           className="w-full max-w-5xl bg-white rounded-lg shadow-lg flex"
           style={{ height: '500px' }} // Fixed height for the entire box
