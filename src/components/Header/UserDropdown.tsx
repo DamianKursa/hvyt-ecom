@@ -34,7 +34,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       {/* Navigation Links */}
       <ul className="space-y-2">
         <li>
-          <Link href="/moje-konto/moje-konto">
+          <Link href="/moje-konto/moje-zamowienia">
             <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Moje zamówienia
             </span>

@@ -71,6 +71,7 @@ export interface Product {
       value: string;
     }>;
   }>;
+  quantity?: number;
 }
 
 export interface Kolekcja {

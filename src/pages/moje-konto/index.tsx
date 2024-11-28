@@ -2,24 +2,38 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout/Layout.component';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const endpoints = [
   {
     key: 'orders',
     label: 'Moje zamówienia',
     path: '/moje-konto/moje-zamowienia',
+    icon: '/icons/cart.svg',
   },
   {
     key: 'kupione-produkty',
     label: 'Kupione produkty',
     path: '/moje-konto/kupione-produkty',
+    icon: '/icons/kupione.svg',
   },
-  { key: 'moje-dane', label: 'Moje dane', path: '/moje-konto/moje-dane' },
-  { key: 'moje-adresy', label: 'Moje adresy', path: '/moje-konto/moje-adresy' },
+  {
+    key: 'moje-dane',
+    label: 'Moje dane',
+    path: '/moje-konto/moje-dane',
+    icon: '/icons/user.svg',
+  },
+  {
+    key: 'moje-adresy',
+    label: 'Moje adresy',
+    path: '/moje-konto/moje-adresy',
+    icon: '/icons/home.svg',
+  },
   {
     key: 'dane-do-faktury',
     label: 'Dane do faktury',
     path: '/moje-konto/dane-do-faktury',
+    icon: '/icons/do-faktury.svg',
   },
 ];
 
@@ -75,19 +89,26 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
 
   return (
     <Layout title="Moje konto">
-      <div className="container mx-auto py-8 px-4 flex">
+      <div className="container mx-auto py-8  flex">
         {/* Sidebar */}
-        <aside className="w-1/4 border-r border-gray-300 pr-4">
+        <aside className="w-1/4 bg-beige p-8  max-h-[410px]  rounded-[25px]">
           <div className="mb-6">
             <h2 className="text-2xl font-semibold mb-4">Moje konto</h2>
           </div>
-          <ul className="space-y-2">
+          <ul className="space-y-4">
             {endpoints.map((endpoint) => (
               <li key={endpoint.key}>
                 <Link href={endpoint.path}>
-                  <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
-                    {endpoint.label}
-                  </span>
+                  <div className="flex items-center py-2 rounded-[25px] hover:bg-gray-100 cursor-pointer">
+                    <Image
+                      src={endpoint.icon}
+                      alt={endpoint.label}
+                      width={24}
+                      height={24}
+                      className="mr-3"
+                    />
+                    <span className="text-[18px]">{endpoint.label}</span>
+                  </div>
                 </Link>
               </li>
             ))}
