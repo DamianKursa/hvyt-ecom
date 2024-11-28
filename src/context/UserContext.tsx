@@ -16,6 +16,11 @@ interface UserContextProps {
   user: User | null;
   fetchUser: () => void;
   logout: () => void;
+  register: (
+    username: string,
+    email: string,
+    password: string,
+  ) => Promise<void>;
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -78,6 +83,37 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  const register = async (
+    username: string,
+    email: string,
+    password: string,
+  ): Promise<void> => {
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      const data = await response.json();
+      console.log('Registration successful:', data);
+
+      // Automatically log in the user after registration
+      setUser({ name: username, email });
+      localStorage.setItem('user', JSON.stringify({ name: username, email })); // Persist user data
+
+      console.log('User registered and logged in.');
+    } catch (error) {
+      console.error('Error during registration:', error);
+      throw error; // Rethrow error for the caller to handle
+    }
+  };
+
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
@@ -88,7 +124,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, fetchUser, logout }}>
+    <UserContext.Provider value={{ user, fetchUser, logout, register }}>
       {children}
     </UserContext.Provider>
   );

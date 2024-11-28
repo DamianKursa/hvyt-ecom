@@ -7,8 +7,8 @@ interface RegisterFormProps {
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
   const [formData, setFormData] = useState({
-    username: '',
-    nazwisko: '',
+    first_name: '', // First Name (Imię)
+    last_name: '', // Last Name (Nazwisko)
     email: '',
     password: '',
   });
@@ -21,6 +21,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess(false);
 
     try {
       const response = await fetch('/api/auth/register', {
@@ -31,13 +32,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
 
       if (response.ok) {
         setSuccess(true);
-        setTimeout(() => router.push('/logowanie'), 3000); // Redirect to login page
+        setTimeout(() => {
+          router.push(`/aktywacja-konta?email=${formData.email}`); // Redirect to activation page
+        }, 1500); // Delay for better user experience
       } else {
         const data = await response.json();
-        setError(data.message || 'Error creating account');
+        setError(data.message || 'Wystąpił błąd podczas tworzenia konta');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError('Wystąpił błąd sieci. Spróbuj ponownie później.');
     } finally {
       setLoading(false);
     }
@@ -48,10 +51,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
       <div className="relative">
         <input
           type="text"
-          value={formData.username}
+          value={formData.first_name}
           placeholder="Imię*"
           onChange={(e) =>
-            setFormData({ ...formData, username: e.target.value })
+            setFormData({ ...formData, first_name: e.target.value })
           }
           className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none"
           required
@@ -60,10 +63,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
       <div className="relative">
         <input
           type="text"
-          value={formData.nazwisko}
+          value={formData.last_name}
           placeholder="Nazwisko*"
           onChange={(e) =>
-            setFormData({ ...formData, nazwisko: e.target.value })
+            setFormData({ ...formData, last_name: e.target.value })
           }
           className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none"
           required
