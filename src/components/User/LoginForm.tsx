@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
-const LoginForm: React.FC = () => {
+interface LoginFormProps {
+  toggleForm: () => void; // Callback to toggle between forms
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -34,31 +38,31 @@ const LoginForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium mb-2">Adres email*</label>
+      <div className="relative">
         <input
           type="text"
           value={formData.username}
+          placeholder="Adres email*"
           onChange={(e) =>
             setFormData({ ...formData, username: e.target.value })
           }
-          className="w-full border border-gray-300 rounded-lg px-4 py-2"
+          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none"
           required
         />
       </div>
-      <div>
-        <label className="block text-sm font-medium mb-2">Hasło*</label>
+      <div className="relative">
         <input
           type="password"
           value={formData.password}
+          placeholder="Hasło*"
           onChange={(e) =>
             setFormData({ ...formData, password: e.target.value })
           }
-          className="w-full border border-gray-300 rounded-lg px-4 py-2"
+          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none"
           required
         />
         <p
-          className="text-sm text-blue-600 mt-2 cursor-pointer hover:underline"
+          className="text-sm underline font-light text-black mt-2 cursor-pointer"
           onClick={() => router.push('/zapomniane-haslo')}
         >
           Nie pamiętam hasła
@@ -71,6 +75,14 @@ const LoginForm: React.FC = () => {
         disabled={loading}
       >
         {loading ? 'Ładowanie...' : 'Zaloguj się'}
+      </button>
+      <hr className="my-6 border-gray-300" />
+      <button
+        type="button"
+        onClick={toggleForm}
+        className="w-full py-2 px-6 rounded-full bg-white text-black border border-black font-bold"
+      >
+        Zarejestruj się
       </button>
     </form>
   );
