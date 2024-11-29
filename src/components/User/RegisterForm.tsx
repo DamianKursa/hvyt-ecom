@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
-interface RegisterFormProps {
-  toggleForm: () => void; // Callback to toggle between forms
-}
-
-const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
+const RegisterForm: React.FC = () => {
   const [formData, setFormData] = useState({
-    first_name: '', // First Name (Imię)
-    last_name: '', // Last Name (Nazwisko)
+    first_name: '',
+    last_name: '',
     email: '',
     password: '',
   });
+  const [focusedField, setFocusedField] = useState<string | null>(null); // Track focused field
+  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -33,8 +31,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
       if (response.ok) {
         setSuccess(true);
         setTimeout(() => {
-          router.push(`/aktywacja-konta?email=${formData.email}`); // Redirect to activation page
-        }, 1500); // Delay for better user experience
+          router.push(`/aktywacja-konta?email=${formData.email}`);
+        }, 1500);
       } else {
         const data = await response.json();
         setError(data.message || 'Wystąpił błąd podczas tworzenia konta');
@@ -48,72 +46,137 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ toggleForm }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* First Name Input */}
       <div className="relative">
         <input
           type="text"
           value={formData.first_name}
-          placeholder="Imię*"
+          onFocus={() => setFocusedField('first_name')}
+          onBlur={() => setFocusedField(null)}
           onChange={(e) =>
             setFormData({ ...formData, first_name: e.target.value })
           }
-          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none"
+          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-gray-500"
           required
         />
+        <span
+          className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${
+            formData.first_name || focusedField === 'first_name'
+              ? 'opacity-0'
+              : 'opacity-100'
+          }`}
+        >
+          Imię<span className="text-red-500">*</span>
+        </span>
       </div>
+
+      {/* Last Name Input */}
       <div className="relative">
         <input
           type="text"
           value={formData.last_name}
-          placeholder="Nazwisko*"
+          onFocus={() => setFocusedField('last_name')}
+          onBlur={() => setFocusedField(null)}
           onChange={(e) =>
             setFormData({ ...formData, last_name: e.target.value })
           }
-          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none"
+          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-gray-500"
           required
         />
+        <span
+          className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${
+            formData.last_name || focusedField === 'last_name'
+              ? 'opacity-0'
+              : 'opacity-100'
+          }`}
+        >
+          Nazwisko<span className="text-red-500">*</span>
+        </span>
       </div>
+
+      {/* Email Input */}
       <div className="relative">
         <input
           type="email"
           value={formData.email}
-          placeholder="Adres email*"
+          onFocus={() => setFocusedField('email')}
+          onBlur={() => setFocusedField(null)}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none"
+          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-gray-500"
           required
         />
+        <span
+          className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${
+            formData.email || focusedField === 'email'
+              ? 'opacity-0'
+              : 'opacity-100'
+          }`}
+        >
+          Adres email<span className="text-red-500">*</span>
+        </span>
       </div>
+
+      {/* Password Input */}
       <div className="relative">
         <input
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           value={formData.password}
-          placeholder="Hasło*"
+          onFocus={() => setFocusedField('password')}
+          onBlur={() => setFocusedField(null)}
           onChange={(e) =>
             setFormData({ ...formData, password: e.target.value })
           }
-          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none"
+          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-gray-500"
           required
         />
+        <span
+          className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${
+            formData.password || focusedField === 'password'
+              ? 'opacity-0'
+              : 'opacity-100'
+          }`}
+        >
+          Hasło<span className="text-red-500">*</span>
+        </span>
+        <img
+          src="/icons/show-pass.svg" // Replace with actual path
+          alt="Show Password"
+          className="absolute right-2 top-3 w-5 h-5 cursor-pointer"
+          onClick={() => setShowPassword(!showPassword)}
+        />
       </div>
+
+      {/* Additional Text */}
+      <p className="text-[12px] font-light mt-2">
+        Twoje hasło musi mieć co najmniej 8 znaków.
+      </p>
+      <p className="text-[16px] font-light mt-4">
+        Zakładając konto, akceptujesz nasz{' '}
+        <a href="/regulamin" className="underline">
+          Regulamin
+        </a>
+        . Przeczytaj naszą{' '}
+        <a href="/polityka-prywatnosci" className="underline">
+          Politykę prywatności
+        </a>
+        .
+      </p>
+
+      {/* Error and Success Messages */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
       {success && (
         <p className="text-green-500 text-sm">
           Konto zostało pomyślnie utworzone! Przekierowanie...
         </p>
       )}
+
+      {/* Submit Button */}
       <button
         type="submit"
-        className="w-full bg-black text-white py-2 rounded-lg"
+        className="w-full bg-black text-white py-3 rounded-full"
         disabled={loading}
       >
         {loading ? 'Ładowanie...' : 'Zarejestruj się'}
-      </button>
-      <hr className="my-6 border-gray-300" />
-      <button
-        type="button"
-        onClick={toggleForm}
-        className="w-full py-2 px-6 rounded-full bg-white text-black border border-black font-bold"
-      >
-        Zaloguj się
       </button>
     </form>
   );

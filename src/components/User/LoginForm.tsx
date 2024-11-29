@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
-interface LoginFormProps {
-  toggleForm: () => void; // Callback to toggle between forms
-}
-
-const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
+const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
+  const [focusedField, setFocusedField] = useState<string | null>(null); // Track focused field
+  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -38,28 +36,57 @@ const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Email Input */}
       <div className="relative">
         <input
           type="text"
           value={formData.username}
-          placeholder="Adres email*"
+          onFocus={() => setFocusedField('username')}
+          onBlur={() => setFocusedField(null)}
           onChange={(e) =>
             setFormData({ ...formData, username: e.target.value })
           }
-          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none"
+          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-black"
           required
         />
+        <span
+          className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${
+            formData.username || focusedField === 'username'
+              ? 'opacity-0'
+              : 'opacity-100'
+          }`}
+        >
+          Adres email<span className="text-red-500">*</span>
+        </span>
       </div>
+
+      {/* Password Input */}
       <div className="relative">
         <input
-          type="password"
+          type={showPassword ? 'text' : 'password'}
           value={formData.password}
-          placeholder="Hasło*"
+          onFocus={() => setFocusedField('password')}
+          onBlur={() => setFocusedField(null)}
           onChange={(e) =>
             setFormData({ ...formData, password: e.target.value })
           }
-          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none"
+          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-black"
           required
+        />
+        <span
+          className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${
+            formData.password || focusedField === 'password'
+              ? 'opacity-0'
+              : 'opacity-100'
+          }`}
+        >
+          Hasło<span className="text-red-500">*</span>
+        </span>
+        <img
+          src="/icons/show-pass.svg" // Replace with actual path
+          alt="Show Password"
+          className="absolute right-2 top-3 w-5 h-5 cursor-pointer"
+          onClick={() => setShowPassword(!showPassword)}
         />
         <p
           className="text-sm underline font-light text-black mt-2 cursor-pointer"
@@ -68,21 +95,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ toggleForm }) => {
           Nie pamiętam hasła
         </p>
       </div>
+
+      {/* Error Message */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      {/* Submit Button */}
       <button
         type="submit"
-        className="w-full bg-black text-white py-2 rounded-lg"
+        className="w-full bg-black text-white py-3 rounded-full"
         disabled={loading}
       >
         {loading ? 'Ładowanie...' : 'Zaloguj się'}
-      </button>
-      <hr className="my-6 border-gray-300" />
-      <button
-        type="button"
-        onClick={toggleForm}
-        className="w-full py-2 px-6 rounded-full bg-white text-black border border-black font-bold"
-      >
-        Zarejestruj się
       </button>
     </form>
   );
