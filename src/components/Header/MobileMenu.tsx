@@ -4,9 +4,14 @@ import Link from 'next/link';
 interface MobileMenuProps {
   menuOpen: boolean;
   toggleMenu: () => void;
+  isLoggedIn: boolean; // Pass logged-in status as a prop
 }
 
-const MobileMenu: React.FC<MobileMenuProps> = ({ menuOpen, toggleMenu }) => {
+const MobileMenu: React.FC<MobileMenuProps> = ({
+  menuOpen,
+  toggleMenu,
+  isLoggedIn,
+}) => {
   return (
     <div
       className={`fixed inset-0 bg-white z-50 w-full transition-transform duration-300 ease-in-out p-4 ${
@@ -53,10 +58,14 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ menuOpen, toggleMenu }) => {
       <div className="mt-10 space-y-6 text-xl rounded-[25px] bg-[#E9E5DF] p-[16px]">
         <ul className="space-y-6 text-xl">
           <li>
-            <Link href="/logowanie" onClick={toggleMenu} className="font-bold">
+            <Link
+              href={isLoggedIn ? '/moje-konto' : '/logowanie'}
+              onClick={toggleMenu}
+              className="font-bold"
+            >
               <div className="flex items-center">
                 <img src="/icons/user.svg" alt="User" className="h-6 mr-3" />
-                Zaloguj się
+                {isLoggedIn ? 'Moje konto' : 'Zaloguj się'}
               </div>
             </Link>
           </li>

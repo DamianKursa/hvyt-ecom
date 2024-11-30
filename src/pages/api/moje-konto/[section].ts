@@ -91,6 +91,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           description: '', // Empty as orders do not include descriptions
           image: '', // No images provided in orders, leave as empty
           attributes: [], // Empty as orders do not include attributes
+          totalPrice: parseFloat(item.price) * item.quantity,
         }))
       );
       res.status(200).json(products);

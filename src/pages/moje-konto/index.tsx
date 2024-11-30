@@ -115,9 +115,6 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
 
         {/* Main Content */}
         <main className="w-3/4 pl-4">
-          <h2 className="text-2xl font-bold mb-6">
-            Witaj, {user.name || user.username}
-          </h2>
           {children || (
             <p className="text-gray-500">
               Wybierz sekcję z menu, aby zobaczyć szczegóły.

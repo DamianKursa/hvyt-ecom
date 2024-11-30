@@ -3,6 +3,44 @@ export interface ProductAttribute {
   options: string[];
 }
 
+export interface LineItem {
+  product_id: string;
+  name: string;
+  quantity: number;
+  price: string;
+  total: string;
+  image?: string; // Optional image property
+  regular_price?: string; // Optional regular price property
+}
+
+export interface Address {
+  first_name: string;
+  last_name: string;
+  company?: string;
+  address_1: string;
+  address_2?: string;
+  city: string;
+  state?: string;
+  postcode: string;
+  country: string;
+  phone?: string;
+}
+
+export interface Order {
+  id: number;
+  date_created: string;
+  payment_status: string;
+  status: string;
+  total: string;
+  subtotal?: string;
+  shipping_total?: string;
+  tax?: string;
+  phone?: string;
+  email?: string;
+  shipping: Address; // Correctly typing shipping as an Address object
+  line_items: LineItem[];
+}
+
 export interface User {
   name?: string;
   username?: string;
@@ -72,6 +110,7 @@ export interface Product {
     }>;
   }>;
   quantity?: number;
+  totalPrice?: number;
 }
 
 export interface Kolekcja {

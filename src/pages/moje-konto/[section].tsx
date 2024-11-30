@@ -1,24 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import MojeKonto from './index';
-import Link from 'next/link';
-import LoadingModal from '@/components/UI/LoadingModal'; // Import the LoadingModal component
+import LoadingModal from '@/components/UI/LoadingModal';
+import OrderTable from '@/components/MojeKonto/OrderTable';
+import OrderDetails from '@/components/MojeKonto/OrderDetails';
+import { Order } from '@/utils/functions/interfaces';
 
-interface ContentData {
-  id: number;
-  [key: string]: any;
-}
-
-const SectionPage = () => {
+const SectionPage: React.FC = () => {
   const router = useRouter();
-  const { section } = router.query;
+  const { section, id } = router.query;
 
-  const [content, setContent] = useState<ContentData[] | null>(null);
+  const [content, setContent] = useState<Order[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!section) return;
+    if (!section || id) return;
 
     const fetchSectionData = async () => {
       try {
@@ -26,11 +23,11 @@ const SectionPage = () => {
 
         const response = await fetch(`/api/moje-konto/${section}`, {
           method: 'GET',
-          credentials: 'include', // Automatically includes cookies
+          credentials: 'include',
         });
 
         if (response.ok) {
-          const data = await response.json();
+          const data: Order[] = await response.json();
           setContent(data);
           setError(null);
         } else if (response.status === 401) {
@@ -48,7 +45,26 @@ const SectionPage = () => {
     };
 
     fetchSectionData();
-  }, [section, router]);
+  }, [section, id, router]);
+
+  const renderContent = () => {
+    if (id && section === 'moje-zamowienia') {
+      return <OrderDetails />;
+    }
+
+    if (section === 'moje-zamowienia') {
+      return (
+        <div className="rounded-[25px] bg-white p-8 shadow-sm">
+          <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
+            Moje zamówienia
+          </h2>
+          {content && <OrderTable content={content} />}
+        </div>
+      );
+    }
+
+    return <p>Unknown section.</p>;
+  };
 
   if (loading) {
     return (
@@ -78,51 +94,6 @@ const SectionPage = () => {
       </MojeKonto>
     );
   }
-
-  const renderContent = () => {
-    switch (section) {
-      case 'moje-zamowienia':
-        return (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">My Orders</h2>
-            <ul className="space-y-4">
-              {content.map((order) => (
-                <li key={order.id} className="border p-4 rounded-lg">
-                  <p>Order Number: {order.id}</p>
-                  <p>Date: {order.date_created}</p>
-                  <p>Payment Status: {order.payment_status}</p>
-                  <p>Order Status: {order.status}</p>
-                  <p>Total: {order.total} zł</p>
-                  <Link
-                    className="mt-2 inline-block px-4 py-2 bg-primary text-white rounded-lg"
-                    href={`/moje-konto/moje-zamowienia/${order.id}`}
-                  >
-                    Details
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      case 'kupione-produkty':
-        return (
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Purchased Products</h2>
-            <ul className="space-y-4">
-              {content.map((product) => (
-                <li key={product.id} className="border p-4 rounded-lg">
-                  <p>Product: {product.name}</p>
-                  <p>Price: {product.price} zł</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        );
-      // Add more cases for other sections...
-      default:
-        return <p>Unknown section.</p>;
-    }
-  };
 
   return <MojeKonto>{renderContent()}</MojeKonto>;
 };

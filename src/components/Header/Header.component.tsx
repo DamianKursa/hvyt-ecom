@@ -72,7 +72,11 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
     <>
       {/* Mobile Menu Component */}
       {isMobile && menuOpen && (
-        <MobileMenu menuOpen={menuOpen} toggleMenu={toggleMobileMenu} />
+        <MobileMenu
+          menuOpen={menuOpen}
+          isLoggedIn={!!user}
+          toggleMenu={toggleMobileMenu}
+        />
       )}
 
       <header className="fixed w-full top-0 z-50 bg-transparent px-4">
