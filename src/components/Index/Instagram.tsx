@@ -45,7 +45,10 @@ const Instagram = () => {
       <div className="hidden md:block">
         <div className="grid grid-cols-4 gap-6">
           {posts.map((post, index) => (
-            <div key={index} className="relative w-full h-[350px] col-span-1">
+            <div
+              key={index}
+              className="relative w-[322px] h-[322px] col-span-1"
+            >
               <Image
                 src={post.media_url}
                 alt={post.caption || 'Instagram Post'}
@@ -78,7 +81,7 @@ const Instagram = () => {
         <ResponsiveSlider
           items={posts} // Posts are already limited to 4
           renderItem={(post: any) => (
-            <div className="relative w-full h-[350px]">
+            <div className="relative w-full h-[322px]">
               <Image
                 src={post.media_url}
                 alt={post.caption || 'Instagram Post'}

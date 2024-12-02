@@ -51,7 +51,6 @@ export const fetchProductBySlug = async (slug: string) => {
 };
 
 // Fetch products by category ID
-// Fetch products by category ID
 export const fetchProductsByCategoryId = async (
   categoryId: number,
   page = 1,
@@ -388,5 +387,30 @@ export const fetchCategoryData = async (
   } catch (error) {
     console.error('Error fetching category data:', error);
     throw error;
+  }
+};
+
+export const validateDiscountCode = async (
+  code: string,
+): Promise<{ valid: boolean; discountValue: number }> => {
+  try {
+    const response = await fetch('/api/discount', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to validate discount code');
+    }
+
+    const data = await response.json();
+    return {
+      valid: data.valid,
+      discountValue: data.discountValue || 0,
+    };
+  } catch (error) {
+    console.error('Error validating discount code:', error);
+    return { valid: false, discountValue: 0 }; // Return default values in case of error
   }
 };

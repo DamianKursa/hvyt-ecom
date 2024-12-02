@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import DiscountCode from '@/components/Cart/DiscountCode'; // Adjust the path if needed
 
 interface CartSummaryProps {
   totalProductsPrice: number;
@@ -9,6 +10,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   totalProductsPrice,
   onCheckout,
 }) => {
+  const [totalPrice, setTotalPrice] = useState(totalProductsPrice); // State to handle the updated total price
+
   const formatPrice = (price: number) =>
     price.toFixed(2).replace('.', ',') + ' zł';
 
@@ -31,25 +34,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       </div>
 
       {/* Discount Code Section */}
-      <div className="mb-6">
-        <label
-          htmlFor="discount-code"
-          className="flex items-center text-lg font-medium text-neutral-darkest"
-        >
-          <img
-            src="/icons/discount.svg"
-            alt="Discount Icon"
-            className="w-5 h-5 mr-2"
-          />
-          Posiadasz kod rabatowy?
-        </label>
-        <input
-          id="discount-code"
-          type="text"
-          placeholder="Wpisz kod"
-          className="mt-3 w-full border border-neutral-light rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-neutral-light"
-        />
-      </div>
+      <DiscountCode cartTotal={totalPrice} setCartTotal={setTotalPrice} />
 
       {/* Total Price Section */}
       <div className="flex justify-between items-top mb-6">
@@ -57,7 +42,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           <span className="text-lg text-neutral-darkest font-medium">Suma</span>
         </div>
         <span className="text-2xl font-bold text-dark-pastel-red">
-          {formatPrice(totalProductsPrice)}
+          {formatPrice(totalPrice)}
           <span className="text-sm text-black font-light">
             <p>kwota zawiera 23% VAT</p>
           </span>
