@@ -7,7 +7,8 @@ const HeroOnas = () => {
 
   useEffect(() => {
     if (imageRef.current) {
-      imageRef.current.style.animation = "overlayAnimation 3s ease-in-out forwards";
+      imageRef.current.style.animation =
+        'overlayAnimation 3s ease-in-out forwards';
     }
   }, []);
 
@@ -25,9 +26,10 @@ const HeroOnas = () => {
         <div className="absolute right-0 top-0 grid grid-cols-3 grid-rows-4 gap-0 justify-end items-center overflow-hidden">
           {Array.from({ length: 12 }).map((_, idx) => {
             const hasBackground =
-              (idx === 2) || // 1st column, 3rd row (top to bottom)
-              (idx === 4 || idx === 7) || // 2nd column, 2nd and 4th rows
-              (idx >= 8); // 3rd column, all rows
+              idx === 2 || // 1st column, 3rd row (top to bottom)
+              idx === 4 ||
+              idx === 7 || // 2nd column, 2nd and 4th rows
+              idx >= 8; // 3rd column, all rows
 
             return (
               <div
@@ -48,30 +50,28 @@ const HeroOnas = () => {
           style={{
             transformOrigin: 'center center',
           }}
-        >
-        </div>
+        ></div>
 
         {/* Content in the Hero */}
         <div className="container relative z-10 mx-auto">
           <div className="flex flex-col items-start justify-center w-full tracking-wide lg:w-1/2">
             <h1 className="text-6xl font-bold leading-tight text-dark-pastel-red mb-4">
-              Mała firma,<br />wielka oferta
+              Mała firma,
+              <br />
+              wielka oferta
             </h1>
             <p className="text-lg leading-relaxed text-neutral-darkest mb-6">
-              HVYT powstał z miłości do designu i dodatków.<br /> Wierzymy, że to właśnie one są odpowiedzialne<br />
-              za indywidualny charakter każdego wnętrza.<br /> Sami jesteśmy całkiem zakręceni, dlatego nasza<br />
-              nazwa to alternatywny zapis słowa „chwyt„.<br /><br /> Staramy się aby nasza oferta była<br /> różnorodna i każdy
-              mógł znaleźć coś dla siebie.
+              HVYT powstał z miłości do designu i dodatków.
+              <br /> Wierzymy, że to właśnie one są odpowiedzialne
+              <br />
+              za indywidualny charakter każdego wnętrza.
+              <br /> Sami jesteśmy całkiem zakręceni, dlatego nasza
+              <br />
+              nazwa to alternatywny zapis słowa „chwyt„.
+              <br />
+              <br /> Staramy się aby nasza oferta była
+              <br /> różnorodna i każdy mógł znaleźć coś dla siebie.
             </p>
-
-            <div className="flex space-x-4">
-              <a
-                className="inline-block min-w-[162px] px-6 py-3 text-lg leading-relaxed text-neutral-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors"
-                href="#"
-              >
-                Poznaj nas bliżej
-              </a>
-            </div>
           </div>
         </div>
       </div>
@@ -116,7 +116,7 @@ const HeroOnas = () => {
         }
 
         .hover-bg {
-          background-color: #DAD3C8;
+          background-color: #dad3c8;
         }
       `}</style>
     </section>
