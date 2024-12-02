@@ -6,16 +6,22 @@ export interface Product {
   qty: number;
   price: number;
   totalPrice: number;
-  image: string; // Ensure this is a string
-  productId: number; // Ensure this is a number
+  image: string;
+  productId: number;
   attributes?: { [key: string]: string };
   variationOptions?: { [key: string]: string[] };
+}
+
+export interface Coupon {
+  code: string;
+  discountValue: number;
 }
 
 export interface Cart {
   products: Product[];
   totalProductsCount: number;
   totalProductsPrice: number;
+  coupon?: Coupon; // Include coupon in cart
 }
 
 interface CartContextProps {
@@ -29,6 +35,8 @@ interface CartContextProps {
     name: string,
     newVariation: string,
   ) => void;
+  applyCoupon: (coupon: Coupon) => void; // Add method to apply coupon
+  removeCoupon: () => void; // Add method to remove coupon
 }
 
 export const CartContext = createContext<CartContextProps>({
@@ -38,6 +46,8 @@ export const CartContext = createContext<CartContextProps>({
   removeCartItem: () => {},
   clearCart: () => {},
   updateCartVariation: () => {},
+  applyCoupon: () => {}, // Initialize coupon methods
+  removeCoupon: () => {}, // Initialize coupon methods
 });
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
@@ -49,6 +59,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     totalProductsPrice: 0,
   });
 
+  // Load the cart (including coupon) from localStorage
   useEffect(() => {
     const storedCart = localStorage.getItem('woocommerce-cart');
     if (storedCart) {
@@ -56,6 +67,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
+  // Save the entire cart, including the coupon, to localStorage
   useEffect(() => {
     localStorage.setItem('woocommerce-cart', JSON.stringify(cart));
   }, [cart]);
@@ -65,22 +77,24 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       (total, product) => total + product.totalPrice,
       0,
     );
+
+    const discountValue = updatedCart.coupon?.discountValue || 0;
+    const totalPriceWithDiscount = totalProductsPrice - discountValue;
+
     const totalProductsCount = updatedCart.products.reduce(
       (count, product) => count + product.qty,
       0,
     );
 
-    return { ...updatedCart, totalProductsPrice, totalProductsCount };
+    return {
+      ...updatedCart,
+      totalProductsPrice:
+        totalPriceWithDiscount >= 0 ? totalPriceWithDiscount : 0,
+      totalProductsCount,
+    };
   };
 
-  const normalizeProductImage = (image: string | { sourceUrl?: string }) =>
-    typeof image === 'string'
-      ? image
-      : image?.sourceUrl || '/fallback-image.jpg';
-
   const addCartItem = (product: Product) => {
-    console.log('Adding Product to Cart:', product); // Debugging
-
     setCart((prevCart) => {
       const updatedCart = { ...prevCart };
 
@@ -95,7 +109,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         updatedCart.products.push(product);
       }
 
-      console.log('Updated Cart:', updatedCart); // Debugging
       return recalculateCartTotals(updatedCart);
     });
   };
@@ -157,6 +170,20 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     });
   };
 
+  const applyCoupon = (coupon: Coupon) => {
+    setCart((prevCart) => {
+      const updatedCart = { ...prevCart, coupon };
+      return recalculateCartTotals(updatedCart);
+    });
+  };
+
+  const removeCoupon = () => {
+    setCart((prevCart) => {
+      const updatedCart = { ...prevCart, coupon: undefined };
+      return recalculateCartTotals(updatedCart);
+    });
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -166,6 +193,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         removeCartItem,
         clearCart,
         updateCartVariation,
+        applyCoupon,
+        removeCoupon,
       }}
     >
       {children}

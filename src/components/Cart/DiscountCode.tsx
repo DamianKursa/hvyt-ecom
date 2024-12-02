@@ -1,28 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Snackbar from '@/components/UI/Snackbar.component'; // Adjust the path to your Snackbar component
 import { validateDiscountCode } from '@/utils/api/woocommerce'; // Adjust the path as needed
+import { CartContext } from '@/stores/CartProvider'; // Use CartContext for global state
 
 interface DiscountCodeProps {
   cartTotal: number;
-  setCartTotal: (value: number) => void;
+  setCartTotal: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const DiscountCode: React.FC<DiscountCodeProps> = ({
   cartTotal,
   setCartTotal,
 }) => {
-  const [isOpen, setIsOpen] = useState(false); // Toggle input visibility
-  const [code, setCode] = useState('');
+  const { applyCoupon, removeCoupon, cart } = useContext(CartContext); // Access cart context
+  const [isOpen, setIsOpen] = useState(false);
+  const [code, setCode] = useState(cart?.coupon?.code || ''); // Preload existing coupon
   const [snackbar, setSnackbar] = useState<{
     message: string;
     type: 'success' | 'error';
     visible: boolean;
   }>({ message: '', type: 'success', visible: false });
-  const [discount, setDiscount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleApplyCode = async () => {
-    if (!code) {
+    if (!code.trim()) {
       setSnackbar({
         message: 'Proszę wprowadzić kod rabatowy',
         type: 'error',
@@ -32,21 +33,20 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     }
 
     setIsLoading(true);
-    setSnackbar({ ...snackbar, visible: false }); // Hide previous messages
+    setSnackbar((prev) => ({ ...prev, visible: false }));
 
     try {
-      const { valid, discountValue } = await validateDiscountCode(code);
+      const { valid, discountValue } = await validateDiscountCode(code.trim());
 
       if (valid) {
-        setDiscount(discountValue);
-        setCartTotal(cartTotal - discountValue);
+        applyCoupon({ code, discountValue }); // Save coupon globally
+        setCartTotal(cartTotal - discountValue); // Update local cart total
         setSnackbar({
           message: 'Kod rabatowy został dodany',
           type: 'success',
           visible: true,
         });
       } else {
-        setDiscount(0);
         setSnackbar({
           message: 'Podany kod nie istnieje',
           type: 'error',
@@ -62,9 +62,25 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       });
     } finally {
       setIsLoading(false);
-      // Automatically hide the snackbar after 3 seconds
-      setTimeout(() => setSnackbar({ ...snackbar, visible: false }), 3000);
+      setTimeout(
+        () => setSnackbar((prev) => ({ ...prev, visible: false })),
+        3000,
+      );
     }
+  };
+
+  const handleRemoveCode = () => {
+    setCode('');
+    removeCoupon(); // Clear global coupon state
+    setSnackbar({
+      message: 'Kod rabatowy został usunięty',
+      type: 'success',
+      visible: true,
+    });
+    setTimeout(
+      () => setSnackbar((prev) => ({ ...prev, visible: false })),
+      3000,
+    );
   };
 
   return (
@@ -79,6 +95,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       <button
         className="flex justify-between items-center w-full text-lg font-medium text-neutral-darkest focus:outline-none"
         onClick={() => setIsOpen((prev) => !prev)}
+        aria-expanded={isOpen}
+        aria-controls="discount-input-section"
       >
         <div className="flex items-center">
           <img
@@ -97,32 +115,50 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
       {/* Expanded Input Section */}
       {isOpen && (
-        <div className="mt-4 flex items-center">
-          {/* Input Field */}
-          <input
-            id="discount-code"
-            type="text"
-            placeholder="Wpisz kod"
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            className="flex-1 bg-transparent border-b border-neutral-light placeholder-black text-neutral-darkest focus:outline-none px-2"
-            disabled={isLoading}
-          />
-
-          {/* Button */}
-          <button
-            onClick={handleApplyCode}
-            className={`ml-4 px-4 py-2 border border-black text-black rounded-full focus:outline-none ${
-              !code ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-            disabled={!code || isLoading}
-          >
-            {isLoading ? 'Ładowanie...' : 'Zapisz'}
-          </button>
+        <div id="discount-input-section" className="mt-4">
+          {cart?.coupon ? (
+            <div className="flex justify-between items-center bg-gray-100 p-2 rounded-md">
+              <span className="text-neutral-darkest font-medium">
+                Kod: {cart.coupon.code}
+              </span>
+              <button
+                onClick={handleRemoveCode}
+                className="text-red-500 hover:underline text-sm"
+              >
+                Usuń kod
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center">
+              <input
+                id="discount-code"
+                type="text"
+                placeholder="Wpisz kod"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                className="flex-1 bg-transparent border-b border-neutral-light placeholder-black text-neutral-darkest focus:outline-none px-2"
+                disabled={isLoading}
+              />
+              <button
+                onClick={handleApplyCode}
+                className={`ml-4 px-4 py-2 border ${
+                  !code.trim()
+                    ? 'border-neutral-light text-neutral-light'
+                    : 'border-black text-black'
+                } rounded-full focus:outline-none ${
+                  !code.trim() || isLoading
+                    ? 'opacity-50 cursor-not-allowed'
+                    : ''
+                }`}
+                disabled={!code.trim() || isLoading}
+              >
+                {isLoading ? 'Ładowanie...' : 'Zapisz'}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Snackbar for Messages */}
       <Snackbar
         message={snackbar.message}
         type={snackbar.type}

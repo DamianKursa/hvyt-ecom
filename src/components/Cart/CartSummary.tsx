@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DiscountCode from '@/components/Cart/DiscountCode'; // Adjust the path if needed
 
 interface CartSummaryProps {
@@ -11,6 +11,11 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   onCheckout,
 }) => {
   const [totalPrice, setTotalPrice] = useState(totalProductsPrice); // State to handle the updated total price
+
+  // Sync totalPrice state with totalProductsPrice prop changes
+  useEffect(() => {
+    setTotalPrice(totalProductsPrice);
+  }, [totalProductsPrice]);
 
   const formatPrice = (price: number) =>
     price.toFixed(2).replace('.', ',') + ' zł';
