@@ -43,7 +43,7 @@ const CategoryDescription: React.FC<CategoryDescriptionProps> = ({
       className={`bg-[#F5F5F5] my-[115px] py-[88px] ${fullWidth ? 'w-full' : 'container mx-auto'}`}
       style={{ backgroundColor: 'var(--color-beige)' }}
     >
-      <div className="max-w-[1440px] mx-auto px-10">
+      <div className="max-w-[1440px] mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-center gap-8">
           {/* Text Column */}
           <div className="w-full md:w-1/2 text-left">
@@ -61,7 +61,7 @@ const CategoryDescription: React.FC<CategoryDescriptionProps> = ({
             <Image
               src={`/images/${category}-description.jpg`}
               alt={`${category} description image`}
-              width={500}
+              width={600}
               height={500}
               className="rounded-lg shadow-lg object-cover"
             />
