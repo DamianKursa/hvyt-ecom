@@ -135,8 +135,8 @@ const Filters = ({
                       />
                       <label
                         htmlFor={option}
-                        className={`flex items-center cursor-pointer w-5 h-5 border rounded ${
-                          isChecked ? 'bg-black' : 'border-gray-300 bg-white'
+                        className={`flex items-center cursor-pointer w-5 h-5 border border-black rounded ${
+                          isChecked ? 'bg-black' : 'border-black'
                         }`}
                       >
                         {isChecked && (

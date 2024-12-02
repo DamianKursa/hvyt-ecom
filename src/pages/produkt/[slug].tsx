@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import Layout from '@/components/Layout/Layout.component';
@@ -31,6 +31,7 @@ const ProductPage = () => {
   const slug = query.slug as string;
   const { state, dispatch } = useProductState();
   const { addCartItem } = React.useContext(CartContext);
+  const frequentlyBoughtTogetherRef = useRef<HTMLDivElement>(null);
 
   const {
     product,
@@ -74,6 +75,12 @@ const ProductPage = () => {
     fetchData();
   }, [slug, dispatch]);
 
+  const handleScrollToFrequentlyBought = () => {
+    frequentlyBoughtTogetherRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
   const handleAttributeChange = (attributeName: string, value: string) => {
     // Update selected attributes
     dispatch({
@@ -189,7 +196,7 @@ const ProductPage = () => {
 
   return (
     <Layout title={product?.name || 'Product'}>
-      <section className="container mx-auto py-12 max-w-grid-desktop px-grid-desktop-margin">
+      <section className="container mx-auto">
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
           <div className="lg:w-8/12 flex flex-col gap-6">
             {product && <SingleProductGallery images={galleryImages} />}
@@ -297,27 +304,13 @@ const ProductPage = () => {
             </div>
 
             <DeliveryReturnInfo
-              items={[
-                {
-                  icon: '/icons/wysylka-w-24.svg',
-                  text: 'Wysyłka w 24h',
-                  alt: 'Shipping within 24 hours',
-                },
-                {
-                  icon: '/icons/zwrot.svg',
-                  text: '30 dni na zwrot',
-                  alt: 'Return Policy',
-                },
-                {
-                  icon: '/icons/kupowane-razem.svg',
-                  text: 'Kupowane razem',
-                  alt: 'Frequently bought together',
-                },
-              ]}
+              onScrollToSection={handleScrollToFrequentlyBought}
             />
           </div>
         </div>
-        <NajczęściejKupowaneRazem productId={product?.id?.toString() || ''} />
+        <div ref={frequentlyBoughtTogetherRef}>
+          <NajczęściejKupowaneRazem productId={product?.id?.toString() || ''} />
+        </div>
         <Instagram />
         {product && <Reviews productId={Number(product.id)} />}
       </section>

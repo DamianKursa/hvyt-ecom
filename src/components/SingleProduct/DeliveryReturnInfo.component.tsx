@@ -1,17 +1,32 @@
 import React from 'react';
 import Image from 'next/image';
 
-interface InfoItem {
-  icon: string; // Path to the icon
-  text: string; // Text to display
-  alt: string; // Alt text for the icon
-}
-
 interface DeliveryReturnInfoProps {
-  items: InfoItem[]; // Array of information items
+  onScrollToSection?: () => void; // Callback for special interaction
 }
 
-const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({ items }) => {
+const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
+  onScrollToSection,
+}) => {
+  const items = [
+    {
+      icon: '/icons/wysylka-w-24.svg',
+      text: 'Wysyłka w 24h',
+      alt: 'Shipping within 24 hours',
+    },
+    {
+      icon: '/icons/zwrot.svg',
+      text: '30 dni na zwrot',
+      alt: 'Return Policy',
+    },
+    {
+      icon: '/icons/kupowane-razem.svg',
+      text: 'Sprawdź produkty w tym samym kolorze',
+      alt: 'Frequently bought together',
+      isInteractive: true,
+    },
+  ];
+
   return (
     <div className="mt-4 border border-[#DAD3C8] rounded-[24px]">
       {items.map((item, index) => (
@@ -23,7 +38,21 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({ items }) => {
           style={{ width: '80%' }}
         >
           <Image src={item.icon} alt={item.alt} width={24} height={24} />
-          <span>{item.text}</span>
+          <span className="text-black">
+            {item.isInteractive ? (
+              <>
+                <span
+                  className="underline cursor-pointer text-dark-pastel-red"
+                  onClick={onScrollToSection}
+                >
+                  Sprawdź
+                </span>{' '}
+                produkty w tym samym kolorze
+              </>
+            ) : (
+              item.text
+            )}
+          </span>
         </div>
       ))}
     </div>

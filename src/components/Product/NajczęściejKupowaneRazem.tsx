@@ -95,9 +95,14 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
           </button>
         </div>
       </div>
-
       {/* Desktop View */}
-      <div className="hidden md:flex overflow-hidden">
+      <div
+        className={`hidden md:flex overflow-hidden ${
+          displayedProducts.length < Math.floor(itemsPerPage)
+            ? 'justify-start'
+            : ''
+        }`}
+      >
         <div
           className="flex transition-transform duration-300"
           style={{
@@ -105,6 +110,7 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
             gap: `${gutter}px`,
           }}
         >
+          {/* Render Products */}
           {displayedProducts.map((product) => (
             <div
               key={product.id}
@@ -128,6 +134,23 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
               />
             </div>
           ))}
+
+          {/* Render Placeholder Boxes */}
+          {Array.from(
+            { length: Math.ceil(itemsPerPage - displayedProducts.length) },
+            (_, index) => (
+              <div
+                key={`placeholder-${index}`}
+                className="flex-none"
+                style={{
+                  width: `calc((100% / ${itemsPerPage}) - ${gutter}px)`,
+                  transition: 'all 0.3s ease',
+                }}
+              >
+                <div className="w-full h-full bg-transparent"></div>
+              </div>
+            ),
+          )}
         </div>
       </div>
 
