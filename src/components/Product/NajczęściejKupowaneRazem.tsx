@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
-import ProductPreview from '../Product/ProductPreview.component';
+import ProductPreview from './ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
-
-interface RecommendedProduct {
-  id: string;
-  slug: string;
-  name: string;
-  price: string;
-  images: { src: string }[];
-}
+import useCrossSellProducts, {
+  RecommendedProduct,
+} from '@/utils/hooks/useCrossSellProducts';
 
 interface NajczesciejKupowaneProps {
-  products: RecommendedProduct[]; // Cross-sell products from the hook
-  loading: boolean; // Loading state from the hook
+  productId: string; // ID of the product to fetch cross-sell products
 }
 
 const fallbackProducts: RecommendedProduct[] = [
@@ -33,14 +27,16 @@ const fallbackProducts: RecommendedProduct[] = [
 ];
 
 const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
-  products = [],
-  loading,
+  productId,
 }) => {
+  // Fetch cross-sell products using the custom hook
+  const { products, loading } = useCrossSellProducts(productId);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 3.8; // Number of items per full slider view
   const gutter = 24; // Gap between products in pixels
 
-  // Fallback products if loading or products array is empty
+  // Display fetched products or fallback products
   const displayedProducts = loading ? fallbackProducts : products || [];
   const totalItems = displayedProducts.length;
 
@@ -137,23 +133,27 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
 
       {/* Mobile View: Responsive Slider */}
       <div className="md:hidden">
-        <ResponsiveSlider
-          items={displayedProducts}
-          renderItem={(product: RecommendedProduct) => (
-            <ProductPreview
-              product={{
-                ...product,
-                images: [
-                  {
-                    src:
-                      product.images?.[0]?.src ||
-                      'https://via.placeholder.com/300',
-                  },
-                ],
-              }}
-            />
-          )}
-        />
+        {loading ? (
+          <p>Ładowanie...</p>
+        ) : (
+          <ResponsiveSlider
+            items={displayedProducts}
+            renderItem={(product: RecommendedProduct) => (
+              <ProductPreview
+                product={{
+                  ...product,
+                  images: [
+                    {
+                      src:
+                        product.images?.[0]?.src ||
+                        'https://via.placeholder.com/300',
+                    },
+                  ],
+                }}
+              />
+            )}
+          />
+        )}
       </div>
     </section>
   );

@@ -317,7 +317,7 @@ const ProductPage = () => {
             />
           </div>
         </div>
-        <NajczęściejKupowaneRazem products={[]} loading={false} />
+        <NajczęściejKupowaneRazem productId={product?.id?.toString() || ''} />
         <Instagram />
         {product && <Reviews productId={Number(product.id)} />}
       </section>

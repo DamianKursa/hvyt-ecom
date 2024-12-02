@@ -15,20 +15,25 @@ const useCrossSellProducts = (productId: string | null) => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      if (!productId) return;
-      setLoading(true);
+      if (!productId) {
+        console.warn('Product ID is null. Skipping fetch.');
+        setLoading(false);
+        return;
+      }
+
       try {
+        setLoading(true);
         const { products: fetchedProducts } = await fetchCrossSellProducts(productId);
         const formattedProducts = fetchedProducts.map((product: any) => ({
           id: product.id,
           slug: product.slug,
           name: product.name,
           price: product.price,
-          images: [{ src: product.images[0]?.src || '/fallback-image.jpg' }],
+          images: [{ src: product.images?.[0]?.src || '/fallback-image.jpg' }],
         }));
         setProducts(formattedProducts.slice(0, 12)); // Limit to 12 products
       } catch (error) {
-        console.error('Error fetching cross-sell products:', error);
+        console.error('Error in useCrossSellProducts:', error);
       } finally {
         setLoading(false);
       }

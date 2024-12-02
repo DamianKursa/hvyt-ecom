@@ -251,17 +251,17 @@ export const fetchProductsByAttribute = async (kolekcja: string) => {
 };
 
 // Fetch cross-sell products
+
 export const fetchCrossSellProducts = async (productId: string) => {
   try {
     // Fetch the main product to get cross-sell IDs
     const productResponse = await WooCommerceAPI.get(`/products/${productId}`);
     const productData = productResponse.data;
 
-    // Log the cross-sell IDs to ensure they are present
-    console.log('Cross-sell IDs:', productData.cross_sell_ids);
-
-    const crossSellIds = productData.cross_sell_ids;
-    if (!crossSellIds || crossSellIds.length === 0) {
+    // Check if cross-sell IDs are available
+    const crossSellIds = productData.cross_sell_ids || [];
+    if (crossSellIds.length === 0) {
+      console.log(`No cross-sell products found for product ID: ${productId}`);
       return { products: [] };
     }
 
@@ -273,6 +273,7 @@ export const fetchCrossSellProducts = async (productId: string) => {
       }),
     );
 
+    console.log('Fetched Cross-Sell Products:', crossSellProducts);
     return { products: crossSellProducts };
   } catch (error) {
     console.error('Error fetching cross-sell products:', error);
