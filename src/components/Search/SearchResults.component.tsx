@@ -79,7 +79,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
                   passHref
                 >
                   <div
-                    className="flex flex-col items-center text-center cursor-pointer"
+                    className="flex flex-col items-start text-start cursor-pointer"
                     onClick={onClose} // Close the modal when clicking on a product
                   >
                     <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
@@ -113,7 +113,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
         {/* Static Sections in One Row */}
         <div className="mt-6 flex w-full">
           {/* Najczęściej wyszukiwane Section - 70% width */}
-          <div className="w-7/10 pr-4">
+          {/*<div className="w-7/10 pr-4">
             <h3 className="text-sm font-semibold mb-2">
               Najczęściej wyszukiwane
             </h3>
@@ -136,15 +136,15 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Co nowego Section - 30% width */}
-          <div className="w-3/10 pl-4">
+          <div className="w-3/10">
             <h3 className="text-sm font-semibold mb-2">Co nowego?</h3>
             {latestKolekcja && (
               <Link href={`/kolekcje/${latestKolekcja.slug}`} passHref>
                 <div
-                  className="flex flex-col items-center text-center cursor-pointer"
+                  className="flex flex-col items-start text-start cursor-pointer"
                   onClick={onClose} // Close the modal when clicking on the latest Kolekcja
                 >
                   <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">

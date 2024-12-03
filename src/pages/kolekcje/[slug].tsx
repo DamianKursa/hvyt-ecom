@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
 import Layout from '@/components/Layout/Layout.component';
 import { Kolekcja } from '../../utils/functions/interfaces';
 import SkeletonCollectionPage from '@/components/Skeletons/SkeletonCollectionPage';
@@ -109,51 +112,65 @@ const CollectionPage = () => {
         <div className="container mx-auto max-w-grid-desktop">
           {/* First Section: Title, Content, Featured Image */}
           <div
-            className="grid grid-cols-2 gap-8 mb-12 rounded-lg"
+            className="grid grid-cols-2 gap-8 mb-12 rounded-[25px]"
             style={{ minHeight: '521px', backgroundColor: '#E9E5DF' }}
           >
             <div className="flex flex-col justify-end p-6">
-              <h1 className="font-size-h1 font-bold text-dark-pastel-red">
+              <h1 className="font-size-h1 capitalize mb-[32px] font-bold text-dark-pastel-red">
                 {slugString}
               </h1>
-              <p className="font-size-text-medium text-neutral-darkest">
+              <p className="font-size-text-medium mb-[48px] text-neutral-darkest">
                 {content}
               </p>
             </div>
-            <div className="relative h-full rounded-lg overflow-hidden">
+            <div className="relative h-full overflow-hidden">
               {featuredImage && (
                 <Image
                   src={featuredImage}
                   alt={slugString as string}
                   layout="fill"
                   objectFit="cover"
-                  className="rounded-lg h-full"
+                  className="rounded-[25px] h-full"
                 />
               )}
             </div>
           </div>
 
           {/* Second Section: Slider with 6 visible boxes */}
-          <div className="grid grid-cols-6 gap-4 mb-12">
-            {kolekcjeData?.slice(0, 6).map((kolekcja: Kolekcja) => (
-              <div
-                key={kolekcja.id}
-                className="relative h-[205px] w-full transition-transform duration-300 transform hover:scale-105 rounded-lg overflow-hidden"
-                style={{ backgroundColor: 'var(--color-beige)' }}
-                onClick={() => handleCollectionClick(kolekcja.slug)}
-              >
-                <Image
-                  src={kolekcja.imageUrl || '/placeholder.jpg'}
-                  alt={kolekcja.title.rendered}
-                  layout="fill"
-                  objectFit="cover"
-                  className="rounded-lg"
-                />
-                <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest bg-white">
-                  {kolekcja.title.rendered}
-                </div>
-              </div>
-            ))}
+
+          {/* Second Section: Slider without navigation */}
+          <div className="mb-12">
+            <Swiper
+              spaceBetween={16}
+              slidesPerView={6}
+              breakpoints={{
+                320: { slidesPerView: 1.3 },
+                768: { slidesPerView: 3.3 },
+                1024: { slidesPerView: 4.3 },
+                1280: { slidesPerView: 6.3 },
+              }}
+            >
+              {kolekcjeData?.map((kolekcja: Kolekcja) => (
+                <SwiperSlide key={kolekcja.id}>
+                  <div
+                    className="relative h-[205px] w-full transition-transform duration-300 transform hover:scale-105 rounded-lg overflow-hidden"
+                    style={{ backgroundColor: 'var(--color-beige)' }}
+                    onClick={() => handleCollectionClick(kolekcja.slug)}
+                  >
+                    <Image
+                      src={kolekcja.imageUrl || '/placeholder.jpg'}
+                      alt={kolekcja.title.rendered}
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-lg"
+                    />
+                    <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest bg-white">
+                      {kolekcja.title.rendered}
+                    </div>
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
 
           {/* Third Section: Product Preview (3 Columns) */}

@@ -83,9 +83,9 @@ const KolekcjePage = () => {
                         layout="fill"
                         objectFit="cover" // Ensure the image covers the full container
                         quality={100}
-                        className="transition-transform duration-500 transform group-hover:scale-105"
+                        className="transition-transform duration-500 rounded-[16px] rtransform group-hover:scale-105"
                       />
-                      <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest bg-white transition-colors duration-300 group-hover:bg-dark-pastel-red group-hover:text-neutral-white">
+                      <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red transition-colors duration-300 group-hover:bg-dark-pastel-red group-hover:text-neutral-white">
                         {kolekcja.title.rendered}
                       </div>
                     </Link>
@@ -108,9 +108,9 @@ const KolekcjePage = () => {
                         layout="fill"
                         objectFit="cover" // Ensure the image covers the full container
                         quality={100}
-                        className="transition-transform duration-500 transform group-hover:scale-105"
+                        className="transition-transform  rounded-[16px] duration-500 transform group-hover:scale-105"
                       />
-                      <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest bg-white transition-colors duration-300 group-hover:bg-dark-pastel-red group-hover:text-neutral-white">
+                      <div className="absolute bottom-4 left-4 px-4 py-2 font-bold text-dark-pastel-red transition-colors duration-300 group-hover:bg-dark-pastel-red group-hover:text-neutral-white">
                         {kolekcja.title.rendered}
                       </div>
                     </Link>

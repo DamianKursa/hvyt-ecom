@@ -199,36 +199,41 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                     </div>
                   ) : (
                     <div className="flex items-center space-x-4">
+                      {/* Search Icon */}
                       <button
                         onClick={toggleSearch}
-                        className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all"
+                        className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all"
                       >
                         <img
                           src="/icons/search.svg"
                           alt="Search"
-                          className={iconClass}
+                          className="w-full h-full"
                         />
                       </button>
+
+                      {/* Wishlist Icon */}
                       <Link href="/wishlist">
-                        <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
+                        <span className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
                           <img
                             src="/icons/wishlist.svg"
                             alt="Wishlist"
-                            className={iconClass}
+                            className="w-full h-full"
                           />
                         </span>
                       </Link>
+
+                      {/* User Icon */}
                       <div
                         onClick={handleUserClick}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
-                        className="relative"
+                        className="relative w-6 h-6 flex items-center justify-center rounded-full"
                       >
-                        <button>
+                        <button className="w-full h-full flex items-center justify-center">
                           <img
                             src="/icons/user.svg"
                             alt="User"
-                            className={iconClass}
+                            className="w-full h-full"
                           />
                         </button>
                         {dropdownOpen && user && (
@@ -241,12 +246,14 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           </div>
                         )}
                       </div>
+
+                      {/* Cart Icon */}
                       <Link href="/koszyk">
-                        <span className="p-2 rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
+                        <span className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
                           <img
                             src="/icons/cart.svg"
                             alt="Cart"
-                            className={iconClass}
+                            className="w-full h-full"
                           />
                         </span>
                       </Link>
