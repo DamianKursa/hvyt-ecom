@@ -24,7 +24,9 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
     <div className="relative w-full">
       {/* Dropdown Trigger */}
       <button
-        className="border rounded-[24px] w-full text-[16px] p-[7px_16px] font-bold flex justify-between items-center hover:bg-gray-100"
+        className={`w-full min-h-[50px] text-[16px] p-[8px] font-bold flex justify-between items-center border border-neutral-light rounded-[24px] ${
+          isOpen ? 'rounded-b-none' : ''
+        }`}
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <span>{selectedValue || placeholder}</span>
@@ -37,15 +39,15 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
 
       {/* Dropdown Options */}
       {isOpen && (
-        <div className="absolute top-full mt-2 w-full bg-white border border-gray-300 rounded-[16px]  z-20">
+        <div
+          className={`absolute top-full w-full border border-dark-pastel-red rounded-b-[24px] bg-beige-light`}
+        >
           {options.map((option, index) => (
             <div
               key={index}
               onClick={() => handleOptionClick(option)}
-              className={`cursor-pointer p-4 hover:bg-gray-100 ${
-                selectedValue === option ? 'bg-gray-100' : ''
-              } ${index === 0 ? 'rounded-t-[16px]' : ''} ${
-                index === options.length - 1 ? 'rounded-b-[16px]' : ''
+              className={`cursor-pointer px-4 py-2 text-neutral-darkest ${
+                selectedValue === option ? 'bg-gray-100 font-medium' : ''
               }`}
             >
               {option}

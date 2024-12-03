@@ -18,7 +18,7 @@ const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
   const cleanedAttributeName = attributeName.replace(/^Atrybut produktu: /, '');
 
   return (
-    <div className="mt-4">
+    <div>
       {/* Dropdown for Selecting Attribute */}
       <CustomDropdown
         options={options}
