@@ -38,7 +38,7 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
         className="relative bg-white rounded-lg shadow-lg p-8 flex items-center justify-center overflow-auto"
         style={{
           maxWidth: '1440px', // Set modal max width to 1440px
-          maxHeight: '90vh', // Allow vertical scroll if the image exceeds viewport height
+          maxHeight: '80vh', // Allow vertical scroll if the image exceeds viewport height
         }}
       >
         {/* Close button */}
@@ -51,14 +51,27 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
         </button>
 
         {/* Image Display */}
-        <div className="relative flex items-center justify-center">
+        <div
+          className="relative flex items-center justify-center"
+          style={{
+            maxWidth: '90vw', // Modal width should fit within the viewport width
+            maxHeight: '70vh', // Modal height should fit within the viewport height
+            overflow: 'hidden', // Prevent any overflow
+          }}
+        >
           <Image
             src={images[currentIndex]}
             alt={`Image ${currentIndex + 1}`}
-            layout="intrinsic" // Keeps the image's original dimensions
-            width={1440} // Ensure the image does not exceed the modal's bounds
-            height={0} // Auto height to maintain aspect ratio
-            style={{ maxWidth: '100%', maxHeight: '100%' }}
+            layout="intrinsic" // Preserve the image's original aspect ratio
+            width={1440} // Provide a reasonable width for large images
+            height={960} // Match the image's aspect ratio (or adjust for your image)
+            style={{
+              width: 'auto', // Let the width scale proportionally
+              height: '100%', // Scale height to fit the modal container
+              maxWidth: '100%', // Prevent the image from exceeding the modal width
+              maxHeight: '100%', // Prevent the image from exceeding the modal height
+              objectFit: 'contain', // Ensure no cropping
+            }}
             priority
           />
         </div>
