@@ -203,7 +203,7 @@ const ProductPage = () => {
             {product && <SingleProductDetails product={product} />}
           </div>
 
-          <div className="lg:w-4/12 flex flex-col gap-6">
+          <div className="lg:w-4/12 flex flex-col gap-6 sticky top-20 self-start">
             <h1 className="text-3xl font-semibold">{product?.name}</h1>
             <p className="text-4xl font-bold text-dark-pastel-red">
               {selectedVariation?.price || product?.price} zł
