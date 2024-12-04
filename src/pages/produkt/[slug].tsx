@@ -281,24 +281,24 @@ const ProductPage = () => {
             <div className="flex items-center mt-4 space-x-4">
               <button
                 onClick={handleAddToCart}
-                className="w-4/5 py-3 text-lg font-semibold text-white bg-black rounded-full flex justify-center items-center hover:bg-dark-pastel-red transition-colors"
+                className="w-4/5 py-3 text-[24px] font-light text-white bg-black rounded-full flex justify-center items-center hover:bg-dark-pastel-red transition-colors"
               >
                 Dodaj do koszyka
                 <Image
                   src="/icons/dodaj-do-koszyka.svg"
                   alt="Add to Cart"
-                  width={24}
-                  height={24}
+                  width={28}
+                  height={28}
                   className="ml-2"
                 />
               </button>
 
-              <button className="w-1/5 p-3 border rounded-full border-neutral-dark text-neutral-dark hover:text-red-600 hover:border-red-600 flex justify-center items-center">
+              <button className="w-1/5 h-[64px] w-[64px] p-3 border rounded-full border-neutral-dark text-neutral-dark hover:text-red-600 hover:border-red-600 flex justify-center items-center">
                 <Image
                   src="/icons/wishlist.svg"
                   alt="Wishlist"
-                  width={24}
-                  height={24}
+                  width={28}
+                  height={28}
                 />
               </button>
             </div>

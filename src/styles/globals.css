@@ -120,22 +120,22 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
 }
 /* Apply styling to retain WordPress formatting */
 .formatted-content {
-  font-size: 16px;
+  font-size: 18px;
   color: #333;
+  font-weight: lighter;
 }
 
 .formatted-content p {
-  margin-bottom: 1.5em; /* Adjust as needed */
+  margin-bottom: 1.5em;
+   /* Adjust as needed */
 }
 
 .formatted-content h1, .formatted-content h2, .formatted-content h3 {
-  font-weight: bold;
-  margin-top: 1.5em;
-  margin-bottom: 0.5em;
+  font-weight: 600;
 }
 
 .formatted-content ul, .formatted-content ol {
-  padding-left: 1.5em;
+
 }
 
 .formatted-content ul li, .formatted-content ol li {

@@ -117,7 +117,10 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
             {!isExpanded && (
               <div
                 className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white to-transparent pointer-events-none"
-                style={{ height: '80px' }}
+                style={{
+                  height: '80px',
+                  opacity: 0.8, // Adjust this value for overall transparency
+                }}
               />
             )}
           </div>
@@ -128,7 +131,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
           <div className="absolute bottom-0 left-0 w-full flex justify-center items-center">
             <button
               onClick={toggleGallery}
-              className="relative z-20 mt-4 px-6 py-2 text-lg font-medium text-neutral-darkest bg-white/70 backdrop-blur-md border border-neutral-dark rounded-full shadow-lg"
+              className="relative z-20 mt-4 px-6 py-2 text-lg font-medium text-neutral-darkest backdrop-blur-md border border-neutral-dark rounded-full shadow-lg"
             >
               Więcej zdjęć +
             </button>
@@ -163,7 +166,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
           <div className="flex justify-center mt-6">
             <button
               onClick={toggleGallery}
-              className="px-6 py-2 text-lg font-medium text-neutral-darkest bg-white/70 backdrop-blur-md border border-neutral-dark rounded-full shadow-lg"
+              className="px-6 py-2 text-lg font-medium text-neutral-darkest backdrop-blur-md border border-neutral-dark rounded-full shadow-lg"
             >
               Mniej zdjęć −
             </button>

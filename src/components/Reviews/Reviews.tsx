@@ -86,14 +86,15 @@ const Reviews = ({ productId }: { productId: number }) => {
   };
 
   return (
-    <section className="container max-w-grid-desktop py-16 sm:px-4 md:px-0 mx-auto">
+    <section className="container bg-beige max-w-grid-desktop py-16 sm:px-4 md:px-0 mx-auto">
       <div className="flex justify-between mb-[40px]">
         <div className="flex px-[16px] lg:px-0 flex-col h-full">
           <h2 className="font-size-h2 font-bold text-neutral-darkest">
-            Opinie Klientów
+            Klienci o HVYT
           </h2>
           <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
-            Sprawdź, co nasi klienci myślą o naszych produktach.
+            Sprawdź co mówią osoby, które kupiły nasze produkty lub podziel się
+            swoją opinią.
           </p>
         </div>
 

@@ -4,44 +4,29 @@ import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import useCrossSellProducts, {
   RecommendedProduct,
 } from '@/utils/hooks/useCrossSellProducts';
+import SkeletonProduct from '@/components/Skeletons/SkeletonProduct';
 
 interface NajczesciejKupowaneProps {
   productId: string; // ID of the product to fetch cross-sell products
 }
 
-const fallbackProducts: RecommendedProduct[] = [
-  {
-    id: '1',
-    slug: 'product-slug-1',
-    name: 'Sample Product 1',
-    price: '15,90',
-    images: [{ src: 'https://via.placeholder.com/300' }],
-  },
-  {
-    id: '2',
-    slug: 'product-slug-2',
-    name: 'Sample Product 2',
-    price: '15,90',
-    images: [{ src: 'https://via.placeholder.com/300' }],
-  },
-];
-
 const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
   productId,
 }) => {
-  // Fetch cross-sell products using the custom hook
   const { products, loading } = useCrossSellProducts(productId);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 3.8; // Number of items per full slider view
-  const gutter = 24; // Gap between products in pixels
+  const itemWidth = 340; // Fixed width for each item in pixels
+  const gutter = 24; // Gap between items in pixels
 
-  // Display fetched products or fallback products
-  const displayedProducts = loading ? fallbackProducts : products || [];
+  const displayedProducts = products || [];
   const totalItems = displayedProducts.length;
 
+  const sliderWidth = totalItems * (itemWidth + gutter) - gutter; // Total slider width
+  const visibleWidth = 4 * (itemWidth + gutter) - gutter; // Visible slider width (4 items)
+
   const canGoPrev = currentIndex > 0;
-  const canGoNext = currentIndex < totalItems - itemsPerPage;
+  const canGoNext = (currentIndex + 1) * visibleWidth < sliderWidth;
 
   const handlePrev = () => {
     if (canGoPrev) setCurrentIndex((prev) => prev - 1);
@@ -97,69 +82,62 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
       </div>
 
       {/* Desktop View */}
-      <div
-        className={`hidden md:flex overflow-hidden ${
-          displayedProducts.length < Math.ceil(itemsPerPage)
-            ? 'justify-start'
-            : ''
-        }`}
-      >
+      <div className="hidden md:flex overflow-hidden">
         <div
           className="flex transition-transform duration-300"
           style={{
-            transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)`,
+            transform: `translateX(-${currentIndex * visibleWidth}px)`,
             gap: `${gutter}px`,
+            width: `${sliderWidth}px`, // Set the total slider width dynamically
           }}
         >
-          {displayedProducts.map((product) => (
-            <div
-              key={product.id}
-              className="flex-none"
-              style={{
-                width: `calc((100% / ${itemsPerPage}) - ${gutter}px)`,
-                transition: 'all 0.3s ease',
-              }}
-            >
-              <ProductPreview
-                product={{
-                  ...product,
-                  images: [
-                    {
-                      src:
-                        product.images?.[0]?.src ||
-                        'https://via.placeholder.com/300',
-                    },
-                  ],
-                }}
-              />
-            </div>
-          ))}
-          {/* Add empty boxes to maintain spacing for fewer than itemsPerPage */}
-          {Array.from(
-            {
-              length: Math.ceil(itemsPerPage - displayedProducts.length),
-            },
-            (_, index) => (
-              <div
-                key={`placeholder-${index}`}
-                className="flex-none"
-                style={{
-                  width: `calc((100% / ${itemsPerPage}) - ${gutter}px)`,
-                  transition: 'all 0.3s ease',
-                }}
-              >
-                {/* Optional: Add a background or make this div invisible */}
-                <div className="w-full h-full bg-transparent"></div>
-              </div>
-            ),
-          )}
+          {loading
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={`skeleton-${index}`}
+                  className="flex-none"
+                  style={{
+                    minWidth: `${itemWidth}px`,
+                    maxWidth: `${itemWidth}px`,
+                  }}
+                >
+                  <SkeletonProduct />
+                </div>
+              ))
+            : displayedProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="flex-none"
+                  style={{
+                    minWidth: `${itemWidth}px`,
+                    maxWidth: `${itemWidth}px`,
+                  }}
+                >
+                  <ProductPreview
+                    product={{
+                      ...product,
+                      images: [
+                        {
+                          src:
+                            product.images?.[0]?.src ||
+                            'https://via.placeholder.com/300',
+                        },
+                      ],
+                    }}
+                  />
+                </div>
+              ))}
         </div>
       </div>
 
       {/* Mobile View: Responsive Slider */}
       <div className="md:hidden">
         {loading ? (
-          <p>Ładowanie...</p>
+          <div className="flex gap-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <SkeletonProduct key={index} />
+            ))}
+          </div>
         ) : (
           <ResponsiveSlider
             items={displayedProducts}
