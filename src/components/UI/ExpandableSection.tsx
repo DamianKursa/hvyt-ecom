@@ -17,12 +17,12 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
     DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
 
   return (
-    <div className="mb-4 border-b border-gray-300">
+    <div className="py-2 border-b border-gray-300">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex justify-between items-center py-2 text-lg font-semibold"
+        className="w-full text-[24px] flex justify-between items-center py-2 text-lg font-semibold"
       >
-        {title}
+        <span className="text-[20px]">{title}</span>
         <Image
           src={isExpanded ? '/icons/minus.svg' : '/icons/plus-sign.svg'}
           alt={isExpanded ? 'Collapse' : 'Expand'}
@@ -32,7 +32,7 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
       </button>
       {isExpanded && (
         <div
-          className="mt-2 formatted-content"
+          className=" formatted-content py-[24px]"
           dangerouslySetInnerHTML={{ __html: cleanHTML(content) }}
         />
       )}

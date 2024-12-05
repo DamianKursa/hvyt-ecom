@@ -129,8 +129,8 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
   margin-bottom: 1.5em;
    /* Adjust as needed */
 }
-
-.formatted-content h1, .formatted-content h2, .formatted-content h3 {
+.formatted-content h4{
+  font-size: 18px;
   font-weight: 600;
 }
 
