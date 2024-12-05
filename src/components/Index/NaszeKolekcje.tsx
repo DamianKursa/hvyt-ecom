@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
+import IconRenderer from '@/components/UI/IconRenderer'; // Import IconRenderer
 import { fetchKolekcjePostsWithImages } from '@/utils/api/woocommerce';
 import SkeletonNaszeKolekcje from '@/components/Skeletons/SkeletonNaszeKolekcje';
 
@@ -38,7 +39,7 @@ const NaszeKolekcje = () => {
     >
       <div className="container mx-auto max-w-grid-desktop">
         {/* Title, Description, and Button */}
-        <div className=" px-[16px] lg:px-0  flex flex-col items-start mb-8 md:flex-row md:justify-between md:items-center">
+        <div className="px-[16px] lg:px-0 flex flex-col items-start mb-8 md:flex-row md:justify-between md:items-center">
           <div>
             <h2 className="font-size-h2 font-bold text-neutral-darkest">
               Sprawdź nasze kolekcje
@@ -47,7 +48,6 @@ const NaszeKolekcje = () => {
               Zobacz co ostatnio nowego dodaliśmy dla Ciebie.
             </p>
           </div>
-          {/* Button for both desktop and mobile */}
           <Link
             href="/kolekcje"
             className="block w-full md:w-auto px-6 py-3 mt-6 md:mt-0 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
@@ -73,7 +73,18 @@ const NaszeKolekcje = () => {
                 quality={100}
                 className="rounded-lg h-full"
               />
-
+              {/* Icons */}
+              <IconRenderer
+                icons={[
+                  kolekcja.acf?.ikonka_1,
+                  kolekcja.acf?.ikonka_2,
+                  kolekcja.acf?.ikonka_3,
+                  kolekcja.acf?.ikonka_4,
+                ]}
+                iconPath="/icons/kolekcja/"
+                iconSize={44} // Set the desired height for the icons
+                gap={5} // Space between icons
+              />
               <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red">
                 {kolekcja.title.rendered}
               </div>
@@ -98,6 +109,18 @@ const NaszeKolekcje = () => {
                     objectFit="cover"
                     quality={100}
                     className="rounded-lg"
+                  />
+                  {/* Icons */}
+                  <IconRenderer
+                    icons={[
+                      kolekcja.acf?.ikonka_1,
+                      kolekcja.acf?.ikonka_2,
+                      kolekcja.acf?.ikonka_3,
+                      kolekcja.acf?.ikonka_4,
+                    ]}
+                    iconPath="/icons/kolekcja/"
+                    iconSize={34} // Set the desired height for the icons
+                    gap={5} // Space between icons
                   />
                   <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                     {kolekcja.title.rendered}

@@ -13,7 +13,7 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
   product,
 }) => {
   return (
-    <div className="product-details">
+    <div className="product-details mx-4 md:mx-0">
       {/* Szczegóły produktu - Rendered as Toggle */}
       {product.meta_data?.find((meta) => meta.key === 'szczegoly_produktu') && (
         <ToggleSection

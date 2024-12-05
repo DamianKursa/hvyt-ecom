@@ -198,12 +198,12 @@ const ProductPage = () => {
     <Layout title={product?.name || 'Product'}>
       <section className="container mx-auto">
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
-          <div className="lg:w-8/12 flex flex-col gap-6">
+          <div className="lg:w-8/12 flex flex-col gap-6 max-w-full">
             {product && <SingleProductGallery images={galleryImages} />}
             {product && <SingleProductDetails product={product} />}
           </div>
 
-          <div className="lg:w-4/12 flex flex-col gap-6 sticky top-20 self-start">
+          <div className="lg:w-4/12 flex flex-col gap-6 sticky mx-4 md:mx-0 top-20 self-start">
             <h1 className="text-3xl font-semibold">{product?.name}</h1>
             <p className="text-4xl font-bold text-dark-pastel-red">
               {selectedVariation?.price || product?.price} zł
