@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Layout from '@/components/Layout/Layout.component';
+import IconRenderer from '@/components/UI/IconRenderer'; // Import IconRenderer
 import { Kolekcja } from '../../utils/functions/interfaces';
 import SkeletonCollectionPage from '@/components/Skeletons/SkeletonCollectionPage';
 import ProductPreview from '../../components/Product/ProductPreview.component';
@@ -31,7 +32,6 @@ const CollectionPage = () => {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Function to strip HTML tags from content
   const stripHTML = (html: string) => {
     const div = document.createElement('div');
     div.innerHTML = html;
@@ -43,20 +43,15 @@ const CollectionPage = () => {
       try {
         if (!slugString) return;
 
-        // Fetch category by slug
         const categoryData = await fetchCategoryBySlug(slugString);
-
-        // Fetch products by category ID
         const fetchedProducts = await fetchProductsByCategoryId(
           categoryData.id,
         );
-        setProductsData(fetchedProducts); // Assuming fetchedProducts has { products: any[], totalProducts: number }
+        setProductsData(fetchedProducts);
 
-        // Fetch Kolekcje data for the slider
         const fetchedKolekcje = await fetchKolekcjePostsWithImages();
         setKolekcjeData(fetchedKolekcje);
 
-        // Fetch Kolekcja details like content and featured image
         const currentKolekcja = fetchedKolekcje.find(
           (kolekcja: Kolekcja) => kolekcja.slug === slugString,
         );
@@ -64,7 +59,6 @@ const CollectionPage = () => {
           stripHTML(currentKolekcja?.content.rendered || 'Opis kolekcji.'),
         );
 
-        // Fetch the featured image
         if (currentKolekcja?.featured_media) {
           const featuredImageUrl = await fetchMediaById(
             currentKolekcja.featured_media,
@@ -112,10 +106,23 @@ const CollectionPage = () => {
         <div className="container mx-auto max-w-grid-desktop">
           {/* First Section: Title, Content, Featured Image */}
           <div
-            className="grid grid-cols-2 gap-8 mb-12 rounded-[25px]"
+            className="grid grid-cols-2 gap-8 mb-12 rounded-[25px] relative"
             style={{ minHeight: '521px', backgroundColor: '#E9E5DF' }}
           >
-            <div className="flex flex-col justify-end p-6">
+            <div className="flex flex-col justify-end p-6 relative">
+              {kolekcjeData && (
+                <IconRenderer
+                  icons={[
+                    kolekcjeData[0]?.acf?.ikonka_1,
+                    kolekcjeData[0]?.acf?.ikonka_2,
+                    kolekcjeData[0]?.acf?.ikonka_3,
+                    kolekcjeData[0]?.acf?.ikonka_4,
+                  ]}
+                  iconPath="/icons/kolekcja/"
+                  iconSize={44}
+                  gap={8}
+                />
+              )}
               <h1 className="font-size-h1 capitalize mb-[32px] font-bold text-dark-pastel-red">
                 {slugString}
               </h1>
@@ -136,9 +143,7 @@ const CollectionPage = () => {
             </div>
           </div>
 
-          {/* Second Section: Slider with 6 visible boxes */}
-
-          {/* Second Section: Slider without navigation */}
+          {/* Second Section: Slider */}
           <div className="mb-12">
             <Swiper
               spaceBetween={16}
@@ -150,30 +155,47 @@ const CollectionPage = () => {
                 1280: { slidesPerView: 6.3 },
               }}
             >
-              {kolekcjeData?.map((kolekcja: Kolekcja) => (
-                <SwiperSlide key={kolekcja.id}>
-                  <div
-                    className="relative h-[205px] w-full transition-transform duration-300 transform hover:scale-105 rounded-lg overflow-hidden"
-                    style={{ backgroundColor: 'var(--color-beige)' }}
-                    onClick={() => handleCollectionClick(kolekcja.slug)}
-                  >
-                    <Image
-                      src={kolekcja.imageUrl || '/placeholder.jpg'}
-                      alt={kolekcja.title.rendered}
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-lg"
-                    />
-                    <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest bg-white">
-                      {kolekcja.title.rendered}
+              {kolekcjeData?.map((kolekcja: Kolekcja) => {
+                console.log('Kolekcja Data:', kolekcja); // Debugging ACF data
+                return (
+                  <SwiperSlide key={kolekcja.id}>
+                    <div
+                      className="relative h-[205px] w-full transition-transform duration-300 transform hover:scale-105 rounded-lg overflow-hidden"
+                      style={{ backgroundColor: 'var(--color-beige)' }}
+                      onClick={() => handleCollectionClick(kolekcja.slug)}
+                    >
+                      {/* Ensure IconRenderer is visible */}
+                      <div className="absolute z-10">
+                        <IconRenderer
+                          icons={[
+                            kolekcja.acf?.ikonka_1,
+                            kolekcja.acf?.ikonka_2,
+                            kolekcja.acf?.ikonka_3,
+                            kolekcja.acf?.ikonka_4,
+                          ]}
+                          iconPath="/icons/kolekcja/"
+                          iconSize={34}
+                          gap={5}
+                        />
+                      </div>
+                      <Image
+                        src={kolekcja.imageUrl || '/placeholder.jpg'}
+                        alt={kolekcja.title.rendered}
+                        layout="fill"
+                        objectFit="cover"
+                        className="rounded-lg"
+                      />
+                      <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest bg-white">
+                        {kolekcja.title.rendered}
+                      </div>
                     </div>
-                  </div>
-                </SwiperSlide>
-              ))}
+                  </SwiperSlide>
+                );
+              })}
             </Swiper>
           </div>
 
-          {/* Third Section: Product Preview (3 Columns) */}
+          {/* Third Section: Product Preview */}
           <div className="grid grid-cols-3 gap-6">
             {productsData?.products.map((product) => (
               <ProductPreview key={product.id} product={product} />

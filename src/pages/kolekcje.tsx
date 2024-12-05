@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component'; // Import Layout
 import { fetchKolekcjePostsWithImages } from '@/utils/api/woocommerce'; // API call for Kolekcje
 import SkeletonKolekcjePage from '../components/Skeletons/SkeletonKolekcjePage'; // Import your custom skeleton loader
+import IconRenderer from '@/components/UI/IconRenderer'; // Reusable component for rendering icons
 
 const KolekcjePage = () => {
   const [kolekcjePosts, setKolekcjePosts] = useState<any[]>([]);
@@ -14,10 +15,13 @@ const KolekcjePage = () => {
     const fetchKolekcje = async () => {
       try {
         const kolekcjeWithImages = await fetchKolekcjePostsWithImages(); // Fetch Kolekcje with images
+
+        // Log the API response to inspect the structure
+        console.log('Fetched Kolekcje API Response:', kolekcjeWithImages);
+
         setKolekcjePosts(kolekcjeWithImages);
         setLoading(false);
       } catch (error) {
-        // Check if the error is an instance of Error and extract the message
         if (error instanceof Error) {
           setErrorMessage(error.message || 'Error loading Kolekcje posts');
         } else {
@@ -73,7 +77,9 @@ const KolekcjePage = () => {
                 {kolekcjePosts.slice(0, 3).map((kolekcja, index) => (
                   <div
                     key={kolekcja.id}
-                    className={`relative transition-all duration-300 ${index === 0 ? 'col-span-2' : 'col-span-1'}`}
+                    className={`relative transition-all duration-300 ${
+                      index === 0 ? 'col-span-2' : 'col-span-1'
+                    }`}
                     style={{ height: '445px' }}
                   >
                     <Link href={`/kolekcje/${kolekcja.slug}`}>
@@ -83,7 +89,17 @@ const KolekcjePage = () => {
                         layout="fill"
                         objectFit="cover" // Ensure the image covers the full container
                         quality={100}
-                        className="transition-transform duration-500 rounded-[16px] rtransform group-hover:scale-105"
+                        className="transition-transform duration-500 rounded-[16px] transform group-hover:scale-105"
+                      />
+                      {/* Render Icons */}
+                      <IconRenderer
+                        icons={[
+                          kolekcja.acf?.ikonka_1,
+                          kolekcja.acf?.ikonka_2,
+                          kolekcja.acf?.ikonka_3,
+                          kolekcja.acf?.ikonka_4,
+                        ]}
+                        iconPath="/icons/kolekcja/"
                       />
                       <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red transition-colors duration-300 group-hover:bg-dark-pastel-red group-hover:text-neutral-white">
                         {kolekcja.title.rendered}
@@ -108,7 +124,17 @@ const KolekcjePage = () => {
                         layout="fill"
                         objectFit="cover" // Ensure the image covers the full container
                         quality={100}
-                        className="transition-transform  rounded-[16px] duration-500 transform group-hover:scale-105"
+                        className="transition-transform rounded-[16px] duration-500 transform group-hover:scale-105"
+                      />
+                      {/* Render Icons */}
+                      <IconRenderer
+                        icons={[
+                          kolekcja.acf?.ikonka_1,
+                          kolekcja.acf?.ikonka_2,
+                          kolekcja.acf?.ikonka_3,
+                          kolekcja.acf?.ikonka_4,
+                        ]}
+                        iconPath="/icons/kolekcja/"
                       />
                       <div className="absolute bottom-4 left-4 px-4 py-2 font-bold text-dark-pastel-red transition-colors duration-300 group-hover:bg-dark-pastel-red group-hover:text-neutral-white">
                         {kolekcja.title.rendered}

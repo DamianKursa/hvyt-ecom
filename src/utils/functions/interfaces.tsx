@@ -127,4 +127,10 @@ export interface Kolekcja {
   yoast_head_json?: {
     og_image?: { url: string }[];
   };
+  acf?: {
+    ikonka_1?: string;
+    ikonka_2?: string;
+    ikonka_3?: string;
+    ikonka_4?: string;
+  };
 }

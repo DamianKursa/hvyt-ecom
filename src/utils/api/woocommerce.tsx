@@ -111,7 +111,6 @@ export const fetchMediaById = async (mediaId: number) => {
   }
 };
 
-// Fetch Kolekcje posts with images
 export const fetchKolekcjePostsWithImages = async () => {
   try {
     // Fetch Kolekcje posts
@@ -148,11 +147,22 @@ export const fetchKolekcjePostsWithImages = async () => {
           imageUrl = kolekcja.yoast_head_json.og_image[0].url; // Fallback to Yoast's og:image
         }
 
-        // Add imageUrl and description to the returned kolekcja
+        // Build icon paths from ACF fields
+        const icons = [
+          kolekcja.acf?.ikonka_1,
+          kolekcja.acf?.ikonka_2,
+          kolekcja.acf?.ikonka_3,
+          kolekcja.acf?.ikonka_4,
+        ]
+          .filter((iconName) => iconName) // Remove null or undefined values
+          .map((iconName) => `/icons/kolekcja/${iconName}.svg`);
+
+        // Add imageUrl, description, and icons to the returned kolekcja
         return {
           ...kolekcja,
-          imageUrl, // Add imageUrl field to the kolekcja object
+          imageUrl,
           description: kolekcja.content?.rendered || 'No description available', // Example fallback
+          icons, // Array of icon file paths
         };
       }),
     );
