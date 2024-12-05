@@ -134,3 +134,10 @@ export interface Kolekcja {
     ikonka_4?: string;
   };
 }
+
+export interface NowosciPost {
+  id: number;
+  title: { rendered: string };
+  featured_media: number;
+  imageUrl: string; // Featured image URL
+}

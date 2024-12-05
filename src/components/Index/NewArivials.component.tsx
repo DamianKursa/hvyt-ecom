@@ -1,33 +1,54 @@
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import ResponsiveSlider from '@/components/Slider/ResponsiveSlider'; // Assuming ResponsiveSlider is used only for mobile
+import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
+import { fetchNowosciPosts } from '@/utils/api/woocommerce';
+import SkeletonNowosci from '@/components/Skeletons/SkeletonNowosci';
 
-interface NewArrivalItem {
-  src: string;
-  alt: string;
-  title?: string; // Optional title for mobile view
+interface NowosciItem {
+  id: number;
+  src: string; // Image URL
+  alt: string; // Image Alt Text
+  title?: string; // Optional title
 }
 
 const NewArrivalsSection = () => {
-  const newArrivalsItems: NewArrivalItem[] = [
-    {
-      src: '/images/new-arrivals-1.png',
-      alt: 'New Arrival 1',
-      title: 'Nowość 1',
-    },
-    {
-      src: '/images/new-arrivals-2.png',
-      alt: 'New Arrival 2',
-      title: 'Nowość 2',
-    },
-    { src: '/images/new-arrivals-3.png', alt: 'New Arrival 3' },
-    { src: '/images/new-arrivals-4.png', alt: 'New Arrival 4' },
-  ];
+  const [nowosciItems, setNowosciItems] = useState<NowosciItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadNowosci = async () => {
+      try {
+        const posts = await fetchNowosciPosts(); // Fetch Nowosci posts
+        const items: NowosciItem[] = posts.map((post) => ({
+          id: post.id,
+          src: post.imageUrl, // Use imageUrl for the image source
+          alt: post.title.rendered, // Use the rendered title for alt text
+          title: post.title.rendered, // Optional title for display
+        }));
+        setNowosciItems(items);
+      } catch (error) {
+        console.error('Error fetching Nowosci items:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadNowosci();
+  }, []);
+
+  if (loading) {
+    return <SkeletonNowosci />;
+  }
+
+  if (nowosciItems.length < 4) {
+    return <p>Insufficient Nowosci data available.</p>;
+  }
 
   return (
     <section className="container mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] py-16">
-      {/* Heading, Description, and Button - Visible on both Desktop and Mobile */}
-      <div className=" px-[16px] flex flex-col items-start mb-8 md:hidden">
+      {/* Header */}
+      <div className="px-[16px] flex flex-col items-start mb-8 md:hidden">
         <h2 className="font-size-h2 font-bold text-neutral-darkest">
           Zobacz nasze nowości
         </h2>
@@ -46,7 +67,6 @@ const NewArrivalsSection = () => {
       <div className="hidden md:flex gap-6 h-[650px]">
         {/* First Column */}
         <div className="flex flex-col w-1/2">
-          {/* Desktop-only Heading, Text, and Button */}
           <div className="flex flex-col h-full mb-[120px]">
             <h2 className="font-size-h2 font-bold text-neutral-darkest">
               Zobacz nasze nowości
@@ -61,12 +81,11 @@ const NewArrivalsSection = () => {
               Zobacz nowości →
             </Link>
           </div>
-          {/* Two images at the bottom */}
           <div className="flex gap-6">
             <div className="w-full h-[250px]">
               <Image
-                src="/images/new-arrivals-1.png"
-                alt="New Arrival 1"
+                src={nowosciItems[0].src}
+                alt={nowosciItems[0].alt}
                 width={500}
                 height={500}
                 className="w-full h-full object-cover rounded-lg"
@@ -74,8 +93,8 @@ const NewArrivalsSection = () => {
             </div>
             <div className="w-full h-[250px]">
               <Image
-                src="/images/new-arrivals-2.png"
-                alt="New Arrival 2"
+                src={nowosciItems[1].src}
+                alt={nowosciItems[1].alt}
                 width={500}
                 height={500}
                 className="w-full h-full object-cover rounded-lg"
@@ -87,11 +106,10 @@ const NewArrivalsSection = () => {
         {/* Second Column */}
         <div className="flex flex-col w-1/2">
           <div className="flex gap-6 h-full">
-            {/* Two images placed next to each other with responsive dimensions */}
             <div className="w-full h-full">
               <Image
-                src="/images/new-arrivals-3.png"
-                alt="New Arrival 3"
+                src={nowosciItems[2].src}
+                alt={nowosciItems[2].alt}
                 width={322}
                 height={642}
                 className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-lg"
@@ -99,8 +117,8 @@ const NewArrivalsSection = () => {
             </div>
             <div className="w-full h-full">
               <Image
-                src="/images/new-arrivals-4.png"
-                alt="New Arrival 4"
+                src={nowosciItems[3].src}
+                alt={nowosciItems[3].alt}
                 width={322}
                 height={642}
                 className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-lg"
@@ -110,11 +128,15 @@ const NewArrivalsSection = () => {
         </div>
       </div>
 
-      {/* Mobile View: Responsive Slider */}
+      {/* Mobile View */}
       <div className="md:hidden">
         <ResponsiveSlider
-          items={newArrivalsItems}
-          renderItem={(item: NewArrivalItem) => (
+          items={nowosciItems.map((item) => ({
+            src: item.src,
+            alt: item.alt,
+            title: item.title,
+          }))}
+          renderItem={(item: { src: string; alt: string; title?: string }) => (
             <div className="relative w-full h-[350px]">
               <Image
                 src={item.src}

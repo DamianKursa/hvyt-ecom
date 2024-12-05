@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Kolekcja } from '../functions/interfaces'; // Adjust the import path
-
+import { NowosciPost } from '../functions/interfaces';
 // Setup the WooCommerce API instance with the necessary credentials.
 const WooCommerceAPI = axios.create({
   baseURL: process.env.NEXT_PUBLIC_REST_API, // WooCommerce REST API base URL
@@ -170,6 +170,36 @@ export const fetchKolekcjePostsWithImages = async () => {
     return kolekcjeWithImages;
   } catch (error) {
     console.error('Error fetching Kolekcje posts:', error);
+    throw error;
+  }
+};
+
+export const fetchNowosciPosts = async (): Promise<NowosciPost[]> => {
+  try {
+    const apiBase = process.env.NEXT_PUBLIC_WP_REST_API; // WordPress REST API base URL
+    const response = await axios.get(`${apiBase}/nowosci`, {
+      params: {
+        per_page: 4, // Limit to exactly 4 posts
+        _embed: true, // Include featured image data
+      },
+    });
+
+    const posts = response.data.map((post: any) => {
+      const featuredImage =
+        post._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
+        '/placeholder.jpg'; // Default fallback image
+
+      return {
+        id: post.id,
+        title: post.title.rendered,
+        featured_media: post.featured_media,
+        imageUrl: featuredImage, // Map the featured image URL
+      };
+    });
+
+    return posts;
+  } catch (error) {
+    console.error('Error fetching Nowosci posts:', error);
     throw error;
   }
 };
