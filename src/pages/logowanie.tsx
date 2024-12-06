@@ -13,12 +13,12 @@ const Logowanie = () => {
           {/* Row 1 - Login Form */}
           <div
             className={`transition-all duration-500 flex ${
-              isRegistering ? 'md:h-[150px]' : 'md:h-[300px]'
+              isRegistering ? 'md:h-[150px]' : 'md:h-[340px]'
             } flex-col md:flex-row h-auto`}
           >
             {/* Left Section */}
             <div
-              className="p-10 w-full md:w-1/2 flex flex-col justify-center"
+              className="p-10 w-full md:w-1/2 flex flex-col justify-start"
               style={{
                 backgroundImage: `url('/images/image-logowanie.png')`, // Replace with the actual path
                 backgroundSize: 'cover',
@@ -28,9 +28,6 @@ const Logowanie = () => {
               <h2 className="text-xl md:text-2xl font-bold mb-4 text-center md:text-left">
                 Jesteś już użytkownikiem?
               </h2>
-              <p className="hidden md:block text-sm text-gray-600">
-                Zaloguj się, aby kontynuować.
-              </p>
             </div>
 
             {/* Right Section */}
@@ -59,13 +56,10 @@ const Logowanie = () => {
             } flex-col md:flex-row h-auto`}
           >
             {/* Left Section */}
-            <div className="bg-[#CBDBE7] p-10 w-full md:w-1/2 flex flex-col justify-center">
+            <div className="bg-[#CBDBE7] p-10 w-full md:w-1/2 flex flex-col justify-start">
               <h2 className="text-xl md:text-2xl font-bold mb-4 text-center md:text-left">
                 Nie masz jeszcze konta?
               </h2>
-              <p className="hidden md:block text-sm text-gray-600">
-                Zarejestruj się, aby cieszyć się zakupami.
-              </p>
             </div>
 
             {/* Right Section */}
