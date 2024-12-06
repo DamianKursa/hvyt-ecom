@@ -237,7 +237,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           />
                         </button>
                         {dropdownOpen && user && (
-                          <div className="absolute left-[-155px] top-12 z-50">
+                          <div className="absolute left-[-120px] top-12 z-50">
                             <UserDropdown
                               onLogout={logout}
                               onMouseEnter={handleMouseEnter}

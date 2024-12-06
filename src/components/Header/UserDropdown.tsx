@@ -21,62 +21,70 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
     <div
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="bg-white shadow-lg rounded-[24px] p-4 w-[250px] text-sm"
+      className="bg-beige rounded-[24px] w-[210px] text-[18px]"
     >
       {/* Greeting Section */}
       <div className="mb-4">
-        <p className="font-bold text-[#661F30] text-[18px]">
+        <p className="font-bold px-4 pt-4 text-[#661F30] text-[18px]">
           {user?.name || 'Użytkownik'}
         </p>
-        <p className="text-gray-500 text-[14px]">Fajnie, że jesteś z nami!</p>
+        <p className="font-light px-4 text-[#661F30] text-[16px]">
+          fajnie, że jesteś z nami!
+        </p>
       </div>
 
       {/* Navigation Links */}
-      <ul className="space-y-2">
+      <ul className="space-y-2 pb-2 text-black font-light">
         <li>
           <Link href="/moje-konto/moje-zamowienia">
-            <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
+            <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Moje zamówienia
             </span>
           </Link>
         </li>
         <li>
           <Link href="/moje-konto/kupione-produkty">
-            <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
+            <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Kupione produkty
             </span>
           </Link>
         </li>
         <li>
           <Link href="/moje-konto/moje-dane">
-            <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
+            <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Moje dane
             </span>
           </Link>
         </li>
         <li>
           <Link href="/moje-konto/moje-adresy">
-            <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
+            <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Moje adresy
             </span>
           </Link>
         </li>
         <li>
           <Link href="/moje-konto/dane-do-faktury">
-            <span className="block px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[18px]">
+            <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
               Dane do faktury
             </span>
           </Link>
         </li>
+        <div className="border-t border-neutral-light"></div>
+        <li>
+          <button
+            onClick={onLogout}
+            className="flex items-center w-full text-left text-black font-light px-4 py-2 rounded-[24px] hover:bg-beige-dark text-[16px]"
+          >
+            <img
+              src="/icons/logout-02.svg"
+              alt="Logout Icon"
+              className="w-5 h-5 mr-2"
+            />
+            Wyloguj się
+          </button>
+        </li>
       </ul>
-
-      {/* Logout Button */}
-      <button
-        onClick={onLogout}
-        className="block w-full text-left mt-4 text-red-500 px-4 py-2 border-t border-gray-200 rounded-[24px] hover:bg-beige-dark text-[18px]"
-      >
-        Wyloguj się
-      </button>
     </div>
   );
 };

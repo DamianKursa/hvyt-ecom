@@ -22,7 +22,7 @@ const LoginForm: React.FC = () => {
       });
 
       if (response.ok) {
-        router.push('/moje-konto');
+        router.push('/moje-konto/moje-zamowienia');
       } else {
         const data = await response.json();
         setError(data.message || 'Invalid credentials');
