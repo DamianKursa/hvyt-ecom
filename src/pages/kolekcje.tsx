@@ -36,7 +36,7 @@ const KolekcjePage = () => {
 
   return (
     <Layout title="Kolekcje">
-      <section className="w-full py-16 text-dark-pastel-red">
+      <section className="w-full py-16">
         <div className="container mx-auto max-w-grid-desktop">
           {/* Page Title and Two-Column Text Section */}
           <div className="text-left mb-12">
@@ -46,21 +46,29 @@ const KolekcjePage = () => {
           </div>
           <div className="grid grid-cols-2 gap-8 mb-12">
             <div>
-              <p className="font-size-text-medium text-neutral-darkest">
-                Zanurz się w piękno minimalistycznych linii, geometrycznych
-                kształtów i eleganckich wykończeń, które łatwo dopełnią Twoje
-                wnętrze. Poznaj uchwyty wykonane z najwyższej jakości
-                materiałów, takich jak litły mosiądz, stal nierdzewna i
-                aluminium.
+              <p className="text-[18px] font-light text-black">
+                <span className="font-bold">Zanurz się</span> w piękno
+                minimalistycznych linii, geometrycznych kształtów
+                <br />i eleganckich wykończeń, które łatwo dopełnią Twoje
+                wnętrze.
+              </p>
+              <p className="text-[18px] font-light text-black">
+                <span className="font-bold">Poznaj uchwyty</span> wykonane z
+                najwyższej jakości materiałów, takich jak litły mosiądz, stal
+                nierdzewna i aluminium.
               </p>
             </div>
             <div>
-              <p className="font-size-text-medium text-neutral-darkest">
+              <p className="text-[18px] font-light text-black">
                 Niezależnie od tego, czy wolisz eleganckie i nowoczesne
-                projekty, czy eklektyczne i ozdobne style, nasze kolekcje
-                oferują różnorodne opcje, które zaspokoją każdy gust i estetykę.
-                <Link href="#" className="text-dark-pastel-red font-bold">
-                  {' '}
+                projekty, czy eklektyczne i ozdobne style,
+              </p>
+              <p className="text-[18px] font-light text-black">
+                nasze kolekcje oferują różnorodne opcje, które zaspokoją każdy
+                gust i estetykę.
+              </p>
+              <p className="text-dark-pastel-red text-[18px] font-light underline">
+                <Link href="#">
                   Zobacz co ostatnio nowego dodaliśmy dla Ciebie.
                 </Link>
               </p>

@@ -4,6 +4,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { InputField } from '../components/Input/InputField.component';
 import Layout from '../components/Layout/Layout.component'; // Assuming Layout is at this path
 import SocialIcons from '@/components/UI/SocialIcons';
+
 const Kontakt = () => {
   const methods = useForm();
   const onSubmit = (data: any) => {
@@ -12,60 +13,86 @@ const Kontakt = () => {
 
   return (
     <Layout title="Kontakt">
-      <section className="container mx-auto max-w-grid-desktop px-grid-desktop-margin pb-[88px] py-16">
-        <div className="flex flex-col md:flex-row justify-between rounded-lg overflow-hidden">
+      <section className="container pb-[88px]">
+        {/* First Row */}
+        <div className="flex flex-col md:flex-row justify-between rounded-[24px] overflow-hidden">
           {/* Left Side (Contact Information) */}
-          <div className="bg-[#F5F5AD] w-full md:w-4/12 p-8 text-black">
-            <h1 className="text-4xl font-bold mb-6">Kontakt</h1>
+          <div
+            className="bg-[#F5F5AD] w-full px-[48px] text-black"
+            style={{ maxWidth: '500px' }}
+          >
+            {/* Title Row */}
+            <div className="w-full pt-4 mb-[32px]">
+              <h1 className="text-[65px] text-dark-pastel-red font-bold text-center md:text-left">
+                Kontakt
+              </h1>
+            </div>
 
-            <ul className="space-y-6 text-lg">
-              {/* Address */}
-              <li className="flex items-start">
-                <img src="/icons/mapa.svg" alt="Address Icon" className="mr-4 mt-1 w-6 h-6" />
-                <div className="text-left">
-                  <span className="block font-bold">Adres</span>
-                  Głogoczów 996,<br />
-                  32-444 Głogoczów
-                </div>
-              </li>
+            {/* Two Columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Left Column (UL Content) */}
+              <div className="w-[250px]">
+                <ul className="space-y-[48px] pb-[54px] font-light text-[18px]">
+                  <li className="flex items-start">
+                    <img
+                      src="/icons/mapa.svg"
+                      alt="Address Icon"
+                      className="mr-4 mt-1 w-6 h-6"
+                    />
+                    <div className="text-left">
+                      <span className="block font-bold mb-2">Adres</span>
+                      <p>Głogoczów 996,</p>
+                      <p>32-444 Głogoczów</p>
+                    </div>
+                  </li>
 
-              {/* Email */}
-              <li className="flex items-start">
-                <img src="/icons/mail.svg" alt="Email Icon" className="mr-4 mt-1 w-6 h-6" />
-                <div className="text-left">
-                  <span className="block font-bold">Email</span>
-                  <Link href="mailto:hello@hvyt.pl">hello@hvyt.pl</Link>
-                </div>
-              </li>
+                  <li className="flex items-start">
+                    <img
+                      src="/icons/mail.svg"
+                      alt="Email Icon"
+                      className="mr-4 mt-1 w-6 h-6"
+                    />
+                    <div className="text-left">
+                      <span className="block font-bold mb-2">Email</span>
+                      <Link href="mailto:hello@hvyt.pl">hello@hvyt.pl</Link>
+                    </div>
+                  </li>
 
-              {/* Phone */}
-              <li className="flex items-start">
-                <img src="/icons/telefon.svg" alt="Phone Icon" className="mr-4 mt-1 w-6 h-6" />
-                <div className="text-left">
-                  <span className="block font-bold">Telefon</span>
-                  <Link href="tel:+48513790697">+48 513 790 697</Link>
-                </div>
-              </li>
-            </ul>
+                  <li className="flex items-start">
+                    <img
+                      src="/icons/telefon.svg"
+                      alt="Phone Icon"
+                      className="mr-4 mt-1 w-6 h-6"
+                    />
+                    <div className="text-left">
+                      <span className="block font-bold mb-2">Telefon</span>
+                      <Link href="tel:+48513790697">+48 513 790 697</Link>
+                    </div>
+                  </li>
 
-            {/* Social Icons */}
-            <SocialIcons/>
+                  <li>
+                    <SocialIcons />
+                  </li>
+                </ul>
+              </div>
 
-            {/* Image (Contact Visual) */}
-            <div className="mt-8">
-              <Image
-                src="/images/contact-image.png"
-                alt="Kontakt Image"
-                width={300}
-                height={300}
-                className="rounded-lg"
-              />
+              {/* Right Column (Image) */}
+              <div className="w-[250px] flex justify-center items-end">
+                <Image
+                  src="/images/contact-image.webp"
+                  alt="Kontakt Image"
+                  width={250}
+                  height={250}
+                />
+              </div>
             </div>
           </div>
 
           {/* Right Side (Contact Form) */}
-          <div className="w-full md:w-8/12 bg-white p-8">
-            <h2 className="text-4xl font-bold text-dark-pastel-red mb-6">Napisz do nas</h2>
+          <div className="w-full md:w-8/12 bg-white py-[56px] md:pl-[72px] md:pr-[120px]">
+            <h2 className="text-[40px] font-bold text-dark-pastel-red mb-6">
+              Napisz do nas
+            </h2>
 
             {/* Form with react-hook-form */}
             <FormProvider {...methods}>
@@ -74,29 +101,46 @@ const Kontakt = () => {
                 <InputField
                   inputLabel="Imię i nazwisko"
                   inputName="name"
-                  customValidation={{ required: "To pole jest wymagane" }}
+                  customValidation={{ required: 'To pole jest wymagane' }}
                   errors={methods.formState.errors}
                 />
                 <InputField
                   inputLabel="Email"
                   inputName="email"
                   type="email"
-                  customValidation={{ required: "To pole jest wymagane" }}
+                  customValidation={{ required: 'To pole jest wymagane' }}
                   errors={methods.formState.errors}
                 />
                 <InputField
                   inputLabel="Treść wiadomości"
                   inputName="message"
                   type="textarea"
-                  customValidation={{ required: "To pole jest wymagane", minLength: 10 }}
+                  customValidation={{
+                    required: 'To pole jest wymagane',
+                    minLength: 10,
+                  }}
                   errors={methods.formState.errors}
                 />
 
                 {/* Checkbox for accepting terms */}
                 <div className="flex items-start mt-4">
-                  <input type="checkbox" id="acceptTerms" className="mr-2 mt-1" />
-                  <label htmlFor="acceptTerms" className="text-sm text-neutral-dark">
-                    Akceptuję <span className="underline"><Link href="#">Regulamin</Link></span> oraz <span className="underline"><Link href="#">Politykę Prywatności</Link></span>
+                  <input
+                    type="checkbox"
+                    id="acceptTerms"
+                    className="mr-2 mt-1"
+                  />
+                  <label
+                    htmlFor="acceptTerms"
+                    className="text-sm text-neutral-dark"
+                  >
+                    Akceptuję{' '}
+                    <span className="underline">
+                      <Link href="#">Regulamin</Link>
+                    </span>{' '}
+                    oraz{' '}
+                    <span className="underline">
+                      <Link href="#">Politykę Prywatności</Link>
+                    </span>
                   </label>
                 </div>
 
@@ -109,6 +153,16 @@ const Kontakt = () => {
                 </button>
               </form>
             </FormProvider>
+          </div>
+        </div>
+
+        {/* Second Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Left Column with Two Sub-Columns */}
+          <div className="grid grid-cols-2 gap-4 w-[500px]">
+            {/* Left Sub-Column */}
+            <div></div>
+            <div className=" min-h-[250px] bg-[#F5F5AD]"></div>
           </div>
         </div>
       </section>

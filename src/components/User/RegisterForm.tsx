@@ -144,13 +144,13 @@ const RegisterForm: React.FC = () => {
           className="absolute right-2 top-3 w-5 h-5 cursor-pointer"
           onClick={() => setShowPassword(!showPassword)}
         />
+        {/* Additional Text */}
+        <p className="text-[12px] mt-1 px-2 font-light">
+          Twoje hasło musi mieć co najmniej 8 znaków.
+        </p>
       </div>
 
-      {/* Additional Text */}
-      <p className="text-[12px] font-light mt-2">
-        Twoje hasło musi mieć co najmniej 8 znaków.
-      </p>
-      <p className="text-[16px] font-light mt-4">
+      <p className="text-[14px] font-light mt-4">
         Zakładając konto, akceptujesz nasz{' '}
         <a href="/regulamin" className="underline">
           Regulamin
