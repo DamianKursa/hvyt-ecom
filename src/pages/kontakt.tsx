@@ -18,20 +18,20 @@ const Kontakt = () => {
         <div className="flex flex-col md:flex-row justify-between rounded-[24px] overflow-hidden">
           {/* Left Side (Contact Information) */}
           <div
-            className="bg-[#F5F5AD] w-full px-[48px] text-black"
+            className="bg-[#F5F5AD] w-full text-black"
             style={{ maxWidth: '500px' }}
           >
             {/* Title Row */}
             <div className="w-full pt-4 mb-[32px]">
-              <h1 className="text-[65px] text-dark-pastel-red font-bold text-center md:text-left">
+              <h1 className="text-[65px] pl-[48px] text-dark-pastel-red font-bold text-center md:text-left">
                 Kontakt
               </h1>
             </div>
 
             {/* Two Columns */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-2">
               {/* Left Column (UL Content) */}
-              <div className="w-[250px]">
+              <div className="w-[250px] pl-[48px]">
                 <ul className="space-y-[48px] pb-[54px] font-light text-[18px]">
                   <li className="flex items-start">
                     <img
@@ -77,13 +77,13 @@ const Kontakt = () => {
               </div>
 
               {/* Right Column (Image) */}
-              <div className="w-[250px] flex justify-center items-end">
-                <Image
-                  src="/images/contact-image.webp"
-                  alt="Kontakt Image"
-                  width={250}
-                  height={250}
-                />
+              <div className="relative w-[250px] h-full flex">
+                <div
+                  className="w-[250px] h-[250px] bg-cover bg-bottom absolute bottom-0"
+                  style={{
+                    backgroundImage: "url('/images/contact-image.webp')",
+                  }}
+                ></div>
               </div>
             </div>
           </div>
@@ -131,12 +131,12 @@ const Kontakt = () => {
                   />
                   <label
                     htmlFor="acceptTerms"
-                    className="text-sm text-neutral-dark"
+                    className="text-sm text-black font-light"
                   >
                     Akceptuję{' '}
                     <span className="underline">
-                      <Link href="#">Regulamin</Link>
-                    </span>{' '}
+                      <Link href="#">Regulamin </Link>{' '}
+                    </span>
                     oraz{' '}
                     <span className="underline">
                       <Link href="#">Politykę Prywatności</Link>
@@ -147,7 +147,7 @@ const Kontakt = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full mt-6 py-3 px-4 bg-black text-neutral-white rounded-full hover:bg-dark-pastel-red transition-all"
+                  className="w-[240px] mt-8 py-3 font-light px-4 bg-black text-neutral-white rounded-full hover:bg-dark-pastel-red transition-all"
                 >
                   Wyślij wiadomość
                 </button>
@@ -157,12 +157,14 @@ const Kontakt = () => {
         </div>
 
         {/* Second Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Left Column with Two Sub-Columns */}
-          <div className="grid grid-cols-2 gap-4 w-[500px]">
+          <div className="grid grid-cols-2 w-[500px]">
             {/* Left Sub-Column */}
             <div></div>
-            <div className=" min-h-[250px] bg-[#F5F5AD]"></div>
+
+            {/* Right Sub-Column */}
+            <div className="min-h-[250px] bg-[#F5F5AD]"></div>
           </div>
         </div>
       </section>

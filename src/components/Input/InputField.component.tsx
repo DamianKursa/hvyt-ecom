@@ -1,4 +1,4 @@
-import { useFormContext, FieldValues, UseFormRegister } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 
 export interface IInputRootObject {
   inputLabel: string;
@@ -19,7 +19,7 @@ export const InputField = ({
 
   // Base input styles with customized placeholder
   const baseInputClassNames = `
-    block w-full py-3 px-2 text-sm font-light border-b-2
+    block w-full py-3 px-2 text-sm font-light border-b
     border-neutral-light bg-transparent text-neutral-darkest 
     placeholder:text-neutral-darkest placeholder:font-light placeholder:text-[16px]
     transition-all duration-300 ease-in-out
@@ -27,9 +27,10 @@ export const InputField = ({
   `;
 
   // Error state handling: Changes the border color to red if there's an error.
-  const stateClassNames = errors && errors[inputName]
-    ? 'border-bright-pastel-red'  // Error state
-    : 'border-neutral-light';     // Default state
+  const stateClassNames =
+    errors && errors[inputName]
+      ? 'border-bright-pastel-red' // Error state
+      : 'border-neutral-light'; // Default state
 
   const inputClassNames = `${baseInputClassNames} ${stateClassNames}`;
 
