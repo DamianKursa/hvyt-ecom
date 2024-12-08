@@ -127,7 +127,14 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
 
 .formatted-content p {
   margin-bottom: 1.5em;
-   /* Adjust as needed */
+
+}
+.blog-content p{
+  margin-top: 1.5em;
+}
+.wp-block-heading{
+    margin-top: 32px;
+    font-size: 40px;
 }
 .formatted-content h4{
   font-size: 18px;
@@ -156,4 +163,5 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
 
 .wp-block-image img{
   border-radius: 16px;
+  margin-top: 32px;
 }

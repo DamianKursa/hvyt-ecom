@@ -61,7 +61,7 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
         )}
 
         {/* Content Box */}
-        <div className="mx-auto max-w-[899px] text-left">
+        <div className="mx-auto max-w-[899px] blog-content text-left">
           <div
             className="text-[18px] font-light text-black leading-7 mb-8"
             dangerouslySetInnerHTML={{ __html: post.content.rendered }}
