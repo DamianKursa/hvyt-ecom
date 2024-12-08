@@ -95,8 +95,9 @@ const Footer = () => {
                     'Uchwyty',
                     'Klamki',
                     'Wieszaki',
-                    'Hvyt Objects',
+                    'Gałki',
                     'Kolekcje',
+                    'Blog',
                   ].map((link, index) => (
                     <li key={index}>
                       <Link

@@ -141,3 +141,15 @@ export interface NowosciPost {
   featured_media: number;
   imageUrl: string; // Featured image URL
 }
+
+export interface PostArchive {
+  id: number;
+  title: { rendered: string };
+  excerpt: { rendered: string };
+  slug: string;
+  date: string;
+  _embedded?: {
+    'wp:featuredmedia'?: { source_url: string }[];
+  };
+  featuredImage?: string; // Add transformed `featuredImage` property
+}
