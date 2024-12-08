@@ -1,6 +1,7 @@
 import { GetServerSideProps } from 'next';
 import { getSinglePost } from '@/utils/api/getPosts';
 import Layout from '@/components/Layout/Layout.component';
+import Image from 'next/image';
 
 // Define the BlogPost interface
 interface BlogPost {
@@ -76,32 +77,54 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
                 className="w-12 h-12 rounded-full mr-4"
               />
             )}
-            <p className="text-[18px] font-bold">{post.author.name}</p>
+            <h4 className="text-[18px] font-bold">{post.author.name}</h4>
           </div>
 
-          {/* Categories */}
-          <div className="flex flex-wrap items-center gap-2 mb-8">
-            {post.categories.map((category, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 bg-gray-100 text-gray-700 text-sm rounded"
-              >
-                {category.name}
-              </span>
-            ))}
-          </div>
+          {/* Divider */}
+          <div className="border-b border-neutral-300 my-8"></div>
 
-          {/* Social Media Links */}
-          <div className="flex items-center gap-4 text-[16px]">
-            <a href="#" className="text-neutral-800">
-              <img src="/icons/facebook.svg" alt="Share on Facebook" />
-            </a>
-            <a href="#" className="text-neutral-800">
-              <img src="/icons/twitter.svg" alt="Share on Twitter" />
-            </a>
-            <a href="#" className="text-neutral-800">
-              <img src="/icons/share.svg" alt="Share on other platforms" />
-            </a>
+          {/* Share Section */}
+          <div className="flex justify-between text-black items-center">
+            {/* Share Text */}
+            <div className="flex items-center">
+              <h4 className="text-[18px] font-bold">Udostępnij ten artykuł</h4>
+            </div>
+
+            {/* Social Media Links */}
+            <div className="flex items-center gap-4">
+              <a href="#">
+                <Image
+                  src="/icons/Pinterest.svg"
+                  alt="Udostępnij na Pinterest"
+                  width={20}
+                  height={20}
+                />
+              </a>
+              <a href="#">
+                <Image
+                  src="/icons/facebook.svg"
+                  alt="Udostępnij na Facebook"
+                  width={20}
+                  height={20}
+                />
+              </a>
+              <a href="#">
+                <Image
+                  src="/icons/instagram.svg"
+                  alt="Udostępnij na Instagram"
+                  width={20}
+                  height={20}
+                />
+              </a>
+              <a href="#">
+                <Image
+                  src="/icons/x.svg"
+                  alt="Udostępnij na X"
+                  width={20}
+                  height={20}
+                />
+              </a>
+            </div>
           </div>
         </div>
       </div>

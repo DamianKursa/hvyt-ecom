@@ -132,6 +132,9 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
 .blog-content p{
   margin-top: 1.5em;
 }
+.social-link p{
+  margin-top: 0px !important;
+}
 .wp-block-heading{
     margin-top: 32px;
     font-size: 40px;
