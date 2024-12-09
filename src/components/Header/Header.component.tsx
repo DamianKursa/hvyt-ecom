@@ -229,11 +229,11 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                         onMouseLeave={handleMouseLeave}
                         className="relative w-6 h-6 flex items-center justify-center rounded-full"
                       >
-                        <button className="w-full h-full flex items-center justify-center">
+                        <button className="w-full h-full flex items-center justify-center hover:text-neutral-darkest">
                           <img
                             src="/icons/user.svg"
                             alt="User"
-                            className="w-full h-full"
+                            className="w-full h-full hover:bg-[#DAD3C8] rounded-full  hover:text-neutral-darkest transition-all "
                           />
                         </button>
                         {dropdownOpen && user && (
