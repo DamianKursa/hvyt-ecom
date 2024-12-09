@@ -11,7 +11,6 @@ const OnasPage = () => {
     <Layout title="O nas">
       {' '}
       {/* Using Layout to maintain consistency */}
-      {/* Hero Section */}
       <HeroOnas />
       {/* Slider Section */}
       <section className="py-16 w-full">

@@ -158,8 +158,10 @@ const BlogArchive = () => {
             ))}
           </div>
         </section>
-        <section>
-          <NaszeKolekcje />
+        <section className="py-16 bg-beige w-full">
+          <div className="container mx-auto max-w-grid-desktop">
+            <NaszeKolekcje />
+          </div>
         </section>
       </div>
     </Layout>

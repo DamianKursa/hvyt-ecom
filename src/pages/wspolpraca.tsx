@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component';
+import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
 
 const WspolpracaPage = () => {
   const sectionRefs = {
@@ -20,8 +21,8 @@ const WspolpracaPage = () => {
 
   return (
     <Layout title="Współpraca">
-      <section className="w-full py-12 px-4 md:px-0">
-        <div className="container mx-auto">
+      <section className="w-full px-4 md:px-0">
+        <div className="container max-w-grid-desktop mx-auto">
           {/* Header Section */}
           <div className="text-left mb-8">
             <h1 className="text-[36px] md:text-[56px] font-bold text-dark-pastel-red leading-tight mb-4">
