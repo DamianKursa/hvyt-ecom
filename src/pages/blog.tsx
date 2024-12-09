@@ -60,7 +60,7 @@ const BlogArchive = () => {
       <div>
         {/* Header */}
         <header className="mx-auto px-4 md:px-0 py-6">
-          <h1 className="text-[56px] font-bold text-black">
+          <h1 className="text-[40px] md:text-[56px] font-bold text-black">
             Aktualności ze świata wnętrz
           </h1>
           <p className="text-black text-[18px] font-light mt-2">
@@ -84,9 +84,9 @@ const BlogArchive = () => {
               <img
                 src={posts[0].featuredImage}
                 alt={posts[0].title?.rendered || 'Blog post image'}
-                className="md:w-1/2 h-[375px] object-cover rounded-[16px]"
+                className="md:w-1/2 h-[185px] md:h-[375px] object-cover rounded-[16px]"
               />
-              <div className="p-6 md:w-1/2 flex flex-col justify-center">
+              <div className="px-0 py-4 md:py-0 md:p-6 md:w-1/2 flex flex-col justify-center">
                 <p className="text-[16px] font-light text-black mb-2">
                   {formatDate(posts[0].date)} {/* Updated date format */}
                 </p>
@@ -124,9 +124,9 @@ const BlogArchive = () => {
                 <img
                   src={post.featuredImage}
                   alt={post.title?.rendered || 'Blog post image'}
-                  className="w-full h-[245px] rounded-[16px] object-cover"
+                  className="w-full h-[185px] md:h-[245px] rounded-[16px] object-cover"
                 />
-                <div className="p-4">
+                <div className="px-0 py-4 md:py-0">
                   <p className="text-[16px] font-light">
                     {formatDate(post.date)} {/* Updated date format */}
                   </p>
