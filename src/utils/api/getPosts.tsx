@@ -1,5 +1,5 @@
-export const getPostsArchive = async () => {
-  const response = await fetch('/api/posts/posts');
+export const getPostsArchive = async (page: number = 1) => {
+  const response = await fetch(`/api/posts/posts?page=${page}`);
   if (!response.ok) throw new Error('Failed to fetch posts');
   return response.json();
 };

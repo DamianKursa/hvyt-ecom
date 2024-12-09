@@ -25,19 +25,24 @@ const formatDate = (dateString: string): string => {
 const BlogArchive = () => {
   const [posts, setPosts] = useState<PostArchive[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1); // Current page
+  const [totalPages, setTotalPages] = useState(1); // Total number of pages
+  const [loadingMore, setLoadingMore] = useState(false); // Loading state for "Load More"
 
   useEffect(() => {
     const fetchPosts = async () => {
+      setLoading(true);
       try {
-        const data: PostArchive[] = await getPostsArchive();
+        const data = await getPostsArchive(1); // Initial fetch for the first page
         setPosts(
-          data.map((post) => ({
+          data.posts.map((post: any) => ({
             ...post,
             featuredImage:
               post._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
               '/placeholder.jpg',
           })),
         );
+        setTotalPages(data.totalPages); // Update total pages
       } catch (error) {
         console.error('Error fetching posts:', error);
       } finally {
@@ -46,6 +51,28 @@ const BlogArchive = () => {
     };
     fetchPosts();
   }, []);
+
+  const loadMorePosts = async () => {
+    if (page >= totalPages) return; // No more pages to load
+    setLoadingMore(true);
+    try {
+      const data = await getPostsArchive(page + 1); // Fetch the next page
+      setPosts((prevPosts) => [
+        ...prevPosts,
+        ...data.posts.map((post: any) => ({
+          ...post,
+          featuredImage:
+            post._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
+            '/placeholder.jpg',
+        })),
+      ]);
+      setPage((prevPage) => prevPage + 1); // Increment the page number
+    } catch (error) {
+      console.error('Error loading more posts:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -59,7 +86,7 @@ const BlogArchive = () => {
     <Layout title="Blog">
       <div>
         {/* Header */}
-        <header className="mx-auto px-4 md:px-0 py-6">
+        <header className="pt-[115px] mx-auto container max-w-grid-desktop px-4 md:px-0 py-6">
           <h1 className="text-[40px] md:text-[56px] font-bold text-black">
             Aktualności ze świata wnętrz
           </h1>
@@ -69,7 +96,7 @@ const BlogArchive = () => {
         </header>
 
         {/* Posts Section */}
-        <section className="mx-auto px-4 md:px-0 py-6">
+        <section className="container mx-auto max-w-grid-desktop px-4 md:px-0 py-6">
           {posts.length === 0 && (
             <div className="text-center py-16">
               <h2 className="text-xl font-bold text-gray-700">
@@ -88,7 +115,7 @@ const BlogArchive = () => {
               />
               <div className="px-0 py-4 md:py-0 md:p-6 md:w-1/2 flex flex-col justify-center">
                 <p className="text-[16px] font-light text-black mb-2">
-                  {formatDate(posts[0].date)} {/* Updated date format */}
+                  {formatDate(posts[0].date)}
                 </p>
                 <h2
                   className="text-[24px] font-bold text-black mb-4"
@@ -128,7 +155,7 @@ const BlogArchive = () => {
                 />
                 <div className="px-0 py-4 md:py-0">
                   <p className="text-[16px] font-light">
-                    {formatDate(post.date)} {/* Updated date format */}
+                    {formatDate(post.date)}
                   </p>
                   <h2
                     className="text-[20px] font-bold mt-2"
@@ -157,7 +184,21 @@ const BlogArchive = () => {
               </article>
             ))}
           </div>
+
+          {/* Load More Button */}
+          <div className="flex justify-center items-center mt-8">
+            {page < totalPages && (
+              <button
+                onClick={loadMorePosts}
+                className="px-6 py-3 bg-black text-white text-[16px] font-medium rounded-full hover:bg-gray-800 transition"
+                disabled={loadingMore}
+              >
+                {loadingMore ? 'Ładowanie...' : 'Pokaż więcej'}
+              </button>
+            )}
+          </div>
         </section>
+
         <section className="py-16 bg-beige w-full">
           <div className="container mx-auto max-w-grid-desktop">
             <NaszeKolekcje />
