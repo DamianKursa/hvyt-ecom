@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { PostArchive } from '@/utils/functions/interfaces';
 import { getPostsArchive } from '@/utils/api/getPosts';
 import Layout from '@/components/Layout/Layout.component';
+import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
 
 // Helper function to trim text to a specified number of words
 const trimToWords = (text: string, wordLimit: number): string => {
@@ -156,6 +157,9 @@ const BlogArchive = () => {
               </article>
             ))}
           </div>
+        </section>
+        <section>
+          <NaszeKolekcje />
         </section>
       </div>
     </Layout>

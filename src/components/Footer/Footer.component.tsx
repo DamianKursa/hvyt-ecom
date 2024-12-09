@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useForm, FormProvider } from 'react-hook-form';
 import { InputField } from '../Input/InputField.component';
 import SocialIcons from '../UI/SocialIcons';
+import { normalizeString } from '@/utils/functions/functions'; // Import normalizeString
 
 const Footer = () => {
   const methods = useForm({
@@ -21,7 +22,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-beige py-16 text-sm text-neutral-darkest">
-      <div className="container mx-auto max-w-grid-desktop px-grid-mobile-margin md:px-grid-desktop-margin">
+      <div className=" max-w-[1440px] container mx-auto">
         {/* First Row - Grid with 50/50 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 border-b border-beige-dark pb-8 mb-8">
           <div className=" grid grid-cols-2 lg:grid-cols-1 space-y-4">
@@ -70,7 +71,7 @@ const Footer = () => {
 
         {/* Second Row - Grid with 50/50 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Company Info */}
             <div className="grid grid-cols-2 lg:grid-cols-1">
               <div>
@@ -101,7 +102,7 @@ const Footer = () => {
                   ].map((link, index) => (
                     <li key={index}>
                       <Link
-                        href={`/${link.toLowerCase()}`}
+                        href={`/${normalizeString(link)}`}
                         className="underline text-black text-regular font-light"
                       >
                         {link}
@@ -110,7 +111,6 @@ const Footer = () => {
                   ))}
                 </ul>
               </div>
-              {/* Second Link Column */}
               <div>
                 <ul className="space-y-2">
                   {[
@@ -122,7 +122,7 @@ const Footer = () => {
                   ].map((link, index) => (
                     <li key={index}>
                       <Link
-                        href={`/${link.toLowerCase().replace(/\s+/g, '-')}`}
+                        href={`/${normalizeString(link)}`}
                         className="underline text-regular text-black font-light"
                       >
                         {link}

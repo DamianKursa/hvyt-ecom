@@ -48,7 +48,7 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
         />
 
         {/* Divider */}
-        <div className="border-b border-neutral-300 mb-8"></div>
+        <div className="border-b border-beige-dark mb-8"></div>
 
         {/* Featured Image */}
         {post.featuredImage && (
@@ -81,7 +81,7 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
           </div>
 
           {/* Divider */}
-          <div className="border-b border-neutral-300 my-8"></div>
+          <div className="border-b border-beige-dark my-8"></div>
 
           {/* Share Section */}
           <div className="flex justify-between text-black items-center">

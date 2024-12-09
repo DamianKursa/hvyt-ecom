@@ -234,3 +234,21 @@ export const handleQuantityChange = (
     }
   }
 };
+export const normalizeString = (text: string): string => {
+  const polishMap: Record<string, string> = {
+    ą: 'a',
+    ć: 'c',
+    ę: 'e',
+    ł: 'l',
+    ń: 'n',
+    ó: 'o',
+    ś: 's',
+    ź: 'z',
+    ż: 'z',
+  };
+
+  return text
+    .toLowerCase()
+    .replace(/[ąćęłńóśźż]/g, (char) => polishMap[char] || char)
+    .replace(/\s+/g, '-'); // Replace spaces with hyphens
+};
