@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProductPreview from './ProductPreview.component';
 import SkeletonProductPreview from '../Skeletons/SkeletonProductPreview.component';
-import { fetchProductsByCategoryId } from '../../utils/api/woocommerce';
+import { fetchProductsByCategoryId } from '../../utils/api/category';
 
 interface ProductArchiveProps {
   categoryId: number;

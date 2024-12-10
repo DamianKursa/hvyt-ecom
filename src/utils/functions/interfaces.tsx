@@ -3,6 +3,23 @@ export interface ProductAttribute {
   options: string[];
 }
 
+export interface Attribute {
+  id: number;
+  name: string;
+  options?: any[];
+}
+
+export interface Category {
+  id: number;
+  name: string;
+}
+
+export interface CategoryPageProps {
+  category: Category;
+  attributes: Attribute[];
+  initialProducts: any[];
+  totalProducts: number;
+}
 export interface LineItem {
   product_id: string;
   name: string;

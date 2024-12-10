@@ -9,11 +9,15 @@ import { Kolekcja } from '../../utils/functions/interfaces';
 import SkeletonCollectionPage from '@/components/Skeletons/SkeletonCollectionPage';
 import ProductPreview from '../../components/Product/ProductPreview.component';
 import {
-  fetchCategoryBySlug,
-  fetchProductsByCategoryId,
   fetchKolekcjePostsWithImages,
   fetchMediaById,
 } from '../../utils/api/woocommerce';
+
+import {
+  fetchCategoryBySlug,
+  fetchProductsByCategoryId,
+} from '../../utils/api/category';
+
 import { useRouter } from 'next/router';
 
 const CollectionPage = () => {

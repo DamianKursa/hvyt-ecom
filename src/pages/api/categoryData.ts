@@ -3,7 +3,7 @@ import {
   fetchCategoryBySlug,
   fetchProductAttributesWithTerms,
   fetchProductsByCategoryId,
-} from '../../utils/api/woocommerce';
+} from '../../utils/api/category';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { slug, page = 1, perPage = 12, filters = '[]', sortingOption = 'default' } = req.query;

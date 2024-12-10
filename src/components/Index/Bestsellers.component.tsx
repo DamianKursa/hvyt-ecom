@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ProductPreview from '../Product/ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
-import { fetchProductsByCategoryId } from '../../utils/api/woocommerce';
+import { fetchProductsByCategoryId } from '../../utils/api/category';
 
 interface Product {
   id: string;

@@ -50,54 +50,6 @@ export const fetchProductBySlug = async (slug: string) => {
   }
 };
 
-// Fetch products by category ID
-export const fetchProductsByCategoryId = async (
-  categoryId: number,
-  page = 1,
-  perPage = 12,
-  filters: { name: string; value: string }[] = [],
-  sortingOption: string = 'default',
-) => {
-  try {
-    console.log('Fetching products with params:', {
-      categoryId,
-      page,
-      perPage,
-      filters,
-      sortingOption,
-    });
-
-    const params: any = {
-      category: categoryId,
-      page,
-      per_page: perPage,
-    };
-
-    // Add filters to params
-    filters.forEach((filter) => {
-      if (filter.name && filter.value) {
-        params[`attribute_${filter.name}`] = filter.value; // Ensure this matches the API's expected structure
-      }
-    });
-
-    // Add sorting option to params
-    if (sortingOption !== 'default') {
-      params.orderby = sortingOption;
-    }
-
-    const response = await WooCommerceAPI.get('/products', { params });
-    console.log('Products response:', response.data);
-
-    return {
-      products: response.data || [],
-      totalProducts: parseInt(response.headers['x-wp-total'] || '0', 10),
-    };
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    throw error;
-  }
-};
-
 // Fetch media by ID
 export const fetchMediaById = async (mediaId: number) => {
   try {
@@ -207,23 +159,19 @@ export const fetchNowosciPosts = async (): Promise<NowosciPost[]> => {
 // Fetch product attributes with terms
 export const fetchProductAttributesWithTerms = async (categoryId: number) => {
   try {
-    console.log(
-      `Fetching product attributes with terms for category ID: ${categoryId}`,
-    );
     const attributesResponse = await WooCommerceAPI.get('/products/attributes');
     const attributes: Attribute[] = attributesResponse.data;
-    console.log('Attributes response:', attributes);
+
+    console.log('Fetched attributes:', attributes);
 
     const attributesWithTerms = await Promise.all(
       attributes.map(async (attribute: Attribute) => {
         const termsResponse = await WooCommerceAPI.get(
           `/products/attributes/${attribute.id}/terms`,
-          { params: { category: categoryId } }, // Ensure categoryId is used
         );
-        console.log(
-          `Terms response for attribute ${attribute.name}:`,
-          termsResponse.data,
-        );
+
+        console.log(`Fetched terms for ${attribute.name}:`, termsResponse.data);
+
         return {
           ...attribute,
           options: termsResponse.data.map((term: any) => term.name),
@@ -235,7 +183,7 @@ export const fetchProductAttributesWithTerms = async (categoryId: number) => {
       (attribute) => attribute.options.length > 0,
     );
   } catch (error) {
-    console.error('Error fetching attributes with terms:', error);
+    console.error('Error in fetchProductAttributesWithTerms:', error);
     throw error;
   }
 };
@@ -394,39 +342,6 @@ export const submitProductReview = async (
     return await response.json();
   } catch (error) {
     console.error('Error submitting product review:', error);
-    throw error;
-  }
-};
-
-// Combined fetch function
-export const fetchCategoryData = async (
-  slug: string,
-  page = 1,
-  perPage = 12,
-  filters: { name: string; value: string }[] = [],
-  sortingOption: string = 'default',
-) => {
-  try {
-    const category = await fetchCategoryBySlug(slug);
-    const [attributes, { products, totalProducts }] = await Promise.all([
-      fetchProductAttributesWithTerms(category.id),
-      fetchProductsByCategoryId(
-        category.id,
-        page,
-        perPage,
-        filters,
-        sortingOption,
-      ),
-    ]);
-
-    return {
-      category,
-      attributes,
-      products,
-      totalProducts,
-    };
-  } catch (error) {
-    console.error('Error fetching category data:', error);
     throw error;
   }
 };

@@ -8,7 +8,7 @@ import ProductArchive from '@/components/Product/ProductArchive';
 import FiltersControls from '../../components/Filters/FiltersControls';
 import Snackbar from '@/components/UI/Snackbar.component';
 import CategoryDescription from '@/components/Category/CategoryDescription.component';
-import { fetchCategoryData } from '../../utils/api/woocommerce';
+import { fetchCategoryData } from '../../utils/api/category';
 
 interface Attribute {
   id: number;
