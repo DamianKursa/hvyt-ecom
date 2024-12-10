@@ -8,7 +8,11 @@ import ProductArchive from '@/components/Product/ProductArchive';
 import FiltersControls from '../../components/Filters/FiltersControls';
 import Snackbar from '@/components/UI/Snackbar.component';
 import CategoryDescription from '@/components/Category/CategoryDescription.component';
-import { fetchCategoryData } from '../../utils/api/category';
+import {
+  fetchCategoryBySlug,
+  fetchProductAttributesWithTerms,
+  fetchProductsByCategoryId,
+} from '@/utils/api/category'; // Ensure these APIs are in the utils folder
 
 interface Attribute {
   id: number;
@@ -73,23 +77,15 @@ const CategoryPage = ({
       if (!slug || !category) return;
 
       try {
-        console.log('Fetching filtered products with params:', {
-          categoryId: category.id,
-          filters: activeFilters,
-          sortingOption,
-        });
-
-        const data = await fetchCategoryData(
-          slug,
+        const { products: fetchedProducts } = await fetchProductsByCategoryId(
+          category.id,
           1,
           12,
           activeFilters,
           sortingOption,
         );
-        console.log('Fetched filtered products:', data.products);
-        setProducts(data.products || []);
+        setProducts(fetchedProducts || []);
       } catch (error: any) {
-        console.error('Error fetching filtered products:', error);
         setErrorMessage(error.message || 'Error fetching filtered products');
         setProducts([]);
       }
@@ -103,12 +99,9 @@ const CategoryPage = ({
       if (!slug || !category) return;
 
       try {
-        console.log('Fetching attributes for category:', category.id);
-        const data = await fetchCategoryData(slug);
-        console.log('Fetched attributes:', data.attributes);
-        setCurrentAttributes(data.attributes);
+        const attributes = await fetchProductAttributesWithTerms(category.id);
+        setCurrentAttributes(attributes);
       } catch (error: any) {
-        console.error('Error fetching attributes:', error);
         setErrorMessage(error.message || 'Error fetching attributes');
       }
     };
@@ -117,7 +110,6 @@ const CategoryPage = ({
   }, [category, slug]);
 
   useEffect(() => {
-    // Parse filters from URL
     const queryFilters = router.query.filters;
     if (queryFilters) {
       try {
@@ -132,10 +124,8 @@ const CategoryPage = ({
   const handleFilterChange = (
     selectedFilters: { name: string; value: string }[],
   ) => {
-    console.log('Filter change:', selectedFilters);
     setActiveFilters(selectedFilters);
 
-    // Update URL with filters
     const query = {
       ...router.query,
       filters: JSON.stringify(selectedFilters),
@@ -157,7 +147,6 @@ const CategoryPage = ({
     );
     setActiveFilters(updatedFilters);
 
-    // Update URL with filters
     const query = {
       ...router.query,
       filters: JSON.stringify(updatedFilters),
@@ -195,7 +184,7 @@ const CategoryPage = ({
 
   return (
     <Layout title={category?.name || 'Category'}>
-      <div className="container  max-w-[1440px] mt-[88px] lg:mt-[115px] mx-auto">
+      <div className="container max-w-[1440px] mt-[88px] lg:mt-[115px] mx-auto">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
 
         <div className="flex items-center mb-8">
@@ -205,7 +194,6 @@ const CategoryPage = ({
           {getCategoryIcon()}
         </div>
 
-        {/* FiltersControls */}
         <FiltersControls
           filtersVisible={filtersVisible}
           toggleFilters={toggleFilters}
@@ -231,7 +219,9 @@ const CategoryPage = ({
           )}
 
           <div
-            className={`${filtersVisible && !isMobile ? 'lg:w-3/4' : 'w-full'} w-full`}
+            className={`${
+              filtersVisible && !isMobile ? 'lg:w-3/4' : 'w-full'
+            } w-full`}
           >
             <ProductArchive
               categoryId={category?.id || 0}
@@ -244,45 +234,9 @@ const CategoryPage = ({
         </div>
       </div>
 
-      {/* Full-width Category Description Section */}
       <div className="w-full">
         <CategoryDescription category={slug || ''} />
       </div>
-
-      {isMobile && filtersVisible && (
-        <div className="fixed inset-0 bg-white z-50 p-4 flex flex-col rounded-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-[24px] font-semibold">Filtry</h2>
-            <button onClick={toggleFilters} className="text-[24px]">
-              &times;
-            </button>
-          </div>
-
-          <div className="flex-grow overflow-y-auto mb-4">
-            <Filters
-              attributes={currentAttributes}
-              errorMessage={errorMessage || undefined}
-              onFilterChange={handleFilterChange}
-              activeFilters={activeFilters}
-            />
-          </div>
-
-          <div className="fixed bottom-0 left-0 w-full bg-white p-4 flex flex-col gap-4">
-            <button
-              onClick={() => setActiveFilters([])}
-              className="inline-block w-full px-6 py-4 text-lg text-black bg-white border border-black rounded-full hover:bg-gray-100 transition-colors"
-            >
-              Wyczysc filtry
-            </button>
-            <button
-              onClick={toggleFilters}
-              className="inline-block w-full px-6 py-4 text-lg text-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors"
-            >
-              Pokaż produkty
-            </button>
-          </div>
-        </div>
-      )}
     </Layout>
   );
 };
@@ -291,14 +245,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { slug } = context.params as { slug: string };
 
   try {
-    const data = await fetchCategoryData(slug);
+    const category = await fetchCategoryBySlug(slug);
+    const attributes = await fetchProductAttributesWithTerms(category.id);
+    const { products, totalProducts } = await fetchProductsByCategoryId(
+      category.id,
+      1,
+      12,
+      [],
+      'default',
+    );
 
     return {
       props: {
-        category: data.category,
-        attributes: data.attributes,
-        initialProducts: data.products,
-        totalProducts: data.totalProducts,
+        category,
+        attributes,
+        initialProducts: products,
+        totalProducts,
       },
     };
   } catch (error: any) {

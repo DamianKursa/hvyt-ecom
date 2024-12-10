@@ -106,35 +106,3 @@ export const fetchProductAttributesWithTerms = async (categoryId: number) => {
     throw error;
   }
 };
-// Combined fetch function
-export const fetchCategoryData = async (
-  slug: string,
-  page = 1,
-  perPage = 12,
-  filters: { name: string; value: string }[] = [],
-  sortingOption: string = 'default',
-) => {
-  try {
-    const category = await fetchCategoryBySlug(slug);
-    const [attributes, { products, totalProducts }] = await Promise.all([
-      fetchProductAttributesWithTerms(category.id),
-      fetchProductsByCategoryId(
-        category.id,
-        page,
-        perPage,
-        filters,
-        sortingOption,
-      ),
-    ]);
-
-    return {
-      category,
-      attributes,
-      products,
-      totalProducts,
-    };
-  } catch (error) {
-    console.error('Error fetching category data:', error);
-    throw error;
-  }
-};
