@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component'; // Adjust based on your project structure
+import Link from 'next/link';
 
 const ZwrotyReklamacjePage = () => {
   return (
@@ -46,21 +47,15 @@ const ZwrotyReklamacjePage = () => {
                 <br />
                 32-444 Głogoczów
               </address>
-              <div id="ak_returns_banner_59c63e5c-3a7e-4b8e-8165-999687ba3bc4">
-                [BANER-WZ]
-              </div>
               <p className="mt-4 text-sm text-neutral-darkest">
-                <div id="ak_returns_banner_59c63e5c-3a7e-4b8e-8165-999687ba3bc4">
-                  [BANER-WZ]
-                </div>
                 Koszty przesyłki zwrotnej ponosi kupujący. Możesz w tym celu
                 skorzystać z{' '}
-                <a
-                  href="#"
+                <Link
+                  href="/wygodne-zwroty"
                   className="text-dark-pastel-red underline hover:no-underline"
                 >
                   Wygodnych Zwrotów
-                </a>
+                </Link>
                 .
               </p>
 
