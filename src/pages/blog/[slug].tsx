@@ -72,7 +72,7 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
           <div className="flex items-center mb-8">
             {post.author.avatar && (
               <img
-                src={post.author.avatar}
+                src="/images/autor.png"
                 alt={post.author.name}
                 className="w-12 h-12 rounded-full mr-4"
               />
