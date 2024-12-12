@@ -81,6 +81,14 @@ const Filters = ({
 
     onFilterChange(updatedFilters); // Update active filters state
 
+    // Avoid fetching products if no filters are applied
+    if (updatedFilters.length === 0) {
+      setProducts([]); // Clear products list
+      setTotalProducts(0); // Reset total product count
+      console.log('No filters applied. Fetch skipped.');
+      return;
+    }
+
     try {
       const { products, totalProducts } = await fetchProductsWithFilters(
         categoryId,

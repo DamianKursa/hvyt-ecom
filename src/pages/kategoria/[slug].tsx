@@ -190,12 +190,12 @@ const CategoryPage = () => {
         categoryId={category?.id || 0}
         activeFilters={activeFilters}
         onFilterChange={setActiveFilters}
-        onApplyFilters={applyFilters} // Provide onApplyFilters
+        onApplyFilters={applyFilters}
         onClearFilters={clearFilters}
         setProducts={setProducts}
-        setTotalProducts={setFilteredProductCount} // Dynamically update total product count
-        productsCount={filteredProductCount} // Pass the updated product count
-        initialProductCount={currentTotalProducts} // Pass initial total product count
+        setTotalProducts={setFilteredProductCount}
+        productsCount={filteredProductCount}
+        initialProductCount={currentTotalProducts}
       />
 
       <div className="w-full">
