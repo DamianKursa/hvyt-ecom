@@ -9,9 +9,10 @@ interface FilterModalProps {
   onFilterChange: (selectedFilters: { name: string; value: string }[]) => void;
   onApplyFilters: () => void; // Callback to apply filters and close the modal
   onClearFilters: () => void; // Clear all filters
-  setProducts: (products: any[]) => void; // Update products when filters change
-  setTotalProducts: (total: number) => void; // Update total products count
   productsCount: number; // Total number of products
+  initialProductCount: number; // Initial total product count
+  setProducts: React.Dispatch<React.SetStateAction<any[]>>; // Update products when filters change
+  setTotalProducts: React.Dispatch<React.SetStateAction<number>>; // Update total products count
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({
@@ -22,11 +23,18 @@ const FilterModal: React.FC<FilterModalProps> = ({
   onFilterChange,
   onApplyFilters,
   onClearFilters,
+  productsCount,
+  initialProductCount,
   setProducts,
   setTotalProducts,
-  productsCount,
 }) => {
   if (!isOpen) return null;
+
+  const handleClearFilters = () => {
+    onFilterChange([]);
+    setProducts([]); // Clear product list
+    setTotalProducts(initialProductCount); // Reset to initial total product count
+  };
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
@@ -42,7 +50,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
               &times;
             </button>
           </div>
-          {/* Display active filters */}
+          {/* Display Active Filters */}
           <div className="flex flex-wrap gap-2">
             {activeFilters.map((filter) => (
               <span
@@ -82,16 +90,26 @@ const FilterModal: React.FC<FilterModalProps> = ({
         {/* Footer Buttons */}
         <div className="p-4 border-t border-gray-200 sticky bottom-0 bg-white z-10">
           <button
-            onClick={onClearFilters}
-            className="w-full mb-2 py-3 text-black border border-black rounded-full text-lg font-semibold hover:bg-gray-100 transition"
+            onClick={handleClearFilters}
+            disabled={activeFilters.length === 0} // Disable if no filters applied
+            className={`w-full mb-2 py-3 text-black border border-black rounded-full text-lg font-semibold hover:bg-gray-100 transition ${
+              activeFilters.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
             Wyczyść filtry
           </button>
           <button
             onClick={onApplyFilters}
-            className="w-full py-3 text-white bg-black rounded-full text-lg font-semibold hover:bg-gray-800 transition"
+            disabled={productsCount === 0 && activeFilters.length > 0} // Disable if no products found
+            className={`w-full py-3 text-white bg-black rounded-full text-lg font-semibold hover:bg-gray-800 transition ${
+              productsCount === 0 && activeFilters.length > 0
+                ? 'opacity-50 cursor-not-allowed'
+                : ''
+            }`}
           >
-            Pokaż {productsCount} produktów
+            {`Pokaż ${
+              activeFilters.length > 0 ? productsCount : initialProductCount
+            } produktów`}
           </button>
         </div>
       </div>

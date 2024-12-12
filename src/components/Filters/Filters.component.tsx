@@ -34,6 +34,7 @@ const Filters = ({
   }>({});
   const previousCategoryId = useRef<number | null>(null);
 
+  // Fetch product attributes when the category changes
   useEffect(() => {
     const fetchAttributes = async () => {
       if (previousCategoryId.current === categoryId) return; // Skip if attributes already fetched for this category
@@ -44,7 +45,7 @@ const Filters = ({
           await fetchProductAttributesWithTerms(categoryId);
         setAttributes(fetchedAttributes);
 
-        // Define the types for the `reduce` function
+        // Initialize the expanded state for the first 3 attributes
         const initialExpandedFilters = fetchedAttributes.slice(0, 3).reduce(
           (acc: { [key: string]: boolean }, attribute: { slug: string }) => ({
             ...acc,
@@ -65,6 +66,7 @@ const Filters = ({
     if (categoryId) fetchAttributes();
   }, [categoryId]);
 
+  // Handle changes to filter selections
   const handleFilterChange = async (
     attributeSlug: string,
     optionSlug: string,
@@ -77,7 +79,7 @@ const Filters = ({
             !(filter.name === attributeSlug && filter.value === optionSlug),
         );
 
-    onFilterChange(updatedFilters);
+    onFilterChange(updatedFilters); // Update active filters state
 
     try {
       const { products, totalProducts } = await fetchProductsWithFilters(
@@ -86,21 +88,25 @@ const Filters = ({
         1,
         12,
       );
-      setProducts(products);
-      setTotalProducts(totalProducts);
+      setProducts(products); // Update the product list
+      setTotalProducts(totalProducts); // Update the total products count
+      console.log('Filtered products fetched:', { products, totalProducts }); // Debug log
     } catch (error) {
       console.error('Error fetching filtered products:', error);
     }
   };
 
+  // Expand or collapse a filter section
   const toggleFilter = (slug: string) => {
     setExpandedFilters((prev) => ({ ...prev, [slug]: !prev[slug] }));
   };
 
+  // Show more or fewer options for a filter
   const toggleMoreOptions = (slug: string) => {
     setMoreOptionsVisible((prev) => ({ ...prev, [slug]: !prev[slug] }));
   };
 
+  // Render loading skeleton while fetching attributes
   if (loading) {
     return (
       <div className="filters border p-4">
@@ -111,6 +117,7 @@ const Filters = ({
     );
   }
 
+  // Render error message if there is an error
   if (errorMessage) {
     return <Snackbar message={errorMessage} type="error" visible={true} />;
   }
@@ -119,6 +126,7 @@ const Filters = ({
     <div className="filters w-full rounded-[24px] p-[12px_16px] border">
       {attributes.map((attribute) => (
         <div key={attribute.slug} className="mb-4">
+          {/* Filter Title */}
           <button
             className="font-bold mb-2 flex justify-between items-center w-full"
             onClick={() => toggleFilter(attribute.slug)}
@@ -135,6 +143,7 @@ const Filters = ({
             />
           </button>
 
+          {/* Filter Options */}
           {expandedFilters[attribute.slug] && attribute.options && (
             <div className="pl-0">
               {attribute.options
@@ -152,6 +161,7 @@ const Filters = ({
                   );
                   return (
                     <div key={option.slug} className="flex items-center mb-2">
+                      {/* Checkbox */}
                       <input
                         type="checkbox"
                         id={`${attribute.slug}-${option.slug}`}
@@ -167,6 +177,7 @@ const Filters = ({
                         }
                         className="hidden"
                       />
+                      {/* Label */}
                       <label
                         htmlFor={`${attribute.slug}-${option.slug}`}
                         className={`flex items-center cursor-pointer w-5 h-5 border border-black rounded ${
@@ -185,6 +196,7 @@ const Filters = ({
                     </div>
                   );
                 })}
+              {/* Show More/Less Button */}
               {attribute.options.length > 4 && (
                 <button
                   className="underline text-[14px]"

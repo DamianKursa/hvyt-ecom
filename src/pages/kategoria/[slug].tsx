@@ -89,16 +89,6 @@ const CategoryPage = () => {
   };
 
   const applyFilters = () => {
-    const query = {
-      ...router.query,
-      filters: JSON.stringify(activeFilters),
-    };
-
-    router.push({
-      pathname: router.pathname,
-      query,
-    });
-
     setIsFilterModalOpen(false); // Close modal after applying filters
   };
 
@@ -176,7 +166,7 @@ const CategoryPage = () => {
                 activeFilters={activeFilters}
                 onFilterChange={handleFilterChange}
                 setProducts={setProducts}
-                setTotalProducts={setCurrentTotalProducts}
+                setTotalProducts={setFilteredProductCount} // Update total products dynamically
               />
             </div>
           )}
@@ -194,18 +184,18 @@ const CategoryPage = () => {
           </div>
         </div>
       </div>
-
       <FilterModal
         isOpen={isFilterModalOpen}
         onClose={toggleFilterModal}
         categoryId={category?.id || 0}
         activeFilters={activeFilters}
-        onFilterChange={handleFilterChange}
-        onApplyFilters={applyFilters}
+        onFilterChange={setActiveFilters}
+        onApplyFilters={applyFilters} // Provide onApplyFilters
         onClearFilters={clearFilters}
         setProducts={setProducts}
-        setTotalProducts={setCurrentTotalProducts}
-        productsCount={filteredProductCount}
+        setTotalProducts={setFilteredProductCount} // Dynamically update total product count
+        productsCount={filteredProductCount} // Pass the updated product count
+        initialProductCount={currentTotalProducts} // Pass initial total product count
       />
 
       <div className="w-full">
