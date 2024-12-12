@@ -1,56 +1,69 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import SkeletonFilter from '../Skeletons/SkeletonFilter.component';
 import Snackbar from '../UI/Snackbar.component';
-import { fetchProductsWithFilters } from '@/utils/api/category';
+import {
+  fetchProductsWithFilters,
+  fetchProductAttributesWithTerms,
+} from '@/utils/api/category';
 
 interface FiltersProps {
-  attributes: {
-    name: string;
-    slug: string;
-    options?: { name: string; slug: string }[];
-  }[];
-  errorMessage?: string;
+  categoryId: number;
   activeFilters: { name: string; value: string }[];
   onFilterChange: (selectedFilters: { name: string; value: string }[]) => void;
-  categoryId: number;
   setProducts: (products: any[]) => void;
   setTotalProducts: (total: number) => void;
 }
 
 const Filters = ({
-  attributes,
-  errorMessage,
+  categoryId,
   activeFilters,
   onFilterChange,
-  categoryId,
   setProducts,
   setTotalProducts,
 }: FiltersProps) => {
-  const [showError, setShowError] = useState(false);
+  const [attributes, setAttributes] = useState<
+    { name: string; slug: string; options?: { name: string; slug: string }[] }[]
+  >([]);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [expandedFilters, setExpandedFilters] = useState<{
     [key: string]: boolean;
   }>({});
   const [moreOptionsVisible, setMoreOptionsVisible] = useState<{
     [key: string]: boolean;
   }>({});
-  const [selectedFilters, setSelectedFilters] =
-    useState<{ name: string; value: string }[]>(activeFilters);
+  const previousCategoryId = useRef<number | null>(null);
 
   useEffect(() => {
-    setSelectedFilters(activeFilters);
-  }, [activeFilters]);
+    const fetchAttributes = async () => {
+      if (previousCategoryId.current === categoryId) return; // Skip if attributes already fetched for this category
 
-  useEffect(() => {
-    if (errorMessage) {
-      setShowError(true);
-    } else {
-      const defaultExpanded: { [key: string]: boolean } = {};
-      attributes.slice(0, 3).forEach((attr) => {
-        defaultExpanded[attr.slug] = true;
-      });
-      setExpandedFilters(defaultExpanded);
-    }
-  }, [errorMessage, attributes]);
+      setLoading(true);
+      try {
+        const fetchedAttributes =
+          await fetchProductAttributesWithTerms(categoryId);
+        setAttributes(fetchedAttributes);
+
+        // Define the types for the `reduce` function
+        const initialExpandedFilters = fetchedAttributes.slice(0, 3).reduce(
+          (acc: { [key: string]: boolean }, attribute: { slug: string }) => ({
+            ...acc,
+            [attribute.slug]: true,
+          }),
+          {},
+        );
+        setExpandedFilters(initialExpandedFilters);
+
+        previousCategoryId.current = categoryId; // Cache the fetched category ID
+        setLoading(false);
+      } catch (error) {
+        setErrorMessage('Failed to load filters');
+        setLoading(false);
+      }
+    };
+
+    if (categoryId) fetchAttributes();
+  }, [categoryId]);
 
   const handleFilterChange = async (
     attributeSlug: string,
@@ -58,31 +71,25 @@ const Filters = ({
     checked: boolean,
   ) => {
     const updatedFilters = checked
-      ? [...selectedFilters, { name: attributeSlug, value: optionSlug }]
-      : selectedFilters.filter(
+      ? [...activeFilters, { name: attributeSlug, value: optionSlug }]
+      : activeFilters.filter(
           (filter) =>
             !(filter.name === attributeSlug && filter.value === optionSlug),
         );
 
-    setSelectedFilters(updatedFilters);
     onFilterChange(updatedFilters);
 
-    if (updatedFilters.length > 0) {
-      try {
-        const { products, totalProducts } = await fetchProductsWithFilters(
-          categoryId,
-          updatedFilters,
-          1,
-          12,
-        );
-        setProducts(products);
-        setTotalProducts(totalProducts);
-      } catch (error) {
-        console.error('Error fetching products with filters:', error);
-      }
-    } else {
-      setProducts([]);
-      setTotalProducts(0);
+    try {
+      const { products, totalProducts } = await fetchProductsWithFilters(
+        categoryId,
+        updatedFilters,
+        1,
+        12,
+      );
+      setProducts(products);
+      setTotalProducts(totalProducts);
+    } catch (error) {
+      console.error('Error fetching filtered products:', error);
     }
   };
 
@@ -94,7 +101,7 @@ const Filters = ({
     setMoreOptionsVisible((prev) => ({ ...prev, [slug]: !prev[slug] }));
   };
 
-  if (attributes.length === 0) {
+  if (loading) {
     return (
       <div className="filters border p-4">
         <SkeletonFilter />
@@ -105,7 +112,7 @@ const Filters = ({
   }
 
   if (errorMessage) {
-    return <Snackbar message={errorMessage} type="error" visible={showError} />;
+    return <Snackbar message={errorMessage} type="error" visible={true} />;
   }
 
   return (
@@ -138,7 +145,7 @@ const Filters = ({
                     : 4,
                 )
                 .map((option) => {
-                  const isChecked = selectedFilters.some(
+                  const isChecked = activeFilters.some(
                     (filter) =>
                       filter.name === attribute.slug &&
                       filter.value === option.slug,
@@ -150,7 +157,6 @@ const Filters = ({
                         id={`${attribute.slug}-${option.slug}`}
                         name={option.slug}
                         value={option.slug}
-                        className="hidden"
                         checked={isChecked}
                         onChange={(e) =>
                           handleFilterChange(
@@ -159,11 +165,12 @@ const Filters = ({
                             e.target.checked,
                           )
                         }
+                        className="hidden"
                       />
                       <label
                         htmlFor={`${attribute.slug}-${option.slug}`}
                         className={`flex items-center cursor-pointer w-5 h-5 border border-black rounded ${
-                          isChecked ? 'bg-black' : 'border-black'
+                          isChecked ? 'bg-black' : ''
                         }`}
                       >
                         {isChecked && (

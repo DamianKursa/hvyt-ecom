@@ -10,17 +10,8 @@ import CategoryDescription from '@/components/Category/CategoryDescription.compo
 import FilterModal from '@/components/Filters/FilterModal';
 import {
   fetchCategoryBySlug,
-  fetchProductAttributesWithTerms,
   fetchProductsByCategoryId,
-  fetchProductsWithFilters,
 } from '@/utils/api/category';
-
-interface Attribute {
-  id: number;
-  name: string;
-  slug: string;
-  options?: { name: string; slug: string }[];
-}
 
 interface Category {
   id: number;
@@ -40,7 +31,6 @@ const CategoryPage = () => {
     : router.query.slug;
 
   const [category, setCategory] = useState<Category | null>(null);
-  const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [products, setProducts] = useState<any[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -50,7 +40,6 @@ const CategoryPage = () => {
     { name: string; value: string }[]
   >([]);
   const [sortingOption, setSortingOption] = useState('default');
-  const [isArrowDown, setIsArrowDown] = useState(true);
   const [currentTotalProducts, setCurrentTotalProducts] = useState(0);
   const [filteredProductCount, setFilteredProductCount] = useState(0);
 
@@ -67,27 +56,17 @@ const CategoryPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Fetch category and initial data
+  // Fetch category and initial products
   useEffect(() => {
     const fetchInitialData = async () => {
       if (!slug) return;
 
       try {
         const fetchedCategory = await fetchCategoryBySlug(slug);
-        const fetchedAttributes = await fetchProductAttributesWithTerms(
-          fetchedCategory.id,
-        );
         const { products: fetchedProducts, totalProducts } =
-          await fetchProductsByCategoryId(
-            fetchedCategory.id,
-            1,
-            12,
-            [],
-            'default',
-          );
+          await fetchProductsByCategoryId(fetchedCategory.id, 1, 12, []);
 
         setCategory(fetchedCategory);
-        setAttributes(fetchedAttributes);
         setProducts(fetchedProducts);
         setCurrentTotalProducts(totalProducts);
         setFilteredProductCount(totalProducts); // Set initial product count
@@ -98,39 +77,6 @@ const CategoryPage = () => {
 
     fetchInitialData();
   }, [slug]);
-
-  // Fetch filtered products
-  useEffect(() => {
-    const fetchFilteredProducts = async () => {
-      if (!slug || !category) return;
-
-      try {
-        if (activeFilters.length > 0) {
-          const { products: fetchedProducts, totalProducts: fetchedTotal } =
-            await fetchProductsWithFilters(category.id, activeFilters, 1, 12);
-          setProducts(fetchedProducts || []);
-          setFilteredProductCount(fetchedTotal); // Update product count
-        } else {
-          const { products: fetchedProducts, totalProducts: fetchedTotal } =
-            await fetchProductsByCategoryId(
-              category.id,
-              1,
-              12,
-              [],
-              sortingOption,
-            );
-          setProducts(fetchedProducts || []);
-          setFilteredProductCount(fetchedTotal); // Reset product count
-        }
-      } catch (error: any) {
-        setErrorMessage(error.message || 'Error fetching products');
-        setProducts([]);
-        setFilteredProductCount(0);
-      }
-    };
-
-    if (category) fetchFilteredProducts();
-  }, [activeFilters, sortingOption, category, slug]);
 
   const toggleFilterModal = () => {
     setIsFilterModalOpen((prev) => !prev);
@@ -159,39 +105,9 @@ const CategoryPage = () => {
   const clearFilters = () => {
     setActiveFilters([]);
     setFilteredProductCount(currentTotalProducts); // Reset product count
+    setProducts([]); // Clear products
     router.push({ pathname: router.pathname }); // Remove filters from URL
   };
-
-  const handleRemoveFilter = (filterToRemove: {
-    name: string;
-    value: string;
-  }) => {
-    const updatedFilters = activeFilters.filter(
-      (filter) =>
-        filter.name !== filterToRemove.name ||
-        filter.value !== filterToRemove.value,
-    );
-
-    setActiveFilters(updatedFilters);
-
-    const query = {
-      ...router.query,
-      filters: updatedFilters.length
-        ? JSON.stringify(updatedFilters)
-        : undefined, // Remove filters if empty
-    };
-
-    if (!updatedFilters.length) {
-      delete query.filters; // Remove the filters key if no filters are left
-    }
-
-    router.push({
-      pathname: router.pathname,
-      query,
-    });
-  };
-
-  const toggleFilters = () => setFiltersVisible(!filtersVisible);
 
   const getCategoryIcon = () => {
     if (slug && icons[slug]) {
@@ -230,13 +146,25 @@ const CategoryPage = () => {
 
         <FiltersControls
           filtersVisible={filtersVisible}
-          toggleFilters={isMobile ? toggleFilterModal : toggleFilters}
+          toggleFilters={
+            isMobile
+              ? toggleFilterModal
+              : () => setFiltersVisible(!filtersVisible)
+          }
           filters={activeFilters}
           sorting={sortingOption}
           onSortingChange={setSortingOption}
-          onRemoveFilter={handleRemoveFilter}
-          isArrowDown={isArrowDown}
-          setIsArrowDown={setIsArrowDown}
+          onRemoveFilter={(filterToRemove) => {
+            setActiveFilters((prev) =>
+              prev.filter(
+                (filter) =>
+                  filter.name !== filterToRemove.name ||
+                  filter.value !== filterToRemove.value,
+              ),
+            );
+          }}
+          isArrowDown={false}
+          setIsArrowDown={() => {}}
           isMobile={isMobile}
         />
 
@@ -244,11 +172,9 @@ const CategoryPage = () => {
           {!isMobile && filtersVisible && (
             <div className="w-1/4 pr-8">
               <Filters
-                attributes={attributes}
-                errorMessage={errorMessage || undefined}
-                onFilterChange={handleFilterChange}
-                activeFilters={activeFilters}
                 categoryId={category?.id || 0}
+                activeFilters={activeFilters}
+                onFilterChange={handleFilterChange}
                 setProducts={setProducts}
                 setTotalProducts={setCurrentTotalProducts}
               />
@@ -256,9 +182,7 @@ const CategoryPage = () => {
           )}
 
           <div
-            className={`${
-              filtersVisible && !isMobile ? 'lg:w-3/4' : 'w-full'
-            } w-full`}
+            className={`w-full ${filtersVisible && !isMobile ? 'lg:w-3/4' : ''}`}
           >
             <ProductArchive
               categoryId={category?.id || 0}
@@ -274,11 +198,13 @@ const CategoryPage = () => {
       <FilterModal
         isOpen={isFilterModalOpen}
         onClose={toggleFilterModal}
-        attributes={attributes}
-        onFilterChange={handleFilterChange}
+        categoryId={category?.id || 0}
         activeFilters={activeFilters}
+        onFilterChange={handleFilterChange}
         onApplyFilters={applyFilters}
         onClearFilters={clearFilters}
+        setProducts={setProducts}
+        setTotalProducts={setCurrentTotalProducts}
         productsCount={filteredProductCount}
       />
 

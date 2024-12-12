@@ -80,37 +80,26 @@ export const fetchProductsByCategoryId = async (
   }
 };
 
-// Fetch product attributes with terms
 export const fetchProductAttributesWithTerms = async (categoryId: number) => {
   try {
-    const attributesResponse = await WooCommerceAPI.get('/products/attributes');
-    const attributes = attributesResponse.data.map((attribute: any) => ({
+    const response = await CustomAPI.get('/attributes', {
+      params: { category: categoryId },
+    });
+
+    console.log('Fetched attributes from Custom API:', response.data);
+
+    return response.data.map((attribute: any) => ({
       id: attribute.id,
       name: attribute.name,
-      slug: attribute.slug, // Ensure slug is included
+      slug: `pa_${attribute.slug}`, // Ensure slug matches taxonomy in backend
+      options: attribute.options.map((option: any) => ({
+        id: option.id,
+        name: option.name,
+        slug: option.slug,
+      })),
     }));
-
-    const attributesWithTerms = await Promise.all(
-      attributes.map(async (attribute: any) => {
-        const termsResponse = await WooCommerceAPI.get(
-          `/products/attributes/${attribute.id}/terms`,
-        );
-
-        return {
-          ...attribute,
-          options: termsResponse.data.map((term: any) => ({
-            name: term.name,
-            slug: term.slug, // Include slug for terms
-          })),
-        };
-      }),
-    );
-
-    return attributesWithTerms.filter(
-      (attribute) => attribute.options.length > 0,
-    );
   } catch (error) {
-    console.error('Error fetching attributes:', error);
+    console.error('Error fetching attributes with terms:', error);
     throw error;
   }
 };

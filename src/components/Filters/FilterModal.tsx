@@ -4,26 +4,26 @@ import Filters from './Filters.component';
 interface FilterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  attributes: {
-    name: string;
-    slug: string;
-    options?: { name: string; slug: string }[];
-  }[];
-  onFilterChange: (selectedFilters: { name: string; value: string }[]) => void;
+  categoryId: number;
   activeFilters: { name: string; value: string }[];
+  onFilterChange: (selectedFilters: { name: string; value: string }[]) => void;
   onApplyFilters: () => void; // Callback to apply filters and close the modal
   onClearFilters: () => void; // Clear all filters
+  setProducts: (products: any[]) => void; // Update products when filters change
+  setTotalProducts: (total: number) => void; // Update total products count
   productsCount: number; // Total number of products
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({
   isOpen,
   onClose,
-  attributes,
-  onFilterChange,
+  categoryId,
   activeFilters,
+  onFilterChange,
   onApplyFilters,
   onClearFilters,
+  setProducts,
+  setTotalProducts,
   productsCount,
 }) => {
   if (!isOpen) return null;
@@ -71,12 +71,11 @@ const FilterModal: React.FC<FilterModalProps> = ({
         {/* Filters Section */}
         <div className="flex-grow overflow-y-auto p-4">
           <Filters
-            attributes={attributes}
-            onFilterChange={onFilterChange}
+            categoryId={categoryId}
             activeFilters={activeFilters}
-            categoryId={0} // Placeholder; not used here
-            setProducts={() => {}} // No need for these in modal context
-            setTotalProducts={() => {}}
+            onFilterChange={onFilterChange}
+            setProducts={setProducts}
+            setTotalProducts={setTotalProducts}
           />
         </div>
 
