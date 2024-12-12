@@ -12,7 +12,7 @@ const Kontakt = () => {
   };
 
   return (
-    <Layout title="Kontakt">
+    <Layout title="Hvyt | Kontakt">
       <section className="container">
         {/* First Row */}
         <div className="flex flex-col md:flex-row justify-between rounded-[24px] overflow-hidden">

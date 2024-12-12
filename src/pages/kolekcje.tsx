@@ -35,7 +35,7 @@ const KolekcjePage = () => {
   }, []);
 
   return (
-    <Layout title="Kolekcje">
+    <Layout title="Hvyt | Kolekcje">
       <section className="w-full py-16">
         <div className="container mx-auto max-w-grid-desktop">
           {/* Page Title and Two-Column Text Section */}

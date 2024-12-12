@@ -30,7 +30,7 @@ const Koszyk: React.FC = () => {
   const formatPrice = (price: number) => price.toFixed(2);
 
   return (
-    <Layout title="Koszyk">
+    <Layout title="Hvyt | Koszyk">
       <section className="container mx-auto px-4 md:px-0">
         <CartProgress />
         {/* Cart Items */}

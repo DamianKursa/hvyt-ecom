@@ -83,7 +83,7 @@ const BlogArchive = () => {
   }
 
   return (
-    <Layout title="Blog">
+    <Layout title="Hvyt | Blog">
       <div>
         {/* Header */}
         <header className="pt-[115px] mx-auto container max-w-grid-desktop px-4 md:px-0 py-6">

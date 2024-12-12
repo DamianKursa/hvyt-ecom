@@ -88,7 +88,7 @@ const CollectionPage = () => {
 
   if (loading) {
     return (
-      <Layout title="Loading...">
+      <Layout title="Hvyt | Ładowanie...">
         <SkeletonCollectionPage />
       </Layout>
     );
@@ -105,7 +105,7 @@ const CollectionPage = () => {
   }
 
   return (
-    <Layout title={slugString || 'Kolekcja'}>
+    <Layout title={`Hvyt | ${slugString || 'Ładowanie...'}`}>
       <section className="w-full py-16">
         <div className="container mx-auto max-w-grid-desktop">
           {/* First Section: Title, Content, Featured Image */}

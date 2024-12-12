@@ -175,7 +175,7 @@ const ProductPage = () => {
 
   if (loading) {
     return (
-      <Layout title="Loading...">
+      <Layout title="Hvyt | Ładowanie...">
         <SkeletonProductPage />
       </Layout>
     );
@@ -183,7 +183,7 @@ const ProductPage = () => {
 
   if (errorMessage) {
     return (
-      <Layout title="Error">
+      <Layout title="Błąd">
         <SkeletonProductPage />
         <Snackbar
           message={snackbar.message}
@@ -195,7 +195,7 @@ const ProductPage = () => {
   }
 
   return (
-    <Layout title={product?.name || 'Product'}>
+    <Layout title={`Hvyt | ${product?.name || 'Ładownie...'}`}>
       <section className="container mx-auto">
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
           <div className="lg:w-8/12 flex flex-col gap-6 max-w-full">

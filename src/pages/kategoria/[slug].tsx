@@ -123,7 +123,7 @@ const CategoryPage = () => {
   }
 
   return (
-    <Layout title={category?.name || 'Category'}>
+    <Layout title={`Hvyt | ${category?.name || 'Ładownie...'}`}>
       <div className="container max-w-[1440px] mt-[88px] px-4 md:px-0 lg:mt-[115px] mx-auto">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
 

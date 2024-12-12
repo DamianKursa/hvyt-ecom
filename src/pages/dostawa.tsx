@@ -4,7 +4,7 @@ import Layout from '@/components/Layout/Layout.component';
 
 const DostawaPage = () => {
   return (
-    <Layout title="Dostawa">
+    <Layout title="Hvyt | Dostawa">
       <section className="w-full py-16 px-4 md:px-0 bg-light-beige">
         <div className="container mx-auto max-w-grid-desktop">
           {/* Delivery Section */}

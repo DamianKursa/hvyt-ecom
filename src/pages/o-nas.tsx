@@ -8,7 +8,7 @@ import HeroOnas from '@/components/Onas/HeroOnas.component';
 
 const OnasPage = () => {
   return (
-    <Layout title="O nas">
+    <Layout title="Hvyt | O nas">
       {' '}
       {/* Using Layout to maintain consistency */}
       <HeroOnas />
