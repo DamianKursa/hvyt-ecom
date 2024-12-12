@@ -107,7 +107,7 @@ const BlogArchive = () => {
 
           {/* First Post */}
           {posts.length > 0 && (
-            <article className="flex flex-col md:flex-row overflow-hidden mb-8">
+            <article className="flex flex-col md:flex-row overflow-hidden pb-12">
               <img
                 src={posts[0].featuredImage}
                 alt={posts[0].title?.rendered || 'Blog post image'}
@@ -145,7 +145,7 @@ const BlogArchive = () => {
           )}
 
           {/* Remaining Posts */}
-          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6">
+          <div className="grid lg:grid-cols-3 md:grid-cols-2  pt-12 gap-y-8 gap-x-6">
             {posts.slice(1).map((post) => (
               <article key={post.id} className="overflow-hidden text-black">
                 <img
@@ -154,17 +154,17 @@ const BlogArchive = () => {
                   className="w-full h-[185px] md:h-[245px] rounded-[16px] object-cover"
                 />
                 <div className="px-0 py-4 md:py-0">
-                  <p className="text-[16px] font-light">
+                  <p className="mt-3 text-[16px] font-light">
                     {formatDate(post.date)}
                   </p>
                   <h2
-                    className="text-[20px] font-bold mt-2"
+                    className="text-[20px] font-bold mt-3"
                     dangerouslySetInnerHTML={{
                       __html: post.title?.rendered || '',
                     }}
                   />
                   <p
-                    className="mt-2 font-light text-[16px]"
+                    className="mt-4 font-light text-[16px]"
                     dangerouslySetInnerHTML={{
                       __html: trimToWords(post.excerpt?.rendered || '', 15),
                     }}

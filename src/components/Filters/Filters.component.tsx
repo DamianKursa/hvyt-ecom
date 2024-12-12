@@ -1,12 +1,20 @@
 import { useState, useEffect } from 'react';
 import SkeletonFilter from '../Skeletons/SkeletonFilter.component';
 import Snackbar from '../UI/Snackbar.component';
+import { fetchProductsWithFilters } from '@/utils/api/category';
 
 interface FiltersProps {
-  attributes: { name: string; options?: string[] }[];
+  attributes: {
+    name: string;
+    slug: string;
+    options?: { name: string; slug: string }[];
+  }[];
   errorMessage?: string;
   activeFilters: { name: string; value: string }[];
   onFilterChange: (selectedFilters: { name: string; value: string }[]) => void;
+  categoryId: number;
+  setProducts: (products: any[]) => void;
+  setTotalProducts: (total: number) => void;
 }
 
 const Filters = ({
@@ -14,6 +22,9 @@ const Filters = ({
   errorMessage,
   activeFilters,
   onFilterChange,
+  categoryId,
+  setProducts,
+  setTotalProducts,
 }: FiltersProps) => {
   const [showError, setShowError] = useState(false);
   const [expandedFilters, setExpandedFilters] = useState<{
@@ -29,43 +40,58 @@ const Filters = ({
     setSelectedFilters(activeFilters);
   }, [activeFilters]);
 
-  // Set default expanded filters on mount and when attributes change
   useEffect(() => {
     if (errorMessage) {
       setShowError(true);
     } else {
       const defaultExpanded: { [key: string]: boolean } = {};
       attributes.slice(0, 3).forEach((attr) => {
-        defaultExpanded[attr.name] = true;
+        defaultExpanded[attr.slug] = true;
       });
       setExpandedFilters(defaultExpanded);
     }
   }, [errorMessage, attributes]);
 
-  const handleFilterChange = (
-    attributeName: string,
-    optionValue: string,
+  const handleFilterChange = async (
+    attributeSlug: string,
+    optionSlug: string,
     checked: boolean,
   ) => {
     const updatedFilters = checked
-      ? [...selectedFilters, { name: attributeName, value: optionValue }]
+      ? [...selectedFilters, { name: attributeSlug, value: optionSlug }]
       : selectedFilters.filter(
           (filter) =>
-            !(filter.name === attributeName && filter.value === optionValue),
+            !(filter.name === attributeSlug && filter.value === optionSlug),
         );
-
-    console.log('Updated filters:', updatedFilters);
 
     setSelectedFilters(updatedFilters);
     onFilterChange(updatedFilters);
+
+    if (updatedFilters.length > 0) {
+      try {
+        const { products, totalProducts } = await fetchProductsWithFilters(
+          categoryId,
+          updatedFilters,
+          1,
+          12,
+        );
+        setProducts(products);
+        setTotalProducts(totalProducts);
+      } catch (error) {
+        console.error('Error fetching products with filters:', error);
+      }
+    } else {
+      setProducts([]);
+      setTotalProducts(0);
+    }
   };
 
-  const toggleFilter = (name: string) => {
-    setExpandedFilters((prev) => ({ ...prev, [name]: !prev[name] }));
+  const toggleFilter = (slug: string) => {
+    setExpandedFilters((prev) => ({ ...prev, [slug]: !prev[slug] }));
   };
 
-  const toggleMoreOptions = (name: string) => {
-    setMoreOptionsVisible((prev) => ({ ...prev, [name]: !prev[name] }));
+  const toggleMoreOptions = (slug: string) => {
+    setMoreOptionsVisible((prev) => ({ ...prev, [slug]: !prev[slug] }));
   };
 
   if (attributes.length === 0) {
@@ -85,56 +111,57 @@ const Filters = ({
   return (
     <div className="filters w-full rounded-[24px] p-[12px_16px] border">
       {attributes.map((attribute) => (
-        <div key={attribute.name} className="mb-4">
+        <div key={attribute.slug} className="mb-4">
           <button
             className="font-bold mb-2 flex justify-between items-center w-full"
-            onClick={() => toggleFilter(attribute.name)}
+            onClick={() => toggleFilter(attribute.slug)}
           >
             {attribute.name}
             <img
               src={
-                expandedFilters[attribute.name]
+                expandedFilters[attribute.slug]
                   ? '/icons/arrow-up.svg'
                   : '/icons/arrow-down.svg'
               }
-              alt={expandedFilters[attribute.name] ? 'Arrow up' : 'Arrow down'}
+              alt={expandedFilters[attribute.slug] ? 'Arrow up' : 'Arrow down'}
               className="w-4 h-4"
             />
           </button>
 
-          {expandedFilters[attribute.name] && attribute.options && (
+          {expandedFilters[attribute.slug] && attribute.options && (
             <div className="pl-0">
               {attribute.options
                 .slice(
                   0,
-                  moreOptionsVisible[attribute.name]
+                  moreOptionsVisible[attribute.slug]
                     ? attribute.options.length
                     : 4,
                 )
                 .map((option) => {
                   const isChecked = selectedFilters.some(
                     (filter) =>
-                      filter.name === attribute.name && filter.value === option,
+                      filter.name === attribute.slug &&
+                      filter.value === option.slug,
                   );
                   return (
-                    <div key={option} className="flex items-center mb-2">
+                    <div key={option.slug} className="flex items-center mb-2">
                       <input
                         type="checkbox"
-                        id={option}
-                        name={option}
-                        value={option}
+                        id={`${attribute.slug}-${option.slug}`}
+                        name={option.slug}
+                        value={option.slug}
                         className="hidden"
                         checked={isChecked}
                         onChange={(e) =>
                           handleFilterChange(
-                            attribute.name,
-                            option,
+                            attribute.slug,
+                            option.slug,
                             e.target.checked,
                           )
                         }
                       />
                       <label
-                        htmlFor={option}
+                        htmlFor={`${attribute.slug}-${option.slug}`}
                         className={`flex items-center cursor-pointer w-5 h-5 border border-black rounded ${
                           isChecked ? 'bg-black' : 'border-black'
                         }`}
@@ -147,16 +174,16 @@ const Filters = ({
                           />
                         )}
                       </label>
-                      <span className="ml-2">{option}</span>
+                      <span className="ml-2">{option.name}</span>
                     </div>
                   );
                 })}
               {attribute.options.length > 4 && (
                 <button
                   className="underline text-[14px]"
-                  onClick={() => toggleMoreOptions(attribute.name)}
+                  onClick={() => toggleMoreOptions(attribute.slug)}
                 >
-                  {moreOptionsVisible[attribute.name] ? 'Mniej' : 'Wiecej'}
+                  {moreOptionsVisible[attribute.slug] ? 'Mniej' : 'Wiecej'}
                 </button>
               )}
             </div>

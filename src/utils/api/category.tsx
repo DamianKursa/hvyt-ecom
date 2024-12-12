@@ -9,10 +9,15 @@ const WooCommerceAPI = axios.create({
   },
 });
 
+const CustomAPI = axios.create({
+  baseURL: 'https://hvyt.pl/wp-json/custom/v1', // Custom API base URL
+});
+
 // Define the type for attributes
 interface Attribute {
   id: number;
   name: string;
+  slug: string;
 }
 
 // Fetch category data by slug
@@ -79,21 +84,24 @@ export const fetchProductsByCategoryId = async (
 export const fetchProductAttributesWithTerms = async (categoryId: number) => {
   try {
     const attributesResponse = await WooCommerceAPI.get('/products/attributes');
-    const attributes: Attribute[] = attributesResponse.data;
-
-    console.log('Fetched attributes:', attributes);
+    const attributes = attributesResponse.data.map((attribute: any) => ({
+      id: attribute.id,
+      name: attribute.name,
+      slug: attribute.slug, // Ensure slug is included
+    }));
 
     const attributesWithTerms = await Promise.all(
-      attributes.map(async (attribute: Attribute) => {
+      attributes.map(async (attribute: any) => {
         const termsResponse = await WooCommerceAPI.get(
           `/products/attributes/${attribute.id}/terms`,
         );
 
-        console.log(`Fetched terms for ${attribute.name}:`, termsResponse.data);
-
         return {
           ...attribute,
-          options: termsResponse.data.map((term: any) => term.name),
+          options: termsResponse.data.map((term: any) => ({
+            name: term.name,
+            slug: term.slug, // Include slug for terms
+          })),
         };
       }),
     );
@@ -102,7 +110,47 @@ export const fetchProductAttributesWithTerms = async (categoryId: number) => {
       (attribute) => attribute.options.length > 0,
     );
   } catch (error) {
-    console.error('Error in fetchProductAttributesWithTerms:', error);
+    console.error('Error fetching attributes:', error);
+    throw error;
+  }
+};
+
+export const fetchProductsWithFilters = async (
+  categoryId: number,
+  filters: { name: string; value: string }[],
+  page = 1,
+  perPage = 12,
+) => {
+  if (!filters || filters.length === 0) {
+    throw new Error(
+      'No filters applied. Cannot fetch products without filters.',
+    );
+  }
+
+  const params: any = {
+    category: categoryId,
+    page,
+    per_page: perPage,
+  };
+
+  filters.forEach((filter, index) => {
+    if (filter.name && filter.value) {
+      params[`attributes[${index}][key]`] = filter.name; // Slug of attribute
+      params[`attributes[${index}][value]`] = filter.value;
+    }
+  });
+
+  try {
+    const response = await CustomAPI.get('/filtered-products', { params });
+
+    console.log('Filtered products fetched:', response.data);
+
+    return {
+      products: response.data.products || [],
+      totalProducts: response.data.total || 0,
+    };
+  } catch (error) {
+    console.error('Error fetching products with filters:', error);
     throw error;
   }
 };

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import ProductPreview from './ProductPreview.component';
 import SkeletonProductPreview from '../Skeletons/SkeletonProductPreview.component';
-import { fetchProductsByCategoryId } from '../../utils/api/category';
+import {
+  fetchProductsByCategoryId,
+  fetchProductsWithFilters,
+} from '../../utils/api/category';
 
 interface ProductArchiveProps {
   categoryId: number;
@@ -40,23 +43,40 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
           sortingOption,
         });
 
-        const {
-          products: fetchedProducts,
-          totalProducts: fetchedTotalProducts,
-        } = await fetchProductsByCategoryId(
-          categoryId,
-          page,
-          perPage,
-          filters,
-          sortingOption,
-        );
+        if (filters.length > 0) {
+          // Fetch products only when filters are applied
+          const {
+            products: fetchedProducts,
+            totalProducts: fetchedTotalProducts,
+          } = await fetchProductsWithFilters(
+            categoryId,
+            filters,
+            page,
+            perPage,
+          );
 
-        console.log('Fetched products:', fetchedProducts);
-        console.log('Fetched total products:', fetchedTotalProducts);
+          console.log('Fetched filtered products:', fetchedProducts);
+          setProducts(fetchedProducts || []);
+          setTotalProducts(fetchedTotalProducts);
+          setTotalPages(Math.ceil(fetchedTotalProducts / perPage));
+        } else {
+          // Fallback to default fetch if no filters are applied
+          const {
+            products: fetchedProducts,
+            totalProducts: fetchedTotalProducts,
+          } = await fetchProductsByCategoryId(
+            categoryId,
+            page,
+            perPage,
+            [],
+            sortingOption,
+          );
 
-        setProducts(fetchedProducts || []);
-        setTotalProducts(fetchedTotalProducts);
-        setTotalPages(Math.ceil(fetchedTotalProducts / perPage));
+          console.log('Fetched default products:', fetchedProducts);
+          setProducts(fetchedProducts || []);
+          setTotalProducts(fetchedTotalProducts);
+          setTotalPages(Math.ceil(fetchedTotalProducts / perPage));
+        }
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
@@ -72,6 +92,7 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
   };
 
   const renderPageNumbers = () => {
+    if (totalPages === 0) return null; // Hide pagination if no pages
     return Array.from({ length: totalPages }, (_, index) => (
       <button
         key={index + 1}

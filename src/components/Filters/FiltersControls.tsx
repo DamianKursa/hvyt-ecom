@@ -26,13 +26,14 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleSortSelect = (value: string) => {
-    onSortingChange(value); // Directly pass the string value
-    setDropdownOpen(false);  // Close dropdown after selection
+    onSortingChange(value);
+    setDropdownOpen(false);
   };
 
   return (
-    <div className={`flex ${isMobile ? 'justify-between' : 'justify-between'} items-center mb-4`}>
-      {/* Filtry Button */}
+    <div
+      className={`flex ${isMobile ? 'justify-between' : 'justify-between'} items-center mb-4`}
+    >
       <button
         onClick={toggleFilters}
         className={`filters-toggle border rounded-[24px] ${isMobile ? 'w-1/2' : 'w-[328px] text-[16px]'} p-[7px_16px] mr-[32px] font-bold flex justify-between items-center`}
@@ -40,18 +41,24 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
         <span className="font-semibold text-center">Filtry</span>
         {!isMobile && (
           <img
-            src={filtersVisible ? '/icons/arrow-left-black.svg' : '/icons/arrow-right-black.svg'}
+            src={
+              filtersVisible
+                ? '/icons/arrow-left-black.svg'
+                : '/icons/arrow-right-black.svg'
+            }
             alt="Toggle Filters"
             className="w-[24px] h-[24px]"
           />
         )}
       </button>
 
-      {/* Active Filters for Desktop */}
       {!isMobile && (
         <div className="flex gap-2 ml-4 flex-wrap">
           {filters.map((filter) => (
-            <span key={`${filter.name}-${filter.value}`} className="flex items-center text-[14px]">
+            <span
+              key={`${filter.name}-${filter.value}`}
+              className="flex items-center text-[14px]"
+            >
               {filter.value}
               <button
                 onClick={() => onRemoveFilter(filter)}
@@ -64,7 +71,6 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
         </div>
       )}
 
-      {/* Sorting Button with Dropdown as Part of Button */}
       <div className={`relative ${isMobile ? 'w-1/2' : 'w-[352px] ml-auto'}`}>
         <button
           className={`border rounded-[24px] w-full text-[16px] p-[7px_16px] font-bold flex justify-between items-center`}
@@ -81,7 +87,6 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
           />
         </button>
 
-        {/* Custom Dropdown Menu styled as part of button */}
         {dropdownOpen && (
           <div className="absolute top-full mt-2 w-full bg-white border border-gray-300 rounded-[16px] shadow-lg z-20">
             <div
