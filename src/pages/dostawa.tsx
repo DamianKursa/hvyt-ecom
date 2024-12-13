@@ -17,7 +17,7 @@ const DostawaPage = () => {
             {/* Image Section */}
             <div className="overflow-hidden rounded-[24px] md:order-last relative min-w-[500px]">
               <Image
-                src="/images/dostawa.png"
+                src="/images/dostawa-zdjecie.png"
                 alt="Dostawa"
                 layout="fill"
                 objectFit="cover"
