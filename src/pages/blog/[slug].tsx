@@ -73,11 +73,11 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
             {post.author.avatar && (
               <img
                 src="/images/autor.png"
-                alt={post.author.name}
+                alt="Hvyt"
                 className="w-12 h-12 rounded-full mr-4"
               />
             )}
-            <h4 className="text-[18px] font-bold">{post.author.name}</h4>
+            <h4 className="text-[18px] font-bold">Hvyt</h4>
           </div>
 
           {/* Divider */}
