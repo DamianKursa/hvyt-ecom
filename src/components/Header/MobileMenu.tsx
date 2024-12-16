@@ -70,7 +70,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             </Link>
           </li>
           <li>
-            <Link href="/wishlist" onClick={toggleMenu} className="font-bold">
+            <Link href="/ulubione" onClick={toggleMenu} className="font-bold">
               <div className="flex items-center">
                 <img
                   src="/icons/heart.svg"

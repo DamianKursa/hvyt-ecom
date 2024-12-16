@@ -212,7 +212,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       </button>
 
                       {/* Wishlist Icon */}
-                      <Link href="/wishlist">
+                      <Link href="/ulubione">
                         <span className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
                           <img
                             src="/icons/wishlist.svg"

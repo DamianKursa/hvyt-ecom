@@ -87,6 +87,7 @@ export interface Product {
   salePrice?: string;
   regularPrice?: string;
   description: string;
+  slug: string;
   image: string; // Main image
   images?: {
     src: string;

@@ -5,7 +5,8 @@ import { ApolloProvider } from '@apollo/client';
 
 // Context Providers
 import { CartProvider } from '@/stores/CartProvider';
-import { UserProvider } from '../context/UserContext';
+import { UserProvider } from '@/context/UserContext';
+import { WishlistProvider } from '@/context/WhishlistContext'; // Import WishlistProvider
 import client from '@/utils/apollo/ApolloClient';
 
 // Types
@@ -25,9 +26,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ApolloProvider client={client}>
       <CartProvider>
         <UserProvider>
-          {' '}
-          {/* Wrap your app with UserProvider */}
-          <Component {...pageProps} />
+          <WishlistProvider>
+            {' '}
+            {/* Wrap with WishlistProvider */}
+            <Component {...pageProps} />
+          </WishlistProvider>
         </UserProvider>
       </CartProvider>
     </ApolloProvider>

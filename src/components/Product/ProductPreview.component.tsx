@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useWishlist } from '@/context/WhishlistContext'; // Import WishlistContext
 
 interface Product {
   name: string;
@@ -30,6 +31,8 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
 
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist(); // Use wishlist context
+
   const firstImage = product.images?.[0]?.src || '/fallback-image.jpg';
   const secondImage = product.images?.[1]?.src || firstImage;
 
@@ -48,6 +51,15 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const imageSize = isSmall ? 250 : 350;
   const cardHeight = isSmall ? '300px' : '400px';
 
+  // Handle wishlist toggle
+  const handleWishlistClick = () => {
+    if (isInWishlist(product.slug)) {
+      removeFromWishlist(product.slug); // Remove product by slug
+    } else {
+      addToWishlist(product); // Add the full product object to the wishlist
+    }
+  };
+
   return (
     <div
       className={`relative w-full h-[${cardHeight}] flex flex-col justify-between group ${containerClass}`}
@@ -56,12 +68,25 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
     >
       {/* Wishlist Button */}
       <button
+        onClick={handleWishlistClick} // Attach wishlist toggle logic
         className="absolute top-2 right-2 w-10 h-10 bg-[#F8F6F7]/50 rounded-full shadow-lg flex items-center justify-center z-20"
-        aria-label="Add to wishlist"
+        aria-label={
+          isInWishlist(product.slug)
+            ? 'Remove from wishlist'
+            : 'Add to wishlist'
+        }
       >
         <Image
-          src="/icons/wishlist.svg"
-          alt="Add to wishlist"
+          src={
+            isInWishlist(product.slug)
+              ? '/icons/heart-added.svg' // Wishlist added icon
+              : '/icons/wishlist.svg' // Default wishlist icon
+          }
+          alt={
+            isInWishlist(product.slug)
+              ? 'Remove from wishlist'
+              : 'Add to wishlist'
+          }
           width={24}
           height={24}
         />

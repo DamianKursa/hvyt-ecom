@@ -15,6 +15,7 @@ import QuantityChanger from '@/components/UI/QuantityChanger';
 import { useProductState } from '@/utils/hooks/useProductState';
 import { fetchProductBySlug } from '@/utils/api/woocommerce';
 import { CartContext } from '@/stores/CartProvider';
+import { useWishlist } from '@/context/WhishlistContext';
 import Image from 'next/image';
 
 const NajczęściejKupowaneRazem = dynamic(
@@ -32,7 +33,7 @@ const ProductPage = () => {
   const { state, dispatch } = useProductState();
   const { addCartItem } = React.useContext(CartContext);
   const frequentlyBoughtTogetherRef = useRef<HTMLDivElement>(null);
-
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const {
     product,
     loading,
@@ -74,6 +75,23 @@ const ProductPage = () => {
 
     fetchData();
   }, [slug, dispatch]);
+
+  const handleWishlistClick = () => {
+    if (!product) return; // Ensure product exists
+
+    const wishlistProduct = {
+      name: product.name,
+      price: selectedVariation?.price || product.price,
+      slug: product.slug,
+      images: product.images || [{ src: '/fallback-image.jpg' }],
+    };
+
+    if (isInWishlist(product.slug)) {
+      removeFromWishlist(product.slug);
+    } else {
+      addToWishlist(wishlistProduct);
+    }
+  };
 
   const handleScrollToFrequentlyBought = () => {
     frequentlyBoughtTogetherRef.current?.scrollIntoView({
@@ -293,14 +311,27 @@ const ProductPage = () => {
                 />
               </button>
 
-              <button className="w-1/5 h-[64px] w-[64px] p-3 border rounded-full border-neutral-dark text-neutral-dark hover:text-red-600 hover:border-red-600 flex justify-center items-center">
-                <Image
-                  src="/icons/wishlist.svg"
-                  alt="Wishlist"
-                  width={28}
-                  height={28}
-                />
-              </button>
+              {product && (
+                <button
+                  onClick={handleWishlistClick}
+                  className={`w-1/5 h-[64px] p-3 border rounded-full ${
+                    isInWishlist(product.slug)
+                      ? 'border-black'
+                      : 'border-neutral-dark text-neutral-dark'
+                  }  flex justify-center items-center transition`}
+                >
+                  <Image
+                    src={
+                      isInWishlist(product.slug)
+                        ? '/icons/heart-added.svg'
+                        : '/icons/wishlist.svg'
+                    }
+                    alt="Wishlist"
+                    width={28}
+                    height={28}
+                  />
+                </button>
+              )}
             </div>
 
             <DeliveryReturnInfo
