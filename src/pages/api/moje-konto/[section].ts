@@ -86,6 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         order.line_items.map((item) => ({
           id: item.product_id,
           name: item.name,
+          slug: `product-${item.product_id}`, // Generate a slug as a placeholder
           quantity: item.quantity,
           price: item.price,
           description: '', // Empty as orders do not include descriptions
@@ -97,6 +98,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(200).json(products);
       return;
     }
+    
 
     res.status(200).json(data);
   } catch (error: any) {

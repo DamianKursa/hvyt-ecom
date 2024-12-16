@@ -84,10 +84,10 @@ export interface Product {
   id: string;
   name: string;
   price: string;
+  slug: string;
   salePrice?: string;
   regularPrice?: string;
   description: string;
-  slug: string;
   image: string; // Main image
   images?: {
     src: string;
