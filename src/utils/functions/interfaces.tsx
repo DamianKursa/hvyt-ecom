@@ -26,7 +26,7 @@ export interface LineItem {
   quantity: number;
   price: string;
   total: string;
-  image?: string; // Optional image property
+  image?: string | { src: string };
   regular_price?: string; // Optional regular price property
 }
 
@@ -56,6 +56,11 @@ export interface Order {
   email?: string;
   shipping: Address; // Correctly typing shipping as an Address object
   line_items: LineItem[];
+  billing: {
+    first_name: string;
+    last_name: string;
+    email: string;
+  }; // Add this property
 }
 
 export interface User {

@@ -34,6 +34,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       apiEndpoint = 'orders';
       break;
     case 'moje-dane':
+      apiEndpoint = 'custom-api/v1/user-data'; // Endpoint for user data
+      break;
     case 'moje-adresy':
     case 'dane-do-faktury':
       apiEndpoint = 'customers/me';
@@ -63,44 +65,102 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const customerId = decodedToken?.data?.user?.id;
 
-    if (!customerId) {
-      return res
-        .status(401)
-        .json({ error: 'Unauthorized: Customer ID not found in token' });
+    if (!customerId && section !== 'moje-dane') {
+      return res.status(401).json({ error: 'Unauthorized: Customer ID not found in token' });
     }
 
-    // Add the customer ID filter for orders or products
-    const url = `${process.env.WORDPRESS_API_URL}/wp-json/wc/v3/${apiEndpoint}`;
-    const response = await axios.get<Order[]>(url, {
+    if (section === 'moje-dane') {
+      if (req.method === 'GET') {
+        try {
+          const response = await axios.get(`${process.env.WORDPRESS_API_URL}/wp-json/${apiEndpoint}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          const userData = response.data;
+          return res.status(200).json({
+            id: userData.id || customerId, // Fallback to decoded ID
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+          });
+        } catch (error: any) {
+          console.error('Error fetching user data:', error.response?.data || error.message);
+          return res.status(500).json({ error: 'Failed to fetch user data' });
+        }
+      } else if (req.method === 'POST') {
+        const { firstName, lastName, email } = req.body;
+
+        if (!firstName || !lastName || !email) {
+          return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        try {
+          const updateResponse = await axios.put(
+            `${process.env.WORDPRESS_API_URL}/wp-json/${apiEndpoint}/${customerId}`, // Use decoded ID
+            { firstName, lastName, email },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          if (updateResponse.status === 200) {
+            return res.status(200).json({ message: 'User updated successfully' });
+          } else {
+            return res.status(500).json({ error: 'Failed to update user' });
+          }
+        } catch (error: any) {
+          console.error('Error updating user:', error.response?.data || error.message);
+          return res.status(500).json({ error: 'Error updating user data' });
+        }
+      } else {
+        return res.status(405).json({ error: 'Method not allowed' });
+      }
+    }
+
+    // Fetch data for other sections
+    const response = await axios.get(`${process.env.WORDPRESS_API_URL}/wp-json/wc/v3/${apiEndpoint}`, {
       headers: { Authorization: `Bearer ${token}` },
-      params: section === 'moje-zamowienia' || section === 'kupione-produkty'
-        ? { customer: customerId } // Filter orders by customer ID
-        : undefined,
+      params:
+        section === 'moje-zamowienia' || section === 'kupione-produkty'
+          ? { customer: customerId }
+          : undefined,
     });
 
-    let data = response.data;
-
     if (section === 'kupione-produkty') {
-      // Transform line items into Product[]
-      const products: Product[] = (data as Order[]).flatMap((order) =>
-        order.line_items.map((item) => ({
-          id: item.product_id,
-          name: item.name,
-          slug: `product-${item.product_id}`, // Generate a slug as a placeholder
-          quantity: item.quantity,
-          price: item.price,
-          description: '', // Empty as orders do not include descriptions
-          image: '', // No images provided in orders, leave as empty
-          attributes: [], // Empty as orders do not include attributes
-          totalPrice: parseFloat(item.price) * item.quantity,
-        }))
+      const products: Product[] = await Promise.all(
+        (response.data as Order[]).flatMap((order) =>
+          order.line_items.map(async (item) => {
+            let image = '/placeholder.jpg'; // Default placeholder image
+            try {
+              const productResponse = await axios.get(
+                `${process.env.WORDPRESS_API_URL}/wp-json/wc/v3/products/${item.product_id}`,
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              image = productResponse.data.images?.[0]?.src || image;
+            } catch (error: any) {
+              console.error('Error fetching product image:', error.response?.data || error.message);
+            }
+            return {
+              id: item.product_id,
+              name: item.name,
+              slug: `product-${item.product_id}`,
+              quantity: item.quantity,
+              price: item.price,
+              description: '',
+              image,
+              attributes: [],
+              totalPrice: parseFloat(item.price) * item.quantity,
+            };
+          })
+        )
       );
-      res.status(200).json(products);
-      return;
+      return res.status(200).json(products);
     }
-    
 
-    res.status(200).json(data);
+    res.status(200).json(response.data);
   } catch (error: any) {
     console.error('Error fetching section data:', error.response?.data || error.message);
     res.status(500).json({ error: 'Error fetching data' });

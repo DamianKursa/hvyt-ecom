@@ -4,38 +4,74 @@ import MojeKonto from './index';
 import LoadingModal from '@/components/UI/LoadingModal';
 import OrderTable from '@/components/MojeKonto/OrderTable';
 import OrderDetails from '@/components/MojeKonto/OrderDetails';
-import { Order } from '@/utils/functions/interfaces';
+import BoughtProductsList from '@/components/UI/BoughtProductsList';
+import MojeDane from '@/components/MojeKonto/MojeDane';
+import { Order, Product } from '@/utils/functions/interfaces';
 
 const SectionPage: React.FC = () => {
   const router = useRouter();
-  const { section, id } = router.query;
+  const { section } = router.query;
 
-  const [content, setContent] = useState<Order[] | null>(null);
+  const [content, setContent] = useState<Order[] | Product[] | null>(null);
+  const [user, setUser] = useState({
+    id: 0,
+    firstName: '',
+    lastName: '',
+    email: '',
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   useEffect(() => {
-    if (!section || id) return;
+    if (!section) return;
 
     const fetchSectionData = async () => {
       try {
         setLoading(true);
 
-        const response = await fetch(`/api/moje-konto/${section}`, {
-          method: 'GET',
-          credentials: 'include',
-        });
+        if (section === 'moje-dane') {
+          const response = await fetch(`/api/moje-konto/${section}`, {
+            method: 'GET',
+            credentials: 'include',
+          });
 
-        if (response.ok) {
-          const data: Order[] = await response.json();
-          setContent(data);
-          setError(null);
-        } else if (response.status === 401) {
-          setError('Unauthorized. Redirecting to login...');
-          router.push('/logowanie');
+          if (response.ok) {
+            const userData = await response.json();
+            console.log('Fetched user data:', userData);
+
+            if (!userData.id) {
+              console.error('Missing ID in fetched user data:', userData);
+            }
+
+            setUser({
+              id: userData.id || 0, // Ensure ID is not undefined
+              firstName: userData.firstName || 'N/A',
+              lastName: userData.lastName || 'N/A',
+              email: userData.email || 'N/A',
+            });
+            setContent(null);
+          } else {
+            throw new Error('Failed to fetch user data');
+          }
         } else {
-          setError('Data not found for this section.');
+          const response = await fetch(`/api/moje-konto/${section}`, {
+            method: 'GET',
+            credentials: 'include',
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setContent(data);
+          } else if (response.status === 401) {
+            setError('Unauthorized. Redirecting to login...');
+            router.push('/logowanie');
+          } else {
+            setError('Data not found for this section.');
+          }
         }
+
+        setError(null);
       } catch (error) {
         console.error('Error fetching section data:', error);
         setError('An error occurred while loading data.');
@@ -45,11 +81,70 @@ const SectionPage: React.FC = () => {
     };
 
     fetchSectionData();
-  }, [section, id, router]);
+  }, [section, router]);
+
+  const handleUserUpdate = async (updatedUser: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  }) => {
+    try {
+      if (!updatedUser.id) {
+        throw new Error('User ID is missing');
+      }
+
+      console.log('Updating user:', updatedUser);
+
+      const response = await fetch(`/api/moje-konto/moje-dane`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedUser),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error updating user');
+      }
+
+      const result = await response.json();
+      console.log('User updated successfully:', result);
+
+      // Update the local state with the new user data
+      setUser({
+        id: updatedUser.id,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        email: updatedUser.email,
+      });
+    } catch (error: any) {
+      console.error('Error updating user:', error.message);
+    }
+  };
+
+  const handleViewOrderDetails = (order: Order) => {
+    setSelectedOrder(order);
+  };
+
+  const handleBackToOrders = () => {
+    setSelectedOrder(null);
+  };
 
   const renderContent = () => {
-    if (id && section === 'moje-zamowienia') {
-      return <OrderDetails />;
+    if (selectedOrder) {
+      return (
+        <div className="rounded-[25px] bg-white p-8 shadow-sm">
+          <button
+            onClick={handleBackToOrders}
+            className="mb-4 text-[#661F30] font-semibold"
+          >
+            ← Powrót do zamówień
+          </button>
+          <OrderDetails order={selectedOrder} />
+        </div>
+      );
     }
 
     if (section === 'moje-zamowienia') {
@@ -58,9 +153,31 @@ const SectionPage: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
             Moje zamówienia
           </h2>
-          {content && <OrderTable content={content} />}
+          {content && Array.isArray(content) && (
+            <OrderTable
+              content={content as Order[]}
+              onViewDetails={handleViewOrderDetails}
+            />
+          )}
         </div>
       );
+    }
+
+    if (section === 'kupione-produkty') {
+      return (
+        <div className="rounded-[25px] bg-white p-8 shadow-sm">
+          <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
+            Kupione Produkty
+          </h2>
+          {content && Array.isArray(content) && (
+            <BoughtProductsList products={content as Product[]} />
+          )}
+        </div>
+      );
+    }
+
+    if (section === 'moje-dane') {
+      return <MojeDane user={user} onUpdate={handleUserUpdate} />;
     }
 
     return <p>Unknown section.</p>;
@@ -85,11 +202,13 @@ const SectionPage: React.FC = () => {
     );
   }
 
-  if (!content || content.length === 0) {
+  if (!content && section !== 'moje-dane') {
     return (
       <MojeKonto>
         <div className="text-center text-gray-500">
-          No data available for this section.
+          {section === 'moje-zamowienia'
+            ? 'Nie znaleziono żadnych zamówień.'
+            : 'Nie znaleziono żadnych produktów.'}
         </div>
       </MojeKonto>
     );

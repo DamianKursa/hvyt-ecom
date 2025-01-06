@@ -1,8 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
 import { Order } from '@/utils/functions/interfaces';
+import Link from 'next/link';
+
 interface OrderTableProps {
   content: Order[];
+  onViewDetails?: (order: Order) => void; // Callback for inline details rendering
 }
 
 // Function to map order statuses
@@ -42,32 +44,30 @@ const getPaymentStatusLabel = (paymentStatus: string) => {
   }
 };
 
-const OrderTable: React.FC<OrderTableProps> = ({ content }) => {
+const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
   return (
     <table className="w-full table-auto rounded-[25px] overflow-hidden">
       <thead className="bg-beige">
         <tr>
-          <th className="py-3 px-4 text-left font-semibold text-neutral-darker">
+          <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
             Zamówienie
           </th>
-          <th className="py-3 px-4 text-left font-semibold text-neutral-darker">
+          <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
             Data zamówienia
           </th>
-          <th className="py-3 px-4 text-left font-semibold text-neutral-darker">
+          <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
             Status płatności
           </th>
-          <th className="py-3 px-4 text-left font-semibold text-neutral-darker">
+          <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
             Status realizacji
           </th>
-          <th className="py-3 px-4 text-left font-semibold text-neutral-darker">
+          <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
             Suma
           </th>
-          <th className="py-3 px-4 text-left font-semibold text-neutral-darker">
-            Akcje
-          </th>
+          <th className="py-3 px-4 text-left font-semibold text-neutral-darker"></th>
         </tr>
       </thead>
-      <tbody>
+      <tbody className="border border-gray-200 rounded-[25px]">
         {content.map((order) => {
           const { label: orderLabel, className: orderClassName } =
             getOrderStatusLabel(order.status);
@@ -76,7 +76,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content }) => {
           return (
             <tr
               key={order.id}
-              className="odd:bg-[#F7F7F7] even:bg-white border-t border-neutral-light"
+              className=" rounded-[25px] border-b border-neutral-light"
             >
               <td className="py-3 font-bold px-4">{order.id}</td>
               <td className="py-3 px-4">
@@ -98,12 +98,23 @@ const OrderTable: React.FC<OrderTableProps> = ({ content }) => {
                 {order.total} zł
               </td>
               <td className="py-3 px-4">
-                <Link
-                  href={`/moje-konto/moje-zamowienia/${order.id}`}
-                  className="text-black font-light underline"
-                >
-                  Szczegóły
-                </Link>
+                {onViewDetails ? (
+                  // Inline rendering with callback
+                  <button
+                    onClick={() => onViewDetails(order)}
+                    className="text-black font-light underline"
+                  >
+                    Szczegóły
+                  </button>
+                ) : (
+                  // Redirection fallback
+                  <Link
+                    href={`/moje-konto/moje-zamowienia/${order.id}`}
+                    className="text-black font-light underline"
+                  >
+                    Szczegóły
+                  </Link>
+                )}
               </td>
             </tr>
           );
