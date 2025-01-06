@@ -47,13 +47,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ error: 'Unauthorized: User ID not found in token' });
     }
 
-    // Ensure the user ID matches the one being updated
-    // (Optional: This check is only necessary if you're sending a user ID in the request.)
+    // Optional: Ensure the user ID matches the one being updated
     if (req.body.userId && req.body.userId !== userId) {
       return res.status(403).json({ error: 'Forbidden: You can only update your own password' });
     }
 
-    // Proceed with updating the password
+    // Call the WordPress API to change the password
     const response = await axios.post(
       `${process.env.WORDPRESS_API_URL}/wp-json/custom-api/v1/change-password`,
       { userId, currentPassword, newPassword },
