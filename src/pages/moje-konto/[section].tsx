@@ -6,6 +6,7 @@ import OrderTable from '@/components/MojeKonto/OrderTable';
 import OrderDetails from '@/components/MojeKonto/OrderDetails';
 import BoughtProductsList from '@/components/UI/BoughtProductsList';
 import MojeDane from '@/components/MojeKonto/MojeDane';
+import MyAddresses from '@/components/MojeKonto/MyAdresses'; // Import MyAddresses
 import { Order, Product } from '@/utils/functions/interfaces';
 
 const SectionPage: React.FC = () => {
@@ -45,7 +46,7 @@ const SectionPage: React.FC = () => {
             }
 
             setUser({
-              id: userData.id || 0, // Ensure ID is not undefined
+              id: userData.id || 0,
               firstName: userData.firstName || 'N/A',
               lastName: userData.lastName || 'N/A',
               email: userData.email || 'N/A',
@@ -53,6 +54,18 @@ const SectionPage: React.FC = () => {
             setContent(null);
           } else {
             throw new Error('Failed to fetch user data');
+          }
+        } else if (section === 'moje-adresy') {
+          const response = await fetch(`/api/moje-konto/adresy`, {
+            method: 'GET',
+            credentials: 'include',
+          });
+
+          if (response.ok) {
+            const addresses = await response.json();
+            setContent(addresses);
+          } else {
+            setContent([]);
           }
         } else {
           const response = await fetch(`/api/moje-konto/${section}`, {
@@ -112,7 +125,6 @@ const SectionPage: React.FC = () => {
       const result = await response.json();
       console.log('User updated successfully:', result);
 
-      // Update the local state with the new user data
       setUser({
         id: updatedUser.id,
         firstName: updatedUser.firstName,
@@ -180,6 +192,10 @@ const SectionPage: React.FC = () => {
       return <MojeDane user={user} onUpdate={handleUserUpdate} />;
     }
 
+    if (section === 'moje-adresy') {
+      return <MyAddresses />;
+    }
+
     return <p>Unknown section.</p>;
   };
 
@@ -202,7 +218,7 @@ const SectionPage: React.FC = () => {
     );
   }
 
-  if (!content && section !== 'moje-dane') {
+  if (!content && section !== 'moje-dane' && section !== 'moje-adresy') {
     return (
       <MojeKonto>
         <div className="text-center text-gray-500">
