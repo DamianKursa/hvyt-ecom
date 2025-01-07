@@ -7,6 +7,7 @@ const MyAddresses: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch addresses on component mount
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
@@ -20,7 +21,8 @@ const MyAddresses: React.FC = () => {
         }
 
         const data = await response.json();
-        setAddresses(data || []);
+        console.log('Fetched addresses:', data); // Debugging log
+        setAddresses(data || []); // Update state with fetched addresses
       } catch (err) {
         console.error('Error fetching addresses:', err);
         setError('Could not load addresses. Please try again later.');
@@ -32,35 +34,62 @@ const MyAddresses: React.FC = () => {
     fetchAddresses();
   }, []);
 
+  // Handle save (add or update address)
   const handleSave = async (newAddress: any) => {
-    if (addresses.length >= 3 && !modalData) {
-      alert('You can only add up to 3 addresses.');
-      return;
-    }
-
-    const updatedAddresses = modalData
-      ? addresses.map((addr) => (addr === modalData ? newAddress : addr))
-      : [...addresses, newAddress];
-
-    setAddresses(updatedAddresses);
-
     try {
+      let payload;
+
+      if (modalData && Object.keys(modalData).length > 0) {
+        // Update existing address
+        payload = {
+          action: 'update',
+          addresses: addresses.map((addr) =>
+            addr === modalData ? newAddress : addr,
+          ),
+        };
+      } else {
+        // Add new address
+        payload = { action: 'add', address: newAddress };
+      }
+
+      console.log('Payload to API:', payload);
+
       const response = await fetch('/api/moje-konto/adresy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ addresses: updatedAddresses }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save addresses');
+        const errorData = await response.json();
+        console.error('Failed to save addresses:', errorData);
+        alert(errorData.error || 'Could not save the address.');
+        return;
       }
 
-      setError(null);
-      setModalData(null); // Close the modal after successful save
-    } catch (err: any) {
-      console.error('Error saving addresses:', err);
-      setError('Could not save address. Please try again later.');
+      const result = await response.json();
+      console.log('Addresses saved successfully:', result);
+
+      // Refresh the address list by re-fetching all addresses
+      const refreshedAddresses = await fetch('/api/moje-konto/adresy', {
+        method: 'GET',
+        credentials: 'include',
+      }).then((res) => res.json());
+
+      console.log('Updated addresses:', refreshedAddresses);
+      setAddresses(refreshedAddresses);
+
+      setModalData(null); // Close modal
+    } catch (error) {
+      console.error('Error saving addresses:', error);
+      alert('An error occurred while saving the address. Please try again.');
     }
+  };
+
+  // Open modal for adding a new address
+  const handleAddAddress = () => {
+    console.log('Opening modal for adding new address');
+    setModalData({}); // Reset modalData for a fresh new address
   };
 
   return (
@@ -73,7 +102,7 @@ const MyAddresses: React.FC = () => {
           <p className="text-red-500">{error}</p>
         ) : addresses.length === 0 ? (
           <button
-            onClick={() => setModalData({})}
+            onClick={handleAddAddress} // Use the add address handler
             className="mt-4 bg-[#661F30] text-white px-4 py-2 rounded-md"
           >
             Dodaj Adres dostawy
@@ -96,7 +125,7 @@ const MyAddresses: React.FC = () => {
             ))}
             {addresses.length < 3 && (
               <button
-                onClick={() => setModalData({})}
+                onClick={handleAddAddress} // Use the add address handler
                 className="mt-4 bg-[#661F30] text-white px-4 py-2 rounded-md"
               >
                 Dodaj Adres dostawy

@@ -7,6 +7,7 @@ import OrderDetails from '@/components/MojeKonto/OrderDetails';
 import BoughtProductsList from '@/components/UI/BoughtProductsList';
 import MojeDane from '@/components/MojeKonto/MojeDane';
 import MyAddresses from '@/components/MojeKonto/MyAdresses'; // Import MyAddresses
+import BillingAddresses from '@/components/MojeKonto/BillingAddresses'; // Import BillingAddresses
 import { Order, Product } from '@/utils/functions/interfaces';
 
 const SectionPage: React.FC = () => {
@@ -41,10 +42,6 @@ const SectionPage: React.FC = () => {
             const userData = await response.json();
             console.log('Fetched user data:', userData);
 
-            if (!userData.id) {
-              console.error('Missing ID in fetched user data:', userData);
-            }
-
             setUser({
               id: userData.id || 0,
               firstName: userData.firstName || 'N/A',
@@ -64,6 +61,18 @@ const SectionPage: React.FC = () => {
           if (response.ok) {
             const addresses = await response.json();
             setContent(addresses);
+          } else {
+            setContent([]);
+          }
+        } else if (section === 'dane-do-faktury') {
+          const response = await fetch(`/api/moje-konto/billing-addresses`, {
+            method: 'GET',
+            credentials: 'include',
+          });
+
+          if (response.ok) {
+            const billingAddresses = await response.json();
+            setContent(billingAddresses);
           } else {
             setContent([]);
           }
@@ -196,6 +205,10 @@ const SectionPage: React.FC = () => {
       return <MyAddresses />;
     }
 
+    if (section === 'dane-do-faktury') {
+      return <BillingAddresses />;
+    }
+
     return <p>Unknown section.</p>;
   };
 
@@ -218,7 +231,12 @@ const SectionPage: React.FC = () => {
     );
   }
 
-  if (!content && section !== 'moje-dane' && section !== 'moje-adresy') {
+  if (
+    !content &&
+    section !== 'moje-dane' &&
+    section !== 'moje-adresy' &&
+    section !== 'dane-do-faktury'
+  ) {
     return (
       <MojeKonto>
         <div className="text-center text-gray-500">
