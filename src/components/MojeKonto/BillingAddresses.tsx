@@ -45,6 +45,24 @@ const BillingAddresses: React.FC = () => {
 
   const handleSave = async (newBillingData: BillingData) => {
     try {
+      // Check if adding a duplicate type
+      if (
+        newBillingData.type === 'individual' &&
+        billingData.some((addr) => addr.type === 'individual') &&
+        !modalData
+      ) {
+        alert('Możesz dodać tylko jeden adres indywidualny.');
+        return;
+      }
+      if (
+        newBillingData.type === 'company' &&
+        billingData.some((addr) => addr.type === 'company') &&
+        !modalData
+      ) {
+        alert('Możesz dodać tylko jeden adres firmowy.');
+        return;
+      }
+
       const payload = modalData
         ? {
             action: 'update',
@@ -127,7 +145,13 @@ const BillingAddresses: React.FC = () => {
       <button
         onClick={() =>
           setModalData({
-            type: 'individual',
+            type: billingData.some((addr) => addr.type === 'individual')
+              ? 'company'
+              : 'individual',
+            firstName: '',
+            lastName: '',
+            companyName: '',
+            nip: '',
             street: '',
             buildingNumber: '',
             apartmentNumber: '',
@@ -137,7 +161,7 @@ const BillingAddresses: React.FC = () => {
         }
         className="mt-4 bg-[#661F30] text-white px-4 py-2 rounded-md"
       >
-        Dodaj dane do faktury
+        Dodaj dane
       </button>
       {modalData && (
         <BillingModal
