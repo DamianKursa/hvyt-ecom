@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 
 interface EditContactModalProps {
   user: {
@@ -21,31 +22,22 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
   onUpdate,
   onClose,
 }) => {
-  const [formData, setFormData] = useState(user);
+  const methods = useForm({
+    defaultValues: {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+    },
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Ensure `user` has a valid ID when the modal opens
-    if (!user.id) {
-      setError('User ID is missing');
-    }
-  }, [user]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSave = async () => {
+  const onSubmit = async (data: any) => {
     try {
       setLoading(true);
-      if (!formData.id) {
-        throw new Error('User ID is missing');
-      }
-      await onUpdate(formData);
+      await onUpdate({ ...user, ...data });
       onClose();
-    } catch (error) {
+    } catch (err) {
       setError('Failed to update user. Please try again.');
     } finally {
       setLoading(false);
@@ -53,48 +45,107 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-[25px] p-8 w-[400px]">
-        <h2 className="text-xl font-semibold mb-4">Edytuj Dane Kontaktowe</h2>
+    <div
+      className="fixed inset-0 flex items-center justify-center"
+      style={{ backgroundColor: 'rgba(54, 49, 50, 0.4)' }} // Overlay color
+    >
+      <div
+        className="bg-beige-light rounded-[25px] w-full max-w-[800px] relative"
+        style={{ padding: '40px 32px', maxWidth: '650px' }} // Modal padding
+      >
+        {/* Title and Close Button */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold">Edytuj Dane Kontaktowe</h2>
+          <button onClick={onClose}>
+            <img
+              src="/icons/close-button.svg"
+              alt="Close"
+              className="w-3 h-3" // 12px x 12px
+              style={{ filter: 'invert(0)' }} // Black color
+            />
+          </button>
+        </div>
+
         {error && <p className="text-red-500 mb-4">{error}</p>}
-        <div className="space-y-4">
-          <input
-            type="text"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            placeholder="Imię"
-            className="w-full border rounded-md p-2"
-          />
-          <input
-            type="text"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            placeholder="Nazwisko"
-            className="w-full border rounded-md p-2"
-          />
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email"
-            className="w-full border rounded-md p-2"
-          />
-        </div>
-        <div className="mt-4 flex justify-end space-x-4">
-          <button onClick={onClose} className="text-gray-500">
-            Anuluj
-          </button>
-          <button
-            onClick={handleSave}
-            className="bg-[#661F30] text-white px-4 py-2 rounded-md"
-            disabled={loading}
-          >
-            {loading ? 'Zapisywanie...' : 'Zapisz'}
-          </button>
-        </div>
+
+        <FormProvider {...methods}>
+          <form onSubmit={methods.handleSubmit(onSubmit)}>
+            {/* Input fields */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">
+                  Imię
+                </label>
+                <input
+                  {...methods.register('firstName', {
+                    required: 'To pole jest wymagane',
+                  })}
+                  type="text"
+                  placeholder="Imię"
+                  className="w-full border-b border-black p-2 bg-beige-light focus:outline-none"
+                />
+                {methods.formState.errors.firstName && (
+                  <p className="text-red-500 text-sm">
+                    {methods.formState.errors.firstName.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">
+                  Nazwisko
+                </label>
+                <input
+                  {...methods.register('lastName', {
+                    required: 'To pole jest wymagane',
+                  })}
+                  type="text"
+                  placeholder="Nazwisko"
+                  className="w-full border-b border-black p-2 bg-beige-light focus:outline-none"
+                />
+                {methods.formState.errors.lastName && (
+                  <p className="text-red-500 text-sm">
+                    {methods.formState.errors.lastName.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-black mb-1">
+                  Email
+                </label>
+                <input
+                  {...methods.register('email', {
+                    required: 'To pole jest wymagane',
+                    pattern: {
+                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                      message: 'Podaj poprawny adres email',
+                    },
+                  })}
+                  type="email"
+                  placeholder="Email"
+                  className="w-full border-b border-black p-2 bg-beige-light focus:outline-none"
+                />
+                {methods.formState.errors.email && (
+                  <p className="text-red-500 text-sm">
+                    {methods.formState.errors.email.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Save Changes Button */}
+            <div className="mt-6 flex justify-end">
+              <button
+                type="submit"
+                className="w-[100%] md:w-[25%] py-3  font-medium bg-black text-white rounded-full hover:bg-gray-800 transition-all"
+                disabled={loading}
+              >
+                {loading ? 'Zapisywanie...' : 'Zapisz zmiany'}
+              </button>
+            </div>
+          </form>
+        </FormProvider>
       </div>
     </div>
   );
