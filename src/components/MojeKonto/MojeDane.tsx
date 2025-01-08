@@ -23,18 +23,20 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
 
   return (
     <div className="rounded-[25px] bg-white p-8 shadow-sm">
-      <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">Moje dane</h2>
-      <div className="space-y-6">
+      <h2 className="text-2xl font-semibold mb-8 text-[#661F30]">Moje dane</h2>
+      <div className="border rounded-[25px]">
         {/* Contact Details */}
-        <div>
-          <h3 className="text-lg font-medium">Dane kontaktowe</h3>
-          <p>
-            {user.firstName} {user.lastName}
-          </p>
-          <p>{user.email}</p>
+        <div className="py-4 border-b border-gray-300 flex items-start justify-between px-4">
+          <div>
+            <p className="font-semibold mb-[32px]">Dane kontaktowe</p>
+            <p>
+              {user.firstName} {user.lastName}
+            </p>
+            <p>{user.email}</p>
+          </div>
           <button
             onClick={() => setIsEditContactModalOpen(true)}
-            className="mt-2 text-[#661F30] flex items-center"
+            className="text-black border border-black px-4 py-2 rounded-full flex items-center"
           >
             Edytuj Dane kontaktowe
             <img src="/icons/edit.svg" alt="Edytuj" className="w-4 h-4 ml-2" />
@@ -42,22 +44,25 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
         </div>
 
         {/* Password */}
-        <div>
-          <h3 className="text-lg font-medium">Hasło</h3>
-          <p>********</p>
+        <div className="py-4 flex items-start justify-between px-4">
+          <div>
+            <p className="font-semibold mb-[32px]">Hasło</p>
+            <p>********</p>
+          </div>
           <button
             onClick={() => setIsEditPasswordModalOpen(true)}
-            className="mt-2 text-[#661F30] flex items-center"
+            className="text-black border border-black px-4 py-2 rounded-full flex items-center"
           >
             Edytuj Hasło
             <img src="/icons/edit.svg" alt="Edytuj" className="w-4 h-4 ml-2" />
           </button>
         </div>
+      </div>
 
-        {/* Delete Account */}
-        <div>
-          <button className="text-red-500">Usuń konto</button>
-        </div>
+      {/* Delete Account Section */}
+      <div className="mt-8 px-4">
+        <p className="font-semibold mb-[32px]">Usuń konto</p>
+        <button className="text-black underline font-medium">Usuń konto</button>
       </div>
 
       {/* Modals */}

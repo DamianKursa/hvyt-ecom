@@ -46,24 +46,6 @@ const BillingAddresses: React.FC = () => {
 
   const handleSave = async (newBillingData: BillingData) => {
     try {
-      // Check if adding a duplicate type
-      if (
-        newBillingData.type === 'individual' &&
-        billingData.some((addr) => addr.type === 'individual') &&
-        !modalData
-      ) {
-        alert('Możesz dodać tylko jeden adres indywidualny.');
-        return;
-      }
-      if (
-        newBillingData.type === 'company' &&
-        billingData.some((addr) => addr.type === 'company') &&
-        !modalData
-      ) {
-        alert('Możesz dodać tylko jeden adres firmowy.');
-        return;
-      }
-
       const payload = modalData
         ? {
             action: 'update',
@@ -111,74 +93,92 @@ const BillingAddresses: React.FC = () => {
     );
   }
 
+  const availableType =
+    billingData.some((addr) => addr.type === 'individual') &&
+    billingData.length < 2
+      ? 'company'
+      : 'individual';
+
   return (
-    <div className="rounded-[25px] bg-white p-8 shadow-sm">
-      <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
-        Dane do faktury
-      </h2>
-      {error ? (
-        <p className="text-red-500">{error}</p>
-      ) : billingData && billingData.length > 0 ? (
-        billingData.map((data, index) => (
-          <div key={index} className="mb-4 border p-4 rounded-md shadow-sm">
-            <p>
-              <strong>
-                {data.type === 'individual'
-                  ? 'Dane do faktury - klient indywidualny'
-                  : 'Dane do faktury - firma'}
-              </strong>
-            </p>
-            {data.type === 'individual' ? (
-              <p>
-                {data.firstName} {data.lastName}
-              </p>
-            ) : (
-              <p>
-                {data.companyName}, NIP: {data.nip}
-              </p>
+    <div className="rounded-[25px] bg-white p-8">
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-2xl font-semibold text-[#661F30]">
+          Dane do faktury
+        </h2>
+      </div>
+      <div className="border rounded-[25px]">
+        {error ? (
+          <p className="text-red-500 p-4">{error}</p>
+        ) : (
+          <>
+            {billingData.map((data, index) => (
+              <div
+                key={index}
+                className="flex justify-between items-center py-4 px-4 border-b border-[#E9E5DF] last:border-none"
+              >
+                <div>
+                  <p className="font-semibold text-black mb-2">
+                    {data.type === 'individual'
+                      ? 'Dane do faktury - klient indywidualny'
+                      : 'Dane do faktury - firma'}
+                  </p>
+                  <p>
+                    {data.type === 'individual'
+                      ? `${data.firstName} ${data.lastName}`
+                      : `${data.companyName}, NIP: ${data.nip}`}
+                  </p>
+                  <p>
+                    {data.street}, {data.buildingNumber}
+                    {data.apartmentNumber && `/${data.apartmentNumber}`},{' '}
+                    {data.city}, {data.postalCode}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setModalData(data)}
+                  className="text-black border border-black px-4 py-2 rounded-full flex items-center"
+                >
+                  Edytuj
+                  <img
+                    src="/icons/edit.svg"
+                    alt="Edytuj"
+                    className="w-4 h-4 ml-2"
+                  />
+                </button>
+              </div>
+            ))}
+            {billingData.length < 2 && (
+              <div className="flex justify-between items-center py-4 px-4">
+                <p className="font-semibold text-black">
+                  {availableType === 'individual'
+                    ? 'Dane do faktury - klient indywidualny'
+                    : 'Dane do faktury - firma'}
+                </p>
+                <button
+                  onClick={() =>
+                    setModalData({
+                      type: availableType,
+                      firstName: '',
+                      lastName: '',
+                      companyName: '',
+                      nip: '',
+                      street: '',
+                      buildingNumber: '',
+                      apartmentNumber: '',
+                      city: '',
+                      postalCode: '',
+                    })
+                  }
+                  className="text-white bg-black border border-black px-4 py-2 rounded-full flex items-center"
+                >
+                  Dodaj{' '}
+                  {availableType === 'individual' ? 'indywidualny' : 'firmowy'}
+                  <span className="ml-2">+</span>
+                </button>
+              </div>
             )}
-            <p>
-              {data.street}, {data.buildingNumber}
-              {data.apartmentNumber && `/${data.apartmentNumber}`}, {data.city},{' '}
-              {data.postalCode}
-            </p>
-            <button
-              onClick={() => setModalData(data)}
-              className="mt-2 text-[#661F30] flex items-center"
-            >
-              Edytuj
-              <img
-                src="/icons/edit.svg"
-                alt="Edytuj"
-                className="w-4 h-4 ml-2"
-              />
-            </button>
-          </div>
-        ))
-      ) : (
-        <p>Nie znaleziono danych do faktury.</p>
-      )}
-      <button
-        onClick={() =>
-          setModalData({
-            type: billingData.some((addr) => addr.type === 'individual')
-              ? 'company'
-              : 'individual',
-            firstName: '',
-            lastName: '',
-            companyName: '',
-            nip: '',
-            street: '',
-            buildingNumber: '',
-            apartmentNumber: '',
-            city: '',
-            postalCode: '',
-          })
-        }
-        className="mt-4 bg-[#661F30] text-white px-4 py-2 rounded-md"
-      >
-        Dodaj dane
-      </button>
+          </>
+        )}
+      </div>
       {modalData && (
         <BillingModal
           billingData={modalData}

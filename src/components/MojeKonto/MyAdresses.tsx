@@ -22,10 +22,8 @@ const MyAddresses: React.FC = () => {
         }
 
         const data = await response.json();
-        console.log('Fetched addresses:', data); // Debugging log
         setAddresses(data || []); // Update state with fetched addresses
       } catch (err) {
-        console.error('Error fetching addresses:', err);
         setError('Nie udało się załadować adresów.');
       } finally {
         setLoading(false);
@@ -53,8 +51,6 @@ const MyAddresses: React.FC = () => {
         payload = { action: 'add', address: newAddress };
       }
 
-      console.log('Payload to API:', payload);
-
       const response = await fetch('/api/moje-konto/adresy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -63,13 +59,9 @@ const MyAddresses: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Failed to save addresses:', errorData);
         alert(errorData.error || 'Nie udało się zapisać adresu.');
         return;
       }
-
-      const result = await response.json();
-      console.log('Addresses saved successfully:', result);
 
       // Refresh the address list by re-fetching all addresses
       const refreshedAddresses = await fetch('/api/moje-konto/adresy', {
@@ -77,19 +69,15 @@ const MyAddresses: React.FC = () => {
         credentials: 'include',
       }).then((res) => res.json());
 
-      console.log('Updated addresses:', refreshedAddresses);
       setAddresses(refreshedAddresses);
-
       setModalData(null); // Close modal
-    } catch (error) {
-      console.error('Error saving addresses:', error);
+    } catch {
       alert('Wystąpił błąd podczas zapisywania adresu. Spróbuj ponownie.');
     }
   };
 
   // Open modal for adding a new address
   const handleAddAddress = () => {
-    console.log('Opening modal for adding new address');
     setModalData({}); // Reset modalData for a fresh new address
   };
 
@@ -108,29 +96,33 @@ const MyAddresses: React.FC = () => {
       <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
         Moje adresy
       </h2>
-      <div className="mt-4">
+      <div className="border rounded-[25px]">
         {error ? (
-          <p className="text-red-500">{error}</p>
-        ) : addresses.length === 0 ? (
-          <button
-            onClick={handleAddAddress} // Use the add address handler
-            className="mt-4 bg-[#661F30] text-white px-4 py-2 rounded-md"
-          >
-            Dodaj Adres dostawy
-          </button>
+          <p className="text-red-500 p-4">{error}</p>
         ) : (
-          <div>
+          <>
             {addresses.map((address, index) => (
-              <div key={index} className="mb-4 border p-4 rounded-md shadow-sm">
-                <p>
-                  <strong>Adres #{index + 1}:</strong> {address.street},{' '}
-                  {address.city}, {address.country}
-                </p>
+              <div
+                key={index}
+                className="py-4 border-b border-gray-300 last:border-none flex items-start justify-between px-4"
+              >
+                <div>
+                  <p className="font-semibold mb-[32px]">
+                    Adres dostawy #{index + 1}
+                  </p>
+                  <p>
+                    {address.street}, {address.buildingNumber}
+                    {address.apartmentNumber && `/${address.apartmentNumber}`}
+                  </p>
+                  <p>
+                    {address.city}, {address.postalCode}, {address.country}
+                  </p>
+                </div>
                 <button
                   onClick={() => setModalData(address)}
-                  className="mt-2 text-[#661F30] flex items-center"
+                  className="text-black border border-black px-4 py-2 rounded-full flex items-center"
                 >
-                  Edytuj
+                  Edytuj Adres dostawy
                   <img
                     src="/icons/edit.svg"
                     alt="Edytuj"
@@ -140,14 +132,20 @@ const MyAddresses: React.FC = () => {
               </div>
             ))}
             {addresses.length < 3 && (
-              <button
-                onClick={handleAddAddress} // Use the add address handler
-                className="mt-4 bg-[#661F30] text-white px-4 py-2 rounded-md"
-              >
-                Dodaj Adres dostawy
-              </button>
+              <div className="py-4 flex items-start justify-between px-4">
+                <p className="font-semibold mb-[32px]">
+                  Adres dostawy #{addresses.length + 1}
+                </p>
+                <button
+                  onClick={handleAddAddress}
+                  className="text-white bg-[#000] border border-black px-4 py-2 rounded-full flex items-center"
+                >
+                  Dodaj Adres dostawy
+                  <span className="ml-2">+</span>
+                </button>
+              </div>
             )}
-          </div>
+          </>
         )}
       </div>
       {modalData !== null && (
