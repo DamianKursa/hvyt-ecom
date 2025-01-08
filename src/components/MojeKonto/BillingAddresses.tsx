@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import BillingModal from './BillingModal'; // Import the new BillingModal
+import BillingModal from './BillingModal'; // Import the BillingModal component
+import LoadingModal from '@/components/UI/LoadingModal'; // Import the LoadingModal component
 
 interface BillingData {
   type: 'individual' | 'company';
@@ -100,12 +101,22 @@ const BillingAddresses: React.FC = () => {
     }
   };
 
+  // Show LoadingModal until data is fully loaded
+  if (loading) {
+    return (
+      <LoadingModal
+        title="Ładowanie..."
+        description="Proszę czekać, trwa ładowanie danych..."
+      />
+    );
+  }
+
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Dane do faktury</h2>
-      {loading ? (
-        <p>Ładowanie...</p>
-      ) : error ? (
+    <div className="rounded-[25px] bg-white p-8 shadow-sm">
+      <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
+        Dane do faktury
+      </h2>
+      {error ? (
         <p className="text-red-500">{error}</p>
       ) : billingData && billingData.length > 0 ? (
         billingData.map((data, index) => (
@@ -133,9 +144,14 @@ const BillingAddresses: React.FC = () => {
             </p>
             <button
               onClick={() => setModalData(data)}
-              className="mt-2 bg-gray-500 text-white px-2 py-1 rounded-md"
+              className="mt-2 text-[#661F30] flex items-center"
             >
               Edytuj
+              <img
+                src="/icons/edit.svg"
+                alt="Edytuj"
+                className="w-4 h-4 ml-2"
+              />
             </button>
           </div>
         ))

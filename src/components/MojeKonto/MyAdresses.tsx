@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import AddressModal from './AddressModal';
+import AddressModal from './AddressModal'; // Import AddressModal
+import LoadingModal from '@/components/UI/LoadingModal'; // Import LoadingModal
 
 const MyAddresses: React.FC = () => {
   const [addresses, setAddresses] = useState<any[]>([]);
@@ -25,7 +26,7 @@ const MyAddresses: React.FC = () => {
         setAddresses(data || []); // Update state with fetched addresses
       } catch (err) {
         console.error('Error fetching addresses:', err);
-        setError('Could not load addresses. Please try again later.');
+        setError('Nie udało się załadować adresów.');
       } finally {
         setLoading(false);
       }
@@ -63,7 +64,7 @@ const MyAddresses: React.FC = () => {
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Failed to save addresses:', errorData);
-        alert(errorData.error || 'Could not save the address.');
+        alert(errorData.error || 'Nie udało się zapisać adresu.');
         return;
       }
 
@@ -82,7 +83,7 @@ const MyAddresses: React.FC = () => {
       setModalData(null); // Close modal
     } catch (error) {
       console.error('Error saving addresses:', error);
-      alert('An error occurred while saving the address. Please try again.');
+      alert('Wystąpił błąd podczas zapisywania adresu. Spróbuj ponownie.');
     }
   };
 
@@ -92,13 +93,23 @@ const MyAddresses: React.FC = () => {
     setModalData({}); // Reset modalData for a fresh new address
   };
 
+  // Show LoadingModal while loading data
+  if (loading) {
+    return (
+      <LoadingModal
+        title="Ładowanie..."
+        description="Proszę czekać, trwa ładowanie adresów..."
+      />
+    );
+  }
+
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold">Moje adresy</h2>
+    <div className="rounded-[25px] bg-white p-8 shadow-sm">
+      <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
+        Moje adresy
+      </h2>
       <div className="mt-4">
-        {loading ? (
-          <p>Loading...</p>
-        ) : error ? (
+        {error ? (
           <p className="text-red-500">{error}</p>
         ) : addresses.length === 0 ? (
           <button
@@ -117,9 +128,14 @@ const MyAddresses: React.FC = () => {
                 </p>
                 <button
                   onClick={() => setModalData(address)}
-                  className="mt-2 bg-gray-500 text-white px-2 py-1 rounded-md"
+                  className="mt-2 text-[#661F30] flex items-center"
                 >
                   Edytuj
+                  <img
+                    src="/icons/edit.svg"
+                    alt="Edytuj"
+                    className="w-4 h-4 ml-2"
+                  />
                 </button>
               </div>
             ))}
