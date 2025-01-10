@@ -2,9 +2,13 @@ import React, { useState } from 'react';
 
 interface EditPasswordModalProps {
   onClose: () => void;
+  onUpdateSuccess: (message: string) => void; // Callback to display success message
 }
 
-const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ onClose }) => {
+const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
+  onClose,
+  onUpdateSuccess,
+}) => {
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -54,8 +58,8 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ onClose }) => {
         throw new Error(errorData.message || 'Nie udało się zmienić hasła.');
       }
 
-      alert('Hasło zostało pomyślnie zmienione.');
-      onClose();
+      onUpdateSuccess('Twoje hasło zostało zmienione.'); // Pass success message
+      onClose(); // Close modal
     } catch (error: any) {
       console.error('Błąd przy zmianie hasła:', error.message);
       alert('Wystąpił błąd przy zmianie hasła.');
@@ -133,7 +137,9 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({ onClose }) => {
                 className="w-4 h-4 mr-2"
               />
               <p
-                className={`text-sm font-light ${isPasswordValid ? 'text-black' : 'text-black'}`}
+                className={`text-sm font-light ${
+                  isPasswordValid ? 'text-black' : 'text-black'
+                }`}
               >
                 {isPasswordValid
                   ? 'Twoje hasło ma 8 znaków, jest dobre.'

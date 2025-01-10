@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router'; // Import the useRouter hook
 import DiscountCode from '@/components/Cart/DiscountCode'; // Adjust the path if needed
 
 interface CartSummaryProps {
   totalProductsPrice: number;
-  onCheckout: () => void;
+  onCheckout: () => void; // Trigger order creation
+  isCheckoutPage?: boolean; // Flag to determine if it's the checkout page
 }
 
 const CartSummary: React.FC<CartSummaryProps> = ({
   totalProductsPrice,
   onCheckout,
+  isCheckoutPage = false,
 }) => {
-  const [totalPrice, setTotalPrice] = useState(totalProductsPrice); // State to handle the updated total price
+  const [totalPrice, setTotalPrice] = useState(totalProductsPrice);
+  const router = useRouter(); // Initialize the useRouter hook
 
-  // Sync totalPrice state with totalProductsPrice prop changes
   useEffect(() => {
     setTotalPrice(totalProductsPrice);
   }, [totalProductsPrice]);
@@ -20,10 +23,19 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   const formatPrice = (price: number) =>
     price.toFixed(2).replace('.', ',') + ' zł';
 
+  const handleButtonClick = () => {
+    if (isCheckoutPage) {
+      onCheckout();
+    } else {
+      router.push('/checkout'); // Redirect to the checkout page
+    }
+  };
+
   return (
     <aside
-      className="lg:w-4/12 bg-beige p-6 mt-8 rounded-[24px] shadow-lg"
-      style={{ maxHeight: '400px' }}
+      className={`${
+        isCheckoutPage ? 'w-full mt-8' : 'lg:w-4/12 mt-8'
+      } bg-beige p-6 rounded-[24px] shadow-lg`}
     >
       {/* Header */}
       <h2 className="text-2xl font-bold mb-6 text-neutral-darkest">
@@ -32,7 +44,9 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
       {/* Total Products */}
       <div className="flex justify-between text-lg mb-6">
-        <span className="text-neutral-darkest font-medium">Razem produkty</span>
+        <span className="text-neutral-darkest font-medium">
+          Wartość produktów
+        </span>
         <span className="font-semibold text-neutral-darkest">
           {formatPrice(totalProductsPrice)}
         </span>
@@ -56,10 +70,10 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
       {/* Checkout Button */}
       <button
-        onClick={onCheckout}
+        onClick={handleButtonClick}
         className="w-full py-4 bg-black text-white text-lg font-semibold rounded-full hover:bg-neutral-dark transition"
       >
-        Przejdź do kasy
+        {isCheckoutPage ? 'Zamawiam i Płacę' : 'Przejdź do kasy'}
       </button>
     </aside>
   );

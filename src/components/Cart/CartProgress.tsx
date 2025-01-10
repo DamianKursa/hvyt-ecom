@@ -1,14 +1,23 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 
-const steps = [
-  { label: 'Koszyk', icon: '/icons/cart.svg', active: true },
-  { label: 'Dostawa i płatność', icon: '/icons/truck.svg', active: false },
-  { label: 'Podsumowanie', icon: '/icons/podsumowanie.svg', active: false },
-];
-
 const CartProgress: React.FC = () => {
   const router = useRouter();
+
+  // Define the steps with their corresponding paths
+  const steps = [
+    { label: 'Koszyk', icon: '/icons/cart.svg', path: '/koszyk' },
+    {
+      label: 'Dostawa i płatność',
+      icon: '/icons/truck.svg',
+      path: '/checkout',
+    },
+    {
+      label: 'Podsumowanie',
+      icon: '/icons/podsumowanie.svg',
+      path: '/podsumowanie',
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-4 w-full">
@@ -23,29 +32,33 @@ const CartProgress: React.FC = () => {
 
       {/* Steps */}
       <div className="flex items-center w-full rounded-full border border-[#E0D6CD] bg-[#F8F5F1]">
-        {steps.map((step, index) => (
-          <div
-            key={index}
-            className={`flex items-center justify-center py-4 px-4 gap-3 flex-1 text-sm font-medium relative ${
-              step.active ? 'bg-[#E0D6CD] font-semibold' : 'bg-transparent'
-            } ${
-              index === 0
-                ? 'rounded-l-full'
-                : index === steps.length - 1
-                  ? 'rounded-r-full'
-                  : ''
-            }`}
-          >
-            {/* Border between steps */}
-            {index !== 0 && (
-              <div className="absolute left-0 top-0 h-full w-[1px] bg-[#E0D6CD]" />
-            )}
+        {steps.map((step, index) => {
+          const isActive = router.pathname === step.path; // Check if the current route matches the step's path
 
-            {/* Icon and label */}
-            <img src={step.icon} alt={step.label} className="w-5 h-5" />
-            <span>{step.label}</span>
-          </div>
-        ))}
+          return (
+            <div
+              key={index}
+              className={`flex items-center justify-center py-4 px-4 gap-3 flex-1 text-sm font-medium relative ${
+                isActive ? 'bg-[#E0D6CD] font-semibold' : 'bg-transparent'
+              } ${
+                index === 0
+                  ? 'rounded-l-full'
+                  : index === steps.length - 1
+                    ? 'rounded-r-full'
+                    : ''
+              }`}
+            >
+              {/* Border between steps */}
+              {index !== 0 && (
+                <div className="absolute left-0 top-0 h-full w-[1px] bg-[#E0D6CD]" />
+              )}
+
+              {/* Icon and label */}
+              <img src={step.icon} alt={step.label} className="w-5 h-5" />
+              <span>{step.label}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

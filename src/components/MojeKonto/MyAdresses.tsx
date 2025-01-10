@@ -5,8 +5,10 @@ import LoadingModal from '@/components/UI/LoadingModal'; // Import LoadingModal
 const MyAddresses: React.FC = () => {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [modalData, setModalData] = useState<any | null>(null);
+  const [modalType, setModalType] = useState<'add' | 'edit'>('add'); // Track modal type
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Fetch addresses on component mount
   useEffect(() => {
@@ -36,20 +38,15 @@ const MyAddresses: React.FC = () => {
   // Handle save (add or update address)
   const handleSave = async (newAddress: any) => {
     try {
-      let payload;
-
-      if (modalData && Object.keys(modalData).length > 0) {
-        // Update existing address
-        payload = {
-          action: 'update',
-          addresses: addresses.map((addr) =>
-            addr === modalData ? newAddress : addr,
-          ),
-        };
-      } else {
-        // Add new address
-        payload = { action: 'add', address: newAddress };
-      }
+      const isEdit = modalType === 'edit';
+      const payload = isEdit
+        ? {
+            action: 'update',
+            addresses: addresses.map((addr) =>
+              addr === modalData ? newAddress : addr,
+            ),
+          }
+        : { action: 'add', address: newAddress };
 
       const response = await fetch('/api/moje-konto/adresy', {
         method: 'POST',
@@ -71,6 +68,14 @@ const MyAddresses: React.FC = () => {
 
       setAddresses(refreshedAddresses);
       setModalData(null); // Close modal
+      setSuccessMessage(
+        isEdit
+          ? 'Twój adres dostawy został zmieniony.'
+          : 'Twój adres dostawy został dodany.',
+      );
+
+      // Clear the success message after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
     } catch {
       alert('Wystąpił błąd podczas zapisywania adresu. Spróbuj ponownie.');
     }
@@ -78,7 +83,14 @@ const MyAddresses: React.FC = () => {
 
   // Open modal for adding a new address
   const handleAddAddress = () => {
-    setModalData({}); // Reset modalData for a fresh new address
+    setModalData({});
+    setModalType('add');
+  };
+
+  // Open modal for editing an existing address
+  const handleEditAddress = (address: any) => {
+    setModalData(address);
+    setModalType('edit');
   };
 
   // Show LoadingModal while loading data
@@ -92,7 +104,7 @@ const MyAddresses: React.FC = () => {
   }
 
   return (
-    <div className="rounded-[25px] bg-white p-8 shadow-sm">
+    <div className="rounded-[25px] bg-white p-8 shadow-sm relative">
       <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
         Moje adresy
       </h2>
@@ -119,7 +131,7 @@ const MyAddresses: React.FC = () => {
                   </p>
                 </div>
                 <button
-                  onClick={() => setModalData(address)}
+                  onClick={() => handleEditAddress(address)}
                   className="text-black border border-black px-4 py-2 rounded-full flex items-center"
                 >
                   Edytuj Adres dostawy
@@ -148,10 +160,28 @@ const MyAddresses: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* Success Message Below the Section */}
+      {successMessage && (
+        <div className="bg-[#2A5E45] text-white px-4 py-2 rounded-lg mt-4 flex items-center">
+          <img
+            src="/icons/circle-check.svg"
+            alt="Success"
+            className="w-5 h-5 mr-2"
+          />
+          <span>{successMessage}</span>
+        </div>
+      )}
+
       {modalData !== null && (
         <AddressModal
           address={modalData}
-          onSave={handleSave}
+          addressNumber={
+            modalType === 'edit'
+              ? addresses.findIndex((addr) => addr === modalData) + 1
+              : addresses.length + 1
+          }
+          onSave={(address) => handleSave(address)}
           onClose={() => setModalData(null)}
         />
       )}

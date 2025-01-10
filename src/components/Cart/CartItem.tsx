@@ -6,9 +6,9 @@ import ProductVariationEdit from '@/components/Product/ProductVariationEdit';
 
 interface CartItemProps {
   product: Product;
-  onIncreaseQuantity: (product: Product) => void;
-  onDecreaseQuantity: (product: Product) => void;
-  onRemoveItem: (product: Product) => void;
+  onIncreaseQuantity?: (product: Product) => void; // Made optional
+  onDecreaseQuantity?: (product: Product) => void; // Made optional
+  onRemoveItem?: (product: Product) => void; // Made optional
 }
 
 const CartItem: React.FC<CartItemProps> = ({
@@ -52,11 +52,13 @@ const CartItem: React.FC<CartItemProps> = ({
         </div>
       </div>
 
-      <QuantityChanger
-        quantity={product.qty}
-        onIncrease={() => onIncreaseQuantity(product)}
-        onDecrease={() => onDecreaseQuantity(product)}
-      />
+      {onIncreaseQuantity && onDecreaseQuantity && (
+        <QuantityChanger
+          quantity={product.qty}
+          onIncrease={() => onIncreaseQuantity(product)}
+          onDecrease={() => onDecreaseQuantity(product)}
+        />
+      )}
 
       <div className="flex flex-col items-end">
         <p className="text-xl font-bold text-neutral-darkest">
@@ -64,12 +66,14 @@ const CartItem: React.FC<CartItemProps> = ({
         </p>
       </div>
 
-      <button
-        className="text-red-500 hover:text-red-700 ml-4"
-        onClick={() => onRemoveItem(product)}
-      >
-        <img src="/icons/trash.svg" alt="Remove Icon" className="w-6 h-6" />
-      </button>
+      {onRemoveItem && (
+        <button
+          className="text-red-500 hover:text-red-700 ml-4"
+          onClick={() => onRemoveItem(product)}
+        >
+          <img src="/icons/trash.svg" alt="Remove Icon" className="w-6 h-6" />
+        </button>
+      )}
     </div>
   );
 };
