@@ -31,6 +31,11 @@ const Checkout: React.FC = () => {
     phone: '',
     company: '',
     vatNumber: '',
+    street: '',
+    buildingNumber: '',
+    apartmentNumber: '',
+    city: '',
+    postalCode: '',
   });
   const [shippingData, setShippingData] = useState({
     street: '',
@@ -73,6 +78,11 @@ const Checkout: React.FC = () => {
         phone: billingData.phone,
         company: customerType === 'company' ? billingData.company : '',
         vat_number: customerType === 'company' ? billingData.vatNumber : '',
+        address_1: `${billingData.street} ${billingData.buildingNumber}`,
+        address_2: billingData.apartmentNumber,
+        city: billingData.city,
+        postcode: billingData.postalCode,
+        country: 'Polska', // Update based on API requirements
       },
       shipping: {
         address_1: `${shippingData.street} ${shippingData.buildingNumber}`,

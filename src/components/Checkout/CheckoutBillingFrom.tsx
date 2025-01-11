@@ -114,7 +114,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     const updatedFormData = { ...formData, [field]: value };
     setFormData(updatedFormData);
-    setBillingData(updatedFormData);
+    setBillingData(updatedFormData); // Pass the complete updated form data
   };
 
   if (loading) {
