@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export interface CheckoutAddressFormProps {
   shippingData: {
@@ -25,10 +25,57 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   shippingData,
   setShippingData,
 }) => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch('/api/moje-konto/user-addresses', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch addresses: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Fetched User Addresses:', data); // Debugging log
+
+        if (data && data.length > 0) {
+          // Use the first address as default (or implement your own logic)
+          const defaultAddress = data[0];
+          setShippingData({
+            street: defaultAddress.street || '',
+            buildingNumber: defaultAddress.buildingNumber || '',
+            city: defaultAddress.city || '',
+            postalCode: defaultAddress.postalCode || '',
+            country: defaultAddress.country || 'Polska',
+            additionalInfo: '',
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching addresses:', err);
+        setError('Nie udało się załadować adresów.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAddresses();
+  }, [setShippingData]);
+
+  if (loading) {
+    return <p>Ładowanie adresów...</p>;
+  }
+
   return (
     <div className="p-[24px_16px] border border-beige-dark rounded-[24px] bg-white mt-8">
+      {error && <p className="text-red-500">{error}</p>}
+
       <div className="grid grid-cols-2 gap-4">
-        {/* Separate Street and Building Number */}
         <input
           type="text"
           placeholder="Nazwa ulicy*"
@@ -82,7 +129,6 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         </select>
       </div>
 
-      {/* Additional Notes Section */}
       <textarea
         placeholder="Dodatkowe informacje do zamówienia (opcjonalnie)"
         value={shippingData.additionalInfo}
