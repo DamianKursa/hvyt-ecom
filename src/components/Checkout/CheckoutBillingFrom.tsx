@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import CreateAccount from '@/components/UI/CreateAccount';
 
 export interface CheckoutBillingFormProps {
@@ -19,6 +19,11 @@ export interface CheckoutBillingFormProps {
       phone: string;
       company: string;
       vatNumber: string;
+      street: string;
+      buildingNumber: string;
+      apartmentNumber: string;
+      city: string;
+      postalCode: string;
     }>
   >;
 }
@@ -34,8 +39,92 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
   user,
   setBillingData,
 }) => {
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    phone: '',
+    company: '',
+    vatNumber: '',
+    street: '',
+    buildingNumber: '',
+    apartmentNumber: '',
+    city: '',
+    postalCode: '',
+  });
+
+  useEffect(() => {
+    const fetchBillingAddress = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `/api/moje-konto/billing-addresses?type=${customerType}`,
+          {
+            method: 'GET',
+            credentials: 'include',
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch billing addresses: ${response.status}`,
+          );
+        }
+
+        const data = await response.json();
+        console.log('Fetched Billing Address:', data);
+
+        const address = data.find((addr: any) => addr.type === customerType);
+
+        if (address) {
+          const updatedFormData = {
+            firstName: address.firstName || '',
+            lastName: address.lastName || '',
+            phone: '', // Update this if phone is provided in API
+            company: address.companyName || '',
+            vatNumber: address.nip || '',
+            street: address.street || '',
+            buildingNumber: address.buildingNumber || '',
+            apartmentNumber: address.apartmentNumber || '',
+            city: address.city || '',
+            postalCode: address.postalCode || '',
+          };
+
+          setFormData(updatedFormData);
+          setBillingData(updatedFormData);
+
+          // Set email if provided in the fetched data
+          if (address.email) {
+            setEmail(address.email);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching billing address:', err);
+        setError('Nie udało się załadować danych do faktury.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBillingAddress();
+  }, [customerType, setBillingData, setEmail]);
+
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    const updatedFormData = { ...formData, [field]: value };
+    setFormData(updatedFormData);
+    setBillingData(updatedFormData);
+  };
+
+  if (loading) {
+    return <p>Ładowanie danych do faktury...</p>;
+  }
+
   return (
     <div className="p-[24px_16px] border border-beige-dark rounded-[24px] bg-white">
+      {error && <p className="text-red-500">{error}</p>}
+
       {/* Customer Type Toggle */}
       <div className="flex gap-4 mb-4">
         <label className="flex items-center">
@@ -43,14 +132,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             type="radio"
             value="individual"
             checked={customerType === 'individual'}
-            onChange={() => {
-              setCustomerType('individual');
-              setBillingData((prev) => ({
-                ...prev,
-                company: '',
-                vatNumber: '',
-              })); // Clear company-specific fields when switching to individual
-            }}
+            onChange={() => setCustomerType('individual')}
             className="hidden"
           />
           <span
@@ -87,24 +169,16 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
           <>
             <input
               type="text"
+              value={formData.firstName}
               placeholder="Imię*"
-              onChange={(e) =>
-                setBillingData((prev) => ({
-                  ...prev,
-                  firstName: e.target.value,
-                }))
-              }
+              onChange={(e) => handleInputChange('firstName', e.target.value)}
               className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
             <input
               type="text"
+              value={formData.lastName}
               placeholder="Nazwisko*"
-              onChange={(e) =>
-                setBillingData((prev) => ({
-                  ...prev,
-                  lastName: e.target.value,
-                }))
-              }
+              onChange={(e) => handleInputChange('lastName', e.target.value)}
               className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
           </>
@@ -112,60 +186,66 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
           <>
             <input
               type="text"
+              value={formData.company}
               placeholder="Nazwa firmy*"
-              onChange={(e) =>
-                setBillingData((prev) => ({
-                  ...prev,
-                  company: e.target.value,
-                }))
-              }
+              onChange={(e) => handleInputChange('company', e.target.value)}
               className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
             <input
               type="text"
+              value={formData.vatNumber}
               placeholder="NIP*"
-              onChange={(e) =>
-                setBillingData((prev) => ({
-                  ...prev,
-                  vatNumber: e.target.value,
-                }))
-              }
+              onChange={(e) => handleInputChange('vatNumber', e.target.value)}
               className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
           </>
         )}
         <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Adres e-mail*"
+          type="text"
+          value={formData.street}
+          placeholder="Ulica*"
+          onChange={(e) => handleInputChange('street', e.target.value)}
           className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
         <input
           type="text"
-          placeholder="Nr telefonu*"
-          onChange={(e) =>
-            setBillingData((prev) => ({
-              ...prev,
-              phone: e.target.value,
-            }))
-          }
+          value={formData.buildingNumber}
+          placeholder="Nr budynku*"
+          onChange={(e) => handleInputChange('buildingNumber', e.target.value)}
+          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+        />
+        <input
+          type="text"
+          value={formData.apartmentNumber}
+          placeholder="Nr lokalu"
+          onChange={(e) => handleInputChange('apartmentNumber', e.target.value)}
+          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+        />
+        <input
+          type="text"
+          value={formData.city}
+          placeholder="Miasto*"
+          onChange={(e) => handleInputChange('city', e.target.value)}
+          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+        />
+        <input
+          type="text"
+          value={formData.postalCode}
+          placeholder="Kod pocztowy*"
+          onChange={(e) => handleInputChange('postalCode', e.target.value)}
+          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+        />
+        <input
+          type="email"
+          value={email}
+          placeholder="Adres e-mail*"
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
       </div>
 
-      {/* Create Account Section */}
-      {!user && (
-        <>
-          <CreateAccount
-            onSave={(data) => {
-              setPassword(data.password);
-            }}
-          />
-        </>
-      )}
+      {!user && <CreateAccount onSave={(data) => setPassword(data.password)} />}
 
-      {/* Newsletter Checkbox */}
       <div className="mt-4 flex items-center gap-2">
         <input
           type="checkbox"
