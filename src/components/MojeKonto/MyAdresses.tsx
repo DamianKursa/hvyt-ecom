@@ -10,6 +10,13 @@ const MyAddresses: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
+  // Parse address_line_2 into buildingNumber and apartmentNumber
+  const parseAddressLine2 = (addressLine2: string) => {
+    if (!addressLine2) return { buildingNumber: '', apartmentNumber: '' };
+    const [buildingNumber, apartmentNumber] = addressLine2.split('/');
+    return { buildingNumber, apartmentNumber: apartmentNumber || '' };
+  };
+
   // Fetch addresses on component mount
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -24,7 +31,14 @@ const MyAddresses: React.FC = () => {
         }
 
         const data = await response.json();
-        setAddresses(data || []); // Update state with fetched addresses
+
+        // Transform the addresses to include buildingNumber and apartmentNumber
+        const transformedAddresses = data.map((address: any) => ({
+          ...address,
+          ...parseAddressLine2(address.address_line_2 || ''),
+        }));
+
+        setAddresses(transformedAddresses);
       } catch (err) {
         setError('Nie udało się załadować adresów.');
       } finally {
@@ -66,7 +80,12 @@ const MyAddresses: React.FC = () => {
         credentials: 'include',
       }).then((res) => res.json());
 
-      setAddresses(refreshedAddresses);
+      const transformedAddresses = refreshedAddresses.map((address: any) => ({
+        ...address,
+        ...parseAddressLine2(address.address_line_2 || ''),
+      }));
+
+      setAddresses(transformedAddresses);
       setModalData(null); // Close modal
       setSuccessMessage(
         isEdit
