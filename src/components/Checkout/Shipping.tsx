@@ -15,6 +15,8 @@ interface ShippingZone {
 interface ShippingProps {
   shippingMethod: string;
   setShippingMethod: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedLocker: React.Dispatch<React.SetStateAction<string>>;
+  setLockerSize: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // Extend the Window interface for TypeScript
@@ -33,6 +35,8 @@ declare global {
 const Shipping: React.FC<ShippingProps> = ({
   shippingMethod,
   setShippingMethod,
+  setSelectedLocker,
+  setLockerSize,
 }) => {
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
   const [loading, setLoading] = useState(true);
@@ -129,6 +133,7 @@ const Shipping: React.FC<ShippingProps> = ({
         (point: any, modal: any) => {
           modal.closeModal();
           console.log('Selected Point:', point);
+          setSelectedLocker(point.name); // Save the selected locker
           alert(`Wybrany Paczkomat: ${point.name}`);
         },
         { width: 500, height: 600 },

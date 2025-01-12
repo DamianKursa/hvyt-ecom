@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component';
@@ -16,15 +16,22 @@ import { useUserContext } from '@/context/UserContext';
 const Checkout: React.FC = () => {
   const router = useRouter();
 
+  // States for customer type, payment, shipping methods, etc.
   const [customerType, setCustomerType] = useState<'individual' | 'company'>(
     'individual',
   );
   const [shippingMethod, setShippingMethod] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<string>('');
+  const [shippingPrice, setShippingPrice] = useState<number>(0);
+  const [shippingTitle, setShippingTitle] = useState<string>('');
+  const [selectedLocker, setSelectedLocker] = useState<string>('');
+  const [lockerSize, setLockerSize] = useState<string>('');
+  const [paymentMethod, setPaymentMethod] = useState<string>('przelewy24');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [subscribeNewsletter, setSubscribeNewsletter] =
     useState<boolean>(false);
+
+  // States for billing and shipping data
   const [billingData, setBillingData] = useState({
     firstName: '',
     lastName: '',
@@ -36,33 +43,67 @@ const Checkout: React.FC = () => {
     apartmentNumber: '',
     city: '',
     postalCode: '',
+    country: 'Polska',
   });
+
   const [shippingData, setShippingData] = useState({
     street: '',
     buildingNumber: '',
+    apartmentNumber: '',
     city: '',
     postalCode: '',
     country: 'Polska',
     additionalInfo: '',
   });
 
+  const [isShippingDifferent, setIsShippingDifferent] = useState(false);
+
   const { user } = useUserContext();
   const { cart } = useContext(CartContext);
 
-  // Redirect to /koszyk if the cart is empty
+  // Redirect to cart page if cart is empty
   useEffect(() => {
-    if (cart === undefined) {
-      // Avoid redirecting before the cart data is loaded
-      return;
-    }
     if (!cart || cart.products.length === 0) {
       router.push('/koszyk');
     }
   }, [cart, router]);
 
+  // Fetch shipping methods
+  useEffect(() => {
+    const fetchShippingMethods = async () => {
+      try {
+        const response = await axios.get('/api/shipping');
+        const shippingZones = response.data;
+
+        if (shippingZones.length > 0) {
+          const defaultMethod = shippingZones[0].methods[0];
+          setShippingMethod(defaultMethod.id);
+          setShippingPrice(Number(defaultMethod.cost) || 0);
+          setShippingTitle(defaultMethod.title);
+        }
+      } catch (error) {
+        console.error('Error fetching shipping methods:', error);
+        alert('Nie udało się załadować metod dostawy.');
+      }
+    };
+
+    fetchShippingMethods();
+  }, []);
+
+  // Handle order submission
   const handleOrderSubmit = async () => {
     if (!cart || cart.products.length === 0) {
-      console.error('Cart is empty!');
+      alert('Koszyk jest pusty!');
+      return;
+    }
+
+    if (!shippingMethod) {
+      alert('Wybierz metodę dostawy.');
+      return;
+    }
+
+    if (!paymentMethod) {
+      alert('Wybierz metodę płatności.');
       return;
     }
 
@@ -79,66 +120,75 @@ const Checkout: React.FC = () => {
         company: customerType === 'company' ? billingData.company : '',
         vat_number: customerType === 'company' ? billingData.vatNumber : '',
         address_1: `${billingData.street} ${billingData.buildingNumber}`,
-        address_2: billingData.apartmentNumber,
+        address_2: billingData.apartmentNumber || '',
         city: billingData.city,
         postcode: billingData.postalCode,
-        country: 'Polska', // Update based on API requirements
+        country: billingData.country,
       },
-      shipping: {
-        address_1: `${shippingData.street} ${shippingData.buildingNumber}`,
-        city: shippingData.city,
-        postcode: shippingData.postalCode,
-        country: shippingData.country,
-      },
+      shipping: isShippingDifferent
+        ? {
+            first_name: billingData.firstName,
+            last_name: billingData.lastName,
+            address_1: `${shippingData.street} ${shippingData.buildingNumber}`,
+            address_2: shippingData.apartmentNumber || '',
+            city: shippingData.city,
+            postcode: shippingData.postalCode,
+            country: shippingData.country,
+          }
+        : {
+            first_name: billingData.firstName,
+            last_name: billingData.lastName,
+            address_1: `${billingData.street} ${billingData.buildingNumber}`,
+            address_2: billingData.apartmentNumber || '',
+            city: billingData.city,
+            postcode: billingData.postalCode,
+            country: billingData.country,
+          },
       shipping_lines: [
         {
           method_id: shippingMethod,
-          total: cart.totalProductsPrice.toFixed(2),
+          method_title: shippingTitle,
+          total: shippingPrice.toFixed(2),
         },
       ],
       line_items: cart.products.map((product) => ({
         product_id: product.productId,
+        variation_id: product.variationId || undefined,
         quantity: product.qty,
         subtotal: product.price.toFixed(2),
         total: product.totalPrice.toFixed(2),
+        meta_data: product.attributes
+          ? Object.entries(product.attributes).map(([key, value]) => ({
+              key,
+              value,
+            }))
+          : [],
       })),
       customer_note: shippingData.additionalInfo || '',
+      customer_id: user?.id || undefined,
     };
 
-    console.log('Order Data:', orderData);
+    console.log('Order data to be sent to API:', orderData);
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_REST_API}/orders`,
-        orderData,
-        {
-          auth: {
-            username: process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || '',
-            password: process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || '',
-          },
+      const response = await axios.post('/api/create-order', orderData, {
+        headers: {
+          'Content-Type': 'application/json',
         },
-      );
+      });
 
       const createdOrder = response.data;
-
       console.log('Order created successfully:', createdOrder);
 
-      if (paymentMethod === 'przelewy24') {
-        redirectToPrzelewy24(createdOrder);
+      if (createdOrder.payment_url) {
+        window.location.href = createdOrder.payment_url;
       } else {
-        alert('Order submitted successfully!');
+        alert('Zamówienie utworzone, ale brakuje linku do płatności.');
       }
     } catch (error) {
-      console.error(
-        'Error submitting order:',
-        (error as AxiosError).response?.data || (error as Error).message,
-      );
+      console.error('Error creating order:', error);
+      alert('Wystąpił błąd podczas składania zamówienia. Spróbuj ponownie.');
     }
-  };
-
-  const redirectToPrzelewy24 = (order: any) => {
-    const paymentUrl = `${process.env.WORDPRESS_API_URL}/checkout/order-pay/${order.id}/?key=${order.payment_url_key}`;
-    window.location.href = paymentUrl;
   };
 
   return (
@@ -182,8 +232,12 @@ const Checkout: React.FC = () => {
                 Adres
               </h2>
               <CheckoutAddressForm
+                billingData={billingData}
+                setBillingData={setBillingData}
                 shippingData={shippingData}
                 setShippingData={setShippingData}
+                isShippingDifferent={isShippingDifferent}
+                setIsShippingDifferent={setIsShippingDifferent}
               />
             </div>
             <div className="mt-8">
@@ -194,6 +248,8 @@ const Checkout: React.FC = () => {
                 <Shipping
                   shippingMethod={shippingMethod}
                   setShippingMethod={setShippingMethod}
+                  setSelectedLocker={setSelectedLocker}
+                  setLockerSize={setLockerSize}
                 />
                 <div className="mt-8">
                   <Payment

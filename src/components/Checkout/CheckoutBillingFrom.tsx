@@ -24,6 +24,7 @@ export interface CheckoutBillingFormProps {
       apartmentNumber: string;
       city: string;
       postalCode: string;
+      country: string;
     }>
   >;
 }
@@ -48,13 +49,9 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
     phone: '',
     company: '',
     vatNumber: '',
-    street: '',
-    buildingNumber: '',
-    apartmentNumber: '',
-    city: '',
-    postalCode: '',
   });
 
+  // Fetch billing address data
   useEffect(() => {
     const fetchBillingAddress = async () => {
       setLoading(true);
@@ -74,15 +71,22 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
         }
 
         const data = await response.json();
-        console.log('Fetched Billing Address:', data);
-
         const address = data.find((addr: any) => addr.type === customerType);
 
         if (address) {
           const updatedFormData = {
             firstName: address.firstName || '',
             lastName: address.lastName || '',
-            phone: '', // Update this if phone is provided in API
+            phone: address.phone || '',
+            company: address.companyName || '',
+            vatNumber: address.nip || '',
+          };
+
+          setFormData(updatedFormData);
+          setBillingData({
+            firstName: address.firstName || '',
+            lastName: address.lastName || '',
+            phone: address.phone || '',
             company: address.companyName || '',
             vatNumber: address.nip || '',
             street: address.street || '',
@@ -90,12 +94,9 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             apartmentNumber: address.apartmentNumber || '',
             city: address.city || '',
             postalCode: address.postalCode || '',
-          };
+            country: address.country || 'Polska',
+          });
 
-          setFormData(updatedFormData);
-          setBillingData(updatedFormData);
-
-          // Set email if provided in the fetched data
           if (address.email) {
             setEmail(address.email);
           }
@@ -114,7 +115,12 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     const updatedFormData = { ...formData, [field]: value };
     setFormData(updatedFormData);
-    setBillingData(updatedFormData); // Pass the complete updated form data
+
+    setBillingData((prev) => ({
+      ...prev,
+      ...updatedFormData,
+      email,
+    }));
   };
 
   if (loading) {
@@ -202,37 +208,9 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
         )}
         <input
           type="text"
-          value={formData.street}
-          placeholder="Ulica*"
-          onChange={(e) => handleInputChange('street', e.target.value)}
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
-        <input
-          type="text"
-          value={formData.buildingNumber}
-          placeholder="Nr budynku*"
-          onChange={(e) => handleInputChange('buildingNumber', e.target.value)}
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
-        <input
-          type="text"
-          value={formData.apartmentNumber}
-          placeholder="Nr lokalu"
-          onChange={(e) => handleInputChange('apartmentNumber', e.target.value)}
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
-        <input
-          type="text"
-          value={formData.city}
-          placeholder="Miasto*"
-          onChange={(e) => handleInputChange('city', e.target.value)}
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
-        <input
-          type="text"
-          value={formData.postalCode}
-          placeholder="Kod pocztowy*"
-          onChange={(e) => handleInputChange('postalCode', e.target.value)}
+          value={formData.phone}
+          placeholder="Numer telefonu*"
+          onChange={(e) => handleInputChange('phone', e.target.value)}
           className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
         <input

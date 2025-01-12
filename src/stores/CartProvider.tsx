@@ -8,8 +8,9 @@ export interface Product {
   totalPrice: number;
   image: string;
   productId: number;
-  attributes?: { [key: string]: string };
-  variationOptions?: { [key: string]: string[] };
+  variationId?: number; // Optional variation ID
+  attributes?: { [key: string]: string }; // Selected attributes for the variation
+  variationOptions?: { [key: string]: string[] }; // Available options for each attribute
 }
 
 export interface Coupon {

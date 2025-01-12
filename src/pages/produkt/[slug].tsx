@@ -156,23 +156,26 @@ const ProductPage = () => {
     }
 
     const cartItem = {
-      cartKey: selectedVariation?.id || product.id.toString(),
+      cartKey: selectedVariation?.id || product.id.toString(), // Key based on variation or product
       name: product.name,
       qty: quantity,
-      price: parseFloat(selectedVariation?.price || product.price),
+      price: parseFloat(selectedVariation?.price || product.price), // Use variation price if available
       totalPrice:
-        quantity * parseFloat(selectedVariation?.price || product.price),
+        quantity * parseFloat(selectedVariation?.price || product.price), // Calculate total price
       image:
-        selectedVariation?.image?.sourceUrl ||
+        selectedVariation?.image?.sourceUrl || // Use variation image if available
         product.images?.[0]?.src ||
         '/fallback-image.jpg',
-      productId: parseInt(product.id.toString(), 10),
-      attributes: selectedAttributes,
+      productId: parseInt(product.id.toString(), 10), // Product ID
+      variationId: selectedVariation?.id
+        ? parseInt(selectedVariation.id, 10)
+        : undefined, // Ensure variationId is a number or undefined
+      attributes: selectedAttributes, // Include selected attributes
     };
 
-    console.log('Adding to cart:', cartItem);
-    addCartItem(cartItem);
-    dispatch({ type: 'TOGGLE_MODAL', payload: true });
+    console.log('Adding to cart:', cartItem); // Debugging log
+    addCartItem(cartItem); // Add the item to the cart
+    dispatch({ type: 'TOGGLE_MODAL', payload: true }); // Open the modal
   };
 
   const galleryImages = useMemo(

@@ -47,7 +47,6 @@ const BillingAddresses: React.FC = () => {
 
   const handleSave = async (newBillingData: BillingData) => {
     try {
-      // Combine buildingNumber and apartmentNumber into billing_address_2
       const formattedAddress = {
         ...newBillingData,
         billing_address_2: `${newBillingData.buildingNumber || ''}${
@@ -58,11 +57,11 @@ const BillingAddresses: React.FC = () => {
       };
 
       const payload = {
-        action: billingData.some((addr) => addr.type === newBillingData.type)
-          ? 'update'
-          : 'add',
-        addresses: [formattedAddress], // Send as an array for update consistency
+        action: 'add',
+        address: formattedAddress,
       };
+
+      console.log('Payload sent to server:', JSON.stringify(payload, null, 2)); // Log payload
 
       const response = await fetch('/api/moje-konto/billing-addresses', {
         method: 'POST',
@@ -70,15 +69,20 @@ const BillingAddresses: React.FC = () => {
         body: JSON.stringify(payload),
       });
 
+      const responseData = await response.json();
+      console.log('Server response:', responseData); // Log server response
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save billing address');
+        console.error('Error response from server:', responseData);
+        throw new Error(
+          responseData.message || 'Failed to save billing address',
+        );
       }
 
       await fetchBillingData(); // Refresh data after saving
       setModalData(null); // Close the modal
     } catch (err) {
-      console.error(err);
+      console.error('Error saving billing address:', err);
       alert('Nie udało się zapisać danych do faktury. Spróbuj ponownie.');
     }
   };

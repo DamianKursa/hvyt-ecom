@@ -7,7 +7,9 @@ import React, {
 } from 'react';
 import { useRouter } from 'next/router';
 
+// Updated User interface to include id (optional)
 interface User {
+  id?: number | null; // Optional id field
   name: string | null;
   email: string | null;
 }
@@ -55,11 +57,15 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
       if (profileResponse.ok) {
         const data = await profileResponse.json();
-        setUser({ name: data.name, email: data.email });
+        setUser({ id: data.id || null, name: data.name, email: data.email }); // Include id
         localStorage.setItem(
           'user',
-          JSON.stringify({ name: data.name, email: data.email }),
-        ); // Persist user data
+          JSON.stringify({
+            id: data.id || null,
+            name: data.name,
+            email: data.email,
+          }),
+        ); // Persist user data including id
         console.log('Fetched user profile:', data);
       } else {
         setUser(null);
@@ -104,8 +110,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       console.log('Registration successful:', data);
 
       // Automatically log in the user after registration
-      setUser({ name: username, email });
-      localStorage.setItem('user', JSON.stringify({ name: username, email })); // Persist user data
+      setUser({ id: data.id || null, name: username, email }); // Include id
+      localStorage.setItem(
+        'user',
+        JSON.stringify({ id: data.id || null, name: username, email }),
+      ); // Persist user data including id
 
       console.log('User registered and logged in.');
     } catch (error) {

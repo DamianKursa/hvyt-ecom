@@ -43,6 +43,9 @@ export const fetchProductBySlug = async (slug: string) => {
         slug,
       },
     });
+
+    console.log('Fetched product data:', response.data); // Log the returned data
+
     return response.data[0]; // Return the first product matching the slug
   } catch (error) {
     console.error('Error fetching product by slug:', error);
