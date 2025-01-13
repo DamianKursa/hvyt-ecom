@@ -103,7 +103,6 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
         }
       } catch (err) {
         console.error('Error fetching billing address:', err);
-        setError('Nie udało się załadować danych do faktury.');
       } finally {
         setLoading(false);
       }

@@ -62,7 +62,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   setIsShippingDifferent,
 }) => {
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+
   const [needVATInvoice, setNeedVATInvoice] = useState<boolean>(false);
 
   useEffect(() => {
@@ -107,7 +107,6 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         }
       } catch (err) {
         console.error('Error fetching addresses:', err);
-        setError('Nie udało się załadować adresów.');
       } finally {
         setLoading(false);
       }
@@ -122,8 +121,6 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
 
   return (
     <div className="p-[24px_16px] border border-beige-dark rounded-[24px] bg-white mt-8">
-      {error && <p className="text-red-500">{error}</p>}
-
       {/* Billing Address */}
       <div className="grid grid-cols-2 gap-4">
         <input
