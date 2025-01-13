@@ -17,6 +17,7 @@ interface ShippingProps {
   setShippingMethod: React.Dispatch<React.SetStateAction<string>>;
   setSelectedLocker: React.Dispatch<React.SetStateAction<string>>;
   setLockerSize: React.Dispatch<React.SetStateAction<string>>;
+  cartTotal: number; // Pass the cart total to dynamically display shipping methods
 }
 
 // Extend the Window interface for TypeScript
@@ -37,13 +38,24 @@ const Shipping: React.FC<ShippingProps> = ({
   setShippingMethod,
   setSelectedLocker,
   setLockerSize,
+  cartTotal,
 }) => {
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const scriptLoadedRef = useRef(false);
 
-  // Fetch shipping methods on component mount
+  // Map titles to icons
+  const shippingIcons: Record<string, string> = {
+    'kurier gls': '/icons/GLS_Logo_2021.svg',
+    'kurier inpost': '/icons/inpost-kurier.svg',
+    'paczkomaty inpost': '/icons/paczkomat.png',
+    'kurier gls - darmowa wysyłka': '/icons/GLS_Logo_2021.svg',
+    'darmowa dostawa': '/icons/free-shipping.svg',
+    'kurier gls pobranie': '/icons/GLS_Logo_2021.svg',
+  };
+
+  // Fetch shipping methods
   useEffect(() => {
     const fetchShippingMethods = async () => {
       try {
@@ -57,22 +69,70 @@ const Shipping: React.FC<ShippingProps> = ({
 
         const data = await response.json();
 
-        // Filter for Poland-related zones (Polska/Poland)
-        const polandShippingZones = data.filter((zone: ShippingZone) =>
-          zone.zoneName.toLowerCase().includes('polska'),
-        );
+        // Filter and prioritize methods
+        const updatedZones = data.map((zone: ShippingZone) => {
+          let filteredMethods = zone.methods.filter(
+            (method) =>
+              !method.title.toLowerCase().includes('flexible shipping') &&
+              !(
+                method.title.toLowerCase().includes('darmowa') &&
+                cartTotal < 300
+              ), // Exclude "Darmowa" if cart < 300
+          );
 
-        setShippingZones(polandShippingZones);
+          if (cartTotal >= 300) {
+            // Ensure only "Darmowa Dostawa", "Kurier GLS - Darmowa wysyłka", and "Paczkomaty InPost" appear
+            filteredMethods = filteredMethods.filter((method) =>
+              [
+                'darmowa dostawa',
+                'kurier gls - darmowa wysyłka',
+                'paczkomaty inpost',
+              ].includes(method.title.toLowerCase()),
+            );
+
+            // Add "Darmowa Dostawa" dynamically if missing
+            if (
+              !filteredMethods.some(
+                (method) => method.title.toLowerCase() === 'darmowa dostawa',
+              )
+            ) {
+              filteredMethods.push({
+                id: 'free_shipping',
+                title: 'Darmowa Dostawa',
+                cost: null,
+                enabled: true,
+              });
+            }
+          }
+
+          // Always include "Paczkomaty InPost" if missing
+          if (
+            !filteredMethods.some(
+              (method) => method.title.toLowerCase() === 'paczkomaty inpost',
+            )
+          ) {
+            filteredMethods.push({
+              id: 'paczkomaty_inpost',
+              title: 'Paczkomaty InPost',
+              cost: cartTotal >= 300 ? null : 15, // Example cost for Paczkomaty
+              enabled: true,
+            });
+          }
+
+          return { ...zone, methods: filteredMethods };
+        });
+
+        setShippingZones(updatedZones);
       } catch (err) {
-        console.error(err);
-        setError((err as Error).message || 'An error occurred');
+        console.error('Error fetching shipping methods:', err);
+        setError('An error occurred while fetching shipping methods.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchShippingMethods();
-  }, []);
+  }, [cartTotal]);
 
   // Load EasyPack script and styles
   useEffect(() => {
@@ -86,12 +146,11 @@ const Shipping: React.FC<ShippingProps> = ({
         script.async = true;
 
         script.onload = () => {
-          console.log('EasyPack script loaded');
           initializeEasyPack();
         };
 
         script.onerror = () => {
-          console.error('Failed to load the EasyPack script.');
+          console.error('Failed to load EasyPack script.');
         };
 
         document.body.appendChild(script);
@@ -107,7 +166,6 @@ const Shipping: React.FC<ShippingProps> = ({
 
     const initializeEasyPack = () => {
       if (window.easyPack) {
-        console.log('Initializing EasyPack...');
         window.easyPack.init({
           defaultLocale: 'pl',
           mapType: 'osm',
@@ -132,7 +190,6 @@ const Shipping: React.FC<ShippingProps> = ({
       window.easyPack.modalMap(
         (point: any, modal: any) => {
           modal.closeModal();
-          console.log('Selected Point:', point);
           setSelectedLocker(point.name); // Save the selected locker
           alert(`Wybrany Paczkomat: ${point.name}`);
         },
@@ -162,13 +219,13 @@ const Shipping: React.FC<ShippingProps> = ({
           {zone.methods.map((method) => (
             <label
               key={method.id}
-              className={`flex items-center justify-between py-[16px] border-b ${
+              className={`grid grid-cols-3 items-center py-[16px] border-b ${
                 shippingMethod === method.id
                   ? 'border-dark-pastel-red'
                   : 'border-beige-dark'
               }`}
             >
-              <div className="flex items-center">
+              <div className="flex items-center gap-4">
                 <input
                   type="radio"
                   value={method.id}
@@ -183,67 +240,35 @@ const Shipping: React.FC<ShippingProps> = ({
                       : 'border-2 border-gray-400'
                   }`}
                 ></span>
-                <span className="ml-2">{method.title}</span>
+                <span>{method.title}</span>
               </div>
-              <span>
+              <span className="text-center">
                 {method.cost
                   ? `${parseFloat(String(method.cost)).toFixed(2)} zł`
                   : 'Darmowa'}
               </span>
-              <span>
-                <img
-                  src="/icons/shipping-icon.svg" // Replace with your icon path
-                  alt="Shipping Icon"
-                  className="w-6 h-6"
-                />
-              </span>
+              <img
+                src={
+                  shippingIcons[method.title.toLowerCase()] ||
+                  '/icons/default.svg'
+                }
+                alt={`${method.title} Icon`}
+                className="w-[55px] h-auto mx-auto"
+              />
             </label>
           ))}
         </div>
       ))}
-      <div
-        className={`py-[16px] border-b ${
-          shippingMethod === 'paczkomaty'
-            ? 'border-dark-pastel-red'
-            : 'border-beige-dark'
-        }`}
-      >
-        <label className="flex items-center justify-between">
-          <div className="flex items-center">
-            <input
-              type="radio"
-              value="paczkomaty"
-              checked={shippingMethod === 'paczkomaty'}
-              onChange={() => setShippingMethod('paczkomaty')}
-              className="hidden"
-            />
-            <span
-              className={`w-5 h-5 rounded-full ${
-                shippingMethod === 'paczkomaty'
-                  ? 'border-4 border-dark-pastel-red'
-                  : 'border-2 border-gray-400'
-              }`}
-            ></span>
-            <span className="ml-2">InPost paczkomaty</span>
-          </div>
-          <span>Darmowa</span>
-          <span>
-            <img
-              src="/icons/paczkomaty-icon.svg" // Replace with your icon path
-              alt="Paczkomaty Icon"
-              className="w-6 h-6"
-            />
-          </span>
-        </label>
-        {shippingMethod === 'paczkomaty' && (
+      {shippingMethod === 'paczkomaty' && (
+        <div>
           <button
             onClick={openModal}
             className="mt-4 p-2 bg-blue-500 text-white rounded"
           >
             Wybierz Paczkomat
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

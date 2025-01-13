@@ -250,7 +250,9 @@ const Checkout: React.FC = () => {
                   setShippingMethod={setShippingMethod}
                   setSelectedLocker={setSelectedLocker}
                   setLockerSize={setLockerSize}
+                  cartTotal={cart?.totalProductsPrice || 0}
                 />
+
                 <div className="mt-8">
                   <Payment
                     paymentMethod={paymentMethod}
