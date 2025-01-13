@@ -118,7 +118,7 @@ const Checkout: React.FC = () => {
         email,
         phone: billingData.phone,
         company: customerType === 'company' ? billingData.company : '',
-        vat_number: customerType === 'company' ? billingData.vatNumber : '',
+        billing_nip: customerType === 'company' ? billingData.vatNumber : '',
         address_1: `${billingData.street} ${billingData.buildingNumber}`,
         address_2: billingData.apartmentNumber || '',
         city: billingData.city,
@@ -181,7 +181,7 @@ const Checkout: React.FC = () => {
       console.log('Order created successfully:', createdOrder);
 
       if (createdOrder.payment_url) {
-        window.location.href = createdOrder.payment_url;
+        //window.location.href = createdOrder.payment_url;
       } else {
         alert('Zamówienie utworzone, ale brakuje linku do płatności.');
       }

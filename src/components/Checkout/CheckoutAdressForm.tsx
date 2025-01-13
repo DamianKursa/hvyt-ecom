@@ -125,7 +125,6 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
       {error && <p className="text-red-500">{error}</p>}
 
       {/* Billing Address */}
-      <h3 className="text-lg font-bold mb-4">Adres do faktury</h3>
       <div className="grid grid-cols-2 gap-4">
         <input
           type="text"
@@ -220,7 +219,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
 
       {isShippingDifferent && (
         <div className="mt-4">
-          <h3 className="text-lg font-bold mb-4">Adres do wysyłki</h3>
+          <h3 className="text-lg font-bold mb-4">Wpisz inny adres</h3>
           <div className="grid grid-cols-2 gap-4">
             <input
               type="text"
