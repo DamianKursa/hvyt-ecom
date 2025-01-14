@@ -126,6 +126,27 @@ const Checkout: React.FC = () => {
       return;
     }
 
+    // Use the appropriate address based on "Dostawa pod inny adres"
+    const shippingAddress = isShippingDifferent
+      ? {
+          first_name: billingData.firstName,
+          last_name: billingData.lastName,
+          address_1: `${shippingData.street} ${shippingData.buildingNumber}`,
+          address_2: shippingData.apartmentNumber || '',
+          city: shippingData.city,
+          postcode: shippingData.postalCode,
+          country: shippingData.country,
+        }
+      : {
+          first_name: billingData.firstName,
+          last_name: billingData.lastName,
+          address_1: `${billingData.street} ${billingData.buildingNumber}`,
+          address_2: billingData.apartmentNumber || '',
+          city: billingData.city,
+          postcode: billingData.postalCode,
+          country: billingData.country,
+        };
+
     const shippingMetaData = [];
     if (shippingMethod === 'paczkomaty_inpost') {
       shippingMetaData.push(
@@ -144,8 +165,9 @@ const Checkout: React.FC = () => {
     }
 
     const orderData = {
-      payment_method: paymentMethod,
-      payment_method_title: shippingTitle,
+      payment_method: paymentMethod, // Pass the correct payment method
+      payment_method_title:
+        paymentMethod === 'przelewy24' ? 'Przelewy24' : shippingTitle,
       set_paid: false,
       billing: {
         first_name: billingData.firstName,
@@ -160,15 +182,7 @@ const Checkout: React.FC = () => {
         postcode: billingData.postalCode,
         country: billingData.country,
       },
-      shipping: {
-        first_name: billingData.firstName,
-        last_name: billingData.lastName,
-        address_1: `${shippingData.street} ${shippingData.buildingNumber}`,
-        address_2: shippingData.apartmentNumber || '',
-        city: shippingData.city,
-        postcode: shippingData.postalCode,
-        country: shippingData.country,
-      },
+      shipping: shippingAddress, // Use the dynamically determined shipping address
       shipping_lines: [
         {
           method_id: shippingMethod,
