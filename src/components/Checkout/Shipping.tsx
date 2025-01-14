@@ -73,8 +73,8 @@ const Shipping: React.FC<ShippingProps> = ({
 
         const data = await response.json();
 
-        // Log the fetched methods for debugging
-        console.log('Fetched shipping methods:', data);
+        // Log the raw fetched data
+        console.log('Fetched shipping methods:', JSON.stringify(data, null, 2));
 
         const updatedZones = data.map((zone: ShippingZone) => {
           let filteredMethods = zone.methods.filter(
@@ -122,6 +122,12 @@ const Shipping: React.FC<ShippingProps> = ({
             });
           }
 
+          // Log each shipping zone after filtering
+          console.log(
+            `Updated zone (${zone.zoneName}):`,
+            JSON.stringify(filteredMethods, null, 2),
+          );
+
           return { ...zone, methods: filteredMethods };
         });
 
@@ -139,12 +145,18 @@ const Shipping: React.FC<ShippingProps> = ({
 
   // Handle dynamic shipping method change
   const handleShippingChange = (method: ShippingMethod) => {
+    console.log('Selected method:', method);
+
     setShippingMethod(method.id);
     setShippingTitle(method.title);
 
-    // Set price to 25 zł for Kurier GLS Pobranie
     const price =
-      method.id === 'kurier_gls_pobranie' ? 25 : Number(method.cost) || 0;
+      method.id === 'kurier_gls_pobranie'
+        ? Number(method.cost) || 25 // Use the fetched cost or fallback to 25
+        : Number(method.cost) || 0;
+
+    console.log(`Price for method (${method.title}):`, price);
+
     setShippingPrice(price);
   };
 
@@ -281,7 +293,7 @@ const Shipping: React.FC<ShippingProps> = ({
                   <div>
                     <button
                       onClick={openModal}
-                      className="mt-2 p-2 bg-blue-500 text-white rounded"
+                      className="mt-6 text-black border border-black px-4 py-2 rounded-full flex items-center text-sm"
                     >
                       Wybierz Paczkomat
                     </button>

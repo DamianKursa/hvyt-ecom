@@ -32,14 +32,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           methods: methodsResponse.data
           .filter((method: any) => method.enabled)
           .map((method: any) => {
-            const cost = Number(method.settings?.cost?.value);
+            const cost =
+              method.title.toLowerCase() === 'kurier gls pobranie'
+                ? 25 // Fallback to 25 if cost is missing or 0
+                : Number(method.settings?.cost?.value);
             return {
               id: method.id,
               title: method.title,
-              cost: isNaN(cost) ? 0 : cost, 
+              cost: isNaN(cost) ? 0 : cost,
               enabled: method.enabled,
             };
           }),
+        
         
             
         };
