@@ -324,6 +324,7 @@ const Checkout: React.FC = () => {
             <div className="sticky top-[80px] pt-[18px] rounded-[25px] bg-white">
               <OrderItems />
               <CartSummary
+                shippingPrice={shippingPrice}
                 totalProductsPrice={cart?.totalProductsPrice || 0}
                 onCheckout={handleOrderSubmit}
                 isCheckoutPage={true}

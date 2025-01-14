@@ -4,12 +4,14 @@ import DiscountCode from '@/components/Cart/DiscountCode'; // Adjust the path if
 
 interface CartSummaryProps {
   totalProductsPrice: number;
+  shippingPrice?: number; // Optional shipping price
   onCheckout: () => void; // Trigger order creation
   isCheckoutPage?: boolean; // Flag to determine if it's the checkout page
 }
 
 const CartSummary: React.FC<CartSummaryProps> = ({
   totalProductsPrice,
+  shippingPrice = 0, // Default shipping price is 0
   onCheckout,
   isCheckoutPage = false,
 }) => {
@@ -17,8 +19,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   const router = useRouter(); // Initialize the useRouter hook
 
   useEffect(() => {
-    setTotalPrice(totalProductsPrice);
-  }, [totalProductsPrice]);
+    // Update total price including shipping if on checkout page
+    const updatedTotal = isCheckoutPage
+      ? totalProductsPrice + shippingPrice
+      : totalProductsPrice;
+    setTotalPrice(updatedTotal);
+  }, [totalProductsPrice, shippingPrice, isCheckoutPage]);
 
   const formatPrice = (price: number) =>
     price.toFixed(2).replace('.', ',') + ' zł';
@@ -51,6 +57,16 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           {formatPrice(totalProductsPrice)}
         </span>
       </div>
+
+      {/* Shipping Price (Visible only on checkout) */}
+      {isCheckoutPage && (
+        <div className="flex justify-between text-lg mb-6">
+          <span className="text-neutral-darkest font-medium">Wysyłka</span>
+          <span className="font-semibold text-neutral-darkest">
+            {shippingPrice > 0 ? formatPrice(shippingPrice) : 'Darmowa'}
+          </span>
+        </div>
+      )}
 
       {/* Discount Code Section */}
       <DiscountCode cartTotal={totalPrice} setCartTotal={setTotalPrice} />
