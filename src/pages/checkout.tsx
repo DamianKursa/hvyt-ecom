@@ -59,6 +59,14 @@ const Checkout: React.FC = () => {
   const { user } = useUserContext();
   const { cart } = useContext(CartContext);
 
+  // Map country name to country code
+  const mapCountry = (country: string): string => {
+    const countryMapping: Record<string, string> = {
+      Polska: 'PL',
+    };
+    return countryMapping[country] || country;
+  };
+
   // Redirect to cart if cart is empty
   useEffect(() => {
     if (!cart || cart.products.length === 0) {
@@ -126,6 +134,10 @@ const Checkout: React.FC = () => {
       return;
     }
 
+    // Map countries to codes before submitting
+    const mappedBillingCountry = mapCountry(billingData.country);
+    const mappedShippingCountry = mapCountry(shippingData.country);
+
     // Use the appropriate address based on "Dostawa pod inny adres"
     const shippingAddress = isShippingDifferent
       ? {
@@ -135,7 +147,7 @@ const Checkout: React.FC = () => {
           address_2: shippingData.apartmentNumber || '',
           city: shippingData.city,
           postcode: shippingData.postalCode,
-          country: shippingData.country,
+          country: mappedShippingCountry,
         }
       : {
           first_name: billingData.firstName,
@@ -144,7 +156,7 @@ const Checkout: React.FC = () => {
           address_2: billingData.apartmentNumber || '',
           city: billingData.city,
           postcode: billingData.postalCode,
-          country: billingData.country,
+          country: mappedBillingCountry,
         };
 
     const shippingMetaData = [];
@@ -165,7 +177,7 @@ const Checkout: React.FC = () => {
     }
 
     const orderData = {
-      payment_method: paymentMethod, // Pass the correct payment method
+      payment_method: paymentMethod,
       payment_method_title:
         paymentMethod === 'przelewy24' ? 'Przelewy24' : shippingTitle,
       set_paid: false,
@@ -180,9 +192,9 @@ const Checkout: React.FC = () => {
         address_2: billingData.apartmentNumber || '',
         city: billingData.city,
         postcode: billingData.postalCode,
-        country: billingData.country,
+        country: mappedBillingCountry,
       },
-      shipping: shippingAddress, // Use the dynamically determined shipping address
+      shipping: shippingAddress,
       shipping_lines: [
         {
           method_id: shippingMethod,
