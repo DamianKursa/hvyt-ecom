@@ -148,16 +148,16 @@ const Shipping: React.FC<ShippingProps> = ({
     console.log('Selected method:', method);
 
     setShippingMethod(method.id);
-    setShippingTitle(method.title);
+    setShippingTitle(method.title || 'Paczkomaty InPost');
 
-    const price =
-      method.id === 'kurier_gls_pobranie'
-        ? Number(method.cost) || 25 // Use the fetched cost or fallback to 25
-        : Number(method.cost) || 0;
-
-    console.log(`Price for method (${method.title}):`, price);
-
+    const price = Number(method.cost) || 0;
     setShippingPrice(price);
+
+    // Reset locker data if the selected method is not "Paczkomaty InPost"
+    if (method.id !== 'paczkomaty_inpost') {
+      setSelectedLocker('');
+      setSelectedLockerData(null);
+    }
   };
 
   useEffect(() => {

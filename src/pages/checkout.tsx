@@ -233,7 +233,7 @@ const Checkout: React.FC = () => {
       console.log('Order created successfully:', createdOrder);
 
       if (createdOrder.payment_url) {
-        window.location.href = createdOrder.payment_url;
+        // window.location.href = createdOrder.payment_url;
       } else {
         alert('Zamówienie utworzone, ale brakuje linku do płatności.');
       }
