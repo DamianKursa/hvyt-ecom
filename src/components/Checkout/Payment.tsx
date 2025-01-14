@@ -26,6 +26,7 @@ const Payment: React.FC<PaymentProps> = ({
     '1': 'kurier_gls',
     '3': 'kurier_gls_pobranie', // Match this to the value for Kurier GLS Pobranie
     '13': 'paczkomaty_inpost',
+    kurier_gls_pobranie: 'kurier_gls_pobranie', // Include full mapping for safety
   };
 
   // Fetch payment methods on component mount
@@ -50,14 +51,12 @@ const Payment: React.FC<PaymentProps> = ({
   // Filter payment methods based on the selected shipping method
   const getFilteredPaymentMethods = () => {
     const mappedShippingMethod = shippingMethodMapping[shippingMethod];
-    console.log('Mapped shipping method:', mappedShippingMethod);
+    console.log('Mapped Shipping Method:', mappedShippingMethod);
 
     if (mappedShippingMethod === 'kurier_gls_pobranie') {
-      // For "Kurier GLS Pobranie", only show "Za pobraniem"
-      return paymentMethods.filter((method) => method.id === 'cod');
+      return paymentMethods.filter((method) => method.id === 'cod'); // "Za pobraniem"
     }
 
-    // For all other shipping methods, only show "Przelewy24"
     return paymentMethods.filter((method) => method.id === 'przelewy24');
   };
 
