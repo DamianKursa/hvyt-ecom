@@ -15,6 +15,8 @@ interface ShippingZone {
 interface ShippingProps {
   shippingMethod: string;
   setShippingMethod: React.Dispatch<React.SetStateAction<string>>;
+  setShippingPrice: React.Dispatch<React.SetStateAction<number>>;
+  setShippingTitle: React.Dispatch<React.SetStateAction<string>>;
   setSelectedLocker: React.Dispatch<React.SetStateAction<string>>;
   setLockerSize: React.Dispatch<React.SetStateAction<string>>;
   cartTotal: number; // Pass the cart total to dynamically display shipping methods
@@ -36,6 +38,8 @@ declare global {
 const Shipping: React.FC<ShippingProps> = ({
   shippingMethod,
   setShippingMethod,
+  setShippingPrice,
+  setShippingTitle,
   setSelectedLocker,
   setLockerSize,
   cartTotal,
@@ -43,9 +47,9 @@ const Shipping: React.FC<ShippingProps> = ({
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedLockerData, setSelectedLockerData] = useState<any>(null);
   const scriptLoadedRef = useRef(false);
 
-  // Map titles to icons
   const shippingIcons: Record<string, string> = {
     'kurier gls': '/icons/GLS_Logo_2021.svg',
     'kurier inpost': '/icons/inpost-kurier.svg',
@@ -69,7 +73,9 @@ const Shipping: React.FC<ShippingProps> = ({
 
         const data = await response.json();
 
-        // Filter and prioritize methods
+        // Log the fetched methods for debugging
+        console.log('Fetched shipping methods:', data);
+
         const updatedZones = data.map((zone: ShippingZone) => {
           let filteredMethods = zone.methods.filter(
             (method) =>
@@ -77,11 +83,10 @@ const Shipping: React.FC<ShippingProps> = ({
               !(
                 method.title.toLowerCase().includes('darmowa') &&
                 cartTotal < 300
-              ), // Exclude "Darmowa" if cart < 300
+              ),
           );
 
           if (cartTotal >= 300) {
-            // Ensure only "Darmowa Dostawa", "Kurier GLS - Darmowa wysyłka", and "Paczkomaty InPost" appear
             filteredMethods = filteredMethods.filter((method) =>
               [
                 'darmowa dostawa',
@@ -90,7 +95,6 @@ const Shipping: React.FC<ShippingProps> = ({
               ].includes(method.title.toLowerCase()),
             );
 
-            // Add "Darmowa Dostawa" dynamically if missing
             if (
               !filteredMethods.some(
                 (method) => method.title.toLowerCase() === 'darmowa dostawa',
@@ -105,7 +109,6 @@ const Shipping: React.FC<ShippingProps> = ({
             }
           }
 
-          // Always include "Paczkomaty InPost" if missing
           if (
             !filteredMethods.some(
               (method) => method.title.toLowerCase() === 'paczkomaty inpost',
@@ -114,7 +117,7 @@ const Shipping: React.FC<ShippingProps> = ({
             filteredMethods.push({
               id: 'paczkomaty_inpost',
               title: 'Paczkomaty InPost',
-              cost: cartTotal >= 300 ? null : 15, // Example cost for Paczkomaty
+              cost: cartTotal >= 300 ? null : 15,
               enabled: true,
             });
           }
@@ -134,7 +137,17 @@ const Shipping: React.FC<ShippingProps> = ({
     fetchShippingMethods();
   }, [cartTotal]);
 
-  // Load EasyPack script and styles
+  // Handle dynamic shipping method change
+  const handleShippingChange = (method: ShippingMethod) => {
+    setShippingMethod(method.id);
+    setShippingTitle(method.title);
+
+    // Set price to 25 zł for Kurier GLS Pobranie
+    const price =
+      method.id === 'kurier_gls_pobranie' ? 25 : Number(method.cost) || 0;
+    setShippingPrice(price);
+  };
+
   useEffect(() => {
     const loadEasyPackScript = () => {
       if (!scriptLoadedRef.current) {
@@ -180,7 +193,7 @@ const Shipping: React.FC<ShippingProps> = ({
       }
     };
 
-    if (shippingMethod === 'paczkomaty') {
+    if (shippingMethod === 'paczkomaty_inpost') {
       loadEasyPackScript();
     }
   }, [shippingMethod]);
@@ -190,8 +203,14 @@ const Shipping: React.FC<ShippingProps> = ({
       window.easyPack.modalMap(
         (point: any, modal: any) => {
           modal.closeModal();
-          setSelectedLocker(point.name); // Save the selected locker
-          alert(`Wybrany Paczkomat: ${point.name}`);
+          const lockerData = {
+            id: point.name,
+            address: point.address.line1,
+            city: point.address.city,
+            postalCode: point.address.postalCode,
+          };
+          setSelectedLocker(point.name);
+          setSelectedLockerData(lockerData);
         },
         { width: 500, height: 600 },
       );
@@ -217,58 +236,68 @@ const Shipping: React.FC<ShippingProps> = ({
         <div key={zone.zoneName}>
           <h3 className="text-lg font-medium mb-2">{zone.zoneName}</h3>
           {zone.methods.map((method) => (
-            <label
-              key={method.id}
-              className={`grid grid-cols-3 items-center py-[16px] border-b ${
-                shippingMethod === method.id
-                  ? 'border-dark-pastel-red'
-                  : 'border-beige-dark'
-              }`}
-            >
-              <div className="flex items-center gap-4">
-                <input
-                  type="radio"
-                  value={method.id}
-                  checked={shippingMethod === method.id}
-                  onChange={() => setShippingMethod(method.id)}
-                  className="hidden"
+            <div key={method.id}>
+              <label
+                className={`grid grid-cols-3 items-center py-[16px] border-b ${
+                  shippingMethod === method.id
+                    ? 'border-dark-pastel-red'
+                    : 'border-beige-dark'
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <input
+                    type="radio"
+                    value={method.id}
+                    checked={shippingMethod === method.id}
+                    onChange={() => handleShippingChange(method)}
+                    className="hidden"
+                  />
+                  <span
+                    className={`w-5 h-5 rounded-full ${
+                      shippingMethod === method.id
+                        ? 'border-4 border-dark-pastel-red'
+                        : 'border-2 border-gray-400'
+                    }`}
+                  ></span>
+                  <span>{method.title}</span>
+                </div>
+                <span className="text-center">
+                  {method.cost
+                    ? `${parseFloat(String(method.cost)).toFixed(2)} zł`
+                    : 'Darmowa'}
+                </span>
+                <img
+                  src={
+                    shippingIcons[method.title.toLowerCase()] ||
+                    '/icons/default.svg'
+                  }
+                  alt={`${method.title} Icon`}
+                  className="w-[55px] h-auto mx-auto"
                 />
-                <span
-                  className={`w-5 h-5 rounded-full ${
-                    shippingMethod === method.id
-                      ? 'border-4 border-dark-pastel-red'
-                      : 'border-2 border-gray-400'
-                  }`}
-                ></span>
-                <span>{method.title}</span>
-              </div>
-              <span className="text-center">
-                {method.cost
-                  ? `${parseFloat(String(method.cost)).toFixed(2)} zł`
-                  : 'Darmowa'}
-              </span>
-              <img
-                src={
-                  shippingIcons[method.title.toLowerCase()] ||
-                  '/icons/default.svg'
-                }
-                alt={`${method.title} Icon`}
-                className="w-[55px] h-auto mx-auto"
-              />
-            </label>
+              </label>
+
+              {method.id === 'paczkomaty_inpost' &&
+                shippingMethod === 'paczkomaty_inpost' && (
+                  <div>
+                    <button
+                      onClick={openModal}
+                      className="mt-2 p-2 bg-blue-500 text-white rounded"
+                    >
+                      Wybierz Paczkomat
+                    </button>
+                    {selectedLockerData && (
+                      <p className="mt-2 text-sm text-gray-700">
+                        Wybrany punkt: {selectedLockerData.id} -{' '}
+                        {selectedLockerData.address}, {selectedLockerData.city},{' '}
+                        {selectedLockerData.postalCode}
+                      </p>
+                    )}
+                  </div>
+                )}
+            </div>
           ))}
         </div>
       ))}
-      {shippingMethod === 'paczkomaty' && (
-        <div>
-          <button
-            onClick={openModal}
-            className="mt-4 p-2 bg-blue-500 text-white rounded"
-          >
-            Wybierz Paczkomat
-          </button>
-        </div>
-      )}
     </div>
   );
 };

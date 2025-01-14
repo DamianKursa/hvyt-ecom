@@ -16,6 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const zonesResponse = await WooCommerceAPI.get('/shipping/zones');
 
       const zones = zonesResponse.data;
+      
 
       if (!zones || zones.length === 0) {
         return res.status(404).json({ error: 'No shipping zones available' });
@@ -29,13 +30,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return {
           zoneName: zone.name,
           methods: methodsResponse.data
-            .filter((method: any) => method.enabled) // Only enabled methods
-            .map((method: any) => ({
+          .filter((method: any) => method.enabled)
+          .map((method: any) => {
+            const cost = Number(method.settings?.cost?.value);
+            return {
               id: method.id,
               title: method.title,
-              cost: method.settings?.cost?.value || null,
+              cost: isNaN(cost) ? 0 : cost, 
               enabled: method.enabled,
-            })),
+            };
+          }),
+        
+            
         };
       });
 
@@ -50,6 +56,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json(polandShippingData);
     } catch (error: any) {
       console.error('Error fetching shipping methods:', error.message || error);
+      
       return res.status(500).json({ error: 'Failed to fetch shipping methods' });
     }
   }

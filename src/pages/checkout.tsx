@@ -16,7 +16,6 @@ import { useUserContext } from '@/context/UserContext';
 const Checkout: React.FC = () => {
   const router = useRouter();
 
-  // States for customer type, payment, shipping methods, etc.
   const [customerType, setCustomerType] = useState<'individual' | 'company'>(
     'individual',
   );
@@ -25,13 +24,12 @@ const Checkout: React.FC = () => {
   const [shippingTitle, setShippingTitle] = useState<string>('');
   const [selectedLocker, setSelectedLocker] = useState<string>('');
   const [lockerSize, setLockerSize] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<string>('przelewy24');
   const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
   const [subscribeNewsletter, setSubscribeNewsletter] =
     useState<boolean>(false);
 
-  // States for billing and shipping data
   const [billingData, setBillingData] = useState({
     firstName: '',
     lastName: '',
@@ -61,7 +59,7 @@ const Checkout: React.FC = () => {
   const { user } = useUserContext();
   const { cart } = useContext(CartContext);
 
-  // Redirect to cart page if cart is empty
+  // Redirect to cart if cart is empty
   useEffect(() => {
     if (!cart || cart.products.length === 0) {
       router.push('/koszyk');
@@ -90,6 +88,27 @@ const Checkout: React.FC = () => {
     fetchShippingMethods();
   }, []);
 
+  // Update shipping title dynamically when shipping method changes
+  useEffect(() => {
+    const fetchShippingTitle = async () => {
+      try {
+        const response = await axios.get('/api/shipping');
+        const shippingZones = response.data;
+
+        const selectedMethod = shippingZones
+          .flatMap((zone: any) => zone.methods)
+          .find((method: any) => method.id === shippingMethod);
+
+        setShippingTitle(selectedMethod?.title || 'Metoda dostawy');
+        setShippingPrice(selectedMethod?.cost || 0); // Update price dynamically
+      } catch (error) {
+        console.error('Error updating shipping title:', error);
+      }
+    };
+
+    if (shippingMethod) fetchShippingTitle();
+  }, [shippingMethod]);
+
   // Handle order submission
   const handleOrderSubmit = async () => {
     if (!cart || cart.products.length === 0) {
@@ -107,10 +126,26 @@ const Checkout: React.FC = () => {
       return;
     }
 
+    const shippingMetaData = [];
+    if (shippingMethod === 'paczkomaty_inpost') {
+      shippingMetaData.push(
+        { key: '_integration', value: 'paczkomaty' },
+        { key: '_paczkomat_id', value: selectedLocker },
+        { key: '_paczkomat_size', value: lockerSize || 'A' },
+        { key: 'delivery_point_id', value: selectedLocker },
+        {
+          key: 'delivery_point_name',
+          value: `${selectedLocker}, ${shippingData.street}, ${shippingData.postalCode} ${shippingData.city}`,
+        },
+        { key: 'delivery_point_address', value: shippingData.street },
+        { key: 'delivery_point_postcode', value: shippingData.postalCode },
+        { key: 'delivery_point_city', value: shippingData.city },
+      );
+    }
+
     const orderData = {
       payment_method: paymentMethod,
-      payment_method_title:
-        paymentMethod === 'przelewy24' ? 'Przelewy24' : 'Other',
+      payment_method_title: shippingTitle,
       set_paid: false,
       billing: {
         first_name: billingData.firstName,
@@ -118,37 +153,28 @@ const Checkout: React.FC = () => {
         email,
         phone: billingData.phone,
         company: customerType === 'company' ? billingData.company : '',
-        billing_nip: customerType === 'company' ? billingData.vatNumber : '',
+        vat_number: customerType === 'company' ? billingData.vatNumber : '',
         address_1: `${billingData.street} ${billingData.buildingNumber}`,
         address_2: billingData.apartmentNumber || '',
         city: billingData.city,
         postcode: billingData.postalCode,
         country: billingData.country,
       },
-      shipping: isShippingDifferent
-        ? {
-            first_name: billingData.firstName,
-            last_name: billingData.lastName,
-            address_1: `${shippingData.street} ${shippingData.buildingNumber}`,
-            address_2: shippingData.apartmentNumber || '',
-            city: shippingData.city,
-            postcode: shippingData.postalCode,
-            country: shippingData.country,
-          }
-        : {
-            first_name: billingData.firstName,
-            last_name: billingData.lastName,
-            address_1: `${billingData.street} ${billingData.buildingNumber}`,
-            address_2: billingData.apartmentNumber || '',
-            city: billingData.city,
-            postcode: billingData.postalCode,
-            country: billingData.country,
-          },
+      shipping: {
+        first_name: billingData.firstName,
+        last_name: billingData.lastName,
+        address_1: `${shippingData.street} ${shippingData.buildingNumber}`,
+        address_2: shippingData.apartmentNumber || '',
+        city: shippingData.city,
+        postcode: shippingData.postalCode,
+        country: shippingData.country,
+      },
       shipping_lines: [
         {
           method_id: shippingMethod,
           method_title: shippingTitle,
-          total: shippingPrice.toFixed(2),
+          total: (!isNaN(shippingPrice) ? shippingPrice : 0).toFixed(2),
+          meta_data: shippingMetaData,
         },
       ],
       line_items: cart.products.map((product) => ({
@@ -181,7 +207,7 @@ const Checkout: React.FC = () => {
       console.log('Order created successfully:', createdOrder);
 
       if (createdOrder.payment_url) {
-        //window.location.href = createdOrder.payment_url;
+        window.location.href = createdOrder.payment_url;
       } else {
         alert('Zamówienie utworzone, ale brakuje linku do płatności.');
       }
@@ -217,11 +243,11 @@ const Checkout: React.FC = () => {
               )}
             </div>
             <CheckoutBillingForm
+              setPassword={setPassword}
               customerType={customerType}
               setCustomerType={setCustomerType}
               email={email}
               setEmail={setEmail}
-              setPassword={setPassword}
               subscribeNewsletter={subscribeNewsletter}
               setSubscribeNewsletter={setSubscribeNewsletter}
               user={user}
@@ -248,15 +274,17 @@ const Checkout: React.FC = () => {
                 <Shipping
                   shippingMethod={shippingMethod}
                   setShippingMethod={setShippingMethod}
+                  setShippingPrice={setShippingPrice}
+                  setShippingTitle={setShippingTitle}
                   setSelectedLocker={setSelectedLocker}
                   setLockerSize={setLockerSize}
                   cartTotal={cart?.totalProductsPrice || 0}
                 />
-
                 <div className="mt-8">
                   <Payment
                     paymentMethod={paymentMethod}
                     setPaymentMethod={setPaymentMethod}
+                    shippingMethod={shippingMethod}
                   />
                 </div>
               </div>

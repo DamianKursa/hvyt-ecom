@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 interface PaymentProps {
   paymentMethod: string;
   setPaymentMethod: React.Dispatch<React.SetStateAction<string>>;
+  shippingMethod: string; // Pass the shipping method to filter payment methods
 }
 
 interface PaymentMethod {
@@ -14,10 +15,18 @@ interface PaymentMethod {
 const Payment: React.FC<PaymentProps> = ({
   paymentMethod,
   setPaymentMethod,
+  shippingMethod,
 }) => {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Shipping method mapping
+  const shippingMethodMapping: Record<string, string> = {
+    '1': 'kurier_gls',
+    '3': 'kurier_gls_pobranie', // Match this to the value for Kurier GLS Pobranie
+    '13': 'paczkomaty_inpost',
+  };
 
   // Fetch payment methods on component mount
   useEffect(() => {
@@ -25,10 +34,8 @@ const Payment: React.FC<PaymentProps> = ({
       try {
         setLoading(true);
         const response = await fetch('/api/payment');
-        if (!response.ok) {
-          throw new Error('Failed to fetch payment methods');
-        }
         const data = await response.json();
+        console.log('Fetched payment methods:', data);
         setPaymentMethods(data);
       } catch (err) {
         setError((err as Error).message || 'An error occurred');
@@ -39,6 +46,33 @@ const Payment: React.FC<PaymentProps> = ({
 
     fetchPaymentMethods();
   }, []);
+
+  // Filter payment methods based on the selected shipping method
+  const getFilteredPaymentMethods = () => {
+    const mappedShippingMethod = shippingMethodMapping[shippingMethod];
+    console.log('Mapped shipping method:', mappedShippingMethod);
+
+    if (mappedShippingMethod === 'kurier_gls_pobranie') {
+      // For "Kurier GLS Pobranie", only show "Za pobraniem"
+      return paymentMethods.filter((method) => method.id === 'cod');
+    }
+
+    // For all other shipping methods, only show "Przelewy24"
+    return paymentMethods.filter((method) => method.id === 'przelewy24');
+  };
+
+  const availableMethods = getFilteredPaymentMethods();
+
+  // Automatically adjust the selected payment method
+  useEffect(() => {
+    const mappedShippingMethod = shippingMethodMapping[shippingMethod];
+
+    if (mappedShippingMethod === 'kurier_gls_pobranie') {
+      setPaymentMethod('cod');
+    } else {
+      setPaymentMethod('przelewy24');
+    }
+  }, [shippingMethod, setPaymentMethod]);
 
   if (loading) {
     return <p>Loading payment methods...</p>;
@@ -53,34 +87,40 @@ const Payment: React.FC<PaymentProps> = ({
       <h2 className="text-[20px] font-bold mb-6 text-neutral-darkest">
         Wybierz sposób płatności
       </h2>
-      <div>
-        {paymentMethods.map((method) => (
-          <label
-            key={method.id}
-            className={`flex items-center py-[16px] border-b ${
-              paymentMethod === method.id
-                ? 'border-dark-pastel-red'
-                : 'border-beige-dark'
-            }`}
-          >
-            <input
-              type="radio"
-              value={method.id}
-              checked={paymentMethod === method.id}
-              onChange={() => setPaymentMethod(method.id)}
-              className="hidden"
-            />
-            <span
-              className={`w-5 h-5 rounded-full ${
+      {availableMethods.length > 0 ? (
+        <div>
+          {availableMethods.map((method) => (
+            <label
+              key={method.id}
+              className={`flex items-center py-[16px] border-b ${
                 paymentMethod === method.id
-                  ? 'border-4 border-dark-pastel-red'
-                  : 'border-2 border-gray-400'
+                  ? 'border-dark-pastel-red'
+                  : 'border-beige-dark'
               }`}
-            ></span>
-            <span className="ml-2">{method.title}</span>
-          </label>
-        ))}
-      </div>
+            >
+              <input
+                type="radio"
+                value={method.id}
+                checked={paymentMethod === method.id}
+                onChange={() => setPaymentMethod(method.id)}
+                className="hidden"
+              />
+              <span
+                className={`w-5 h-5 rounded-full ${
+                  paymentMethod === method.id
+                    ? 'border-4 border-dark-pastel-red'
+                    : 'border-2 border-gray-400'
+                }`}
+              ></span>
+              <span className="ml-2">{method.title}</span>
+            </label>
+          ))}
+        </div>
+      ) : (
+        <p className="text-red-500 mt-4">
+          No payment methods available for the selected shipping method.
+        </p>
+      )}
     </div>
   );
 };
