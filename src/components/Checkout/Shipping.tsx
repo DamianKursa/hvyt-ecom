@@ -146,18 +146,11 @@ const Shipping: React.FC<ShippingProps> = ({
   // Handle dynamic shipping method change
   const handleShippingChange = (method: ShippingMethod) => {
     console.log('Selected method:', method);
-
     setShippingMethod(method.id);
-    setShippingTitle(method.title || 'Paczkomaty InPost');
-
+    setShippingTitle(method.title || 'Paczkomaty InPost'); // Ensure fallback
     const price = Number(method.cost) || 0;
     setShippingPrice(price);
-
-    // Reset locker data if the selected method is not "Paczkomaty InPost"
-    if (method.id !== 'paczkomaty_inpost') {
-      setSelectedLocker('');
-      setSelectedLockerData(null);
-    }
+    console.log(`Updated shipping title: ${method.title}, price: ${price}`);
   };
 
   useEffect(() => {

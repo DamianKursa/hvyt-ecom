@@ -107,8 +107,10 @@ const Checkout: React.FC = () => {
           .flatMap((zone: any) => zone.methods)
           .find((method: any) => method.id === shippingMethod);
 
-        setShippingTitle(selectedMethod?.title || 'Metoda dostawy');
-        setShippingPrice(selectedMethod?.cost || 0); // Update price dynamically
+        if (selectedMethod) {
+          setShippingTitle(selectedMethod.title); // Update title
+          setShippingPrice(Number(selectedMethod.cost) || 0); // Update price
+        }
       } catch (error) {
         console.error('Error updating shipping title:', error);
       }
@@ -198,7 +200,7 @@ const Checkout: React.FC = () => {
       shipping_lines: [
         {
           method_id: shippingMethod,
-          method_title: shippingTitle,
+          method_title: shippingTitle || 'Paczkomaty InPost',
           total: (!isNaN(shippingPrice) ? shippingPrice : 0).toFixed(2),
           meta_data: shippingMetaData,
         },
@@ -306,6 +308,7 @@ const Checkout: React.FC = () => {
                   setLockerSize={setLockerSize}
                   cartTotal={cart?.totalProductsPrice || 0}
                 />
+
                 <div className="mt-8">
                   <Payment
                     paymentMethod={paymentMethod}

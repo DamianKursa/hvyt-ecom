@@ -65,9 +65,9 @@ const Payment: React.FC<PaymentProps> = ({
 
   // Automatically adjust the selected payment method
   useEffect(() => {
-    const mappedShippingMethod = shippingMethodMapping[shippingMethod];
-
-    if (mappedShippingMethod === 'kurier_gls_pobranie') {
+    if (shippingMethod === 'paczkomaty_inpost') {
+      setPaymentMethod('przelewy24');
+    } else if (shippingMethod === 'kurier_gls_pobranie') {
       setPaymentMethod('cod');
     } else {
       setPaymentMethod('przelewy24');
