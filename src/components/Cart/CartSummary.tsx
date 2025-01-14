@@ -16,14 +16,21 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   isCheckoutPage = false,
 }) => {
   const [totalPrice, setTotalPrice] = useState(totalProductsPrice);
+  const [loading, setLoading] = useState(false); // State to control spinner
   const router = useRouter(); // Initialize the useRouter hook
 
   useEffect(() => {
-    // Update total price including shipping if on checkout page
-    const updatedTotal = isCheckoutPage
-      ? totalProductsPrice + shippingPrice
-      : totalProductsPrice;
-    setTotalPrice(updatedTotal);
+    setLoading(true); // Start spinner when price changes
+    const timeout = setTimeout(() => {
+      // Update total price including shipping if on checkout page
+      const updatedTotal = isCheckoutPage
+        ? totalProductsPrice + shippingPrice
+        : totalProductsPrice;
+      setTotalPrice(updatedTotal);
+      setLoading(false); // Stop spinner after update
+    }, 500); // Simulate loading delay for 500ms
+
+    return () => clearTimeout(timeout); // Cleanup timeout
   }, [totalProductsPrice, shippingPrice, isCheckoutPage]);
 
   const formatPrice = (price: number) =>
@@ -61,9 +68,17 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       {/* Shipping Price (Visible only on checkout) */}
       {isCheckoutPage && (
         <div className="flex justify-between text-lg mb-6">
-          <span className="text-neutral-darkest font-medium">Wysyłka</span>
+          <span className="text-neutral-darkest font-medium">
+            Koszt dostawy
+          </span>
           <span className="font-semibold text-neutral-darkest">
-            {shippingPrice > 0 ? formatPrice(shippingPrice) : 'Darmowa'}
+            {loading ? (
+              <span className="loader"></span> // Spinner for loading state
+            ) : shippingPrice > 0 ? (
+              formatPrice(shippingPrice)
+            ) : (
+              'Darmowa'
+            )}
           </span>
         </div>
       )}
@@ -77,7 +92,11 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           <span className="text-lg text-neutral-darkest font-medium">Suma</span>
         </div>
         <span className="text-2xl font-bold text-dark-pastel-red">
-          {formatPrice(totalPrice)}
+          {loading ? (
+            <span className="loader"></span> // Spinner for total price
+          ) : (
+            formatPrice(totalPrice)
+          )}
           <span className="text-sm text-black font-light">
             <p>kwota zawiera 23% VAT</p>
           </span>
