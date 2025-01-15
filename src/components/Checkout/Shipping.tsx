@@ -256,6 +256,7 @@ const Shipping: React.FC<ShippingProps> = ({
                     checked={shippingMethod === method.id}
                     onChange={() => handleShippingChange(method)}
                     className="hidden"
+                    disabled={loading}
                   />
                   <span
                     className={`w-5 h-5 rounded-full ${

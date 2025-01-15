@@ -1,36 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router'; // Import the useRouter hook
-import DiscountCode from '@/components/Cart/DiscountCode'; // Adjust the path if needed
+import { useRouter } from 'next/router';
+import DiscountCode from '@/components/Cart/DiscountCode';
 
 interface CartSummaryProps {
   totalProductsPrice: number;
-  shippingPrice?: number; // Optional shipping price
-  onCheckout: () => void; // Trigger order creation
-  isCheckoutPage?: boolean; // Flag to determine if it's the checkout page
+  shippingPrice?: number;
+  onCheckout: () => void;
+  isCheckoutPage?: boolean;
 }
 
 const CartSummary: React.FC<CartSummaryProps> = ({
   totalProductsPrice,
-  shippingPrice = 0, // Default shipping price is 0
+  shippingPrice = 0,
   onCheckout,
   isCheckoutPage = false,
 }) => {
   const [totalPrice, setTotalPrice] = useState(totalProductsPrice);
-  const [loading, setLoading] = useState(false); // State to control spinner
-  const router = useRouter(); // Initialize the useRouter hook
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    setLoading(true); // Start spinner when price changes
+    setLoading(true);
     const timeout = setTimeout(() => {
-      // Update total price including shipping if on checkout page
       const updatedTotal = isCheckoutPage
         ? totalProductsPrice + shippingPrice
         : totalProductsPrice;
       setTotalPrice(updatedTotal);
-      setLoading(false); // Stop spinner after update
-    }, 500); // Simulate loading delay for 500ms
+      setLoading(false);
+    }, 500);
 
-    return () => clearTimeout(timeout); // Cleanup timeout
+    return () => clearTimeout(timeout);
   }, [totalProductsPrice, shippingPrice, isCheckoutPage]);
 
   const formatPrice = (price: number) =>
@@ -40,7 +39,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     if (isCheckoutPage) {
       onCheckout();
     } else {
-      router.push('/checkout'); // Redirect to the checkout page
+      router.push('/checkout');
     }
   };
 
@@ -50,12 +49,10 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         isCheckoutPage ? 'w-full mt-8' : 'lg:w-4/12 mt-8'
       } bg-beige p-6 rounded-[24px] shadow-lg`}
     >
-      {/* Header */}
       <h2 className="text-2xl font-bold mb-6 text-neutral-darkest">
         Podsumowanie
       </h2>
 
-      {/* Total Products */}
       <div className="flex justify-between text-lg mb-6">
         <span className="text-neutral-darkest font-medium">
           Wartość produktów
@@ -65,7 +62,6 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         </span>
       </div>
 
-      {/* Shipping Price (Visible only on checkout) */}
       {isCheckoutPage && (
         <div className="flex justify-between text-lg mb-6">
           <span className="text-neutral-darkest font-medium">
@@ -73,7 +69,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           </span>
           <span className="font-semibold text-neutral-darkest">
             {loading ? (
-              <span className="loader"></span> // Spinner for loading state
+              <div className="loader-pulse w-16 h-6 rounded"></div>
             ) : shippingPrice > 0 ? (
               formatPrice(shippingPrice)
             ) : (
@@ -83,17 +79,15 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         </div>
       )}
 
-      {/* Discount Code Section */}
       <DiscountCode cartTotal={totalPrice} setCartTotal={setTotalPrice} />
 
-      {/* Total Price Section */}
       <div className="flex justify-between items-top mb-6">
         <div className="flex flex-col">
           <span className="text-lg text-neutral-darkest font-medium">Suma</span>
         </div>
         <span className="text-2xl font-bold text-dark-pastel-red">
           {loading ? (
-            <span className="loader"></span> // Spinner for total price
+            <div className="loader-pulse w-20 h-8 rounded"></div>
           ) : (
             formatPrice(totalPrice)
           )}
@@ -103,13 +97,34 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         </span>
       </div>
 
-      {/* Checkout Button */}
       <button
         onClick={handleButtonClick}
         className="w-full py-4 bg-black text-white text-lg font-semibold rounded-full hover:bg-neutral-dark transition"
       >
         {isCheckoutPage ? 'Zamawiam i Płacę' : 'Przejdź do kasy'}
       </button>
+
+      <style jsx>{`
+        .loader-pulse {
+          background: #f0f0f0; /* Lighter gray color */
+          animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+            opacity: 0.7;
+          }
+          50% {
+            transform: scale(1.05);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(1);
+            opacity: 0.7;
+          }
+        }
+      `}</style>
     </aside>
   );
 };
