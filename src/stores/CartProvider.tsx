@@ -16,6 +16,7 @@ export interface Product {
 export interface Coupon {
   code: string;
   discountValue: number;
+  discountType?: 'percent' | 'fixed';
 }
 
 export interface Cart {

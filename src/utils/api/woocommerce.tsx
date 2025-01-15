@@ -351,7 +351,11 @@ export const submitProductReview = async (
 
 export const validateDiscountCode = async (
   code: string,
-): Promise<{ valid: boolean; discountValue: number }> => {
+): Promise<{
+  valid: boolean;
+  discountValue: number;
+  discountType?: 'percent' | 'fixed'; // Added discountType
+}> => {
   try {
     const response = await fetch('/api/discount', {
       method: 'POST',
@@ -367,6 +371,7 @@ export const validateDiscountCode = async (
     return {
       valid: data.valid,
       discountValue: data.discountValue || 0,
+      discountType: data.discountType, // Include discountType from the response
     };
   } catch (error) {
     console.error('Error validating discount code:', error);

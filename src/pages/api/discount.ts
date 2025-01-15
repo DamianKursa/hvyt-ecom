@@ -35,12 +35,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (response.data.length > 0) {
       const coupon = response.data[0];
 
-      // If coupon is found, return valid status and discount value
+      // Determine discount type and amount
+      const isPercentage = coupon.discount_type === 'percent';
+      const discountValue = parseFloat(coupon.amount || '0');
+
+      // If coupon is found, return valid status and discount details
       return res.status(200).json({
         valid: true,
-        discountValue: parseFloat(coupon.amount || '0'), // Discount amount
-        couponId: coupon.id, // Optionally return the coupon ID
-        description: coupon.description || '', // Optionally return the coupon description
+        discountType: isPercentage ? 'percent' : 'fixed', // Discount type: percent or fixed
+        discountValue, // Discount amount
+        couponId: coupon.id, // Coupon ID
+        description: coupon.description || '', // Optional description
       });
     } else {
       // No coupon found

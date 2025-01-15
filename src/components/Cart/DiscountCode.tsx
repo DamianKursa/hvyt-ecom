@@ -36,11 +36,21 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     setSnackbar((prev) => ({ ...prev, visible: false }));
 
     try {
-      const { valid, discountValue } = await validateDiscountCode(code.trim());
+      const { valid, discountValue, discountType } = await validateDiscountCode(
+        code.trim(),
+      );
 
       if (valid) {
-        applyCoupon({ code, discountValue }); // Save coupon globally
-        setCartTotal(cartTotal - discountValue); // Update local cart total
+        let discountApplied = 0;
+
+        if (discountType === 'percent') {
+          discountApplied = (cartTotal * discountValue) / 100; // Calculate percentage discount
+        } else if (discountType === 'fixed') {
+          discountApplied = discountValue; // Apply fixed discount
+        }
+
+        applyCoupon({ code, discountValue: discountApplied, discountType }); // Save coupon globally
+        setCartTotal(cartTotal - discountApplied); // Update local cart total
         setSnackbar({
           message: 'Kod rabatowy został dodany',
           type: 'success',
