@@ -27,6 +27,57 @@ const Index: NextPage = () => (
       imageSrc="/images/strona-główna.png"
       imageAlt="Hvyt Hero Image"
       bgColor="linear-gradient(0deg, #E4D6B1 0%, #E6D8B5 100%)"
+      staticBoxes={[
+        { index: 2, bgColor: '#F5F5AD' },
+        { index: 5, bgColor: '#F5F5AD' },
+        { index: 4, bgColor: '#F5F5AD' },
+        { index: 6, bgColor: '#F5F5AD' },
+        { index: 8, bgColor: '#F5F5AD' },
+        { index: 10, bgColor: '#F5F5AD' },
+        { index: 11, bgColor: '#F5F5AD' },
+      ]}
+      animationSteps={[
+        {
+          step: 1, // Fire at step 1
+          animatedBoxes: [
+            {
+              index: 6,
+              bgColor: '#F5F5AD',
+              animationType: 'slidingToTransparent',
+            },
+            { index: 7, bgColor: '#F5F5AD', animationType: 'slidingToBg' },
+          ],
+        },
+        {
+          step: 2, // Fire at step 2
+          animatedBoxes: [],
+        },
+        {
+          step: 3, // Fire at step 3
+          animatedBoxes: [
+            {
+              index: 4,
+              bgColor: '#F5F5AD',
+              animationType: 'slidingToTransparent',
+            },
+            {
+              index: 10,
+              bgColor: '#F5F5AD',
+              animationType: 'slidingToTransparent',
+            },
+          ],
+        },
+        {
+          step: 4, // Fire at step 3
+          animatedBoxes: [
+            {
+              index: 2,
+              bgColor: '#F5F5AD',
+              animationType: 'slidingTopToBottom',
+            },
+          ],
+        },
+      ]}
     />
     <NewArrivals />
     <Bestsellers />

@@ -1,6 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 
+interface BoxConfig {
+  index: number;
+  bgColor: string;
+  animationType?: 'slidingToTransparent' | 'slidingToBg' | 'slidingTopToBottom';
+}
+
+interface AnimationStep {
+  step: number;
+  animatedBoxes: BoxConfig[];
+}
+
 interface HeroProps {
   title: string;
   description: string;
@@ -9,6 +20,8 @@ interface HeroProps {
   imageSrc: string;
   imageAlt: string;
   bgColor: string;
+  staticBoxes: BoxConfig[];
+  animationSteps: AnimationStep[];
 }
 
 const Hero: React.FC<HeroProps> = ({
@@ -19,26 +32,51 @@ const Hero: React.FC<HeroProps> = ({
   imageSrc,
   imageAlt,
   bgColor,
+  staticBoxes,
+  animationSteps,
 }) => {
-  const imageRef = useRef<HTMLImageElement | null>(null);
   const boxesRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    const isMobile = window.innerWidth < 768; // Check if screen width is below 768px
+    const isMobile = window.innerWidth < 768;
 
     if (!isMobile) {
-      if (imageRef.current) {
-        imageRef.current.style.animation =
-          'overlayAnimation 2000ms ease-in-out forwards';
-      }
-
-      boxesRef.current.forEach((box, index) => {
+      // Set static backgrounds
+      staticBoxes.forEach(({ index, bgColor }) => {
+        const box = boxesRef.current[index];
         if (box) {
-          box.style.animation = `boxMoveAnimation 2000ms ease-in-out ${index * 0.3}s forwards`;
+          const slidingBg = box.querySelector<HTMLElement>('.sliding-bg');
+          if (slidingBg) {
+            slidingBg.style.background = bgColor;
+          }
         }
       });
+
+      // Animate boxes in steps
+      animationSteps.forEach(({ step, animatedBoxes }) => {
+        setTimeout(() => {
+          animatedBoxes.forEach(({ index, bgColor, animationType }) => {
+            const box = boxesRef.current[index];
+            if (box) {
+              const slidingBg = box.querySelector<HTMLElement>('.sliding-bg');
+              if (slidingBg) {
+                if (animationType === 'slidingToTransparent') {
+                  slidingBg.style.background = `linear-gradient(to right, ${bgColor} 100%, transparent 0%)`;
+                  slidingBg.style.animation = `slidingToTransparent 1s ease-in-out forwards`;
+                } else if (animationType === 'slidingToBg') {
+                  slidingBg.style.background = `linear-gradient(to right, ${bgColor} 100%, transparent 0%)`;
+                  slidingBg.style.animation = `slidingToBg 1s ease-in-out forwards`;
+                } else if (animationType === 'slidingTopToBottom') {
+                  slidingBg.style.background = `linear-gradient(to bottom, ${bgColor} 100%, transparent 0%)`;
+                  slidingBg.style.animation = `slidingTopToBottom 1s ease-in-out forwards`;
+                }
+              }
+            }
+          });
+        }, step * 1000); // Delay animations based on step number
+      });
     }
-  }, []);
+  }, [staticBoxes, animationSteps]);
 
   return (
     <section
@@ -49,25 +87,22 @@ const Hero: React.FC<HeroProps> = ({
       }}
     >
       <div className="container mx-auto max-w-grid-desktop h-full flex justify-between items-center">
-        {/* Background boxes for animation */}
+        {/* Grid of boxes */}
         <div className="absolute right-0 top-0 grid grid-cols-3 grid-rows-4 gap-0 justify-end items-center overflow-hidden">
-          {Array.from({ length: 12 }).map((_, idx) => {
-            const hasBackground =
-              idx === 2 || idx === 4 || idx === 7 || idx >= 8;
-
-            return (
-              <div
-                key={idx}
-                ref={(el) => {
-                  boxesRef.current[idx] = el;
-                }}
-                className={`w-[200px] h-[200px] ${hasBackground ? 'bg-[#F5F5AD]' : 'bg-transparent'}`}
-              />
-            );
-          })}
+          {Array.from({ length: 12 }).map((_, idx) => (
+            <div
+              key={idx}
+              ref={(el) => {
+                boxesRef.current[idx] = el;
+              }}
+              className="w-[200px] h-[200px] relative overflow-hidden"
+            >
+              <div className="sliding-bg"></div>
+            </div>
+          ))}
         </div>
 
-        {/* Overlay Image centered with animation */}
+        {/* Overlay Image */}
         <div
           className="absolute inset-0 flex justify-center items-center"
           style={{ transformOrigin: 'center center' }}
@@ -78,11 +113,10 @@ const Hero: React.FC<HeroProps> = ({
             width={1270}
             height={698}
             className="animate-overlay"
-            ref={imageRef}
           />
         </div>
 
-        {/* Content in the Hero */}
+        {/* Hero Content */}
         <div className="container relative z-10 mx-auto">
           <div className="flex flex-col items-start justify-center w-full tracking-wide lg:w-1/2">
             <h1 className="text-6xl font-bold leading-tight text-dark-pastel-red mb-4">
@@ -112,55 +146,38 @@ const Hero: React.FC<HeroProps> = ({
 
       <style jsx>{`
         @media (min-width: 768px) {
-          @keyframes overlayAnimation {
+          @keyframes slidingToTransparent {
             0% {
-              transform: rotate(0deg);
-              width: 1270px;
-              height: 698px;
-              opacity: 0;
-            }
-            25% {
-              transform: rotate(10deg);
-              opacity: 0.4;
-            }
-            50% {
-              transform: rotate(-10deg);
-              opacity: 0.7;
-            }
-            75% {
-              transform: rotate(0deg);
-              opacity: 1;
-              width: 1450px;
-              height: 750px;
+              left: 0%;
             }
             100% {
-              transform: rotate(0deg);
-              width: 1995.75px;
-              height: 1096.88px;
+              left: 100%;
             }
           }
 
-          @keyframes boxMoveAnimation {
+          @keyframes slidingToBg {
             0% {
-              transform: translate(200px, 200px) scale(0.5);
-              opacity: 0;
-            }
-            25% {
-              transform: translate(150px, 150px) scale(0.7);
-              opacity: 0.3;
-            }
-            50% {
-              transform: translate(100px, 100px) scale(0.8);
-              opacity: 0.6;
-            }
-            75% {
-              transform: translate(50px, 50px) scale(0.9);
-              opacity: 0.8;
+              left: -100%;
             }
             100% {
-              transform: translate(0, 0) scale(1);
-              opacity: 1;
+              left: 0%;
             }
+          }
+          @keyframes slidingTopToBottom {
+            0% {
+              top: 0%;
+            }
+            100% {
+              top: 100%;
+            }
+          }
+
+          .sliding-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
           }
 
           .animate-overlay {

@@ -86,8 +86,8 @@ const NewArrivalsSection = () => {
               <Image
                 src={nowosciItems[0].src}
                 alt={nowosciItems[0].alt}
-                width={600}
-                height={600}
+                width={350}
+                height={300}
                 className="w-full h-full object-cover rounded-lg"
               />
             </div>
@@ -95,8 +95,8 @@ const NewArrivalsSection = () => {
               <Image
                 src={nowosciItems[1].src}
                 alt={nowosciItems[1].alt}
-                width={600}
-                height={600}
+                width={350}
+                height={300}
                 className="w-full h-full object-cover rounded-lg"
               />
             </div>

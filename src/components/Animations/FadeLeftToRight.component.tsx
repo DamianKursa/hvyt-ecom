@@ -1,6 +1,5 @@
-// CircleCI doesn't like import { motion } from "framer-motion" here, so we use require
 const { motion } = require('framer-motion');
-
+import React from 'react';
 import type { IAnimateStaggerWithDelayProps } from './types/Animations.types';
 
 /**
@@ -11,6 +10,7 @@ import type { IAnimateStaggerWithDelayProps } from './types/Animations.types';
  * @param {number} delay - Time to wait before starting animation
  * @param {number} staggerDelay - Time to wait before starting animation for children items
  * @param {boolean} animateNotReverse - Start animation backwards
+ * @param {number[]} activeIndexes - Array of indexes of children to animate
  * @returns {JSX.Element} - Rendered component
  */
 
@@ -20,27 +20,43 @@ const FadeLeftToRight = ({
   delay,
   staggerDelay,
   animateNotReverse,
-}: IAnimateStaggerWithDelayProps) => {
+  activeIndexes = [],
+}: IAnimateStaggerWithDelayProps & { activeIndexes?: number[] }) => {
   const FadeLeftToRightVariants = {
     visible: {
-      opacity: 1,
+      x: 0, // No horizontal offset
       transition: {
         when: 'beforeChildren',
-        staggerChildren: staggerDelay ? staggerDelay : 0.5,
+        staggerChildren: staggerDelay || 0.5,
         delay,
         ease: 'easeInOut',
         staggerDirection: 1,
       },
     },
     hidden: {
-      opacity: 0,
+      x: '-100%', // Slide from left (no opacity animation)
       transition: {
         when: 'afterChildren',
-        staggerChildren: staggerDelay ? staggerDelay : 0.5,
+        staggerChildren: staggerDelay || 0.5,
         staggerDirection: -1,
       },
     },
   };
+
+  const childVariants = {
+    visible: (index: number) =>
+      activeIndexes.includes(index)
+        ? {
+            x: 0, // Visible position
+            transition: { duration: 0.5, ease: 'easeInOut' },
+          }
+        : {}, // Skip animation for other items
+    hidden: {
+      x: '-100%', // Hidden position (no opacity change)
+      transition: { duration: 0.5, ease: 'easeInOut' },
+    },
+  };
+
   return (
     <motion.div
       initial="hidden"
@@ -49,7 +65,15 @@ const FadeLeftToRight = ({
       className={cssClass}
       data-testid="fadelefttoright"
     >
-      {children}
+      {React.Children.map(children, (child, index) => (
+        <motion.div
+          custom={index}
+          variants={childVariants}
+          key={`fade-left-to-right-${index}`}
+        >
+          {child}
+        </motion.div>
+      ))}
     </motion.div>
   );
 };
