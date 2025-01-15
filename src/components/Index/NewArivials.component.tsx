@@ -53,7 +53,7 @@ const NewArrivalsSection = () => {
           Zobacz nasze nowości
         </h2>
         <p className="font-size-text-medium text-neutral-darkest mt-2">
-          Nowa Kolekcja Santi to samo dobro i moc opcji.
+          Nowa gałka HALOHOLD projektu Moniki Rogusz-Witkoś.
         </p>
         <Link
           href="#"
@@ -72,7 +72,7 @@ const NewArrivalsSection = () => {
               Zobacz nasze nowości
             </h2>
             <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
-              Nowa Kolekcja Santi to samo dobro i moc opcji.
+              Nowa gałka HALOHOLD projektu Moniki Rogusz-Witkoś.
             </p>
             <Link
               href="#"
@@ -82,21 +82,21 @@ const NewArrivalsSection = () => {
             </Link>
           </div>
           <div className="flex gap-6">
-            <div className="w-full h-[250px]">
+            <div className="w-full h-[300px]">
               <Image
                 src={nowosciItems[0].src}
                 alt={nowosciItems[0].alt}
-                width={500}
-                height={500}
+                width={600}
+                height={600}
                 className="w-full h-full object-cover rounded-lg"
               />
             </div>
-            <div className="w-full h-[250px]">
+            <div className="w-full h-[300px]">
               <Image
                 src={nowosciItems[1].src}
                 alt={nowosciItems[1].alt}
-                width={500}
-                height={500}
+                width={600}
+                height={600}
                 className="w-full h-full object-cover rounded-lg"
               />
             </div>
