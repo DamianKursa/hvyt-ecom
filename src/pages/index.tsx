@@ -20,8 +20,8 @@ import type { NextPage } from 'next';
 const Index: NextPage = () => (
   <Layout title="Hvyt | Strona główna">
     <Hero
-      title="Wybierz swój HVYT"
-      description="Od eleganckich, nowoczesnych wzorów uchwytów meblowych po ponadczasowe klasyki. Sprawdź jak nasze Hvyt’y mogą odmienić Twoje wnętrze."
+      title="Wybierz<br/> swój HVYT"
+      description="Od eleganckich, nowoczesnych wzorów uchwytów <br/> meblowych po ponadczasowe klasyki. Sprawdź jak<br/> nasze Hvyt’y mogą odmienić Twoje wnętrze."
       buttonText="Zobacz uchwyty"
       buttonLink="/kategoria/uchwyty-meblowe"
       imageSrc="/images/strona-główna.png"

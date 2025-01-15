@@ -73,7 +73,7 @@ const Hero: React.FC<HeroProps> = ({
               }
             }
           });
-        }, step * 1000); // Delay animations based on step number
+        }, step * 500); // Delay animations based on step number
       });
     }
   }, [staticBoxes, animationSteps]);
@@ -104,7 +104,7 @@ const Hero: React.FC<HeroProps> = ({
 
         {/* Overlay Image */}
         <div
-          className="absolute inset-0 flex justify-center items-center"
+          className="absolute inset-0 flex justify-center items-center animate-overlay"
           style={{ transformOrigin: 'center center' }}
         >
           <Image
@@ -113,18 +113,21 @@ const Hero: React.FC<HeroProps> = ({
             width={1270}
             height={698}
             className="animate-overlay"
+            priority
           />
         </div>
 
         {/* Hero Content */}
         <div className="container relative z-10 mx-auto">
           <div className="flex flex-col items-start justify-center w-full tracking-wide lg:w-1/2">
-            <h1 className="text-6xl font-bold leading-tight text-dark-pastel-red mb-4">
-              {title}
-            </h1>
-            <p className="text-lg font-normal leading-relaxed text-neutral-darkest mb-6">
-              {description}
-            </p>
+            <h1
+              className="text-[64px] font-bold leading-tight text-dark-pastel-red mb-4"
+              dangerouslySetInnerHTML={{ __html: title }}
+            ></h1>
+            <p
+              className="text-[18px] font-normal  text-neutral-darkest mb-6"
+              dangerouslySetInnerHTML={{ __html: description }}
+            ></p>
 
             <div className="flex space-x-4">
               <a
@@ -146,6 +149,19 @@ const Hero: React.FC<HeroProps> = ({
 
       <style jsx>{`
         @media (min-width: 768px) {
+          .animate-overlay {
+            animation: overlayScaleRotate 4s ease-in-out forwards;
+          }
+
+          @keyframes overlayScaleRotate {
+            0% {
+              transform: rotate(40deg) scale(1);
+            }
+            100% {
+              transform: rotate(0deg) scale(2);
+            }
+          }
+
           @keyframes slidingToTransparent {
             0% {
               left: 0%;
@@ -163,6 +179,7 @@ const Hero: React.FC<HeroProps> = ({
               left: 0%;
             }
           }
+
           @keyframes slidingTopToBottom {
             0% {
               top: 0%;
@@ -178,11 +195,12 @@ const Hero: React.FC<HeroProps> = ({
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 9999;
           }
-
           .animate-overlay {
             max-width: 100%;
             object-fit: cover;
+            image-rendering: auto; /* Adjust scaling behavior */
           }
         }
       `}</style>
