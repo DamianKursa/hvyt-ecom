@@ -24,7 +24,7 @@ const Index: NextPage = () => (
       description="Od eleganckich, nowoczesnych wzorów uchwytów meblowych po ponadczasowe klasyki. Sprawdź jak nasze Hvyt’y mogą odmienić Twoje wnętrze."
       buttonText="Zobacz uchwyty"
       buttonLink="/kategoria/uchwyty-meblowe"
-      imageSrc="/images/hero-overlay.png"
+      imageSrc="/images/strona-główna.png"
       imageAlt="Hvyt Hero Image"
       bgColor="linear-gradient(0deg, #E4D6B1 0%, #E6D8B5 100%)"
     />
