@@ -267,26 +267,45 @@ const ProductPage = () => {
                 <>
                   <div className="flex-1">
                     {product?.baselinker_variations?.[0]?.attributes.map(
-                      (attr) => (
-                        <AttributeSwitcher
-                          key={attr.name}
-                          attributeName={attr.name}
-                          options={Array.from(
-                            new Set(
-                              product?.baselinker_variations?.map(
-                                (variation) =>
-                                  variation.attributes?.find(
-                                    (a) => a.name === attr.name,
-                                  )?.option,
+                      (attr) => {
+                        // Build a map of options to prices for the current attribute
+                        const pricesMap = product.baselinker_variations?.reduce(
+                          (map, variation) => {
+                            const option = variation.attributes.find(
+                              (a) => a.name === attr.name,
+                            )?.option;
+                            if (option) {
+                              map[option] = variation.price.toFixed(2); // Format price with 2 decimal places
+                            }
+                            return map;
+                          },
+                          {} as { [key: string]: string },
+                        );
+
+                        return (
+                          <AttributeSwitcher
+                            key={attr.name}
+                            attributeName={attr.name}
+                            options={Array.from(
+                              new Set(
+                                product?.baselinker_variations?.map(
+                                  (variation) =>
+                                    variation.attributes?.find(
+                                      (a) => a.name === attr.name,
+                                    )?.option,
+                                ),
                               ),
-                            ),
-                          ).filter((option): option is string =>
-                            Boolean(option),
-                          )}
-                          selectedValue={selectedAttributes[attr.name] || null}
-                          onAttributeChange={handleAttributeChange}
-                        />
-                      ),
+                            ).filter((option): option is string =>
+                              Boolean(option),
+                            )}
+                            selectedValue={
+                              selectedAttributes[attr.name] || null
+                            }
+                            onAttributeChange={handleAttributeChange}
+                            pricesMap={pricesMap} // Pass the prices map to the AttributeSwitcher
+                          />
+                        );
+                      },
                     )}
                   </div>
                   <div className="w-2/5">

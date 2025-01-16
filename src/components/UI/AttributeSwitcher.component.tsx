@@ -2,10 +2,11 @@ import React from 'react';
 import CustomDropdown from '@/components/UI/CustomDropdown.component';
 
 interface AttributeSwitcherProps {
-  attributeName: string; // The name of the attribute (e.g., "Atrybut produktu: KULKA")
-  options: string[]; // Available options for the attribute
+  attributeName: string; // Attribute name, e.g., "Rozstaw"
+  options: string[]; // Available options
   selectedValue: string | null; // Currently selected value
-  onAttributeChange: (attributeName: string, value: string) => void; // Callback for handling changes
+  onAttributeChange: (attributeName: string, value: string) => void; // Callback for attribute changes
+  pricesMap?: { [key: string]: string }; // Optional map of prices
 }
 
 const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
@@ -13,22 +14,31 @@ const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
   options,
   selectedValue,
   onAttributeChange,
+  pricesMap = {},
 }) => {
-  // Remove "Atrybut produktu: " prefix dynamically
   const cleanedAttributeName = attributeName.replace(/^Atrybut produktu: /, '');
+
+  // Map options to display with prices if available
+  const displayOptions = options.map((option) => {
+    const price = pricesMap[option];
+    return price ? `${option} | ${price} zł` : option;
+  });
 
   return (
     <div>
-      {/* Dropdown for Selecting Attribute */}
       <CustomDropdown
-        options={options}
+        options={displayOptions}
         selectedValue={selectedValue}
-        placeholder={selectedValue || cleanedAttributeName} // Use the cleaned name as placeholder
-        onChange={(value) => onAttributeChange(attributeName, value)}
+        placeholder={selectedValue || cleanedAttributeName}
+        onChange={(value) =>
+          onAttributeChange(
+            attributeName,
+            value.split(' | ')[0], // Extract the selected option only
+          )
+        }
       />
     </div>
   );
 };
 
 export default AttributeSwitcher;
-///Price is not always changing.
