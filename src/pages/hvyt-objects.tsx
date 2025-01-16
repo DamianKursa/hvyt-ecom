@@ -2,25 +2,26 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component';
-import Hero from '../components/Index/Hero.component'; // Import the existing Hero component
-
 // Collaboration data (dummy)
 const collaborations = [
   {
     title: 'Współpraca XXX',
-    description: 'Tutaj zajawkowy tekst o tej współpracy. Tutaj zajawkowy tekst o tej współpracy.',
+    description:
+      'Tutaj zajawkowy tekst o tej współpracy. Tutaj zajawkowy tekst o tej współpracy.',
     imageUrl: '/images/img-1.png', // Replace with the correct image path
     link: '#',
   },
   {
     title: 'Współpraca YYY',
-    description: 'Tutaj zajawkowy tekst o tej współpracy. Tutaj zajawkowy tekst o tej współpracy.',
+    description:
+      'Tutaj zajawkowy tekst o tej współpracy. Tutaj zajawkowy tekst o tej współpracy.',
     imageUrl: '/images/img-2.png', // Replace with the correct image path
     link: '#',
   },
   {
     title: 'Współpraca ZZZ',
-    description: 'Tutaj zajawkowy tekst o tej współpracy. Tutaj zajawkowy tekst o tej współpracy.',
+    description:
+      'Tutaj zajawkowy tekst o tej współpracy. Tutaj zajawkowy tekst o tej współpracy.',
     imageUrl: '/images/img.png', // Replace with the correct image path
     link: '#',
   },
@@ -30,15 +31,6 @@ const HvytObjectsPage = () => {
   return (
     <Layout title="Hvyt Objects">
       {/* Use existing Hero component */}
-      <Hero
-        title="Hvyt Objects"
-        description="Tutaj tekst opisujący co użytkownik tu może znaleźć, o co chodzi na tej podstronie. Tutaj tekst opisujący co użytkownik tu może znaleźć, o co chodzi na tej podstronie."
-        buttonText="Sprawdź najnowszą współpracę"
-        buttonLink="#"
-        imageSrc="/images/IMG_7566_2.png" // Replace with actual image path
-        imageAlt="Hvyt Objects Hero Image"
-        bgColor="bg-beige" // Adjust the background color if needed
-      />
 
       {/* Dynamic Collaboration Sections */}
       <section className="container mx-auto max-w-grid-desktop py-16 px-6">
@@ -57,7 +49,9 @@ const HvytObjectsPage = () => {
               />
             </div>
             <div className="w-full lg:w-1/2 flex flex-col justify-center">
-              <h2 className="text-3xl font-bold text-neutral-darkest mb-4">{collab.title}</h2>
+              <h2 className="text-3xl font-bold text-neutral-darkest mb-4">
+                {collab.title}
+              </h2>
               <p className="text-lg text-neutral-dark mb-4">
                 {collab.description}
               </p>
