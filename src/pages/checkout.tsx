@@ -325,31 +325,34 @@ const Checkout: React.FC = () => {
                     setPaymentMethod={setPaymentMethod}
                     shippingMethod={shippingMethod}
                   />
+                  {/* Terms and Privacy Checkbox */}
+                  <div className="mt-6">
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={isTermsChecked}
+                        onChange={() => setIsTermsChecked((prev) => !prev)}
+                        className="hidden"
+                      />
+                      <span
+                        className={`w-5 h-5 flex items-center justify-center border rounded ${
+                          isTermsChecked
+                            ? 'bg-black text-white'
+                            : 'border-black'
+                        }`}
+                      >
+                        {isTermsChecked && (
+                          <img src="/icons/check.svg" alt="check" />
+                        )}
+                      </span>
+                      <span>
+                        *Potwierdzam, że zapoznałam/em się z treścią Regulaminu
+                        i Polityki Prywatności oraz akceptuję ich postanowienia.
+                      </span>
+                    </label>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* Terms and Privacy Checkbox */}
-            <div className="mt-6">
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={isTermsChecked}
-                  onChange={() => setIsTermsChecked((prev) => !prev)}
-                  className="hidden"
-                />
-                <span
-                  className={`w-5 h-5 flex items-center justify-center border rounded ${
-                    isTermsChecked ? 'bg-black text-white' : 'border-black'
-                  }`}
-                >
-                  {isTermsChecked && <img src="/icons/check.svg" alt="check" />}
-                </span>
-                <span>
-                  *Potwierdzam, że zapoznałam/em się z treścią Regulaminu i
-                  Polityki Prywatności oraz akceptuję ich postanowienia.
-                </span>
-              </label>
             </div>
           </div>
 
