@@ -1,5 +1,6 @@
+import { GetStaticProps, GetStaticPaths } from 'next';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
 import Filters from '../../components/Filters/Filters.component';
@@ -24,15 +25,19 @@ const icons: Record<string, string> = {
   wieszaki: '/icons/wieszaki-kształty.svg',
 };
 
-const CategoryPage = () => {
-  const router = useRouter();
-  const slug = Array.isArray(router.query.slug)
-    ? router.query.slug[0]
-    : router.query.slug;
+interface CategoryPageProps {
+  category: Category;
+  initialProducts: any[];
+  initialTotalProducts: number;
+}
 
-  const [category, setCategory] = useState<Category | null>(null);
-  const [products, setProducts] = useState<any[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+const CategoryPage = ({
+  category,
+  initialProducts,
+  initialTotalProducts,
+}: CategoryPageProps) => {
+  const router = useRouter();
+  const [products, setProducts] = useState(initialProducts);
   const [isMobile, setIsMobile] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(!isMobile);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -40,10 +45,9 @@ const CategoryPage = () => {
     { name: string; value: string }[]
   >([]);
   const [sortingOption, setSortingOption] = useState('default');
-  const [currentTotalProducts, setCurrentTotalProducts] = useState(0);
-  const [filteredProductCount, setFilteredProductCount] = useState(0);
+  const [filteredProductCount, setFilteredProductCount] =
+    useState(initialTotalProducts);
 
-  // Handle mobile view and filter visibility
   useEffect(() => {
     const handleResize = () => {
       const isCurrentlyMobile = window.innerWidth <= 768;
@@ -56,28 +60,6 @@ const CategoryPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Fetch category and initial products
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      if (!slug) return;
-
-      try {
-        const fetchedCategory = await fetchCategoryBySlug(slug);
-        const { products: fetchedProducts, totalProducts } =
-          await fetchProductsByCategoryId(fetchedCategory.id, 1, 12, []);
-
-        setCategory(fetchedCategory);
-        setProducts(fetchedProducts);
-        setCurrentTotalProducts(totalProducts);
-        setFilteredProductCount(totalProducts); // Set initial product count
-      } catch (error: any) {
-        setErrorMessage(error.message || 'Error loading category data');
-      }
-    };
-
-    fetchInitialData();
-  }, [slug]);
-
   const toggleFilterModal = () => {
     setIsFilterModalOpen((prev) => !prev);
   };
@@ -89,22 +71,22 @@ const CategoryPage = () => {
   };
 
   const applyFilters = () => {
-    setIsFilterModalOpen(false); // Close modal after applying filters
+    setIsFilterModalOpen(false);
   };
 
   const clearFilters = () => {
     setActiveFilters([]);
-    setFilteredProductCount(currentTotalProducts); // Reset product count
-    setProducts([]); // Clear products
-    router.push({ pathname: router.pathname }); // Remove filters from URL
+    setFilteredProductCount(initialTotalProducts);
+    setProducts(initialProducts);
+    router.push({ pathname: router.pathname });
   };
 
   const getCategoryIcon = () => {
-    if (slug && icons[slug]) {
+    if (category && icons[category.name.toLowerCase()]) {
       return (
         <Image
-          src={icons[slug]}
-          alt={`${slug} icon`}
+          src={icons[category.name.toLowerCase()]}
+          alt={`${category.name} icon`}
           width={54}
           height={24}
           className="ml-2"
@@ -114,22 +96,14 @@ const CategoryPage = () => {
     return null;
   };
 
-  if (errorMessage) {
-    return (
-      <Layout title="Error">
-        <Snackbar message={errorMessage} type="error" visible={true} />
-      </Layout>
-    );
-  }
-
   return (
-    <Layout title={`Hvyt | ${category?.name || 'Ładownie...'}`}>
+    <Layout title={`Hvyt | ${category.name || 'Loading...'}`}>
       <div className="container max-w-[1440px] mt-[88px] px-4 md:px-0 lg:mt-[115px] mx-auto">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
 
         <div className="flex items-center mb-8">
           <h1 className="text-[40px] font-bold text-[#661F30]">
-            {category?.name}
+            {category.name}
           </h1>
           {getCategoryIcon()}
         </div>
@@ -162,11 +136,11 @@ const CategoryPage = () => {
           {!isMobile && filtersVisible && (
             <div className="w-1/4 pr-8">
               <Filters
-                categoryId={category?.id || 0}
+                categoryId={category.id}
                 activeFilters={activeFilters}
                 onFilterChange={handleFilterChange}
                 setProducts={setProducts}
-                setTotalProducts={setFilteredProductCount} // Update total products dynamically
+                setTotalProducts={setFilteredProductCount}
               />
             </div>
           )}
@@ -175,11 +149,11 @@ const CategoryPage = () => {
             className={`w-full ${filtersVisible && !isMobile ? 'lg:w-3/4' : ''}`}
           >
             <ProductArchive
-              categoryId={category?.id || 0}
+              categoryId={category.id}
               filters={activeFilters}
               sortingOption={sortingOption}
               initialProducts={products}
-              totalProducts={currentTotalProducts}
+              totalProducts={filteredProductCount}
             />
           </div>
         </div>
@@ -187,7 +161,7 @@ const CategoryPage = () => {
       <FilterModal
         isOpen={isFilterModalOpen}
         onClose={toggleFilterModal}
-        categoryId={category?.id || 0}
+        categoryId={category.id}
         activeFilters={activeFilters}
         onFilterChange={setActiveFilters}
         onApplyFilters={applyFilters}
@@ -195,14 +169,51 @@ const CategoryPage = () => {
         setProducts={setProducts}
         setTotalProducts={setFilteredProductCount}
         productsCount={filteredProductCount}
-        initialProductCount={currentTotalProducts}
+        initialProductCount={initialTotalProducts}
       />
 
       <div className="w-full">
-        <CategoryDescription category={slug || ''} />
+        <CategoryDescription category={category.name} />
       </div>
     </Layout>
   );
+};
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const slug = context.params?.slug as string;
+
+  try {
+    const fetchedCategory = await fetchCategoryBySlug(slug);
+    const { products: fetchedProducts, totalProducts } =
+      await fetchProductsByCategoryId(fetchedCategory.id, 1, 12, []);
+
+    return {
+      props: {
+        category: fetchedCategory,
+        initialProducts: fetchedProducts,
+        initialTotalProducts: totalProducts,
+      },
+      revalidate: 60, // Optional revalidation for fresh data
+    };
+  } catch (error) {
+    return {
+      notFound: true,
+    };
+  }
+};
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  // Manually define paths as `fetchAllCategorySlugs` is not available
+  const paths = [
+    { params: { slug: 'uchwyty-meblowe' } },
+    { params: { slug: 'klamki' } },
+    { params: { slug: 'wieszaki' } },
+  ];
+
+  return {
+    paths,
+    fallback: 'blocking',
+  };
 };
 
 export default CategoryPage;

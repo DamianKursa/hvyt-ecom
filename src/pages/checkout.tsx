@@ -346,8 +346,15 @@ const Checkout: React.FC = () => {
                         )}
                       </span>
                       <span>
-                        *Potwierdzam, że zapoznałam/em się z treścią Regulaminu
-                        i Polityki Prywatności oraz akceptuję ich postanowienia.
+                        *Potwierdzam, że zapoznałam/em się z treścią{' '}
+                        <a className="underline " href="/regulamin">
+                          Regulaminu
+                        </a>{' '}
+                        i{' '}
+                        <a className="underline " href="/polityka-prywatnosci">
+                          Polityki Prywatności
+                        </a>
+                        oraz akceptuję ich postanowienia.
                       </span>
                     </label>
                   </div>
