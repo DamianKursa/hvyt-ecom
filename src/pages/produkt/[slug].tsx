@@ -157,23 +157,27 @@ const ProductPage = () => {
   };
 
   const handleAddToCart = () => {
-    if (!selectedVariation) {
-      setValidationError('Wybierz wariant przed dodaniem do koszyka.');
-      return;
-    }
-
     if (!product) {
       console.error('No product available to add to cart');
       return;
     }
 
+    // Check if the product has variations
+    if (product.baselinker_variations?.length) {
+      if (!selectedVariation) {
+        setValidationError('Wybierz wariant przed dodaniem do koszyka.');
+        return;
+      }
+    }
+
+    const price = parseFloat(selectedVariation?.price || product.price); // Ensure price is a number
+
     const cartItem = {
       cartKey: selectedVariation?.id || product.id.toString(),
       name: product.name,
       qty: quantity,
-      price: parseFloat(selectedVariation?.price || product.price),
-      totalPrice:
-        quantity * parseFloat(selectedVariation?.price || product.price),
+      price: parseFloat(price.toFixed(2)), // Convert to number and format
+      totalPrice: parseFloat((quantity * price).toFixed(2)), // Calculate total price and format
       image:
         selectedVariation?.image?.sourceUrl ||
         product.images?.[0]?.src ||
@@ -187,7 +191,7 @@ const ProductPage = () => {
 
     console.log('Adding to cart:', cartItem);
     addCartItem(cartItem);
-    dispatch({ type: 'TOGGLE_MODAL', payload: true });
+    dispatch({ type: 'TOGGLE_MODAL', payload: true }); // Open the modal
   };
 
   const galleryImages = useMemo(
@@ -375,6 +379,31 @@ const ProductPage = () => {
                 </button>
               )}
             </div>
+            {/* Cart Modal */}
+            {showModal && product && (
+              <CartModal
+                product={{
+                  id: product.id.toString(),
+                  name: product.name,
+                  image:
+                    selectedVariation?.image?.sourceUrl ||
+                    galleryImages[0]?.sourceUrl ||
+                    '/fallback-image.jpg',
+                  price: selectedVariation?.price
+                    ? parseFloat(selectedVariation.price).toFixed(2)
+                    : parseFloat(product.price).toFixed(2),
+                }}
+                total={(
+                  quantity *
+                  parseFloat(selectedVariation?.price || product.price || '0')
+                ).toFixed(2)} // Ensure total is a string
+                onClose={() =>
+                  dispatch({ type: 'TOGGLE_MODAL', payload: false })
+                }
+                crossSellProducts={[]} // Optional: Pass cross-sell products here
+                loading={false} // Replace with actual loading state if needed
+              />
+            )}
 
             <DeliveryReturnInfo
               onScrollToSection={handleScrollToFrequentlyBought}
