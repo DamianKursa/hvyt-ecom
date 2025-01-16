@@ -317,10 +317,10 @@ const ProductPage = () => {
               {product && (
                 <button
                   onClick={handleWishlistClick}
-                  className={`w-1/5 h-[64px] p-3 border rounded-full ${
+                  className={`w-1/5 w-[64px] h-[64px] p-3 border rounded-[100px] ${
                     isInWishlist(product.slug)
                       ? 'border-black'
-                      : 'border-neutral-dark text-neutral-dark'
+                      : 'border-black text-black'
                   }  flex justify-center items-center transition`}
                 >
                   <Image
@@ -330,8 +330,8 @@ const ProductPage = () => {
                         : '/icons/wishlist.svg'
                     }
                     alt="Wishlist"
-                    width={28}
-                    height={28}
+                    width={34}
+                    height={31}
                   />
                 </button>
               )}
