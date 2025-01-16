@@ -105,29 +105,35 @@ const ProductPage = () => {
   const handleAttributeChange = (attributeName: string, value: string) => {
     setValidationError(null); // Clear error when a valid attribute is selected
 
+    // Create a temporary updated attributes object
+    const updatedAttributes = {
+      ...selectedAttributes,
+      [attributeName]: value,
+    };
+
+    // Dispatch the state update for attributes
     dispatch({
       type: 'UPDATE_ATTRIBUTE',
       payload: { name: attributeName, value },
     });
 
+    // Find the matched variation using the updated attributes
     const matchedVariation = product?.baselinker_variations?.find((variation) =>
       variation.attributes.every((attr) => {
-        const selectedValue =
-          selectedAttributes[attr.name] ||
-          (attr.name === attributeName ? value : null);
-        return selectedValue === attr.option;
+        return updatedAttributes[attr.name] === attr.option;
       }),
     );
 
+    // Dispatch the updated variation
     dispatch({
       type: 'SET_VARIATION',
       payload: matchedVariation
         ? {
             ...matchedVariation,
             id: matchedVariation.id.toString(),
-            price: matchedVariation.price.toString(),
-            regular_price: matchedVariation.regular_price.toString(),
-            sale_price: matchedVariation.sale_price.toString(),
+            price: matchedVariation.price.toFixed(2), // Convert to string
+            regular_price: matchedVariation.regular_price.toFixed(2), // Convert to string
+            sale_price: matchedVariation.sale_price.toFixed(2), // Convert to string
             image: matchedVariation.image
               ? { sourceUrl: matchedVariation.image.src }
               : undefined,
@@ -233,7 +239,12 @@ const ProductPage = () => {
           <div className="lg:w-4/12 flex flex-col gap-6 sticky mx-4 md:mx-0 top-20 self-start">
             <h1 className="text-3xl font-semibold">{product?.name}</h1>
             <p className="text-4xl font-bold text-dark-pastel-red">
-              {selectedVariation?.price || product?.price} zł
+              {selectedVariation?.price
+                ? parseFloat(selectedVariation.price).toFixed(2)
+                : product?.price
+                  ? parseFloat(product.price).toFixed(2)
+                  : '0.00'}{' '}
+              zł
             </p>
 
             {/* Display validation error below variation box */}
@@ -302,7 +313,7 @@ const ProductPage = () => {
                               selectedAttributes[attr.name] || null
                             }
                             onAttributeChange={handleAttributeChange}
-                            pricesMap={pricesMap} // Pass the prices map to the AttributeSwitcher
+                            pricesMap={pricesMap}
                           />
                         );
                       },
