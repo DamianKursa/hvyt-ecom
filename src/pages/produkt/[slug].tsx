@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import Layout from '@/components/Layout/Layout.component';
@@ -46,6 +46,8 @@ const ProductPage = () => {
     snackbar,
   } = state;
 
+  const [validationError, setValidationError] = useState<string | null>(null); // New state for validation error
+
   useEffect(() => {
     const fetchData = async () => {
       if (!slug) return;
@@ -77,7 +79,7 @@ const ProductPage = () => {
   }, [slug, dispatch]);
 
   const handleWishlistClick = () => {
-    if (!product) return; // Ensure product exists
+    if (!product) return;
 
     const wishlistProduct = {
       name: product.name,
@@ -99,17 +101,17 @@ const ProductPage = () => {
       block: 'start',
     });
   };
+
   const handleAttributeChange = (attributeName: string, value: string) => {
-    // Update selected attributes
+    setValidationError(null); // Clear error when a valid attribute is selected
+
     dispatch({
       type: 'UPDATE_ATTRIBUTE',
       payload: { name: attributeName, value },
     });
 
-    // Match the correct variation based on updated attributes
     const matchedVariation = product?.baselinker_variations?.find((variation) =>
       variation.attributes.every((attr) => {
-        // Check if all required attributes match, including the updated one
         const selectedValue =
           selectedAttributes[attr.name] ||
           (attr.name === attributeName ? value : null);
@@ -117,7 +119,6 @@ const ProductPage = () => {
       }),
     );
 
-    // Update the selected variation in state
     dispatch({
       type: 'SET_VARIATION',
       payload: matchedVariation
@@ -150,32 +151,37 @@ const ProductPage = () => {
   };
 
   const handleAddToCart = () => {
+    if (!selectedVariation) {
+      setValidationError('Wybierz wariant przed dodaniem do koszyka.');
+      return;
+    }
+
     if (!product) {
       console.error('No product available to add to cart');
       return;
     }
 
     const cartItem = {
-      cartKey: selectedVariation?.id || product.id.toString(), // Key based on variation or product
+      cartKey: selectedVariation?.id || product.id.toString(),
       name: product.name,
       qty: quantity,
-      price: parseFloat(selectedVariation?.price || product.price), // Use variation price if available
+      price: parseFloat(selectedVariation?.price || product.price),
       totalPrice:
-        quantity * parseFloat(selectedVariation?.price || product.price), // Calculate total price
+        quantity * parseFloat(selectedVariation?.price || product.price),
       image:
-        selectedVariation?.image?.sourceUrl || // Use variation image if available
+        selectedVariation?.image?.sourceUrl ||
         product.images?.[0]?.src ||
         '/fallback-image.jpg',
-      productId: parseInt(product.id.toString(), 10), // Product ID
+      productId: parseInt(product.id.toString(), 10),
       variationId: selectedVariation?.id
         ? parseInt(selectedVariation.id, 10)
-        : undefined, // Ensure variationId is a number or undefined
-      attributes: selectedAttributes, // Include selected attributes
+        : undefined,
+      attributes: selectedAttributes,
     };
 
-    console.log('Adding to cart:', cartItem); // Debugging log
-    addCartItem(cartItem); // Add the item to the cart
-    dispatch({ type: 'TOGGLE_MODAL', payload: true }); // Open the modal
+    console.log('Adding to cart:', cartItem);
+    addCartItem(cartItem);
+    dispatch({ type: 'TOGGLE_MODAL', payload: true });
   };
 
   const galleryImages = useMemo(
@@ -230,24 +236,11 @@ const ProductPage = () => {
               {selectedVariation?.price || product?.price} zł
             </p>
 
-            {showModal && (
-              <CartModal
-                product={{
-                  id: product!.id.toString(),
-                  name: product!.name,
-                  image: galleryImages[0]?.sourceUrl || '/fallback-image.jpg',
-                  price: selectedVariation?.price || product!.price,
-                }}
-                total={(
-                  quantity *
-                  parseFloat(selectedVariation?.price || product!.price)
-                ).toFixed(2)}
-                onClose={() =>
-                  dispatch({ type: 'TOGGLE_MODAL', payload: false })
-                }
-                crossSellProducts={[]} // Replace with your cross-sell data
-                loading={false} // Replace with your actual loading state
-              />
+            {/* Display validation error below variation box */}
+            {validationError && (
+              <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg mt-2">
+                <span>{validationError}</span>
+              </div>
             )}
 
             <ColorSwitcher
