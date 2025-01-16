@@ -1,6 +1,6 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
 import Filters from '../../components/Filters/Filters.component';
@@ -37,6 +37,10 @@ const CategoryPage = ({
   initialTotalProducts,
 }: CategoryPageProps) => {
   const router = useRouter();
+  const slug = Array.isArray(router.query.slug)
+    ? router.query.slug[0]
+    : router.query.slug;
+
   const [products, setProducts] = useState(initialProducts);
   const [isMobile, setIsMobile] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(!isMobile);
@@ -82,11 +86,11 @@ const CategoryPage = ({
   };
 
   const getCategoryIcon = () => {
-    if (category && icons[category.name.toLowerCase()]) {
+    if (slug && icons[slug]) {
       return (
         <Image
-          src={icons[category.name.toLowerCase()]}
-          alt={`${category.name} icon`}
+          src={icons[slug]}
+          alt={`${slug} icon`}
           width={54}
           height={24}
           className="ml-2"
@@ -95,6 +99,14 @@ const CategoryPage = ({
     }
     return null;
   };
+
+  if (!category) {
+    return (
+      <Layout title="Loading...">
+        <Snackbar message="Loading category..." type="error" visible={true} />
+      </Layout>
+    );
+  }
 
   return (
     <Layout title={`Hvyt | ${category.name || 'Loading...'}`}>
@@ -173,7 +185,7 @@ const CategoryPage = ({
       />
 
       <div className="w-full">
-        <CategoryDescription category={category.name} />
+        <CategoryDescription category={slug || ''} />
       </div>
     </Layout>
   );
@@ -203,7 +215,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  // Manually define paths as `fetchAllCategorySlugs` is not available
   const paths = [
     { params: { slug: 'uchwyty-meblowe' } },
     { params: { slug: 'klamki' } },
