@@ -245,11 +245,11 @@ const ProductPage = () => {
 
             <ColorSwitcher
               options={
-                product?.attributes.find((attr) => attr.name === 'Kolor')
-                  ?.options || []
+                product?.attributes?.find((attr) => attr.name === 'Kolor OK') // Find the "Kolor" attribute
+                  ?.options || [] // Use its options if available
               }
-              selectedColor={selectedColor}
-              onColorChange={handleColorChange}
+              selectedColor={selectedColor} // Pass the selected color from state
+              onColorChange={handleColorChange} // Update the selected color in state
               colorMap={{
                 Złoty: '#eded87',
                 Srebrny: '#c6c6c6',
@@ -263,33 +263,49 @@ const ProductPage = () => {
             />
 
             <div className="flex items-center gap-4">
-              <div className="flex-1">
-                {product?.baselinker_variations?.[0]?.attributes.map((attr) => (
-                  <AttributeSwitcher
-                    key={attr.name}
-                    attributeName={attr.name}
-                    options={Array.from(
-                      new Set(
-                        product?.baselinker_variations?.map(
-                          (variation) =>
-                            variation.attributes.find(
-                              (a) => a.name === attr.name,
-                            )?.option,
-                        ),
+              {product?.baselinker_variations?.[0]?.attributes?.length ? (
+                <>
+                  <div className="flex-1">
+                    {product?.baselinker_variations?.[0]?.attributes.map(
+                      (attr) => (
+                        <AttributeSwitcher
+                          key={attr.name}
+                          attributeName={attr.name}
+                          options={Array.from(
+                            new Set(
+                              product?.baselinker_variations?.map(
+                                (variation) =>
+                                  variation.attributes?.find(
+                                    (a) => a.name === attr.name,
+                                  )?.option,
+                              ),
+                            ),
+                          ).filter((option): option is string =>
+                            Boolean(option),
+                          )}
+                          selectedValue={selectedAttributes[attr.name] || null}
+                          onAttributeChange={handleAttributeChange}
+                        />
                       ),
-                    ).filter((option): option is string => Boolean(option))}
-                    selectedValue={selectedAttributes[attr.name] || null}
-                    onAttributeChange={handleAttributeChange}
+                    )}
+                  </div>
+                  <div className="w-2/5">
+                    <QuantityChanger
+                      quantity={quantity}
+                      onIncrease={() => handleQuantityChange('increase')}
+                      onDecrease={() => handleQuantityChange('decrease')}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="w-2/5">
+                  <QuantityChanger
+                    quantity={quantity}
+                    onIncrease={() => handleQuantityChange('increase')}
+                    onDecrease={() => handleQuantityChange('decrease')}
                   />
-                ))}
-              </div>
-              <div className="w-2/5">
-                <QuantityChanger
-                  quantity={quantity}
-                  onIncrease={() => handleQuantityChange('increase')}
-                  onDecrease={() => handleQuantityChange('decrease')}
-                />
-              </div>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center mt-4 space-x-4">
