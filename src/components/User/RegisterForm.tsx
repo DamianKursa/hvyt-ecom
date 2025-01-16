@@ -13,7 +13,21 @@ const RegisterForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [passwordError, setPasswordError] = useState(''); // Password validation error
   const router = useRouter();
+
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    // Validate password length
+    if (name === 'password' && value.length < 8) {
+      setPasswordError('Hasło musi mieć co najmniej 8 znaków.');
+    } else {
+      setPasswordError('');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,16 +60,33 @@ const RegisterForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Success and Error Messages */}
+      {error && (
+        <div
+          className="bg-red-500 text-white px-4 py-2 rounded-lg flex flex-col"
+          dangerouslySetInnerHTML={{ __html: error }}
+        ></div>
+      )}
+      {success && (
+        <div className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center">
+          <img
+            src="/icons/circle-check.svg"
+            alt="Success"
+            className="w-5 h-5 mr-2"
+          />
+          <span>Konto zostało pomyślnie utworzone!</span>
+        </div>
+      )}
+
       {/* First Name Input */}
       <div className="relative">
         <input
           type="text"
+          name="first_name"
           value={formData.first_name}
           onFocus={() => setFocusedField('first_name')}
           onBlur={() => setFocusedField(null)}
-          onChange={(e) =>
-            setFormData({ ...formData, first_name: e.target.value })
-          }
+          onChange={handleInputChange}
           className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-gray-500"
           required
         />
@@ -74,12 +105,11 @@ const RegisterForm: React.FC = () => {
       <div className="relative">
         <input
           type="text"
+          name="last_name"
           value={formData.last_name}
           onFocus={() => setFocusedField('last_name')}
           onBlur={() => setFocusedField(null)}
-          onChange={(e) =>
-            setFormData({ ...formData, last_name: e.target.value })
-          }
+          onChange={handleInputChange}
           className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-gray-500"
           required
         />
@@ -98,10 +128,11 @@ const RegisterForm: React.FC = () => {
       <div className="relative">
         <input
           type="email"
+          name="email"
           value={formData.email}
           onFocus={() => setFocusedField('email')}
           onBlur={() => setFocusedField(null)}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          onChange={handleInputChange}
           className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-gray-500"
           required
         />
@@ -120,13 +151,14 @@ const RegisterForm: React.FC = () => {
       <div className="relative">
         <input
           type={showPassword ? 'text' : 'password'}
+          name="password"
           value={formData.password}
           onFocus={() => setFocusedField('password')}
           onBlur={() => setFocusedField(null)}
-          onChange={(e) =>
-            setFormData({ ...formData, password: e.target.value })
-          }
-          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-gray-500"
+          onChange={handleInputChange}
+          className={`w-full border-b ${
+            passwordError ? 'border-red-500' : 'border-gray-300'
+          } focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-gray-500`}
           required
         />
         <span
@@ -139,15 +171,14 @@ const RegisterForm: React.FC = () => {
           Hasło<span className="text-red-500">*</span>
         </span>
         <img
-          src="/icons/show-pass.svg" // Replace with actual path
+          src="/icons/show-pass.svg"
           alt="Show Password"
           className="absolute right-2 top-3 w-5 h-5 cursor-pointer"
           onClick={() => setShowPassword(!showPassword)}
         />
-        {/* Additional Text */}
-        <p className="text-[12px] mt-1 px-2 font-light">
-          Twoje hasło musi mieć co najmniej 8 znaków.
-        </p>
+        {passwordError && (
+          <p className="text-red-500 text-xs mt-1 px-2">{passwordError}</p>
+        )}
       </div>
 
       <p className="text-[14px] font-light mt-4">
@@ -162,18 +193,10 @@ const RegisterForm: React.FC = () => {
         .
       </p>
 
-      {/* Error and Success Messages */}
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-      {success && (
-        <p className="text-green-500 text-sm">
-          Konto zostało pomyślnie utworzone! Przekierowanie...
-        </p>
-      )}
-
       {/* Submit Button */}
       <button
         type="submit"
-        className="w-full bg-black text-white py-3 rounded-full"
+        className="w-full bg-black text-white py-3 rounded-full flex justify-center items-center"
         disabled={loading}
       >
         {loading ? 'Ładowanie...' : 'Zarejestruj się'}
