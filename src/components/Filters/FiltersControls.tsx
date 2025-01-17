@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import CustomDropdown from '@/components/UI/CustomDropdown.component';
 
 interface FiltersControlsProps {
   filtersVisible: boolean;
@@ -7,8 +8,6 @@ interface FiltersControlsProps {
   sorting: string;
   onSortingChange: (value: string) => void;
   onRemoveFilter: (filter: { name: string; value: string }) => void;
-  isArrowDown: boolean;
-  setIsArrowDown: React.Dispatch<React.SetStateAction<boolean>>;
   isMobile: boolean;
 }
 
@@ -19,24 +18,25 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
   sorting,
   onSortingChange,
   onRemoveFilter,
-  isArrowDown,
-  setIsArrowDown,
   isMobile,
 }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  const handleSortSelect = (value: string) => {
-    onSortingChange(value);
-    setDropdownOpen(false);
-  };
+  const sortingOptions = [
+    'Bestsellers',
+    'Najnowsze produkty',
+    'Najwyższa cena',
+    'Najniższa cena',
+  ];
 
   return (
     <div
       className={`flex ${isMobile ? 'justify-between' : 'justify-between'} items-center mb-4`}
     >
+      {/* Toggle Filters Button */}
       <button
         onClick={toggleFilters}
-        className={`filters-toggle border rounded-[24px] ${isMobile ? 'w-1/2' : 'w-[328px] text-[16px]'} p-[7px_16px] mr-[32px] font-bold flex justify-between items-center`}
+        className={`filters-toggle border rounded-[24px] ${
+          isMobile ? 'w-1/2' : 'w-[328px] text-[16px]'
+        } p-[7px_16px] mr-[32px] font-bold flex justify-between items-center`}
       >
         <span className="font-semibold text-center">Filtry</span>
         {!isMobile && (
@@ -52,6 +52,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
         )}
       </button>
 
+      {/* Display Active Filters */}
       {!isMobile && (
         <div className="flex gap-2 ml-4 flex-wrap">
           {filters.map((filter) => (
@@ -71,50 +72,18 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
         </div>
       )}
 
+      {/* Sorting Dropdown */}
       <div className={`relative ${isMobile ? 'w-1/2' : 'w-[352px] ml-auto'}`}>
-        <button
-          className={`border rounded-[24px] w-full text-[16px] p-[7px_16px] font-bold flex justify-between items-center`}
-          onClick={() => {
-            setDropdownOpen(!dropdownOpen);
-            setIsArrowDown(!dropdownOpen);
-          }}
-        >
-          <span className="text-left">Sortowanie</span>
-          <img
-            src={isArrowDown ? '/icons/arrow-down.svg' : '/icons/arrow-up.svg'}
-            alt="Arrow"
-            className="w-[16px] h-[16px]"
-          />
-        </button>
-
-        {dropdownOpen && (
-          <div className="absolute top-full mt-2 w-full bg-white border border-gray-300 rounded-[16px] shadow-lg z-20">
-            <div
-              onClick={() => handleSortSelect('bestsellers')}
-              className={`cursor-pointer p-4 ${sorting === 'bestsellers' ? 'bg-gray-100' : ''} hover:bg-gray-100 rounded-t-[16px]`}
-            >
-              Bestsellers
-            </div>
-            <div
-              onClick={() => handleSortSelect('newest')}
-              className={`cursor-pointer p-4 ${sorting === 'newest' ? 'bg-gray-100' : ''} hover:bg-gray-100`}
-            >
-              Najnowsze produkty
-            </div>
-            <div
-              onClick={() => handleSortSelect('price-desc')}
-              className={`cursor-pointer p-4 ${sorting === 'price-desc' ? 'bg-gray-100' : ''} hover:bg-gray-100`}
-            >
-              Najwyższa cena
-            </div>
-            <div
-              onClick={() => handleSortSelect('price-asc')}
-              className={`cursor-pointer p-4 ${sorting === 'price-asc' ? 'bg-gray-100' : ''} hover:bg-gray-100 rounded-b-[16px]`}
-            >
-              Najniższa cena
-            </div>
-          </div>
-        )}
+        <CustomDropdown
+          options={sortingOptions}
+          selectedValue={
+            sortingOptions.find((option) => option.toLowerCase() === sorting) ||
+            sortingOptions[0]
+          }
+          placeholder="Sortowanie"
+          onChange={(value) => onSortingChange(value.toLowerCase())}
+          isProductPage={false}
+        />
       </div>
     </div>
   );

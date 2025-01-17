@@ -29,6 +29,7 @@ const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
       <CustomDropdown
         options={displayOptions}
         selectedValue={selectedValue}
+        isProductPage={true}
         placeholder={selectedValue || cleanedAttributeName}
         onChange={(value) =>
           onAttributeChange(
