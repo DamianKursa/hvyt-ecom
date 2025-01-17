@@ -12,6 +12,7 @@ import FilterModal from '@/components/Filters/FilterModal';
 import {
   fetchCategoryBySlug,
   fetchProductsByCategoryId,
+  fetchSortedProducts,
 } from '@/utils/api/category';
 
 interface Category {
@@ -48,7 +49,7 @@ const CategoryPage = ({
   const [activeFilters, setActiveFilters] = useState<
     { name: string; value: string }[]
   >([]);
-  const [sortingOption, setSortingOption] = useState('default');
+  const [sortingOption, setSortingOption] = useState('Sortowanie');
   const [filteredProductCount, setFilteredProductCount] =
     useState(initialTotalProducts);
 
@@ -66,6 +67,49 @@ const CategoryPage = ({
 
   const toggleFilterModal = () => {
     setIsFilterModalOpen((prev) => !prev);
+  };
+
+  const handleSortingChange = async (sortingValue: string) => {
+    try {
+      if (sortingValue === 'Sortowanie') {
+        setSortingOption('Sortowanie');
+        // Reset to default sorting
+        const { products: defaultProducts, totalProducts } =
+          await fetchProductsByCategoryId(category.id, 1, 12, []);
+        setProducts(defaultProducts);
+        setFilteredProductCount(totalProducts);
+        return;
+      }
+
+      setSortingOption(sortingValue);
+
+      const sortingMap: Record<string, { orderby: string; order: string }> = {
+        Bestsellers: { orderby: 'popularity', order: 'asc' },
+        'Najnowsze produkty': { orderby: 'date', order: 'asc' },
+        'Najwyższa cena': { orderby: 'price', order: 'desc' },
+        'Najniższa cena': { orderby: 'price', order: 'asc' },
+      };
+
+      const sortingParams = sortingMap[sortingValue] || {
+        orderby: 'menu_order',
+        order: 'asc',
+      };
+
+      const { products: sortedProducts, totalProducts } =
+        await fetchSortedProducts(
+          category.id,
+          sortingParams.orderby,
+          sortingParams.order,
+          1,
+          12,
+        );
+
+      console.log('Sorted Products:', sortedProducts);
+      setProducts(sortedProducts);
+      setFilteredProductCount(totalProducts);
+    } catch (error) {
+      console.error('Error fetching sorted products:', error);
+    }
   };
 
   const handleFilterChange = (
@@ -129,7 +173,7 @@ const CategoryPage = ({
           }
           filters={activeFilters}
           sorting={sortingOption}
-          onSortingChange={setSortingOption}
+          onSortingChange={handleSortingChange}
           onRemoveFilter={(filterToRemove) => {
             setActiveFilters((prev) =>
               prev.filter(
@@ -139,8 +183,6 @@ const CategoryPage = ({
               ),
             );
           }}
-          isArrowDown={false}
-          setIsArrowDown={() => {}}
           isMobile={isMobile}
         />
 

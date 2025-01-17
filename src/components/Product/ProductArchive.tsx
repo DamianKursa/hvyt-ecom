@@ -30,7 +30,18 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
   const [totalPages, setTotalPages] = useState(
     Math.ceil(initialTotalProducts / perPage),
   );
+  const [currentSorting, setCurrentSorting] = useState<string>('Sortowanie'); // Default sorting label
 
+  // Reset products and pagination when category or initial products change
+  useEffect(() => {
+    setProducts(initialProducts || []);
+    setTotalProducts(initialTotalProducts);
+    setTotalPages(Math.ceil(initialTotalProducts / perPage));
+    setPage(1); // Reset to the first page
+    setCurrentSorting('Sortowanie'); // Reset sorting to default
+  }, [initialProducts, categoryId, initialTotalProducts]);
+
+  // Fetch products when filters, sorting, or page changes
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoaded(false);
@@ -40,11 +51,11 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
           page,
           perPage,
           filters,
-          sortingOption,
+          sortingOption: currentSorting,
         });
 
         if (filters.length > 0) {
-          // Fetch products only when filters are applied
+          // Fetch products based on filters
           const {
             products: fetchedProducts,
             totalProducts: fetchedTotalProducts,
@@ -55,12 +66,22 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
             perPage,
           );
 
-          console.log('Fetched filtered products:', fetchedProducts);
           setProducts(fetchedProducts || []);
           setTotalProducts(fetchedTotalProducts);
           setTotalPages(Math.ceil(fetchedTotalProducts / perPage));
-        } else {
-          // Fallback to default fetch if no filters are applied
+        } else if (currentSorting !== 'Sortowanie') {
+          // Fetch products based on sorting
+          const sortingMap: Record<string, { orderby: string; order: string }> =
+            {
+              bestsellers: { orderby: 'popularity', order: 'desc' },
+              'najnowsze produkty': { orderby: 'date', order: 'desc' },
+              'najwyższa cena': { orderby: 'price', order: 'desc' },
+              'najniższa cena': { orderby: 'price', order: 'asc' },
+            };
+
+          const sortingParams =
+            sortingMap[currentSorting.toLowerCase()] || sortingMap.bestsellers;
+
           const {
             products: fetchedProducts,
             totalProducts: fetchedTotalProducts,
@@ -69,10 +90,25 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
             page,
             perPage,
             [],
-            sortingOption,
+            `${sortingParams.orderby}:${sortingParams.order}`,
           );
 
-          console.log('Fetched default products:', fetchedProducts);
+          setProducts(fetchedProducts || []);
+          setTotalProducts(fetchedTotalProducts);
+          setTotalPages(Math.ceil(fetchedTotalProducts / perPage));
+        } else {
+          // Default fetch without any sorting
+          const {
+            products: fetchedProducts,
+            totalProducts: fetchedTotalProducts,
+          } = await fetchProductsByCategoryId(
+            categoryId,
+            page,
+            perPage,
+            [],
+            'default',
+          );
+
           setProducts(fetchedProducts || []);
           setTotalProducts(fetchedTotalProducts);
           setTotalPages(Math.ceil(fetchedTotalProducts / perPage));
@@ -85,14 +121,19 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
     };
 
     fetchProducts();
-  }, [categoryId, filters, sortingOption, page]);
+  }, [categoryId, filters, currentSorting, page]);
 
   const handlePageClick = (pageNum: number) => {
     setPage(pageNum);
   };
 
+  const handleSortingChange = (newSorting: string) => {
+    setCurrentSorting(newSorting);
+    setPage(1); // Reset to the first page on sorting change
+  };
+
   const renderPageNumbers = () => {
-    if (totalPages === 0) return null; // Hide pagination if no pages
+    if (totalPages === 0) return null;
     return Array.from({ length: totalPages }, (_, index) => (
       <button
         key={index + 1}

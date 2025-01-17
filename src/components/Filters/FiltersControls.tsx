@@ -76,12 +76,9 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
       <div className={`relative ${isMobile ? 'w-1/2' : 'w-[352px] ml-auto'}`}>
         <CustomDropdown
           options={sortingOptions}
-          selectedValue={
-            sortingOptions.find((option) => option.toLowerCase() === sorting) ||
-            sortingOptions[0]
-          }
+          selectedValue={sorting}
           placeholder="Sortowanie"
-          onChange={(value) => onSortingChange(value.toLowerCase())}
+          onChange={(value) => onSortingChange(value)}
           isProductPage={false}
         />
       </div>

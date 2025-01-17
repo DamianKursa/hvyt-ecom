@@ -48,27 +48,55 @@ export const fetchProductsByCategoryId = async (
   sortingOption: string = 'default',
 ) => {
   try {
-    const params: any = {
+    // Initialize API request parameters
+    const params: Record<string, any> = {
       category: categoryId,
       page,
       per_page: perPage,
     };
 
+    // Add filters to the request
     filters.forEach((filter) => {
       if (filter.name && filter.value) {
-        params[`attribute_${filter.name}`] = filter.value;
+        // Use WooCommerce attribute query format
+        const attributeKey = `attribute_${filter.name}`;
+        if (!params[attributeKey]) {
+          params[attributeKey] = filter.value;
+        } else {
+          params[attributeKey] += `,${filter.value}`; // Handle multiple values for the same filter
+        }
       }
     });
 
-    if (sortingOption !== 'default') {
-      params.orderby = sortingOption;
+    // Map the sortingOption to WooCommerce-compatible parameters
+    const sortingMap: Record<string, { orderby: string; order?: string }> = {
+      default: { orderby: 'menu_order' }, // Default sorting by WooCommerce menu order
+      'price-asc': { orderby: 'price', order: 'asc' }, // Sort by lowest price
+      'price-desc': { orderby: 'price', order: 'desc' }, // Sort by highest price
+      newest: { orderby: 'date', order: 'desc' }, // Sort by newest products
+      bestsellers: { orderby: 'popularity' }, // Sort by popularity
+    };
+
+    // Use the sorting map to set WooCommerce-compatible sorting
+    const sortingParams =
+      sortingMap[sortingOption.toLowerCase()] || sortingMap.default;
+    params.orderby = sortingParams.orderby;
+    if (sortingParams.order) {
+      params.order = sortingParams.order;
     }
 
-    console.log('Sending API request to fetch products:', params);
+    // Log the final API request parameters for debugging
+    console.log(
+      'Sending API request to fetch products with parameters:',
+      params,
+    );
 
+    // Fetch products from WooCommerce API
     const response = await WooCommerceAPI.get('/products', { params });
 
+    // Log the fetched products and total count for debugging
     console.log('Products fetched from WooCommerce:', response.data);
+    console.log('Total Products:', response.headers['x-wp-total']);
 
     return {
       products: response.data || [],
@@ -76,7 +104,12 @@ export const fetchProductsByCategoryId = async (
     };
   } catch (error) {
     console.error('Error in fetchProductsByCategoryId:', error);
-    throw error;
+
+    // Return empty results in case of failure
+    return {
+      products: [],
+      totalProducts: 0,
+    };
   }
 };
 
@@ -140,6 +173,45 @@ export const fetchProductsWithFilters = async (
     };
   } catch (error) {
     console.error('Error fetching products with filters:', error);
+    throw error;
+  }
+};
+// Fetch products with custom sorting
+export const fetchSortedProducts = async (
+  categoryId: number,
+  orderby: string,
+  order: string,
+  page = 1,
+  perPage = 12,
+) => {
+  try {
+    const params = {
+      category: categoryId,
+      page,
+      per_page: perPage,
+      orderby,
+      order,
+    };
+
+    console.log('Sending API request to fetch sorted products:', params);
+
+    const response = await CustomAPI.get('/sorted-products', { params });
+
+    return {
+      products: response.data.products.map((product: any) => ({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        slug: product.permalink.split('/').filter(Boolean).pop(), // Extract slug from permalink
+        images: [
+          { src: product.image }, // Wrap image in an array
+        ],
+        variations: [], // Add variations if available in API
+      })),
+      totalProducts: response.data.total || 0,
+    };
+  } catch (error) {
+    console.error('Error in fetchSortedProducts:', error);
     throw error;
   }
 };
