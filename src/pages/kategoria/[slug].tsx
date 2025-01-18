@@ -130,14 +130,47 @@ const CategoryPage = ({
   };
 
   const getCategoryIcon = () => {
-    if (slug && icons[slug]) {
+    if (slug === 'uchwyty-meblowe') {
+      return (
+        <div className="flex items-center gap-4 icons-container">
+          <Image
+            src="/icons/kategoria-uchwyty-1.svg"
+            alt="Icon 1"
+            className="icon-image ml-2 "
+            width={50} // Keep these values consistent
+            height={50}
+          />
+          <Image
+            src="/icons/kategoria-uchwyty-2.svg"
+            alt="Icon 2"
+            className="icon-image"
+            width={50}
+            height={50}
+          />
+          <Image
+            src="/icons/kategoria-uchwyty-3.svg"
+            alt="Icon 3"
+            className="icon-image"
+            width={50}
+            height={50}
+          />
+          <Image
+            src="/icons/kategoria-uchwyty-4.svg"
+            alt="Icon 4"
+            className="icon-image "
+            width={50}
+            height={50}
+          />
+        </div>
+      );
+    } else if (slug && icons[slug]) {
       return (
         <Image
           src={icons[slug]}
           alt={`${slug} icon`}
           width={54}
           height={24}
-          className="ml-2"
+          className="ml-2 icon-image"
         />
       );
     }

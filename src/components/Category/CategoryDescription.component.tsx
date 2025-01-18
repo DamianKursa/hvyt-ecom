@@ -61,7 +61,7 @@ const CategoryDescription: React.FC<CategoryDescriptionProps> = ({
             <Image
               src={`/images/${category}-description.jpg`}
               alt={`${category} description image`}
-              width={600}
+              width={800}
               height={500}
               className="rounded-lg shadow-lg object-cover"
             />

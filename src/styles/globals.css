@@ -207,3 +207,15 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
 }
 
 
+.icons-container {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* Adjust the gap between icons */
+}
+
+.icon-image {
+  height: 34px; /* Set a fixed height for all icons */
+  width: auto; /* Maintain the aspect ratio */
+  object-fit: contain; /* Ensure the SVGs scale properly */
+  display: block; /* Prevent inline spacing issues */
+}
