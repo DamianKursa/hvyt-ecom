@@ -82,7 +82,9 @@ const NaszeKolekcje = () => {
                   kolekcja.acf?.ikonka_4,
                 ]}
                 iconPath="/icons/kolekcja/"
-                iconSize={44} // Set the desired height for the icons
+                iconHeight={24}
+                top={16}
+                left={32}
                 gap={5} // Space between icons
               />
               <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red">
@@ -119,7 +121,7 @@ const NaszeKolekcje = () => {
                       kolekcja.acf?.ikonka_4,
                     ]}
                     iconPath="/icons/kolekcja/"
-                    iconSize={34} // Set the desired height for the icons
+                    iconHeight={24} // Set the desired height for the icons
                     gap={5} // Space between icons
                   />
                   <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">

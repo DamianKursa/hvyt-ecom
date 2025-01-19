@@ -1,48 +1,53 @@
 import React from 'react';
 
 interface IconRendererProps {
-  icons: (string | undefined)[];
-  iconPath: string; // Base path for the icons, e.g., "/icons/kolekcja/"
-  iconSize?: number; // Optional size for icons (default: 34px)
-  gap?: number; // Optional gap between icons (default: 5px)
+  icons: (string | null | undefined)[]; // Allow null or undefined to skip missing icons
+  iconPath: string; // Base path for the icons (e.g., "/icons/")
+  iconHeight?: number; // Height for icons (default: 24px)
+  gap?: number; // Gap between icons (default: 5px)
+  containerClassName?: string; // Optional class for the container
+  iconClassName?: string; // Optional class for individual icons
+  top?: number; // Top offset for positioning
+  left?: number; // Left offset for positioning
 }
 
 const IconRenderer: React.FC<IconRendererProps> = ({
   icons,
   iconPath,
-  iconSize = 44,
+  iconHeight = 24,
   gap = 5,
+  containerClassName = '',
+  iconClassName = '',
+  top = 20,
+  left = 30,
 }) => {
-  const filteredIcons = icons.filter((icon) => icon); // Filter out undefined or null icons
+  // Filter out missing or invalid icons
+  const filteredIcons = icons.filter((icon) => !!icon);
 
   return (
     <div
-      className="flex items-start absolute top-4 left-6"
+      className={`flex ${containerClassName}`}
       style={{
         gap: `${gap}px`,
-        lineHeight: `${iconSize}px`, // Ensures proper alignment with icon size
+        position: 'absolute',
+        top: `${top}px`,
+        left: `${left}px`,
+        zIndex: 10, // Ensure it appears above the background
       }}
     >
       {filteredIcons.map((iconName, index) => (
-        <div
+        <img
           key={index}
-          className="relative"
+          src={`${iconPath}${iconName}.svg`}
+          alt={`Icon ${iconName}`}
+          className={iconClassName}
           style={{
-            width: `${iconSize}px`,
-            height: `${iconSize}px`,
-            display: 'inline-block',
+            height: `${iconHeight}px`, // Set fixed height for icons
+            width: 'auto', // Maintain aspect ratio
+            objectFit: 'contain', // Prevent distortion of SVGs
+            display: 'inline-block', // Ensure proper rendering
           }}
-        >
-          <img
-            src={`${iconPath}${iconName}.svg`}
-            alt={iconName || 'icon'}
-            style={{
-              width: '100%',
-              height: '100%',
-              display: 'block', // Prevents spacing issues in inline-block
-            }}
-          />
-        </div>
+        />
       ))}
     </div>
   );

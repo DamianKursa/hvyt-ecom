@@ -117,14 +117,14 @@ const CollectionPage = () => {
               {kolekcjeData && (
                 <IconRenderer
                   icons={[
-                    kolekcjeData[0]?.acf?.ikonka_1,
-                    kolekcjeData[0]?.acf?.ikonka_2,
-                    kolekcjeData[0]?.acf?.ikonka_3,
-                    kolekcjeData[0]?.acf?.ikonka_4,
+                    kolekcjeData[0]?.acf?.ikonka_1 ?? '',
+                    kolekcjeData[0]?.acf?.ikonka_2 ?? '',
+                    kolekcjeData[0]?.acf?.ikonka_3 ?? '',
+                    kolekcjeData[0]?.acf?.ikonka_4 ?? '',
                   ]}
                   iconPath="/icons/kolekcja/"
-                  iconSize={44}
-                  gap={8}
+                  iconHeight={24}
+                  gap={5}
                 />
               )}
               <h1 className="font-size-h1 capitalize mb-[32px] font-bold text-dark-pastel-red">
@@ -159,43 +159,42 @@ const CollectionPage = () => {
                 1280: { slidesPerView: 6.3 },
               }}
             >
-              {kolekcjeData?.map((kolekcja: Kolekcja) => {
-                console.log('Kolekcja Data:', kolekcja); // Debugging ACF data
-                return (
-                  <SwiperSlide key={kolekcja.id}>
-                    <div
-                      className="relative h-[205px] w-full transition-transform duration-300 transform hover:scale-105 rounded-lg overflow-hidden"
-                      style={{ backgroundColor: 'var(--color-beige)' }}
-                      onClick={() => handleCollectionClick(kolekcja.slug)}
-                    >
-                      {/* Ensure IconRenderer is visible */}
-                      <div className="absolute z-10">
-                        <IconRenderer
-                          icons={[
-                            kolekcja.acf?.ikonka_1,
-                            kolekcja.acf?.ikonka_2,
-                            kolekcja.acf?.ikonka_3,
-                            kolekcja.acf?.ikonka_4,
-                          ]}
-                          iconPath="/icons/kolekcja/"
-                          iconSize={34}
-                          gap={5}
-                        />
-                      </div>
-                      <Image
-                        src={kolekcja.imageUrl || '/placeholder.jpg'}
-                        alt={kolekcja.title.rendered}
-                        layout="fill"
-                        objectFit="cover"
-                        className="rounded-lg"
-                      />
-                      <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest bg-white">
-                        {kolekcja.title.rendered}
-                      </div>
+              {kolekcjeData?.map((kolekcja: Kolekcja) => (
+                <SwiperSlide key={kolekcja.id}>
+                  <div
+                    className="relative h-[205px] w-full transition-transform duration-300 transform hover:scale-105 rounded-lg overflow-hidden"
+                    style={{ backgroundColor: 'var(--color-beige)' }}
+                    onClick={() => handleCollectionClick(kolekcja.slug)}
+                  >
+                    {/* IconRenderer */}
+                    <IconRenderer
+                      icons={[
+                        kolekcja.acf?.ikonka_1 ?? '',
+                        kolekcja.acf?.ikonka_2 ?? '',
+                        kolekcja.acf?.ikonka_3 ?? '',
+                        kolekcja.acf?.ikonka_4 ?? '',
+                      ]}
+                      iconPath="/icons/kolekcja/"
+                      iconHeight={24} // Uniform height
+                      gap={5} // Adjust gap between icons
+                    />
+
+                    {/* Background Image */}
+                    <Image
+                      src={kolekcja.imageUrl || '/placeholder.jpg'}
+                      alt={kolekcja.title.rendered}
+                      layout="fill"
+                      objectFit="cover"
+                      className="rounded-lg"
+                    />
+
+                    {/* Title */}
+                    <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest bg-white z-10">
+                      {kolekcja.title.rendered}
                     </div>
-                  </SwiperSlide>
-                );
-              })}
+                  </div>
+                </SwiperSlide>
+              ))}
             </Swiper>
           </div>
 

@@ -1,4 +1,1 @@
-<svg width="34" height="24" viewBox="0 0 34 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="2" y="2" width="15" height="15" fill="#661F30"/>
-<rect x="17" y="2" width="15" height="15" fill="#661F30"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="19" height="34" fill="none"><path fill="#661F30" d="M17 2v15H2V2zM17 17v15H2V17z"/></svg>

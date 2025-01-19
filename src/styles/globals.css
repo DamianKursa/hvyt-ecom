@@ -219,3 +219,23 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
   object-fit: contain; /* Ensure the SVGs scale properly */
   display: block; /* Prevent inline spacing issues */
 }
+.my-icons-container {
+  justify-content: center;
+}
+
+.my-icon {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  image-rendering: crisp-edges; /* For sharper edges */
+  image-rendering: pixelated; 
+}
+.icons-container {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Space between icons */
+  justify-content: center;
+}
+
+.icon-image {
+  image-rendering: crisp-edges; /* For sharp SVG edges */
+}

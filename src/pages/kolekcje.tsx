@@ -108,6 +108,7 @@ const KolekcjePage = () => {
                           kolekcja.acf?.ikonka_4,
                         ]}
                         iconPath="/icons/kolekcja/"
+                        iconHeight={24}
                       />
                       <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red transition-colors duration-300 group-hover:bg-dark-pastel-red group-hover:text-neutral-white">
                         {kolekcja.title.rendered}
