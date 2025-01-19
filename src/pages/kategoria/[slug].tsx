@@ -52,6 +52,7 @@ const CategoryPage = ({
   const [sortingOption, setSortingOption] = useState('Sortowanie');
   const [filteredProductCount, setFilteredProductCount] =
     useState(initialTotalProducts);
+  const [loading, setLoading] = useState(false); // Track loading state for filtered products
 
   useEffect(() => {
     const handleResize = () => {
@@ -65,6 +66,93 @@ const CategoryPage = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  useEffect(() => {
+    // Initialize filters from URL query
+    const queryFilters: { name: string; value: string }[] = [];
+    Object.entries(router.query).forEach(([key, value]) => {
+      if (key !== 'slug' && value) {
+        if (Array.isArray(value)) {
+          value.forEach((v) => queryFilters.push({ name: key, value: v }));
+        } else {
+          queryFilters.push({ name: key, value: value as string });
+        }
+      }
+    });
+
+    if (queryFilters.length > 0) {
+      setLoading(true);
+      setActiveFilters(queryFilters);
+      fetchFilteredProducts(queryFilters).finally(() => setLoading(false));
+    }
+  }, [router.query]);
+
+  const updateUrlWithFilters = (filters: { name: string; value: string }[]) => {
+    const query: Record<string, string | string[]> = { slug: slug || '' };
+
+    filters.forEach((filter) => {
+      if (!query[filter.name]) {
+        query[filter.name] = [];
+      }
+
+      if (Array.isArray(query[filter.name])) {
+        if (!(query[filter.name] as string[]).includes(filter.value)) {
+          query[filter.name] = [
+            ...(query[filter.name] as string[]),
+            filter.value,
+          ];
+        }
+      } else {
+        query[filter.name] = [filter.value];
+      }
+    });
+
+    router.push(
+      {
+        pathname: router.pathname,
+        query,
+      },
+      undefined,
+      { shallow: true },
+    );
+  };
+
+  const fetchFilteredProducts = async (
+    filters: { name: string; value: string }[],
+  ) => {
+    try {
+      const { products: filteredProducts, totalProducts } =
+        await fetchProductsByCategoryId(category.id, 1, 12, filters);
+
+      setProducts(filteredProducts);
+      setFilteredProductCount(totalProducts);
+    } catch (error) {
+      console.error('Error fetching filtered products:', error);
+    }
+  };
+
+  const handleFilterChange = (
+    selectedFilters: { name: string; value: string }[],
+  ) => {
+    setActiveFilters(selectedFilters);
+    updateUrlWithFilters(selectedFilters);
+    fetchFilteredProducts(selectedFilters);
+  };
+
+  const clearFilters = () => {
+    setActiveFilters([]);
+    setFilteredProductCount(initialTotalProducts);
+    setProducts(initialProducts);
+
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { slug: slug || '' },
+      },
+      undefined,
+      { shallow: true },
+    );
+  };
+
   const toggleFilterModal = () => {
     setIsFilterModalOpen((prev) => !prev);
   };
@@ -73,7 +161,6 @@ const CategoryPage = ({
     try {
       if (sortingValue === 'Sortowanie') {
         setSortingOption('Sortowanie');
-        // Reset to default sorting
         const { products: defaultProducts, totalProducts } =
           await fetchProductsByCategoryId(category.id, 1, 12, []);
         setProducts(defaultProducts);
@@ -104,7 +191,6 @@ const CategoryPage = ({
           12,
         );
 
-      console.log('Sorted Products:', sortedProducts);
       setProducts(sortedProducts);
       setFilteredProductCount(totalProducts);
     } catch (error) {
@@ -112,72 +198,7 @@ const CategoryPage = ({
     }
   };
 
-  const handleFilterChange = (
-    selectedFilters: { name: string; value: string }[],
-  ) => {
-    setActiveFilters(selectedFilters);
-  };
-
-  const applyFilters = () => {
-    setIsFilterModalOpen(false);
-  };
-
-  const clearFilters = () => {
-    setActiveFilters([]);
-    setFilteredProductCount(initialTotalProducts);
-    setProducts(initialProducts);
-    router.push({ pathname: router.pathname });
-  };
-
-  const getCategoryIcon = () => {
-    if (slug === 'uchwyty-meblowe') {
-      return (
-        <div className="flex items-center gap-4 icons-container">
-          <Image
-            src="/icons/kategoria-uchwyty-1.svg"
-            alt="Icon 1"
-            className="icon-image ml-2 "
-            width={50} // Keep these values consistent
-            height={50}
-          />
-          <Image
-            src="/icons/kategoria-uchwyty-2.svg"
-            alt="Icon 2"
-            className="icon-image"
-            width={50}
-            height={50}
-          />
-          <Image
-            src="/icons/kategoria-uchwyty-3.svg"
-            alt="Icon 3"
-            className="icon-image"
-            width={50}
-            height={50}
-          />
-          <Image
-            src="/icons/kategoria-uchwyty-4.svg"
-            alt="Icon 4"
-            className="icon-image "
-            width={50}
-            height={50}
-          />
-        </div>
-      );
-    } else if (slug && icons[slug]) {
-      return (
-        <Image
-          src={icons[slug]}
-          alt={`${slug} icon`}
-          width={54}
-          height={24}
-          className="ml-2 icon-image"
-        />
-      );
-    }
-    return null;
-  };
-
-  if (!category) {
+  if (!category || loading) {
     return (
       <Layout title="Loading...">
         <Snackbar message="Loading category..." type="error" visible={true} />
@@ -194,7 +215,6 @@ const CategoryPage = ({
           <h1 className="text-[40px] font-bold text-[#661F30]">
             {category.name}
           </h1>
-          {getCategoryIcon()}
         </div>
 
         <FiltersControls
@@ -208,13 +228,12 @@ const CategoryPage = ({
           sorting={sortingOption}
           onSortingChange={handleSortingChange}
           onRemoveFilter={(filterToRemove) => {
-            setActiveFilters((prev) =>
-              prev.filter(
-                (filter) =>
-                  filter.name !== filterToRemove.name ||
-                  filter.value !== filterToRemove.value,
-              ),
+            const updatedFilters = activeFilters.filter(
+              (filter) =>
+                filter.name !== filterToRemove.name ||
+                filter.value !== filterToRemove.value,
             );
+            handleFilterChange(updatedFilters);
           }}
           isMobile={isMobile}
         />
@@ -250,8 +269,8 @@ const CategoryPage = ({
         onClose={toggleFilterModal}
         categoryId={category.id}
         activeFilters={activeFilters}
-        onFilterChange={setActiveFilters}
-        onApplyFilters={applyFilters}
+        onFilterChange={handleFilterChange}
+        onApplyFilters={() => setIsFilterModalOpen(false)}
         onClearFilters={clearFilters}
         setProducts={setProducts}
         setTotalProducts={setFilteredProductCount}
@@ -280,7 +299,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         initialProducts: fetchedProducts,
         initialTotalProducts: totalProducts,
       },
-      revalidate: 60, // Optional revalidation for fresh data
+      revalidate: 60,
     };
   } catch (error) {
     return {
