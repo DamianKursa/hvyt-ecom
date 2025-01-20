@@ -12,6 +12,7 @@ interface ProductArchiveProps {
   sortingOption: string;
   initialProducts: any[];
   totalProducts: number;
+  loading: boolean; // Indicates whether the parent is fetching new data
 }
 
 const ProductArchive: React.FC<ProductArchiveProps> = ({
@@ -20,17 +21,18 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
   sortingOption,
   initialProducts,
   totalProducts: initialTotalProducts,
+  loading,
 }) => {
   const perPage = 12;
 
   const [products, setProducts] = useState<any[]>(initialProducts || []);
-  const [isLoaded, setIsLoaded] = useState(true);
   const [page, setPage] = useState(1);
   const [totalProducts, setTotalProducts] = useState(initialTotalProducts);
   const [totalPages, setTotalPages] = useState(
     Math.ceil(initialTotalProducts / perPage),
   );
   const [currentSorting, setCurrentSorting] = useState<string>('Sortowanie'); // Default sorting label
+  const [isFetching, setIsFetching] = useState(false); // Internal loading state for local fetches
 
   // Reset products and pagination when category or initial products change
   useEffect(() => {
@@ -44,16 +46,10 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
   // Fetch products when filters, sorting, or page changes
   useEffect(() => {
     const fetchProducts = async () => {
-      setIsLoaded(false);
-      try {
-        console.log('Fetching products with params:', {
-          categoryId,
-          page,
-          perPage,
-          filters,
-          sortingOption: currentSorting,
-        });
+      if (loading || isFetching) return; // Avoid multiple fetches
 
+      setIsFetching(true);
+      try {
         if (filters.length > 0) {
           // Fetch products based on filters
           const {
@@ -116,12 +112,12 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
-        setIsLoaded(true);
+        setIsFetching(false);
       }
     };
 
     fetchProducts();
-  }, [categoryId, filters, currentSorting, page]);
+  }, [categoryId, filters, currentSorting, page, loading]);
 
   const handlePageClick = (pageNum: number) => {
     setPage(pageNum);
@@ -150,12 +146,12 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {isLoaded
-          ? products.map((product) => (
-              <ProductPreview key={product.id} product={product} />
-            ))
-          : Array.from({ length: perPage }).map((_, index) => (
+        {loading || isFetching
+          ? Array.from({ length: perPage }).map((_, index) => (
               <SkeletonProductPreview key={index} />
+            ))
+          : products.map((product) => (
+              <ProductPreview key={product.id} product={product} />
             ))}
       </div>
 

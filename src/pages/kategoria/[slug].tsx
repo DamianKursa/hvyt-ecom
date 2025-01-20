@@ -198,14 +198,6 @@ const CategoryPage = ({
     }
   };
 
-  if (!category || loading) {
-    return (
-      <Layout title="Loading...">
-        <Snackbar message="Loading category..." type="error" visible={true} />
-      </Layout>
-    );
-  }
-
   return (
     <Layout title={`Hvyt | ${category.name || 'Loading...'}`}>
       <div className="container max-w-[1440px] mt-[88px] px-4 md:px-0 lg:mt-[115px] mx-auto">
@@ -260,6 +252,7 @@ const CategoryPage = ({
               sortingOption={sortingOption}
               initialProducts={products}
               totalProducts={filteredProductCount}
+              loading={loading}
             />
           </div>
         </div>
