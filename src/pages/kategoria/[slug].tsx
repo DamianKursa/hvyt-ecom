@@ -222,7 +222,11 @@ const CategoryPage = ({
 
         <FiltersControls
           filtersVisible={filtersVisible}
-          toggleFilters={() => setFiltersVisible(!filtersVisible)}
+          toggleFilters={
+            isMobile
+              ? toggleFilterModal // Use modal toggle for mobile
+              : () => setFiltersVisible(!filtersVisible) // Use sidebar toggle for desktop
+          }
           filters={activeFilters}
           sorting={sortingOption}
           onSortingChange={handleSortingChange}
