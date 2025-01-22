@@ -81,6 +81,7 @@ export const fetchProductsByCategoryId = async (
     const sortingParams =
       sortingMap[sortingOption.toLowerCase()] || sortingMap.default;
     params.orderby = sortingParams.orderby;
+
     if (sortingParams.order) {
       params.order = sortingParams.order;
     }

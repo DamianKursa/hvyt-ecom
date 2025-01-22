@@ -1,10 +1,16 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useForm, FormProvider } from 'react-hook-form';
 import { InputField } from '../Input/InputField.component';
 import SocialIcons from '../UI/SocialIcons';
 import { normalizeString } from '@/utils/functions/functions'; // Import normalizeString
 
 const Footer = () => {
+  const router = useRouter();
+  const isSpecialPage =
+    router.pathname.startsWith('/produkt') ||
+    router.pathname.startsWith('/kategoria');
+
   const methods = useForm({
     defaultValues: {
       email: '',
@@ -21,7 +27,11 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-beige py-16 text-sm text-neutral-darkest">
+    <footer
+      className={`${
+        isSpecialPage ? 'bg-beige-light' : 'bg-beige'
+      } py-16 text-sm text-neutral-darkest`}
+    >
       <div className=" max-w-[1440px] container mx-auto">
         {/* First Row - Grid with 50/50 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 border-b border-beige-dark pb-8 mb-8">

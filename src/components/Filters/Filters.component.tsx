@@ -1,10 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 import SkeletonFilter from '../Skeletons/SkeletonFilter.component';
 import Snackbar from '../UI/Snackbar.component';
+import PriceSlider from '@/components/UI/PriceSlider'; // Import the PriceSlider component
 import {
   fetchProductsWithFilters,
   fetchProductAttributesWithTerms,
 } from '@/utils/api/category';
+
+interface FilterOption {
+  name: string;
+  slug: string;
+}
+
+interface FilterAttribute {
+  name: string;
+  slug: string;
+  options?: FilterOption[];
+}
 
 interface FiltersProps {
   categoryId: number;
@@ -12,6 +24,7 @@ interface FiltersProps {
   onFilterChange: (selectedFilters: { name: string; value: string }[]) => void;
   setProducts: (products: any[]) => void;
   setTotalProducts: (total: number) => void;
+  filterOrder?: string[]; // Define the order of filters
 }
 
 const Filters = ({
@@ -20,10 +33,9 @@ const Filters = ({
   onFilterChange,
   setProducts,
   setTotalProducts,
+  filterOrder = [], // Default to an empty array if not provided
 }: FiltersProps) => {
-  const [attributes, setAttributes] = useState<
-    { name: string; slug: string; options?: { name: string; slug: string }[] }[]
-  >([]);
+  const [attributes, setAttributes] = useState<FilterAttribute[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [expandedFilters, setExpandedFilters] = useState<{
@@ -32,41 +44,49 @@ const Filters = ({
   const [moreOptionsVisible, setMoreOptionsVisible] = useState<{
     [key: string]: boolean;
   }>({});
+  const [priceRange, setPriceRange] = useState<[number, number]>([15, 500]);
   const previousCategoryId = useRef<number | null>(null);
 
-  // Fetch product attributes when the category changes
   useEffect(() => {
     const fetchAttributes = async () => {
-      if (previousCategoryId.current === categoryId) return; // Skip if attributes already fetched for this category
+      if (previousCategoryId.current === categoryId) return;
 
       setLoading(true);
       try {
-        const fetchedAttributes =
+        const fetchedAttributes: FilterAttribute[] =
           await fetchProductAttributesWithTerms(categoryId);
-        setAttributes(fetchedAttributes);
 
-        // Initialize the expanded state for the first 3 attributes
-        const initialExpandedFilters = fetchedAttributes.slice(0, 3).reduce(
-          (acc: { [key: string]: boolean }, attribute: { slug: string }) => ({
+        // Filter and sort attributes based on `filterOrder`
+        const orderedAttributes =
+          filterOrder.length > 0
+            ? fetchedAttributes.filter((attr) =>
+                filterOrder.includes(attr.name),
+              )
+            : fetchedAttributes;
+
+        setAttributes(orderedAttributes);
+
+        // Initialize expanded state for the first 3 attributes
+        const initialExpandedFilters = orderedAttributes.slice(0, 3).reduce(
+          (acc: { [key: string]: boolean }, attr: FilterAttribute) => ({
             ...acc,
-            [attribute.slug]: true,
+            [attr.slug]: true,
           }),
           {},
         );
         setExpandedFilters(initialExpandedFilters);
 
-        previousCategoryId.current = categoryId; // Cache the fetched category ID
-        setLoading(false);
+        previousCategoryId.current = categoryId;
       } catch (error) {
         setErrorMessage('Failed to load filters');
+      } finally {
         setLoading(false);
       }
     };
 
     if (categoryId) fetchAttributes();
-  }, [categoryId]);
+  }, [categoryId, filterOrder]);
 
-  // Handle changes to filter selections
   const handleFilterChange = async (
     attributeSlug: string,
     optionSlug: string,
@@ -79,13 +99,11 @@ const Filters = ({
             !(filter.name === attributeSlug && filter.value === optionSlug),
         );
 
-    onFilterChange(updatedFilters); // Update active filters state
+    onFilterChange(updatedFilters);
 
-    // Avoid fetching products if no filters are applied
     if (updatedFilters.length === 0) {
-      setProducts([]); // Clear products list
-      setTotalProducts(0); // Reset total product count
-      console.log('No filters applied. Fetch skipped.');
+      setProducts([]);
+      setTotalProducts(0);
       return;
     }
 
@@ -96,25 +114,48 @@ const Filters = ({
         1,
         12,
       );
-      setProducts(products); // Update the product list
-      setTotalProducts(totalProducts); // Update the total products count
-      console.log('Filtered products fetched:', { products, totalProducts }); // Debug log
+      setProducts(products);
+      setTotalProducts(totalProducts);
     } catch (error) {
       console.error('Error fetching filtered products:', error);
     }
   };
 
-  // Expand or collapse a filter section
+  const handlePriceChange = async (newRange: [number, number]) => {
+    setPriceRange(newRange);
+    const priceFilter = {
+      name: 'price',
+      value: `${newRange[0]}-${newRange[1]}`,
+    }; // Use `price` instead of `Cena`
+    const updatedFilters = [
+      ...activeFilters.filter((filter) => filter.name !== 'price'),
+      priceFilter,
+    ];
+
+    onFilterChange(updatedFilters);
+
+    try {
+      const { products, totalProducts } = await fetchProductsWithFilters(
+        categoryId,
+        updatedFilters,
+        1,
+        12,
+      );
+      setProducts(products);
+      setTotalProducts(totalProducts);
+    } catch (error) {
+      console.error('Error applying price filter:', error);
+    }
+  };
+
   const toggleFilter = (slug: string) => {
     setExpandedFilters((prev) => ({ ...prev, [slug]: !prev[slug] }));
   };
 
-  // Show more or fewer options for a filter
   const toggleMoreOptions = (slug: string) => {
     setMoreOptionsVisible((prev) => ({ ...prev, [slug]: !prev[slug] }));
   };
 
-  // Render loading skeleton while fetching attributes
   if (loading) {
     return (
       <div className="filters border p-4">
@@ -125,13 +166,22 @@ const Filters = ({
     );
   }
 
-  // Render error message if there is an error
   if (errorMessage) {
     return <Snackbar message={errorMessage} type="error" visible={true} />;
   }
 
+  // Ensure at least one filter is visible
+  if (attributes.length === 0) {
+    return (
+      <div className="filters border p-4">
+        <p className="text-gray-500">No filters available for this category.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="filters w-full rounded-[24px] p-[12px_16px] border">
+      {/* Other Filters */}
       {attributes.map((attribute) => (
         <div key={attribute.slug} className="mb-4">
           {/* Filter Title */}
@@ -217,6 +267,16 @@ const Filters = ({
           )}
         </div>
       ))}
+
+      {/* Price Slider Filter at the Bottom */}
+      <div className="mb-4">
+        <PriceSlider
+          minPrice={0}
+          maxPrice={1000}
+          currentRange={priceRange}
+          onPriceChange={handlePriceChange}
+        />
+      </div>
     </div>
   );
 };

@@ -1,17 +1,16 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { useEffect, useState, useRef } from 'react';
 import Layout from '@/components/Layout/Layout.component';
-import Filters from '../../components/Filters/Filters.component';
+import Filters from '@/components/Filters/Filters.component';
 import ProductArchive from '@/components/Product/ProductArchive';
-import FiltersControls from '../../components/Filters/FiltersControls';
-import Snackbar from '@/components/UI/Snackbar.component';
+import FiltersControls from '@/components/Filters/FiltersControls';
 import CategoryDescription from '@/components/Category/CategoryDescription.component';
 import FilterModal from '@/components/Filters/FilterModal';
 import {
   fetchCategoryBySlug,
   fetchProductsByCategoryId,
+  fetchProductsWithFilters,
   fetchSortedProducts,
 } from '@/utils/api/category';
 
@@ -19,12 +18,6 @@ interface Category {
   id: number;
   name: string;
 }
-
-const icons: Record<string, string> = {
-  'uchwyty-meblowe': '/icons/uchwyty-kształty.svg',
-  klamki: '/icons/klamki-kształty.svg',
-  wieszaki: '/icons/wieszaki-kształty.svg',
-};
 
 interface CategoryPageProps {
   category: Category;
@@ -43,6 +36,7 @@ const CategoryPage = ({
     : router.query.slug;
 
   const [products, setProducts] = useState(initialProducts);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(!isMobile);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -52,7 +46,48 @@ const CategoryPage = ({
   const [sortingOption, setSortingOption] = useState('Sortowanie');
   const [filteredProductCount, setFilteredProductCount] =
     useState(initialTotalProducts);
-  const [loading, setLoading] = useState(false); // Track loading state for filtered products
+  const [loading, setLoading] = useState(false);
+
+  const lastFetchParams = useRef<string | null>(null);
+
+  const filterOrder: Record<string, string[]> = {
+    'uchwyty-meblowe': [
+      'Rodzaj',
+      'Kolor OK',
+      'Rozstaw',
+      'Materiał',
+      'Styl',
+      'Kolekcja',
+      'Przeznaczenie',
+    ],
+    klamki: ['Kształt rozety', 'Kolor OK', 'Materiał'],
+    wieszaki: ['Kolor OK', 'Materiał'],
+  };
+
+  useEffect(() => {
+    const updateCategoryData = async () => {
+      if (!slug) return;
+
+      setLoading(true);
+      try {
+        const fetchedCategory = await fetchCategoryBySlug(slug);
+        const { products: fetchedProducts, totalProducts } =
+          await fetchProductsByCategoryId(fetchedCategory.id, 1, 12);
+
+        setProducts(fetchedProducts);
+        setFilteredProductCount(totalProducts);
+        setCurrentPage(1);
+        setActiveFilters([]);
+        setSortingOption('Sortowanie');
+      } catch (error) {
+        console.error('Error updating category data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    updateCategoryData();
+  }, [slug]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -66,25 +101,88 @@ const CategoryPage = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  useEffect(() => {
-    // Initialize filters from URL query
-    const queryFilters: { name: string; value: string }[] = [];
-    Object.entries(router.query).forEach(([key, value]) => {
-      if (key !== 'slug' && value) {
-        if (Array.isArray(value)) {
-          value.forEach((v) => queryFilters.push({ name: key, value: v }));
-        } else {
-          queryFilters.push({ name: key, value: value as string });
-        }
-      }
-    });
+  const fetchProducts = async (
+    filters: { name: string; value: string }[] = activeFilters,
+    sortOption: string = sortingOption,
+    page: number = currentPage,
+  ) => {
+    const fetchParams = JSON.stringify({ filters, sortOption, page });
 
-    if (queryFilters.length > 0) {
-      setLoading(true);
-      setActiveFilters(queryFilters);
-      fetchFilteredProducts(queryFilters).finally(() => setLoading(false));
+    if (fetchParams === lastFetchParams.current) return;
+    lastFetchParams.current = fetchParams;
+
+    setLoading(true);
+
+    try {
+      if (filters.length > 0) {
+        const { products: fetchedProducts, totalProducts } =
+          await fetchProductsWithFilters(category.id, filters, page, 12);
+        setProducts(fetchedProducts);
+        setFilteredProductCount(totalProducts);
+      } else if (sortOption !== 'Sortowanie') {
+        const sortingMap: Record<string, { orderby: string; order: string }> = {
+          Bestsellers: { orderby: 'popularity', order: 'asc' },
+          'Najnowsze produkty': { orderby: 'date', order: 'desc' },
+          'Najwyższa cena': { orderby: 'price', order: 'desc' },
+          'Najniższa cena': { orderby: 'price', order: 'asc' },
+        };
+
+        const sortingParams = sortingMap[sortOption] || {
+          orderby: 'menu_order',
+          order: 'asc',
+        };
+
+        const { products: sortedProducts, totalProducts } =
+          await fetchSortedProducts(
+            category.id,
+            sortingParams.orderby,
+            sortingParams.order,
+            page,
+            12,
+          );
+
+        setProducts(sortedProducts);
+        setFilteredProductCount(totalProducts);
+      } else {
+        const { products: fetchedProducts, totalProducts } =
+          await fetchProductsByCategoryId(category.id, page, 12);
+        setProducts(fetchedProducts);
+        setFilteredProductCount(totalProducts);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
     }
-  }, [router.query]);
+  };
+
+  const handleFilterChange = (
+    selectedFilters: { name: string; value: string }[],
+  ) => {
+    setActiveFilters(selectedFilters);
+    setCurrentPage(1);
+    updateUrlWithFilters(selectedFilters);
+    fetchProducts(selectedFilters, sortingOption, 1);
+  };
+
+  const clearFilters = () => {
+    setActiveFilters([]);
+    setFilteredProductCount(initialTotalProducts);
+    setProducts(initialProducts);
+    setCurrentPage(1);
+
+    router.push({ pathname: router.pathname, query: { slug: slug || '' } });
+  };
+
+  const toggleFilterModal = () => {
+    setIsFilterModalOpen((prev) => !prev);
+  };
+
+  const handleSortingChange = (sortingValue: string) => {
+    setSortingOption(sortingValue);
+    setCurrentPage(1);
+    fetchProducts(activeFilters, sortingValue, 1);
+  };
 
   const updateUrlWithFilters = (filters: { name: string; value: string }[]) => {
     const query: Record<string, string | string[]> = { slug: slug || '' };
@@ -106,96 +204,9 @@ const CategoryPage = ({
       }
     });
 
-    router.push(
-      {
-        pathname: router.pathname,
-        query,
-      },
-      undefined,
-      { shallow: true },
-    );
-  };
-
-  const fetchFilteredProducts = async (
-    filters: { name: string; value: string }[],
-  ) => {
-    try {
-      const { products: filteredProducts, totalProducts } =
-        await fetchProductsByCategoryId(category.id, 1, 12, filters);
-
-      setProducts(filteredProducts);
-      setFilteredProductCount(totalProducts);
-    } catch (error) {
-      console.error('Error fetching filtered products:', error);
-    }
-  };
-
-  const handleFilterChange = (
-    selectedFilters: { name: string; value: string }[],
-  ) => {
-    setActiveFilters(selectedFilters);
-    updateUrlWithFilters(selectedFilters);
-    fetchFilteredProducts(selectedFilters);
-  };
-
-  const clearFilters = () => {
-    setActiveFilters([]);
-    setFilteredProductCount(initialTotalProducts);
-    setProducts(initialProducts);
-
-    router.push(
-      {
-        pathname: router.pathname,
-        query: { slug: slug || '' },
-      },
-      undefined,
-      { shallow: true },
-    );
-  };
-
-  const toggleFilterModal = () => {
-    setIsFilterModalOpen((prev) => !prev);
-  };
-
-  const handleSortingChange = async (sortingValue: string) => {
-    try {
-      if (sortingValue === 'Sortowanie') {
-        setSortingOption('Sortowanie');
-        const { products: defaultProducts, totalProducts } =
-          await fetchProductsByCategoryId(category.id, 1, 12, []);
-        setProducts(defaultProducts);
-        setFilteredProductCount(totalProducts);
-        return;
-      }
-
-      setSortingOption(sortingValue);
-
-      const sortingMap: Record<string, { orderby: string; order: string }> = {
-        Bestsellers: { orderby: 'popularity', order: 'asc' },
-        'Najnowsze produkty': { orderby: 'date', order: 'asc' },
-        'Najwyższa cena': { orderby: 'price', order: 'desc' },
-        'Najniższa cena': { orderby: 'price', order: 'asc' },
-      };
-
-      const sortingParams = sortingMap[sortingValue] || {
-        orderby: 'menu_order',
-        order: 'asc',
-      };
-
-      const { products: sortedProducts, totalProducts } =
-        await fetchSortedProducts(
-          category.id,
-          sortingParams.orderby,
-          sortingParams.order,
-          1,
-          12,
-        );
-
-      setProducts(sortedProducts);
-      setFilteredProductCount(totalProducts);
-    } catch (error) {
-      console.error('Error fetching sorted products:', error);
-    }
+    router.push({ pathname: router.pathname, query }, undefined, {
+      shallow: true,
+    });
   };
 
   return (
@@ -211,11 +222,7 @@ const CategoryPage = ({
 
         <FiltersControls
           filtersVisible={filtersVisible}
-          toggleFilters={
-            isMobile
-              ? toggleFilterModal
-              : () => setFiltersVisible(!filtersVisible)
-          }
+          toggleFilters={() => setFiltersVisible(!filtersVisible)}
           filters={activeFilters}
           sorting={sortingOption}
           onSortingChange={handleSortingChange}
@@ -239,6 +246,7 @@ const CategoryPage = ({
                 onFilterChange={handleFilterChange}
                 setProducts={setProducts}
                 setTotalProducts={setFilteredProductCount}
+                filterOrder={filterOrder[slug || ''] || []}
               />
             </div>
           )}
@@ -247,28 +255,35 @@ const CategoryPage = ({
             className={`w-full ${filtersVisible && !isMobile ? 'lg:w-3/4' : ''}`}
           >
             <ProductArchive
-              categoryId={category.id}
-              filters={activeFilters}
-              sortingOption={sortingOption}
-              initialProducts={products}
+              products={products}
               totalProducts={filteredProductCount}
               loading={loading}
+              perPage={12}
+              currentPage={currentPage}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                fetchProducts(activeFilters, sortingOption, page);
+              }}
             />
           </div>
         </div>
       </div>
       <FilterModal
         isOpen={isFilterModalOpen}
-        onClose={toggleFilterModal}
+        onClose={() => setIsFilterModalOpen(false)}
         categoryId={category.id}
         activeFilters={activeFilters}
         onFilterChange={handleFilterChange}
-        onApplyFilters={() => setIsFilterModalOpen(false)}
+        onApplyFilters={() => {
+          setIsFilterModalOpen(false);
+          fetchProducts(activeFilters, sortingOption, 1);
+        }}
         onClearFilters={clearFilters}
         setProducts={setProducts}
         setTotalProducts={setFilteredProductCount}
         productsCount={filteredProductCount}
         initialProductCount={initialTotalProducts}
+        filterOrder={filterOrder[slug || ''] || []}
       />
 
       <div className="w-full">
@@ -284,7 +299,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     const fetchedCategory = await fetchCategoryBySlug(slug);
     const { products: fetchedProducts, totalProducts } =
-      await fetchProductsByCategoryId(fetchedCategory.id, 1, 12, []);
+      await fetchProductsByCategoryId(fetchedCategory.id, 1, 12);
 
     return {
       props: {
@@ -295,9 +310,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
       revalidate: 60,
     };
   } catch (error) {
-    return {
-      notFound: true,
-    };
+    return { notFound: true };
   }
 };
 
@@ -308,10 +321,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     { params: { slug: 'wieszaki' } },
   ];
 
-  return {
-    paths,
-    fallback: 'blocking',
-  };
+  return { paths, fallback: 'blocking' };
 };
 
 export default CategoryPage;

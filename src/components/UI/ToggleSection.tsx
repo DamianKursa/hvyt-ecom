@@ -1,21 +1,27 @@
-// ToggleSection.tsx
 import React, { useState } from 'react';
 
 interface ToggleSectionProps {
   title: string;
-  content: string; // Processed HTML content
+  content: string; // HTML content
 }
 
 const ToggleSection: React.FC<ToggleSectionProps> = ({ title, content }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className=" border-b border-gray-300">
+    <div className="toggle-section border-b border-gray-300 pb-4">
+      {/* Title */}
       <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+
+      {/* Content */}
       <div
-        className={`formatted-content ${isExpanded ? '' : 'line-clamp-3'}`}
+        className={`formatted-content ${
+          isExpanded ? '' : 'line-clamp-2'
+        } whitespace-pre-wrap`}
         dangerouslySetInnerHTML={{ __html: content }}
       />
+
+      {/* Toggle Button */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="text-black mb-[24px] underline hover:text-dark-pastel-red mt-2"

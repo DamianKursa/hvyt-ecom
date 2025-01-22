@@ -27,6 +27,12 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
     'Najniższa cena',
   ];
 
+  const handleFilterRemove = (filter: { name: string; value: string }) => {
+    onRemoveFilter(filter);
+    // Reset sorting to default ("Sortowanie") when a filter is removed
+    onSortingChange('Sortowanie');
+  };
+
   return (
     <div
       className={`flex ${isMobile ? 'justify-between' : 'justify-between'} items-center mb-4`}
@@ -62,7 +68,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
             >
               {filter.value}
               <button
-                onClick={() => onRemoveFilter(filter)}
+                onClick={() => handleFilterRemove(filter)}
                 className="ml-1 text-gray-500 hover:text-red-500"
               >
                 &times;

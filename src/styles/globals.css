@@ -121,7 +121,7 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
 /* Apply styling to retain WordPress formatting */
 .formatted-content {
   font-size: 18px;
-  color: #333;
+  color: #0E0B0C;
   font-weight: lighter;
 }
 
@@ -161,7 +161,7 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
   margin: 1em 0;
   padding-left: 1em;
   border-left: 3px solid #ccc;
-  color: #666;
+  color:#0E0B0C;
 }
 
 .wp-block-image img{
@@ -239,3 +239,60 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
 .icon-image {
   image-rendering: crisp-edges; /* For sharp SVG edges */
 }
+
+
+.price-slider {
+  width: 100%;
+}
+
+.price-slider {
+  width: 100%;
+}
+
+.horizontal-slider {
+  height: 2px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  position: relative;
+  margin-top: 8px;
+}
+
+.slider-thumb {
+  height: 20px;
+  width: 20px;
+  background: #661f30;
+  border-radius: 50%;
+  cursor: grab;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.horizontal-slider-track {
+  height: 2px;
+  border-radius: 2px;
+}
+
+.inactive-track {
+  background: #e0e0e0; /* Inactive track color */
+}
+
+.active-track {
+  background: #661f30; /* Active track color */
+}
+
+input {
+  font-size: 16px;
+  text-align: center;
+  background-color: transparent; /* Transparent background */
+  outline: none;
+  color: var(--color-neutral-dark);
+}
+
+input:focus {
+  border-color: #661f30;
+}
+
+
+
+

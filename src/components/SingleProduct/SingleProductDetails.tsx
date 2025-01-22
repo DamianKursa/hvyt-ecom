@@ -1,7 +1,6 @@
-// SingleProductDetails.tsx
 import React from 'react';
-import ExpandableSection from '@/components/UI/ExpandableSection';
 import ToggleSection from '@/components/UI/ToggleSection';
+import ExpandableSection from '@/components/UI/ExpandableSection';
 import { Product } from '@/utils/functions/interfaces';
 import { cleanHTML } from '@/utils/cleanHTML';
 
@@ -14,7 +13,7 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
 }) => {
   return (
     <div className="product-details mx-4 md:mx-0">
-      {/* Szczegóły produktu - Rendered as Toggle */}
+      {/* Szczegóły produktu */}
       {product.meta_data?.find((meta) => meta.key === 'szczegoly_produktu') && (
         <ToggleSection
           title="Szczegóły produktu"
@@ -25,9 +24,10 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
         />
       )}
 
-      {/* Wymiary - Rendered as Expandable Section */}
+      {/* Wymiary */}
       {product.meta_data?.find((meta) => meta.key === 'wymiary') && (
         <ExpandableSection
+          isWymiary={true}
           title="Wymiary"
           content={cleanHTML(
             product.meta_data.find((meta) => meta.key === 'wymiary')?.value ||
@@ -36,7 +36,7 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
         />
       )}
 
-      {/* Informacje dodatkowe - Rendered as Expandable Section */}
+      {/* Informacje dodatkowe */}
       {product.meta_data?.find(
         (meta) => meta.key === 'informacje_dodatkowe',
       ) && (
@@ -50,7 +50,7 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
         />
       )}
 
-      {/* Karta produktu i model 3D - Rendered as Expandable Section */}
+      {/* Karta produktu i model 3D */}
       {product.meta_data?.find((meta) => meta.key === 'karta') && (
         <ExpandableSection
           title="Karta produktu i model 3D"
