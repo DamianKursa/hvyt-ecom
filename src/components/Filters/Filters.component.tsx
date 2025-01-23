@@ -77,7 +77,7 @@ const Filters = ({
             ...acc,
             [attr.slug]: true,
           }),
-          {},
+          { price: false },
         );
         setExpandedFilters(initialExpandedFilters);
 
@@ -283,12 +283,32 @@ const Filters = ({
         </div>
       ))}
       <div className="mb-4">
-        <PriceSlider
-          minPrice={0}
-          maxPrice={500}
-          currentRange={priceRange}
-          onPriceChange={handlePriceChange}
-        />
+        <div key="price" className="mb-4">
+          <button
+            className="font-bold mb-2 flex items-center justify-between w-full"
+            onClick={() => toggleFilter('price')}
+          >
+            <span>Cena</span>
+            <img
+              src={
+                expandedFilters['price']
+                  ? '/icons/arrow-up.svg'
+                  : '/icons/arrow-down.svg'
+              }
+              alt={expandedFilters['price'] ? 'Arrow up' : 'Arrow down'}
+              className="w-4 h-4"
+            />
+          </button>
+
+          {expandedFilters['price'] && (
+            <PriceSlider
+              minPrice={0}
+              maxPrice={500}
+              currentRange={priceRange}
+              onPriceChange={handlePriceChange}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

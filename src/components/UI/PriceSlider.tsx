@@ -37,13 +37,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   };
 
   return (
-    <div className="price-slider">
-      {/* Slider Header */}
-      <div className="font-bold mb-4 flex justify-between items-center w-full">
-        <span>Cena</span>
-        <img src="/icons/arrow-down.svg" alt="Arrow" className="w-4 h-4" />
-      </div>
-
+    <div className="px-2 py-2 price-slider">
       {/* React Slider */}
       <ReactSlider
         className="horizontal-slider"
