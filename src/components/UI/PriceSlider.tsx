@@ -65,7 +65,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
         }}
         min={minPrice}
         max={maxPrice}
-        step={5}
+        step={1}
         value={range}
         onChange={(values) => setRange(values as [number, number])}
         onAfterChange={handleAfterChange}

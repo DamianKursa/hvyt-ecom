@@ -33,7 +33,7 @@ const Filters = ({
   onFilterChange,
   setProducts,
   setTotalProducts,
-  filterOrder = [], // Default to an empty array if not provided
+  filterOrder = [],
 }: FiltersProps) => {
   const [attributes, setAttributes] = useState<FilterAttribute[]>([]);
   const [loading, setLoading] = useState(false);
@@ -44,9 +44,10 @@ const Filters = ({
   const [moreOptionsVisible, setMoreOptionsVisible] = useState<{
     [key: string]: boolean;
   }>({});
-  const [priceRange, setPriceRange] = useState<[number, number]>([15, 500]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const previousCategoryId = useRef<number | null>(null);
 
+  // Fetch attributes and reset price when category changes
   useEffect(() => {
     const fetchAttributes = async () => {
       if (previousCategoryId.current === categoryId) return;
@@ -56,7 +57,6 @@ const Filters = ({
         const fetchedAttributes: FilterAttribute[] =
           await fetchProductAttributesWithTerms(categoryId);
 
-        // Filter and sort attributes based on `filterOrder`
         const orderedAttributes =
           filterOrder.length > 0
             ? filterOrder
@@ -67,6 +67,9 @@ const Filters = ({
             : fetchedAttributes;
 
         setAttributes(orderedAttributes);
+
+        // Reset price filter
+        setPriceRange([0, 500]);
 
         // Initialize expanded state for the first 3 attributes
         const initialExpandedFilters = orderedAttributes.slice(0, 3).reduce(
@@ -125,10 +128,12 @@ const Filters = ({
 
   const handlePriceChange = async (newRange: [number, number]) => {
     setPriceRange(newRange);
+
     const priceFilter = {
       name: 'price',
       value: `${newRange[0]}-${newRange[1]}`,
-    }; // Use `price` instead of `Cena`
+    };
+
     const updatedFilters = [
       ...activeFilters.filter((filter) => filter.name !== 'price'),
       priceFilter,
@@ -172,7 +177,6 @@ const Filters = ({
     return <Snackbar message={errorMessage} type="error" visible={true} />;
   }
 
-  // Ensure at least one filter is visible
   if (attributes.length === 0) {
     return (
       <div className="filters border p-4">
@@ -185,12 +189,10 @@ const Filters = ({
     <div className="filters w-full rounded-[24px] p-[12px_16px] border">
       {attributes.map((attribute) => (
         <div key={attribute.slug} className="mb-4">
-          {/* Filter Title */}
           <button
             className="font-bold mb-2 flex items-center justify-between w-full"
             onClick={() => toggleFilter(attribute.slug)}
           >
-            {/* Title and Icon in Same Column */}
             <div className="flex items-center">
               <span>{attribute.name}</span>
               {attribute.name === 'Rozstaw' && (
@@ -198,9 +200,8 @@ const Filters = ({
                   <img
                     src="/icons/info.svg"
                     alt="Info"
-                    className="w-6 h-6 cursor-pointer" // Set size to 24x24px
+                    className="w-6 h-6 cursor-pointer"
                   />
-                  {/* Tooltip */}
                   <div className="absolute left-full w-[160px] top-1/2 transform -translate-y-1/2 ml-2 bg-beige-dark text-black font-light text-[12px] rounded-[5px] px-4 py-2 hidden group-hover:block z-50 shadow-lg">
                     <div className="absolute -left-[6px] top-1/2 transform -translate-y-1/2 w-3 h-3 bg-beige-dark rotate-45"></div>
                     Rozstaw to odległość pomiędzy środkami otworów montażowych.
@@ -208,8 +209,6 @@ const Filters = ({
                 </div>
               )}
             </div>
-
-            {/* Arrow Icon */}
             <img
               src={
                 expandedFilters[attribute.slug]
@@ -221,7 +220,6 @@ const Filters = ({
             />
           </button>
 
-          {/* Filter Options */}
           {expandedFilters[attribute.slug] && attribute.options && (
             <div className="pl-0">
               {attribute.options
@@ -287,7 +285,7 @@ const Filters = ({
       <div className="mb-4">
         <PriceSlider
           minPrice={0}
-          maxPrice={1000}
+          maxPrice={500}
           currentRange={priceRange}
           onPriceChange={handlePriceChange}
         />

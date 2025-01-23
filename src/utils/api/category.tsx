@@ -156,10 +156,19 @@ export const fetchProductsWithFilters = async (
     per_page: perPage,
   };
 
-  filters.forEach((filter, index) => {
-    if (filter.name && filter.value) {
-      params[`attributes[${index}][key]`] = filter.name; // Slug of attribute
-      params[`attributes[${index}][value]`] = filter.value;
+  filters.forEach((filter) => {
+    if (filter.name === 'price') {
+      // Add price filter to params
+      const [minPrice, maxPrice] = filter.value.split('-').map(Number);
+      params.min_price = minPrice;
+      params.max_price = maxPrice;
+    } else {
+      // Add attribute filter to params
+      params.attributes = params.attributes || [];
+      params.attributes.push({
+        key: filter.name,
+        value: filter.value,
+      });
     }
   });
 
@@ -177,6 +186,7 @@ export const fetchProductsWithFilters = async (
     throw error;
   }
 };
+
 // Fetch products with custom sorting
 export const fetchSortedProducts = async (
   categoryId: number,
