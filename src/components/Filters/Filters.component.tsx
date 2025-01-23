@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SkeletonFilter from '../Skeletons/SkeletonFilter.component';
 import Snackbar from '../UI/Snackbar.component';
-import PriceSlider from '@/components/UI/PriceSlider'; // Import the PriceSlider component
+import PriceSlider from '@/components/UI/PriceSlider';
 import {
   fetchProductsWithFilters,
   fetchProductAttributesWithTerms,
@@ -59,9 +59,11 @@ const Filters = ({
         // Filter and sort attributes based on `filterOrder`
         const orderedAttributes =
           filterOrder.length > 0
-            ? fetchedAttributes.filter((attr) =>
-                filterOrder.includes(attr.name),
-              )
+            ? filterOrder
+                .map((order) =>
+                  fetchedAttributes.find((attr) => attr.name === order),
+                )
+                .filter((attr): attr is FilterAttribute => !!attr)
             : fetchedAttributes;
 
         setAttributes(orderedAttributes);
@@ -181,15 +183,33 @@ const Filters = ({
 
   return (
     <div className="filters w-full rounded-[24px] p-[12px_16px] border">
-      {/* Other Filters */}
       {attributes.map((attribute) => (
         <div key={attribute.slug} className="mb-4">
           {/* Filter Title */}
           <button
-            className="font-bold mb-2 flex justify-between items-center w-full"
+            className="font-bold mb-2 flex items-center justify-between w-full"
             onClick={() => toggleFilter(attribute.slug)}
           >
-            {attribute.name}
+            {/* Title and Icon in Same Column */}
+            <div className="flex items-center">
+              <span>{attribute.name}</span>
+              {attribute.name === 'Rozstaw' && (
+                <div className="relative group ml-2">
+                  <img
+                    src="/icons/info.svg"
+                    alt="Info"
+                    className="w-6 h-6 cursor-pointer" // Set size to 24x24px
+                  />
+                  {/* Tooltip */}
+                  <div className="absolute left-full w-[160px] top-1/2 transform -translate-y-1/2 ml-2 bg-beige-dark text-black font-light text-[12px] rounded-[5px] px-4 py-2 hidden group-hover:block z-50 shadow-lg">
+                    <div className="absolute -left-[6px] top-1/2 transform -translate-y-1/2 w-3 h-3 bg-beige-dark rotate-45"></div>
+                    Rozstaw to odległość pomiędzy środkami otworów montażowych.
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Arrow Icon */}
             <img
               src={
                 expandedFilters[attribute.slug]
@@ -219,7 +239,6 @@ const Filters = ({
                   );
                   return (
                     <div key={option.slug} className="flex items-center mb-2">
-                      {/* Checkbox */}
                       <input
                         type="checkbox"
                         id={`${attribute.slug}-${option.slug}`}
@@ -235,7 +254,6 @@ const Filters = ({
                         }
                         className="hidden"
                       />
-                      {/* Label */}
                       <label
                         htmlFor={`${attribute.slug}-${option.slug}`}
                         className={`flex items-center cursor-pointer w-5 h-5 border border-black rounded ${
@@ -254,7 +272,6 @@ const Filters = ({
                     </div>
                   );
                 })}
-              {/* Show More/Less Button */}
               {attribute.options.length > 4 && (
                 <button
                   className="underline text-[14px]"
@@ -267,8 +284,6 @@ const Filters = ({
           )}
         </div>
       ))}
-
-      {/* Price Slider Filter at the Bottom */}
       <div className="mb-4">
         <PriceSlider
           minPrice={0}
