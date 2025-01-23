@@ -3,12 +3,12 @@ import ProductPreview from './ProductPreview.component';
 import SkeletonProductPreview from '../Skeletons/SkeletonProductPreview.component';
 
 interface ProductArchiveProps {
-  products: any[]; // Products passed from CategoryPage
-  totalProducts: number; // Total products passed from CategoryPage
-  loading: boolean; // Indicates whether the parent is fetching new data
-  perPage?: number; // Number of products per page
-  currentPage: number; // Current page number
-  onPageChange: (page: number) => void; // Callback for page change
+  products: any[];
+  totalProducts: number;
+  loading: boolean;
+  perPage?: number;
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
 
 const ProductArchive: React.FC<ProductArchiveProps> = ({
@@ -28,7 +28,7 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
   };
 
   const renderPageNumbers = () => {
-    if (totalPages <= 1) return null;
+    if (totalPages === 0) return null;
 
     return Array.from({ length: totalPages }, (_, index) => {
       const pageNumber = index + 1;
@@ -36,10 +36,10 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
         <button
           key={pageNumber}
           onClick={() => handlePageClick(pageNumber)}
-          className={`px-2 py-1 rounded ${
+          className={`px-2 ${
             currentPage === pageNumber
-              ? 'bg-black text-white'
-              : 'bg-gray-200 text-black'
+              ? 'font-bold text-black'
+              : 'text-gray-500'
           }`}
         >
           {pageNumber}
@@ -67,13 +67,15 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
           <button
             onClick={() => handlePageClick(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`p-2 ${
-              currentPage === 1 ? 'opacity-50' : 'hover:bg-gray-300'
-            }`}
+            className="p-2"
             aria-label="Previous page"
           >
             <img
-              src="/icons/arrow-left-pagination.svg"
+              src={
+                currentPage === 1
+                  ? '/icons/arrow-left-pagination.svg'
+                  : '/icons/arrow-left-black-pagination.svg'
+              }
               alt="Previous"
               className="w-4 h-4"
             />
@@ -84,13 +86,15 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
           <button
             onClick={() => handlePageClick(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`p-2 ${
-              currentPage === totalPages ? 'opacity-50' : 'hover:bg-gray-300'
-            }`}
+            className="p-2"
             aria-label="Next page"
           >
             <img
-              src="/icons/arrow-right-pagination.svg"
+              src={
+                currentPage === totalPages
+                  ? '/icons/arrow-right-pagination.svg'
+                  : '/icons/arrow-right-black-pagination.svg'
+              }
               alt="Next"
               className="w-4 h-4"
             />
