@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
-const LoginForm: React.FC = () => {
+const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
+  onForgotPassword,
+}) => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [focusedField, setFocusedField] = useState<string | null>(null); // Track focused field
   const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter();
+  const router = useRouter(); // Next.js router for redirection
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,6 +24,7 @@ const LoginForm: React.FC = () => {
       });
 
       if (response.ok) {
+        // Redirect to user account page
         router.push('/moje-konto/moje-zamowienia');
       } else {
         const data = await response.json();
@@ -46,7 +49,7 @@ const LoginForm: React.FC = () => {
           onChange={(e) =>
             setFormData({ ...formData, username: e.target.value })
           }
-          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full text-left border-b border-gray-300 focus:border-black px-2 py-2 text-black focus:outline-none font-light"
           required
         />
         <span
@@ -70,7 +73,7 @@ const LoginForm: React.FC = () => {
           onChange={(e) =>
             setFormData({ ...formData, password: e.target.value })
           }
-          className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full text-left border-b border-gray-300 focus:border-black px-2 py-2 text-black focus:outline-none font-light"
           required
         />
         <span
@@ -83,18 +86,20 @@ const LoginForm: React.FC = () => {
           Hasło<span className="text-red-500">*</span>
         </span>
         <img
-          src="/icons/show-pass.svg" // Replace with actual path
+          src="/icons/show-pass.svg"
           alt="Show Password"
           className="absolute right-2 top-3 w-5 h-5 cursor-pointer"
           onClick={() => setShowPassword(!showPassword)}
         />
-        <p
-          className="text-sm underline font-light text-black mt-2 cursor-pointer"
-          onClick={() => router.push('/zapomniane-haslo')}
-        >
-          Nie pamiętam hasła
-        </p>
       </div>
+
+      {/* Forgot Password Link */}
+      <p
+        className="text-sm underline font-light text-black mt-2 cursor-pointer"
+        onClick={onForgotPassword}
+      >
+        Nie pamiętam hasła
+      </p>
 
       {/* Error Message */}
       {error && <p className="text-red-500 text-sm">{error}</p>}
