@@ -4,7 +4,7 @@ const PasswordChangeConfirmation: React.FC<{ onBackToLogin: () => void }> = ({
   onBackToLogin,
 }) => {
   return (
-    <div className="flex flex-col md:flex-row w-full h-auto md:h-[340px] bg-white rounded-[40px] shadow-md">
+    <div className="flex flex-col md:flex-row w-full h-auto md:h-[400px] bg-white rounded-[40px] shadow-md">
       {/* Left Section */}
       <div
         className="p-10 w-full md:w-1/2 flex flex-col"

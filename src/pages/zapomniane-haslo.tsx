@@ -11,12 +11,15 @@ const ResetPassword: React.FC = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false); // Track component mount state
+
+  // State for toggling password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
-    if (!key || !login) {
-      router.replace('/logowanie'); // Redirect if missing required parameters
-    }
-  }, [key, login, router]);
+    setIsMounted(true); // Mark component as mounted
+  }, []);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,11 +54,16 @@ const ResetPassword: React.FC = () => {
     }
   };
 
+  if (!isMounted || !key || !login) {
+    // Prevent rendering until the component is mounted and query parameters are available
+    return null;
+  }
+
   return (
     <Layout title="Hvyt | Resetuj Hasło">
       <div className="bg-[#F9F6F2] flex justify-center items-center mt-12">
         <div className="w-full max-w-4xl bg-white rounded-[40px] shadow-md overflow-hidden">
-          <div className="flex flex-col md:flex-row">
+          <div className="flex flex-col md:flex-row h-[400px]">
             {/* Left Section */}
             <div
               className="p-10 w-full md:w-1/2 flex flex-col justify-start"
@@ -76,7 +84,7 @@ const ResetPassword: React.FC = () => {
                 {/* Password Input */}
                 <div className="relative">
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none font-light text-black text-left"
@@ -90,12 +98,18 @@ const ResetPassword: React.FC = () => {
                   >
                     Nowe hasło<span className="text-red-500">*</span>
                   </span>
+                  <img
+                    src="/icons/show-pass.svg"
+                    alt="Show Password"
+                    className="absolute right-2 top-3 w-5 h-5 cursor-pointer"
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
                 </div>
 
                 {/* Confirm Password Input */}
                 <div className="relative">
                   <input
-                    type="password"
+                    type={showConfirmPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none font-light text-black text-left"
@@ -109,6 +123,12 @@ const ResetPassword: React.FC = () => {
                   >
                     Powtórz hasło<span className="text-red-500">*</span>
                   </span>
+                  <img
+                    src="/icons/show-pass.svg"
+                    alt="Show Confirm Password"
+                    className="absolute right-2 top-3 w-5 h-5 cursor-pointer"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  />
                 </div>
 
                 {/* Messages */}

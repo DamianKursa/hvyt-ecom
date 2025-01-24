@@ -40,7 +40,7 @@ const ForgotPassword: React.FC<{ onBackToLogin: () => void }> = ({
   }
 
   return (
-    <div className="flex flex-col md:flex-row w-full h-auto md:h-[340px] bg-white rounded-[40px] shadow-md">
+    <div className="flex flex-col md:flex-row w-full  md:h-[305px] bg-white rounded-[40px] shadow-md">
       <div
         className="p-10 w-full md:w-1/2 flex flex-col"
         style={{
