@@ -177,10 +177,12 @@ const Filters = ({
     return <Snackbar message={errorMessage} type="error" visible={true} />;
   }
 
-  if (attributes.length === 0) {
+  if (loading || attributes.length === 0) {
     return (
       <div className="filters border p-4">
-        <p className="text-gray-500">No filters available for this category.</p>
+        <SkeletonFilter />
+        <SkeletonFilter />
+        <SkeletonFilter />
       </div>
     );
   }
@@ -303,7 +305,7 @@ const Filters = ({
           {expandedFilters['price'] && (
             <PriceSlider
               minPrice={0}
-              maxPrice={500}
+              maxPrice={300}
               currentRange={priceRange}
               onPriceChange={handlePriceChange}
             />

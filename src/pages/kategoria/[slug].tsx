@@ -64,30 +64,31 @@ const CategoryPage = ({
     wieszaki: ['Kolor OK', 'Materiał'],
   };
 
+  // Parse filters from URL query parameters
   useEffect(() => {
-    const updateCategoryData = async () => {
-      if (!slug) return;
+    const updateFiltersFromQuery = () => {
+      const queryFilters: { name: string; value: string }[] = [];
+      const queryKeys = Object.keys(router.query);
 
-      setLoading(true);
-      try {
-        const fetchedCategory = await fetchCategoryBySlug(slug);
-        const { products: fetchedProducts, totalProducts } =
-          await fetchProductsByCategoryId(fetchedCategory.id, 1, 12);
+      queryKeys.forEach((key) => {
+        if (key !== 'slug') {
+          const values = router.query[key];
+          if (Array.isArray(values)) {
+            values.forEach((value) => queryFilters.push({ name: key, value }));
+          } else if (typeof values === 'string') {
+            queryFilters.push({ name: key, value: values });
+          }
+        }
+      });
 
-        setProducts(fetchedProducts);
-        setFilteredProductCount(totalProducts);
-        setCurrentPage(1);
-        setActiveFilters([]);
-        setSortingOption('Sortowanie');
-      } catch (error) {
-        console.error('Error updating category data:', error);
-      } finally {
-        setLoading(false);
-      }
+      setActiveFilters(queryFilters);
+      fetchProducts(queryFilters, sortingOption, 1); // Fetch products based on query filters
     };
 
-    updateCategoryData();
-  }, [slug]);
+    if (router.isReady) {
+      updateFiltersFromQuery();
+    }
+  }, [router.query, router.isReady]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -224,8 +225,8 @@ const CategoryPage = ({
           filtersVisible={filtersVisible}
           toggleFilters={
             isMobile
-              ? toggleFilterModal // Use modal toggle for mobile
-              : () => setFiltersVisible(!filtersVisible) // Use sidebar toggle for desktop
+              ? toggleFilterModal
+              : () => setFiltersVisible(!filtersVisible)
           }
           filters={activeFilters}
           sorting={sortingOption}
