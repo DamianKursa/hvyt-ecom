@@ -5,6 +5,7 @@ import CartProgress from '@/components/Cart/CartProgress';
 import CartItems from '@/components/Cart/CartItems';
 import CartSummary from '@/components/Cart/CartSummary';
 import Link from 'next/link';
+import Bestsellers from '@/components/Index/Bestsellers.component'; // Import the Bestsellers component
 
 const Koszyk: React.FC = () => {
   const { cart, updateCartItem, removeCartItem } = useContext(CartContext);
@@ -82,6 +83,14 @@ const Koszyk: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Add Bestsellers Section */}
+        <div className="mt-16">
+          <Bestsellers
+            title="Produkty, które mogą Ci się spodobać"
+            description="Sprawdź produkty, które idealnie pasują z wybranym produktem."
+          />
+        </div>
       </section>
     </Layout>
   );

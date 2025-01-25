@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 import ProductPreview from '../Product/ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
+import SkeletonProduct from '@/components/Skeletons/SkeletonProduct';
 import { fetchProductsByCategoryId } from '../../utils/api/category';
 
 interface Product {
@@ -13,24 +12,12 @@ interface Product {
   image: { src: string };
 }
 
-const fallbackBestsellers: Product[] = [
-  {
-    id: '1',
-    slug: 'uchwyt-industrialny-zloty-1',
-    name: 'UCHWYT INDUSTRIALNY ZŁOTY',
-    price: '15,90',
-    image: { src: 'https://via.placeholder.com/300' },
-  },
-  {
-    id: '2',
-    slug: 'uchwyt-industrialny-zloty-2',
-    name: 'UCHWYT INDUSTRIALNY ZŁOTY',
-    price: '15,90',
-    image: { src: 'https://via.placeholder.com/300' },
-  },
-];
+interface BestsellersProps {
+  title?: string;
+  description?: string;
+}
 
-const Bestsellers = () => {
+const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 3.8;
   const gutter = 24;
@@ -39,7 +26,7 @@ const Bestsellers = () => {
 
   useEffect(() => {
     const fetchBestsellers = async () => {
-      setLoading(true);
+      setLoading(true); // Set loading state to true initially
       try {
         const categoryId = 123; // Replace with actual category ID
         const { products: fetchedProducts } =
@@ -49,20 +36,20 @@ const Bestsellers = () => {
           slug: product.slug,
           name: product.name,
           price: product.price,
-          image: { src: product.images[0]?.src || '/fallback-image.jpg' },
+          image: { src: product.images?.[0]?.src || '/fallback-image.jpg' },
         }));
         setProducts(formattedProducts.slice(0, 12));
       } catch (error) {
         console.error('Error fetching Bestsellers:', error);
       } finally {
-        setLoading(false);
+        setLoading(false); // Set loading state to false after data is fetched
       }
     };
 
     fetchBestsellers();
   }, []);
 
-  const totalItems = products.length;
+  const totalItems = loading ? 4 : products.length; // Use 4 skeletons during loading
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < totalItems - itemsPerPage;
 
@@ -74,10 +61,10 @@ const Bestsellers = () => {
       <div className="flex justify-between mb-[40px]">
         <div className="flex px-[16px] lg:px-0 flex-col h-full">
           <h2 className="font-size-h2 font-bold text-neutral-darkest">
-            Bestsellers
+            {title || 'Bestsellers'}
           </h2>
           <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
-            Poznaj nasze najpopularniejsze modele.
+            {description || 'Poznaj nasze najpopularniejsze modele.'}
           </p>
         </div>
 
@@ -91,6 +78,7 @@ const Bestsellers = () => {
                 : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
             }`}
             disabled={!canGoPrev}
+            aria-disabled={!canGoPrev}
           >
             <img
               src="/icons/arrow-left.svg"
@@ -106,6 +94,7 @@ const Bestsellers = () => {
                 : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
             }`}
             disabled={!canGoNext}
+            aria-disabled={!canGoNext}
           >
             <img src="/icons/arrow-right.svg" alt="Next" className="h-6 w-6" />
           </button>
@@ -117,37 +106,65 @@ const Bestsellers = () => {
         <div
           className="flex transition-transform duration-300"
           style={{
-            transform: `translateX(-${(currentIndex % totalItems) * (100 / itemsPerPage)}%)`,
+            transform: `translateX(-${
+              (currentIndex % totalItems) * (100 / itemsPerPage)
+            }%)`,
             gap: `${gutter}px`,
           }}
         >
-          {(loading ? fallbackBestsellers : products).map((product) => (
-            <div
-              key={product.id}
-              className="flex-none"
-              style={{
-                width: `calc((100% / ${itemsPerPage}) - ${gutter}px)`,
-                transition: 'all 0.3s ease',
-              }}
-            >
-              <ProductPreview
-                product={{ ...product, images: [{ src: product.image.src }] }}
-              />
-            </div>
-          ))}
+          {(loading ? Array.from({ length: 4 }) : products).map(
+            (product, idx) =>
+              loading ? (
+                <div
+                  key={`skeleton-${idx}`}
+                  className="flex-none"
+                  style={{
+                    width: `calc((100% / ${itemsPerPage}) - ${gutter}px)`,
+                  }}
+                >
+                  <SkeletonProduct />
+                </div>
+              ) : (
+                <div
+                  key={(product as Product).id}
+                  className="flex-none"
+                  style={{
+                    width: `calc((100% / ${itemsPerPage}) - ${gutter}px)`,
+                  }}
+                >
+                  <ProductPreview
+                    product={{
+                      ...(product as Product),
+                      images: [{ src: (product as Product).image.src }],
+                    }}
+                  />
+                </div>
+              ),
+          )}
         </div>
       </div>
 
       {/* Mobile View: Responsive Slider */}
       <div className="md:hidden">
-        <ResponsiveSlider
-          items={loading ? fallbackBestsellers : products}
-          renderItem={(product: Product) => (
-            <ProductPreview
-              product={{ ...product, images: [{ src: product.image.src }] }}
-            />
-          )}
-        />
+        {loading ? (
+          <div className="flex gap-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <SkeletonProduct key={`skeleton-mobile-${index}`} />
+            ))}
+          </div>
+        ) : (
+          <ResponsiveSlider
+            items={products}
+            renderItem={(product: Product) => (
+              <ProductPreview
+                product={{
+                  ...product,
+                  images: [{ src: product.image.src }],
+                }}
+              />
+            )}
+          />
+        )}
       </div>
     </section>
   );
