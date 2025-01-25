@@ -1,6 +1,7 @@
 // Layout.tsx
 import React, { ReactNode, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { SpeedInsights } from '@vercel/speed-insights/next'; // Import SpeedInsights
 
 // Components
 import Header from '@/components/Header/Header.component';
@@ -58,6 +59,9 @@ const Layout: React.FC<ILayoutProps> = ({ children, title }) => {
       </main>
 
       <Footer />
+
+      {/* Add SpeedInsights */}
+      <SpeedInsights />
     </>
   );
 };

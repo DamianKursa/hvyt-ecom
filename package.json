@@ -24,6 +24,7 @@
   "dependencies": {
     "@apollo/client": "^3.11.4",
     "@types/react": "^18.3.4",
+    "@vercel/speed-insights": "^1.1.0",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "algoliasearch": "^4.24.0",
     "autoprefixer": "^10.4.20",
