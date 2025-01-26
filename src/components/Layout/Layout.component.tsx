@@ -21,7 +21,12 @@ const Layout: React.FC<ILayoutProps> = ({ children, title }) => {
 
   // Define routes for full-width or modified layout
   const noMarginPages = ['/', '/o-nas', '/hvyt-objects', '/blog'];
-  const fullWidthCategories = ['uchwyty-meblowe', 'klamki', 'wieszaki'];
+  const fullWidthCategories = [
+    'uchwyty-meblowe',
+    'klamki',
+    'wieszaki',
+    'produkt',
+  ];
 
   const isFullWidthHero =
     noMarginPages.includes(router.pathname) ||

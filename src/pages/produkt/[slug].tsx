@@ -233,7 +233,7 @@ const ProductPage = () => {
 
   return (
     <Layout title={`Hvyt | ${product?.name || 'Ładownie...'}`}>
-      <section className="container mx-auto">
+      <section className="max-w-[1440px] container mx-auto">
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
           <div className="lg:w-8/12 flex flex-col gap-6 max-w-full">
             {product && <SingleProductGallery images={galleryImages} />}
@@ -410,12 +410,14 @@ const ProductPage = () => {
             />
           </div>
         </div>
-        <div ref={frequentlyBoughtTogetherRef}>
-          <NajczęściejKupowaneRazem productId={product?.id?.toString() || ''} />
-        </div>
-        <Instagram />
-        {product && <Reviews productId={Number(product.id)} />}
       </section>
+      <div ref={frequentlyBoughtTogetherRef}>
+        <NajczęściejKupowaneRazem productId={product?.id?.toString() || ''} />
+      </div>
+      <Instagram />
+      <div className="w-full">
+        {product && <Reviews productId={Number(product.id)} />}
+      </div>
     </Layout>
   );
 };

@@ -62,7 +62,7 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
           <Image
             src={images[currentIndex]}
             alt={`Image ${currentIndex + 1}`}
-            layout="intrinsic" // Preserve the image's original aspect ratio
+            layout="responsive" // Preserve the image's original aspect ratio
             width={1440} // Provide a reasonable width for large images
             height={0} // Match the image's aspect ratio (or adjust for your image)
             style={{
