@@ -17,7 +17,6 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [processedContent, setProcessedContent] = useState<string>('');
 
-  // Process content when product metadata changes
   useEffect(() => {
     const processContent = (content: string): string => {
       const parser = new DOMParser();
@@ -26,32 +25,41 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
 
       // Add icons to links
       doc.querySelectorAll('a').forEach((link) => {
-        const icon = `<img src="/icons/download-single.svg" alt="Download" class="w-5 h-5 ml-2" />`;
-        link.innerHTML += icon;
+        const icon = document.createElement('img');
+        icon.src = '/icons/download-single.svg';
+        icon.alt = 'Download';
+        icon.classList.add('w-5', 'h-5', 'ml-2', 'inline-block');
+        icon.setAttribute('data-icon', 'true'); // Add distinguishing attribute
+        link.appendChild(icon);
       });
 
-      // Add unique classes and validate image src
-      doc.querySelectorAll('img').forEach((img, index) => {
+      // Process and validate images (exclude icons)
+      let validImageIndex = 0; // Track index of valid images in `imageSources`
+      doc.querySelectorAll('img').forEach((img) => {
+        if (img.hasAttribute('data-icon')) return; // Skip icons
+
         const imageSrc = img.getAttribute('src');
         if (imageSrc && imageSrc.trim() !== '') {
           imageSources.push(imageSrc.trim());
           img.classList.add('product-image', 'cursor-pointer', 'mt-6');
           img.setAttribute('data-src', imageSrc.trim());
-          img.setAttribute('data-index', index.toString());
+          img.setAttribute('data-index', validImageIndex.toString()); // Use validImageIndex
+          validImageIndex++; // Increment only for valid images
         } else {
           console.warn('Image with missing src detected, skipping:', img);
           img.remove();
         }
       });
 
-      setModalImages(imageSources); // Update modalImages only once
+      console.log('Processed Image Sources:', imageSources); // Debug processed images
+      setModalImages(imageSources); // Update modal images
       return doc.body.innerHTML;
     };
 
-    // Process the content if `product.meta_data` and `karta` exist
     const kartaContent = product.meta_data?.find(
       (meta) => meta.key === 'karta',
     )?.value;
+
     if (kartaContent) {
       setProcessedContent(processContent(kartaContent));
     }
@@ -59,6 +67,7 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
 
   const handleImageClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
+    console.log('Clicked Element:', target);
 
     if (
       target.tagName === 'IMG' &&
@@ -67,12 +76,15 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
       const imageUrl = target.getAttribute('data-src');
       const index = parseInt(target.getAttribute('data-index') || '0', 10);
 
-      if (imageUrl) {
-        console.log('Image clicked:', imageUrl, index);
+      console.log('Image URL:', imageUrl);
+      console.log('Image Index:', index);
+      console.log('Modal Images:', modalImages);
+
+      if (imageUrl && modalImages[index]) {
         setSelectedImageIndex(index);
         setIsModalOpen(true);
       } else {
-        console.warn('Image src is invalid, skipping modal open.');
+        console.warn('Invalid image clicked or not found in modalImages.');
       }
     }
   };
@@ -84,7 +96,6 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
 
   return (
     <div className="product-details mx-4 md:mx-0" onClick={handleImageClick}>
-      {/* Szczegóły produktu */}
       {product.meta_data?.find((meta) => meta.key === 'szczegoly_produktu') && (
         <ToggleSection
           title="Szczegóły produktu"
@@ -95,7 +106,6 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
         />
       )}
 
-      {/* Wymiary */}
       {product.meta_data?.find((meta) => meta.key === 'wymiary') && (
         <ExpandableSection
           isWymiary={true}
@@ -107,7 +117,6 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
         />
       )}
 
-      {/* Informacje dodatkowe */}
       {product.meta_data?.find(
         (meta) => meta.key === 'informacje_dodatkowe',
       ) && (
@@ -121,7 +130,6 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
         />
       )}
 
-      {/* Karta produktu i model 3D */}
       {product.meta_data?.find((meta) => meta.key === 'karta') && (
         <ExpandableSection
           title="Karta produktu i model 3D"
@@ -129,13 +137,18 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
         />
       )}
 
-      {/* Modal */}
       {isModalOpen && modalImages.length > 0 && (
         <ModalImageGallery
           images={modalImages}
           selectedImageIndex={selectedImageIndex}
           onClose={closeModal}
         />
+      )}
+
+      {modalImages.length === 0 && (
+        <p className="text-center mt-4">
+          No images available for this product.
+        </p>
       )}
     </div>
   );
