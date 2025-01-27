@@ -233,7 +233,7 @@ const ProductPage = () => {
 
   return (
     <Layout title={`Hvyt | ${product?.name || 'Ładownie...'}`}>
-      <section className="max-w-[1440px] container mx-auto">
+      <section className="max-w-[1440px] mt-[140px] container mx-auto">
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
           <div className="lg:w-8/12 flex flex-col gap-6 max-w-full">
             {product && <SingleProductGallery images={galleryImages} />}

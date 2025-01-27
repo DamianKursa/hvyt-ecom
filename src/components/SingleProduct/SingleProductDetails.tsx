@@ -50,8 +50,6 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
           img.remove();
         }
       });
-
-      console.log('Processed Image Sources:', imageSources); // Debug processed images
       setModalImages(imageSources); // Update modal images
       return doc.body.innerHTML;
     };
@@ -67,7 +65,6 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
 
   const handleImageClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
-    console.log('Clicked Element:', target);
 
     if (
       target.tagName === 'IMG' &&
@@ -75,10 +72,6 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
     ) {
       const imageUrl = target.getAttribute('data-src');
       const index = parseInt(target.getAttribute('data-index') || '0', 10);
-
-      console.log('Image URL:', imageUrl);
-      console.log('Image Index:', index);
-      console.log('Modal Images:', modalImages);
 
       if (imageUrl && modalImages[index]) {
         setSelectedImageIndex(index);
@@ -90,7 +83,6 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
   };
 
   const closeModal = () => {
-    console.log('Closing modal');
     setIsModalOpen(false);
   };
 

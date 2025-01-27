@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DOMPurify from 'dompurify';
 
 interface ExpandableReviewProps {
-  content: string; // The review content
+  content: string;
 }
 
 const ExpandableReview: React.FC<ExpandableReviewProps> = ({ content }) => {
@@ -15,9 +15,10 @@ const ExpandableReview: React.FC<ExpandableReviewProps> = ({ content }) => {
 
   useEffect(() => {
     if (contentRef.current) {
-      // Check if the content exceeds 4 lines
-      const maxHeight =
-        parseFloat(getComputedStyle(contentRef.current).lineHeight) * 4;
+      const lineHeight = parseFloat(
+        getComputedStyle(contentRef.current).lineHeight,
+      );
+      const maxHeight = lineHeight * 4; // 4 lines height
       if (contentRef.current.scrollHeight > maxHeight) {
         setIsTruncated(true);
       }
@@ -28,13 +29,16 @@ const ExpandableReview: React.FC<ExpandableReviewProps> = ({ content }) => {
     <div className="mb-4">
       <div
         ref={contentRef}
-        className={`formatted-content text-black overflow-hidden transition-all ${
-          isExpanded ? 'max-h-full' : 'max-h-[4.5rem]'
+        className={`text-black overflow-hidden transition-all duration-300 ${
+          isExpanded ? 'max-h-full' : 'max-h-[6rem]'
         }`}
         style={{
           display: '-webkit-box',
-          WebkitLineClamp: isExpanded ? 'unset' : 4, // Limit to 4 lines when not expanded
+          WebkitLineClamp: isExpanded ? 'unset' : 4,
           WebkitBoxOrient: 'vertical',
+          lineHeight: '1.5rem',
+          wordWrap: 'break-word',
+          whiteSpace: 'normal',
         }}
         dangerouslySetInnerHTML={{ __html: cleanHTML(content) }}
       />
@@ -42,6 +46,7 @@ const ExpandableReview: React.FC<ExpandableReviewProps> = ({ content }) => {
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="mt-2 text-dark-pastel-red text-sm underline"
+          aria-expanded={isExpanded}
         >
           {isExpanded ? 'Zwiń' : 'Rozwiń'}
         </button>

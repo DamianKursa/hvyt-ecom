@@ -44,7 +44,10 @@ const ReviewForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white w-[900px] p-6 rounded-[24px] shadow-lg"
+    >
       <h3 className="text-xl font-bold mb-6">Dodaj swoją opinię</h3>
       <div className="flex items-center mb-4">
         <div className="flex items-center gap-1">
@@ -88,20 +91,38 @@ const ReviewForm = ({
         required
         onChange={(e) => setFormData({ ...formData, content: e.target.value })}
       />
-      <div className="flex items-center gap-2 mb-6">
-        <input
-          type="checkbox"
-          id="consent"
-          className="w-5 h-5 border-gray-300 rounded"
-          onChange={(e) =>
-            setFormData({ ...formData, consent: e.target.checked })
-          }
-        />
-        <label htmlFor="consent" className="text-sm">
-          Tutaj zgody do zaakceptowania
+      {/* Styled Checkbox */}
+      <div className="mt-6">
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={formData.consent}
+            onChange={(e) =>
+              setFormData({ ...formData, consent: e.target.checked })
+            }
+            className="hidden"
+          />
+          <span
+            className={`w-5 h-5 flex items-center justify-center border rounded ${
+              formData.consent ? 'bg-black text-white' : 'border-black'
+            }`}
+          >
+            {formData.consent && <img src="/icons/check.svg" alt="check" />}
+          </span>
+          <span>
+            Potwierdzam, że zapoznałam/em się z treścią{' '}
+            <a className="underline" href="/regulamin">
+              Regulaminu
+            </a>{' '}
+            i{' '}
+            <a className="underline" href="/polityka-prywatnosci">
+              Polityki Prywatności
+            </a>{' '}
+            oraz akceptuję ich postanowienia.
+          </span>
         </label>
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end mt-6">
         <button
           type="submit"
           className="px-6 py-3 bg-black text-white rounded-full hover:bg-dark-pastel-red transition-all"
