@@ -19,6 +19,12 @@ interface Category {
   name: string;
 }
 
+const icons: Record<string, string> = {
+  'uchwyty-meblowe': '/icons/uchwyty-kształty.svg',
+  klamki: '/icons/klamki-kształty.svg',
+  wieszaki: '/icons/wieszaki-kształty.svg',
+};
+
 interface CategoryPageProps {
   category: Category;
   initialProducts: any[];
@@ -48,6 +54,7 @@ const CategoryPage = ({
     useState(initialTotalProducts);
   const [loading, setLoading] = useState(false);
 
+  const initialLoadRef = useRef(true); // Prevent resetting during the initial load
   const lastFetchParams = useRef<string | null>(null);
 
   const filterOrder: Record<string, string[]> = {
@@ -81,8 +88,10 @@ const CategoryPage = ({
         }
       });
 
-      setActiveFilters(queryFilters);
-      fetchProducts(queryFilters, sortingOption, 1); // Fetch products based on query filters
+      if (queryFilters.length > 0) {
+        setActiveFilters(queryFilters);
+        fetchProducts(queryFilters, sortingOption, 1); // Fetch products based on query filters
+      }
     };
 
     if (router.isReady) {
@@ -101,6 +110,19 @@ const CategoryPage = ({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Prevent default category reset on first load
+  useEffect(() => {
+    if (!initialLoadRef.current) {
+      setProducts(initialProducts);
+      setFilteredProductCount(initialTotalProducts);
+      setCurrentPage(1);
+      setActiveFilters([]);
+      setSortingOption('Sortowanie');
+    } else {
+      initialLoadRef.current = false; // Mark initial load as complete
+    }
+  }, [category.id]);
 
   const fetchProducts = async (
     filters: { name: string; value: string }[] = activeFilters,
@@ -216,8 +238,15 @@ const CategoryPage = ({
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
 
         <div className="flex items-center mb-8">
-          <h1 className="text-[40px] font-bold text-[#661F30]">
+          <h1 className="text-[40px] font-bold text-[#661F30] flex items-center gap-4">
             {category.name}
+            {icons[slug || ''] && (
+              <img
+                src={icons[slug || '']}
+                alt="Category Icon"
+                className="ml-4"
+              />
+            )}
           </h1>
         </div>
 

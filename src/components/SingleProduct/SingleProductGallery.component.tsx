@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import ResponsiveSlider from '@/components/Slider/ResponsiveSlider'; // Import ResponsiveSlider
-import ModalImageGallery from '../UI/ModalGalleryImage'; // Import your ModalImageGallery
+import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
+import ModalImageGallery from '../UI/ModalGalleryImage';
 
 interface ImageType {
   id: string;
@@ -32,7 +32,6 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
     setIsModalOpen(false);
   };
 
-  // Use these for rendering the layout as before
   const firstImage = images[0] || null;
   const twoImagesRow = images.length > 2 ? images.slice(1, 3) : images.slice(1);
   const fullWidthImageThird = images.length > 3 ? images[3] : null;
@@ -49,7 +48,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
             <div
               key={image.id}
               className="relative w-full h-[430px] overflow-hidden cursor-pointer"
-              onClick={() => openModal(images.indexOf(image))} // Correctly get the index
+              onClick={() => openModal(images.indexOf(image))}
             >
               <Image
                 src={image.sourceUrl}
@@ -57,7 +56,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
                 layout="fill"
                 objectFit="cover"
                 quality={100}
-                className="rounded-lg"
+                className="rounded-[16px]"
               />
             </div>
           )}
@@ -78,7 +77,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               style={{ objectFit: 'cover' }}
-              className="rounded-lg cursor-pointer"
+              className="rounded-[16px] cursor-pointer"
             />
           </div>
         )}
@@ -102,7 +101,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   style={{ objectFit: 'cover' }}
-                  className="rounded-lg cursor-pointer"
+                  className="rounded-[16px] cursor-pointer"
                 />
               </div>
             ))}
@@ -121,7 +120,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               style={{ objectFit: 'cover' }}
-              className="rounded-lg cursor-pointer"
+              className="rounded-[16px] cursor-pointer"
             />
           </div>
         )}
@@ -130,8 +129,9 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
         <div className="relative">
           {remainingImages.length > 0 && (
             <div
-              className="relative w-full h-[540px] overflow-hidden mb-4"
-              onClick={() => openModal(4)}
+              className={`relative w-full ${
+                isExpanded ? 'h-[540px]' : 'h-[250px]'
+              } overflow-hidden mb-4 transition-all duration-300`}
             >
               <Image
                 src={remainingImages[0].sourceUrl}
@@ -142,12 +142,20 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
                 className="rounded-lg cursor-pointer"
               />
 
+              {/* Mask-based Gradient */}
               {!isExpanded && (
                 <div
-                  className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-white to-transparent pointer-events-none"
+                  className="absolute bottom-0 left-0 w-full h-full pointer-events-none"
                   style={{
-                    height: '80px',
-                    opacity: 0.8, // Adjust this value for overall transparency
+                    WebkitMaskImage:
+                      'linear-gradient(to top, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 90%)',
+                    maskImage:
+                      'linear-gradient(to top, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 90%)',
+                    WebkitMaskSize: '100% 100%',
+                    maskSize: '100% 100%',
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskRepeat: 'no-repeat',
+                    backgroundColor: 'rgba(245, 240, 235, 1)', // Beige background to match
                   }}
                 />
               )}
@@ -184,7 +192,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   style={{ objectFit: 'cover' }}
-                  className="rounded-lg cursor-pointer"
+                  className="rounded-[16px] cursor-pointer"
                 />
               </div>
             ))}

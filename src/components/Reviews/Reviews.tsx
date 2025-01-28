@@ -144,7 +144,7 @@ const Reviews = ({ productId }: { productId: number }) => {
             onClick={() => setShowForm(!showForm)}
             className="px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-white transition-all"
           >
-            {showForm ? 'Schowaj formularz' : 'Dodaj swoją opinię'}
+            {showForm ? 'Schowaj formularz - ' : 'Dodaj swoją opinię + '}
           </button>
         </div>
 

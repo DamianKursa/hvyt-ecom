@@ -125,7 +125,7 @@ const ReviewForm = ({
       <div className="flex justify-end mt-6">
         <button
           type="submit"
-          className="px-6 py-3 bg-black text-white rounded-full hover:bg-dark-pastel-red transition-all"
+          className="px-[75px] font-light py-3 bg-black text-white rounded-full hover:bg-dark-pastel-red transition-all"
         >
           Dodaj opinię
         </button>

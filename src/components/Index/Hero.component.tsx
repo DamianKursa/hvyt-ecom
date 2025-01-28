@@ -125,19 +125,19 @@ const Hero: React.FC<HeroProps> = ({
               dangerouslySetInnerHTML={{ __html: title }}
             ></h1>
             <p
-              className="text-[18px] font-normal  text-neutral-darkest mb-6"
+              className="text-[18px] font-light  text-neutral-darkest mb-6"
               dangerouslySetInnerHTML={{ __html: description }}
             ></p>
 
             <div className="flex space-x-4">
               <a
-                className="inline-block min-w-[162px] px-6 py-3 text-lg leading-relaxed text-neutral-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors"
+                className="inline-block min-w-[162px] font-light px-6 py-3 text-lg leading-relaxed text-neutral-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors"
                 href={buttonLink}
               >
                 {buttonText}
               </a>
               <a
-                className="inline-block px-6 py-3 text-lg border border-black text-black rounded-full hover:border-dark-pastel-red hover:bg-transparent hover:text-dark-pastel-red transition-colors"
+                className="inline-block px-6 py-3 font-light text-lg border border-black text-black rounded-full hover:border-dark-pastel-red hover:bg-transparent hover:text-dark-pastel-red transition-colors"
                 href={buttonLink}
               >
                 Zobacz gałki
@@ -158,7 +158,7 @@ const Hero: React.FC<HeroProps> = ({
               transform: rotate(40deg) scale(1);
             }
             100% {
-              transform: rotate(0deg) scale(2);
+              transform: rotate(0deg) scale(1.5);
             }
           }
 
