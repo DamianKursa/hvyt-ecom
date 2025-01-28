@@ -25,7 +25,7 @@ const CartItem: React.FC<CartItemProps> = ({
 
   return (
     <div className="flex items-center justify-between mb-6 border-b pb-4 last:border-none last:pb-0">
-      <div className="flex items-start">
+      <div className="flex items-center">
         <div className="w-[90px] h-[90px] relative rounded-lg overflow-hidden">
           <Image
             src={product.image as string}
@@ -43,9 +43,9 @@ const CartItem: React.FC<CartItemProps> = ({
             Object.entries(product.attributes).map(([name, value]) => (
               <ProductVariationEdit
                 key={name}
-                variationName={name}
+                variationName={name.replace(/^Atrybut produktu:\s*/, '')}
                 currentValue={value}
-                variationOptions={product.variationOptions?.[name] || []}
+                variationOptions={product.variationOptions?.[name] || []} // Ensure options are passed
                 onSave={(newValue) => handleSaveVariation(name, newValue)}
               />
             ))}
