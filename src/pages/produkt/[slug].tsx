@@ -17,6 +17,7 @@ import { fetchProductBySlug } from '@/utils/api/woocommerce';
 import { CartContext } from '@/stores/CartProvider';
 import { useWishlist } from '@/context/WhishlistContext';
 import Image from 'next/image';
+import { Product } from '@/stores/CartProvider';
 
 const NajczęściejKupowaneRazem = dynamic(
   () => import('@/components/Product/NajczęściejKupowaneRazem'),
@@ -162,22 +163,40 @@ const ProductPage = () => {
       return;
     }
 
-    // Check if the product has variations
-    if (product.baselinker_variations?.length) {
-      if (!selectedVariation) {
-        setValidationError('Wybierz wariant przed dodaniem do koszyka.');
-        return;
-      }
+    if (product.baselinker_variations?.length && !selectedVariation) {
+      setValidationError('Wybierz wariant przed dodaniem do koszyka.');
+      return;
     }
 
-    const price = parseFloat(selectedVariation?.price || product.price); // Ensure price is a number
+    const price = parseFloat(selectedVariation?.price || product.price);
 
-    const cartItem = {
+    const variationOptions: {
+      [key: string]: { option: string; price: number }[];
+    } = {};
+
+    product.baselinker_variations?.forEach((variation) => {
+      variation.attributes.forEach((attr) => {
+        if (!variationOptions[attr.name]) {
+          variationOptions[attr.name] = [];
+        }
+        variationOptions[attr.name].push({
+          option: attr.option,
+          price: variation.price,
+        });
+      });
+    });
+
+    console.log(
+      '✅ Generated Variation Options before adding to cart:',
+      variationOptions,
+    );
+
+    const cartItem: Product = {
       cartKey: selectedVariation?.id || product.id.toString(),
       name: product.name,
       qty: quantity,
-      price: parseFloat(price.toFixed(2)), // Convert to number and format
-      totalPrice: parseFloat((quantity * price).toFixed(2)), // Calculate total price and format
+      price: parseFloat(price.toFixed(2)),
+      totalPrice: parseFloat((quantity * price).toFixed(2)),
       image:
         selectedVariation?.image?.sourceUrl ||
         product.images?.[0]?.src ||
@@ -187,11 +206,13 @@ const ProductPage = () => {
         ? parseInt(selectedVariation.id, 10)
         : undefined,
       attributes: selectedAttributes,
+      variationOptions,
     };
 
-    console.log('Adding to cart:', cartItem);
+    console.log('🛒 Adding to cart:', cartItem);
+
     addCartItem(cartItem);
-    dispatch({ type: 'TOGGLE_MODAL', payload: true }); // Open the modal
+    dispatch({ type: 'TOGGLE_MODAL', payload: true });
   };
 
   const galleryImages = useMemo(

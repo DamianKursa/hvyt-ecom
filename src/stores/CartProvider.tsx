@@ -8,9 +8,15 @@ export interface Product {
   totalPrice: number;
   image: string;
   productId: number;
-  variationId?: number; // Optional variation ID
-  attributes?: { [key: string]: string }; // Selected attributes for the variation
-  variationOptions?: { [key: string]: string[] }; // Available options for each attribute
+  slug?: string;
+  variationId?: number;
+  attributes?: { [key: string]: string };
+  variationOptions?: { [key: string]: { option: string; price: number }[] };
+  baselinker_variations?: {
+    id: number;
+    price: number;
+    attributes: { name: string; option: string }[];
+  }[];
 }
 
 export interface Coupon {
@@ -23,7 +29,7 @@ export interface Cart {
   products: Product[];
   totalProductsCount: number;
   totalProductsPrice: number;
-  coupon?: Coupon; // Include coupon in cart
+  coupon?: Coupon;
 }
 
 interface CartContextProps {
@@ -36,9 +42,10 @@ interface CartContextProps {
     cartKey: string,
     name: string,
     newVariation: string,
+    newPrice?: number,
   ) => void;
-  applyCoupon: (coupon: Coupon) => void; // Add method to apply coupon
-  removeCoupon: () => void; // Add method to remove coupon
+  applyCoupon: (coupon: Coupon) => void;
+  removeCoupon: () => void;
 }
 
 export const CartContext = createContext<CartContextProps>({
@@ -48,8 +55,8 @@ export const CartContext = createContext<CartContextProps>({
   removeCartItem: () => {},
   clearCart: () => {},
   updateCartVariation: () => {},
-  applyCoupon: () => {}, // Initialize coupon methods
-  removeCoupon: () => {}, // Initialize coupon methods
+  applyCoupon: () => {},
+  removeCoupon: () => {},
 });
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
@@ -61,7 +68,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     totalProductsPrice: 0,
   });
 
-  // Load the cart (including coupon) from localStorage
+  // Load cart from localStorage
   useEffect(() => {
     const storedCart = localStorage.getItem('woocommerce-cart');
     if (storedCart) {
@@ -69,20 +76,18 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, []);
 
-  // Save the entire cart, including the coupon, to localStorage
+  // Save cart to localStorage
   useEffect(() => {
     localStorage.setItem('woocommerce-cart', JSON.stringify(cart));
   }, [cart]);
 
-  const recalculateCartTotals = (updatedCart: Cart) => {
+  const recalculateCartTotals = (updatedCart: Cart): Cart => {
     const totalProductsPrice = updatedCart.products.reduce(
       (total, product) => total + product.totalPrice,
       0,
     );
-
     const discountValue = updatedCart.coupon?.discountValue || 0;
     const totalPriceWithDiscount = totalProductsPrice - discountValue;
-
     const totalProductsCount = updatedCart.products.reduce(
       (count, product) => count + product.qty,
       0,
@@ -97,9 +102,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const addCartItem = (product: Product) => {
+    console.log('🛒 Adding Product to Cart:', product);
+
     setCart((prevCart) => {
       const updatedCart = { ...prevCart };
-
       const existingProduct = updatedCart.products.find(
         (item) => item.cartKey === product.cartKey,
       );
@@ -108,7 +114,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         existingProduct.qty += product.qty;
         existingProduct.totalPrice += product.totalPrice;
       } else {
-        updatedCart.products.push(product);
+        console.log('✅ Storing Product in Cart:', product);
+        updatedCart.products.push({
+          ...product,
+          attributes: product.attributes || {},
+          variationOptions: product.variationOptions || {}, // ✅ Ensure variationOptions is stored
+        });
       }
 
       return recalculateCartTotals(updatedCart);
@@ -135,6 +146,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     cartKey: string,
     name: string,
     newVariation: string,
+    newPrice?: number,
   ) => {
     setCart((prevCart) => {
       const updatedCart = { ...prevCart };
@@ -143,13 +155,28 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       );
 
       if (product) {
+        const cleanName = name.replace(/^Atrybut produktu:\s*/, '').trim();
+        console.log(`🛒 Updating Variation: ${cleanName} -> ${newVariation}`);
+
         product.attributes = {
           ...product.attributes,
-          [name]: newVariation,
+          [cleanName]: newVariation,
         };
+
+        if (typeof newPrice !== 'undefined') {
+          console.log(`💰 Updating price for ${cleanName}: ${newPrice} zł`);
+          product.price = newPrice;
+          product.totalPrice = newPrice * product.qty;
+        }
+
+        // ✅ Ensure variationOptions stays in the cart
+        product.variationOptions = product.variationOptions || {};
+
+        console.log('✅ Updated Product:', product);
+        return recalculateCartTotals(updatedCart);
       }
 
-      return updatedCart;
+      return prevCart;
     });
   };
 

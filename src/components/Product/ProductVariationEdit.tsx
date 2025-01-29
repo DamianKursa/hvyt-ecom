@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
 interface ProductVariationEditProps {
-  variationName: string; // The name of the variation (e.g., "Rozstaw")
-  currentValue: string; // The current value of the variation
-  variationOptions: string[]; // List of available variation options
-  onSave: (newValue: string) => void; // Callback to save the updated value
+  variationName: string;
+  currentValue: string;
+  variationOptions: { option: string; price: number }[];
+  onSave: (attrName: string, newValue: string) => void; // ✅ Fix: Accepts both attrName and newValue
 }
 
 const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
@@ -15,31 +15,47 @@ const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
 }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [newValue, setNewValue] = useState(currentValue);
-  const [options, setOptions] = useState<string[]>([]);
+  const [options, setOptions] = useState<{ option: string; price: number }[]>(
+    [],
+  );
 
-  // Update options when modal opens and variationOptions changes
   useEffect(() => {
     if (isModalOpen) {
-      console.log('variationOptions:', variationOptions); // Debugging log
+      console.log(
+        `📢 Opening Modal for ${variationName}, Options:`,
+        variationOptions,
+      );
+
       setOptions(variationOptions || []);
+      setNewValue(currentValue); // ✅ Ensure previously selected variation is pre-filled
     }
-  }, [isModalOpen, variationOptions]);
+  }, [isModalOpen, variationOptions, currentValue]);
+
+  useEffect(() => {
+    setNewValue(currentValue);
+  }, [currentValue]);
 
   const handleSave = () => {
-    onSave(newValue);
+    if (!newValue) {
+      console.warn(`⚠️ No variation selected for ${variationName}`);
+      return;
+    }
+
+    console.log(`✅ Saving Variation: ${variationName} -> ${newValue}`);
+
+    onSave(variationName, newValue); // ✅ DO NOT prepend "Atrybut produktu: " here
+
     setModalOpen(false);
   };
 
   return (
     <div className="mt-3 flex flex-wrap items-center">
-      {/* Attribute name and value */}
       <p className="text-neutral-dark mr-4">
         {variationName}: <span className="font-medium">{currentValue}</span>
       </p>
 
-      {/* "edytuj" button */}
       <button
-        className=" font-light text-black underline flex items-center hover:text-gray-800 transition"
+        className="font-light text-black underline flex items-center hover:text-gray-800 transition"
         onClick={() => setModalOpen(true)}
         style={{ fontSize: '16px' }}
       >
@@ -63,9 +79,9 @@ const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
                 onChange={(e) => setNewValue(e.target.value)}
                 className="w-full border border-gray-300 p-2 rounded-lg"
               >
-                {options.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
+                {options.map((opt) => (
+                  <option key={opt.option} value={opt.option}>
+                    {opt.option} ({opt.price.toFixed(2)} zł)
                   </option>
                 ))}
               </select>
