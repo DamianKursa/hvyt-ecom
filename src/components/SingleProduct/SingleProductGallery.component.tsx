@@ -150,7 +150,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
                     className="absolute bottom-0 left-0 w-full h-[250px]"
                     style={{
                       background:
-                        'linear-gradient(to bottom, rgba(247, 245, 243, 0) 30%, #f7f5f3 100%)',
+                        'linear-gradient(to bottom, rgba(247, 245, 243, .3) 20%, #f7f5f3 100%)',
                     }}
                   />
                 </div>

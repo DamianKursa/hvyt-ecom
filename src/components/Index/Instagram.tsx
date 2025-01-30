@@ -30,7 +30,7 @@ const Instagram = () => {
   }
 
   return (
-    <section className="container mx-auto max-w-grid-desktop mt-[115px] py-16 md:px-0">
+    <section className="container mx-auto max-w-grid-desktop py-16 md:px-0">
       {/* Heading and Description */}
       <div className="px-4 md:px-0 mb-8">
         <h2 className="font-size-h2 font-bold text-neutral-darkest text-left">
