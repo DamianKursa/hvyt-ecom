@@ -39,7 +39,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
   const showToggle = remainingImages.length > 0;
 
   return (
-    <div className="product-gallery relative">
+    <div className="product-gallery relative bg-[#f7f5f3]">
       {/* Mobile View: Responsive Slider */}
       <div className="md:hidden my-8 max-w-full">
         <ResponsiveSlider
@@ -68,7 +68,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
         {/* First Image (Full Width) */}
         {firstImage && (
           <div
-            className="relative w-full h-[540px] overflow-hidden mb-4"
+            className="relative w-full h-[540px] overflow-hidden mb-4 cursor-pointer"
             onClick={() => openModal(0)}
           >
             <Image
@@ -77,7 +77,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               style={{ objectFit: 'cover' }}
-              className="rounded-[16px] cursor-pointer"
+              className="rounded-[16px]"
             />
           </div>
         )}
@@ -92,7 +92,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
             {twoImagesRow.map((image, index) => (
               <div
                 key={image.id}
-                className="relative w-full h-[430px] overflow-hidden"
+                className="relative w-full h-[430px] overflow-hidden cursor-pointer"
                 onClick={() => openModal(index + 1)}
               >
                 <Image
@@ -101,7 +101,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   style={{ objectFit: 'cover' }}
-                  className="rounded-[16px] cursor-pointer"
+                  className="rounded-[16px]"
                 />
               </div>
             ))}
@@ -111,7 +111,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
         {/* Full-Width Third Image */}
         {fullWidthImageThird && (
           <div
-            className="relative w-full h-[540px] overflow-hidden mb-4"
+            className="relative w-full h-[540px] overflow-hidden mb-4 cursor-pointer"
             onClick={() => openModal(3)}
           >
             <Image
@@ -120,18 +120,19 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
               fill
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               style={{ objectFit: 'cover' }}
-              className="rounded-[16px] cursor-pointer"
+              className="rounded-[16px]"
             />
           </div>
         )}
 
-        {/* Remaining Images with Toggle */}
+        {/* Remaining Images with Fading Effect & Clickable Modal */}
         <div className="relative">
           {remainingImages.length > 0 && (
             <div
               className={`relative w-full ${
                 isExpanded ? 'h-[540px]' : 'h-[250px]'
-              } overflow-hidden mb-4 transition-all duration-300`}
+              } overflow-hidden mb-4 transition-all duration-500 cursor-pointer`}
+              onClick={() => openModal(4)}
             >
               <Image
                 src={remainingImages[0].sourceUrl}
@@ -142,22 +143,17 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
                 className="rounded-lg cursor-pointer"
               />
 
-              {/* Mask-based Gradient */}
+              {/* Fading Effect (Starts at 30%) */}
               {!isExpanded && (
-                <div
-                  className="absolute bottom-0 left-0 w-full h-full pointer-events-none"
-                  style={{
-                    WebkitMaskImage:
-                      'linear-gradient(to top, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 90%)',
-                    maskImage:
-                      'linear-gradient(to top, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0) 90%)',
-                    WebkitMaskSize: '100% 100%',
-                    maskSize: '100% 100%',
-                    WebkitMaskRepeat: 'no-repeat',
-                    maskRepeat: 'no-repeat',
-                    backgroundColor: 'rgba(245, 240, 235, 1)', // Beige background to match
-                  }}
-                />
+                <div className="absolute bottom-0 left-0 w-full h-full pointer-events-none">
+                  <div
+                    className="absolute bottom-0 left-0 w-full h-[250px]"
+                    style={{
+                      background:
+                        'linear-gradient(to bottom, rgba(247, 245, 243, 0) 30%, #f7f5f3 100%)',
+                    }}
+                  />
+                </div>
               )}
             </div>
           )}
@@ -167,23 +163,23 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
             <div className="absolute bottom-0 left-0 w-full flex justify-center items-center">
               <button
                 onClick={toggleGallery}
-                className="relative z-20 mt-4 px-6 py-2 text-lg font-medium text-neutral-darkest backdrop-blur-md border border-neutral-dark rounded-full shadow-lg"
+                className="relative z-20 mt-4 px-6 py-2 text-lg font-light text-neutral-darkest  border border-neutral-dark rounded-full "
               >
                 Więcej zdjęć +
               </button>
             </div>
           )}
 
-          {/* Additional images */}
+          {/* Additional images (Modal Enabled) */}
           <div
-            className={`grid grid-cols-2 gap-2 mb-4 transition-opacity duration-300 ${
+            className={`grid grid-cols-2 gap-2 mb-4 transition-opacity duration-500 ${
               isExpanded ? '' : 'max-h-[0px] overflow-hidden'
             }`}
           >
             {remainingImages.slice(1).map((image, index) => (
               <div
                 key={image.id}
-                className="relative w-full h-[430px] overflow-hidden"
+                className="relative w-full h-[430px] overflow-hidden cursor-pointer"
                 onClick={() => openModal(index + 5)}
               >
                 <Image
@@ -192,7 +188,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   style={{ objectFit: 'cover' }}
-                  className="rounded-[16px] cursor-pointer"
+                  className="rounded-[16px]"
                 />
               </div>
             ))}
@@ -202,7 +198,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
             <div className="flex justify-center mt-6">
               <button
                 onClick={toggleGallery}
-                className="px-6 py-2 text-lg font-medium text-neutral-darkest backdrop-blur-md border border-neutral-dark rounded-full shadow-lg"
+                className="px-6 py-2 text-lg font-light text-neutral-darkest border border-neutral-dark rounded-full"
               >
                 Mniej zdjęć −
               </button>
