@@ -7,6 +7,7 @@ interface AttributeSwitcherProps {
   selectedValue: string | null; // Currently selected value
   onAttributeChange: (attributeName: string, value: string) => void; // Callback for attribute changes
   pricesMap?: { [key: string]: string }; // Optional map of prices
+  isCartPage?: boolean; // ✅ NEW PROP to detect cart page
 }
 
 const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
@@ -15,6 +16,7 @@ const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
   selectedValue,
   onAttributeChange,
   pricesMap = {},
+  isCartPage = false, // ✅ Default to false
 }) => {
   const cleanedAttributeName = attributeName.replace(/^Atrybut produktu: /, '');
 
@@ -29,7 +31,8 @@ const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
       <CustomDropdown
         options={displayOptions}
         selectedValue={selectedValue}
-        isProductPage={true}
+        isProductPage={!isCartPage} // ✅ Prevents conflict with `isCartPage`
+        isCartPage={isCartPage} // ✅ Pass isCartPage
         placeholder={selectedValue || cleanedAttributeName}
         onChange={(value) =>
           onAttributeChange(

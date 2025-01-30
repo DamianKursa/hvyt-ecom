@@ -97,7 +97,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     <div
       className={`border ${
         isOpen
-          ? 'border-2 border-dark-pastel-red rounded-[24px] bg-white'
+          ? 'border-2 border-dark-pastel-red rounded-[24px] bg-beige-light'
           : 'border-neutral-light rounded-[24px]'
       } px-4 py-3 transition-all duration-300 ease-in-out mb-[33px]`}
     >

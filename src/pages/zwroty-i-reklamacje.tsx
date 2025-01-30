@@ -28,8 +28,12 @@ const ZwrotyReklamacjePage = () => {
                 <li>Dołączono do niego wypełniony formularz zwrotu.</li>
               </ul>
               <div className="mt-4">
-                <a href="#" className="text-lg" aria-label="Label for button">
-                  Button label
+                <a
+                  href="/downloads/formularz_zwrotu_HVYT.pdf"
+                  className="text-lg"
+                  aria-label="Formularz zwrotu"
+                >
+                  Formularz zwrotu
                 </a>
               </div>
               <p className="font-size-h3 mt-4">

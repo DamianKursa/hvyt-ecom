@@ -38,7 +38,9 @@ const OrderItems: React.FC = () => {
                 </p>
               </div>
               {/* Product Quantity */}
-              <p className="text-sm text-black">Ilość: {product.qty}</p>
+              <p className="text-[14px] font-light text-black">
+                Ilość: {product.qty}
+              </p>
             </div>
           </div>
         ))}

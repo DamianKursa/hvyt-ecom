@@ -6,6 +6,7 @@ interface CustomDropdownProps {
   placeholder?: string; // Placeholder text when no value is selected
   onChange: (value: string) => void; // Callback when an option is selected
   isProductPage?: boolean; // Indicates if the dropdown is on a product page
+  isCartPage?: boolean; // ✅ NEW: Indicates if it's on the cart page
 }
 
 const CustomDropdown: React.FC<CustomDropdownProps> = ({
@@ -14,6 +15,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   placeholder = 'Wybierz',
   onChange,
   isProductPage = false,
+  isCartPage = false, // ✅ NEW PROP
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -21,8 +23,8 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   const toggleDropdown = () => setIsOpen((prev) => !prev);
 
   const handleOptionClick = (value: string) => {
-    onChange(value); // Trigger callback with selected value
-    setIsOpen(false); // Close dropdown
+    onChange(value);
+    setIsOpen(false);
   };
 
   const handleOutsideClick = (event: MouseEvent) => {
@@ -30,7 +32,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
       dropdownRef.current &&
       !dropdownRef.current.contains(event.target as Node)
     ) {
-      setIsOpen(false); // Close dropdown when clicking outside
+      setIsOpen(false);
     }
   };
 
@@ -41,7 +43,10 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   }, []);
 
   return (
-    <div className="relative w-full" ref={dropdownRef}>
+    <div
+      className={`w-full ${isCartPage ? 'relative block' : 'relative'}`}
+      ref={dropdownRef}
+    >
       {/* Trigger Button */}
       <button
         className={`w-full ${
@@ -66,7 +71,11 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
       {/* Dropdown Options */}
       {isOpen && (
         <div
-          className="absolute top-full left-0 w-full bg-beige-light border border-dark-pastel-red border-t-0 rounded-b-[24px] z-50"
+          className={`${
+            isCartPage
+              ? 'relative block w-full'
+              : 'absolute top-full left-0 w-full'
+          } bg-beige-light border border-dark-pastel-red border-t-0 rounded-b-[24px] z-50`}
           role="listbox"
         >
           {options.map((option, index) => (

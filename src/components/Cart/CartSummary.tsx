@@ -49,14 +49,12 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         isCheckoutPage ? 'w-full mt-8' : 'lg:w-4/12 mt-8'
       } bg-beige p-6 rounded-[24px] shadow-lg`}
     >
-      <h2 className="text-2xl font-bold mb-6 text-neutral-darkest">
+      <h2 className="text-[32px] font-bold mb-6 text-neutral-darkest">
         Podsumowanie
       </h2>
 
-      <div className="flex justify-between text-lg mb-6">
-        <span className="text-neutral-darkest font-medium">
-          Wartość produktów
-        </span>
+      <div className="flex justify-between text-[20px] mb-6">
+        <span className="text-neutral-darkest font-bold">Razem produkty</span>
         <span className="font-semibold text-neutral-darkest">
           {formatPrice(totalProductsPrice)}
         </span>
@@ -83,7 +81,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
       <div className="flex justify-between items-top mb-6">
         <div className="flex flex-col">
-          <span className="text-lg text-neutral-darkest font-medium">Suma</span>
+          <span className="text-base text-neutral-darkest font-bold">Suma</span>
         </div>
         <span className="text-2xl font-bold text-dark-pastel-red">
           {loading ? (

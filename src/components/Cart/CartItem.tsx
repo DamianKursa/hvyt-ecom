@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { CartContext, Product } from '@/stores/CartProvider';
 import QuantityChanger from '@/components/UI/QuantityChanger';
@@ -22,6 +22,10 @@ const CartItem: React.FC<CartItemProps> = ({
   const [selectedVariation, setSelectedVariation] = useState<string | null>(
     null,
   );
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const [modalHeight, setModalHeight] = useState<string>('auto');
+
+  const variationOptions = product.variationOptions ?? {};
 
   const handleSaveVariation = (name: string, newValue: string) => {
     console.log(`✅ Saving Variation in CartItem: ${name} -> ${newValue}`);
@@ -29,7 +33,7 @@ const CartItem: React.FC<CartItemProps> = ({
     // ✅ Ensure UI updates
     setSelectedVariation(newValue);
 
-    const fullAttributeName = Object.keys(product.variationOptions || {}).find(
+    const fullAttributeName = Object.keys(variationOptions).find(
       (key) =>
         key.trim().toLowerCase().endsWith(name.trim().toLowerCase()) ||
         key.trim().toLowerCase() === name.trim().toLowerCase(),
@@ -44,9 +48,9 @@ const CartItem: React.FC<CartItemProps> = ({
       return;
     }
 
-    const matchingVariation = product.variationOptions?.[
-      fullAttributeName
-    ]?.find((option) => option.option.trim() === newValue.trim());
+    const matchingVariation = variationOptions?.[fullAttributeName]?.find(
+      (option) => option.option.trim() === newValue.trim(),
+    );
 
     if (matchingVariation) {
       console.log(`✅ Found Matching Variation:`, matchingVariation);
@@ -67,8 +71,8 @@ const CartItem: React.FC<CartItemProps> = ({
 
   return (
     <div className="flex items-center justify-between mb-6 border-b pb-4 last:border-none last:pb-0">
-      <div className="flex items-start">
-        <div className="w-[90px] h-[90px] relative rounded-lg overflow-hidden">
+      <div className="flex items-center">
+        <div className="w-[90px] h-[90px] relative rounded-[24px] overflow-hidden">
           <Image
             src={product.image as string}
             alt={product.name}
@@ -78,22 +82,21 @@ const CartItem: React.FC<CartItemProps> = ({
           />
         </div>
         <div className="ml-4">
-          <h3 className="text-lg font-semibold text-neutral-darkest">
+          <h3 className="text-base font-semibold text-neutral-darkest">
             {product.name}
           </h3>
 
           {product.attributes &&
             Object.entries(product.attributes).map(([name, value]) => {
-              if (!product.variationOptions?.[name]) return null;
+              if (!variationOptions[name]) return null;
 
               return (
                 <div key={name} className="mt-3 flex flex-wrap items-center">
-                  <p className="text-neutral-dark mr-4">
+                  <p className="font-light text-neutral-dark mr-4">
                     {name.replace(/^Atrybut produktu:\s*/, '')}:
-                    <span className="font-medium">
+                    <span className="font-light">
                       {selectedVariation || String(value)}
-                    </span>{' '}
-                    {/* ✅ UI now updates */}
+                    </span>
                   </p>
                   <button
                     className="font-light text-black underline flex items-center hover:text-gray-800 transition"
@@ -140,37 +143,100 @@ const CartItem: React.FC<CartItemProps> = ({
 
       {/* Modal for Attribute Selection */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50">
-          <div className="bg-white p-6 w-full max-w-md rounded-lg relative">
+        <div className="fixed inset-0 bg-[#36313266] flex items-center justify-center z-50">
+          <div
+            className="bg-[#FAF7F5] px-[48px] py-[40px] w-full max-w-[650px] rounded-[24px] relative shadow-lg transition-all duration-300 ease-in-out"
+            style={{ maxHeight: modalHeight, overflowY: 'auto' }}
+          >
+            {/* Close Button */}
             <button
-              className="absolute top-2 right-2 text-black text-xl font-bold"
+              className="absolute top-4 right-4 text-black text-2xl font-bold"
               onClick={() => setModalOpen(false)}
             >
               &times;
             </button>
-            <h3 className="text-lg font-bold mb-4">Edytuj Wariant</h3>
 
-            {product.variationOptions &&
-              Object.entries(product.variationOptions).map(
-                ([name, options]) => (
-                  <AttributeSwitcher
-                    key={name}
-                    attributeName={name.replace(/^Atrybut produktu:\s*/, '')}
-                    options={(
-                      options as { option: string; price: number }[]
-                    ).map((opt) => opt.option)}
-                    selectedValue={
-                      selectedVariation || product.attributes?.[name] || null
-                    }
-                    pricesMap={Object.fromEntries(
-                      (options as { option: string; price: number }[]).map(
-                        (opt) => [opt.option, opt.price.toFixed(2)],
-                      ),
-                    )}
-                    onAttributeChange={handleSaveVariation}
-                  />
-                ),
-              )}
+            {/* Modal Header */}
+            <h3 className="text-[24px] font-semibold text-[#1C1C1C] mb-[24px]">
+              Edytuj rozstaw produktu
+            </h3>
+
+            <p className="text-neutral-darkest font-light text-base mb-[40px]">
+              Produkty zostaną dodane do koszyka z uwzględnieniem ich aktualnych
+              cen. Czy chcesz kontynuować?
+            </p>
+
+            {/* Attribute Switcher */}
+            {/* Attribute Label (Rozstaw) with Tooltip */}
+            {Object.entries(variationOptions).map(([name, options]) => (
+              <div key={name} className="mb-4" ref={dropdownRef}>
+                <label className="text-[#1C1C1C] text-base font-light mb-[16px] px-[16px] block flex items-center">
+                  {name.replace(/^Atrybut produktu:\s*/, '')}
+
+                  {/* 🔹 Add Tooltip for Rozstaw */}
+                  {name.includes('Rozstaw') && (
+                    <div className="relative group ml-2">
+                      <img
+                        src="/icons/info.svg"
+                        alt="Info"
+                        className="w-6 h-6 cursor-pointer"
+                      />
+                      <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 bg-beige-dark text-black font-light text-[12px] rounded-[5px] px-4 py-2 hidden group-hover:block z-50 shadow-lg w-[180px]">
+                        <div className="absolute left-1/2 transform -translate-x-1/2 -top-[6px] w-3 h-3 bg-beige-dark rotate-45"></div>
+                        Rozstaw to odległość pomiędzy środkami otworów
+                        montażowych.
+                      </div>
+                    </div>
+                  )}
+                </label>
+
+                {/* Attribute Switcher */}
+                <AttributeSwitcher
+                  isCartPage={true}
+                  key={name}
+                  attributeName={name}
+                  options={(options as { option: string; price: number }[]).map(
+                    (opt) => `${opt.option} | ${opt.price.toFixed(2)} zł`,
+                  )}
+                  selectedValue={
+                    selectedVariation || product.attributes?.[name] || ''
+                  }
+                  onAttributeChange={(attribute, newValue) => {
+                    setSelectedVariation(newValue.split(' | ')[0]);
+                  }}
+                />
+              </div>
+            ))}
+
+            {/* Buttons */}
+            <div className="flex justify-between items-center mt-[48px] mb-[8px] gap-4">
+              <button
+                className="w-1/2 py-3 text-black border border-black rounded-full text-base font-light hover:bg-gray-100 transition"
+                onClick={() => setModalOpen(false)}
+              >
+                Anuluj
+              </button>
+
+              <button
+                className={`w-1/2 py-3 text-white rounded-full text-base font-light transition ${
+                  selectedVariation
+                    ? 'bg-[#1C1C1C] hover:bg-black cursor-pointer'
+                    : 'bg-gray-400 cursor-not-allowed'
+                }`}
+                disabled={!selectedVariation}
+                onClick={() => {
+                  if (selectedVariation) {
+                    handleSaveVariation(
+                      Object.keys(variationOptions)[0],
+                      selectedVariation,
+                    );
+                    setModalOpen(false);
+                  }
+                }}
+              >
+                Zapisz
+              </button>
+            </div>
           </div>
         </div>
       )}
