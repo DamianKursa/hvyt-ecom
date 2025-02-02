@@ -317,6 +317,7 @@ const Checkout: React.FC = () => {
                   setSelectedLocker={setSelectedLocker}
                   setLockerSize={setLockerSize}
                   cartTotal={cart?.totalProductsPrice || 0}
+                  cart={cart}
                 />
 
                 <div className="mt-8">

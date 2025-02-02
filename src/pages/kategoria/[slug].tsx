@@ -76,9 +76,14 @@ const CategoryPage = ({
     const updateFiltersFromQuery = () => {
       const queryFilters: { name: string; value: string }[] = [];
       const queryKeys = Object.keys(router.query);
+      let sortFromQuery = 'Sortowanie'; // default value
 
       queryKeys.forEach((key) => {
-        if (key !== 'slug') {
+        if (key === 'sort') {
+          // Save the sort query parameter separately
+          sortFromQuery = router.query[key] as string;
+        } else if (key !== 'slug') {
+          // Treat other keys as filters
           const values = router.query[key];
           if (Array.isArray(values)) {
             values.forEach((value) => queryFilters.push({ name: key, value }));
@@ -88,10 +93,14 @@ const CategoryPage = ({
         }
       });
 
-      if (queryFilters.length > 0) {
-        setActiveFilters(queryFilters);
-        fetchProducts(queryFilters, sortingOption, 1); // Fetch products based on query filters
+      // Update the sorting option if provided
+      if (sortFromQuery !== 'Sortowanie') {
+        setSortingOption(sortFromQuery);
       }
+      setActiveFilters(queryFilters);
+
+      // Fetch products with the proper sorting option
+      fetchProducts(queryFilters, sortFromQuery, 1);
     };
 
     if (router.isReady) {
@@ -202,9 +211,15 @@ const CategoryPage = ({
   };
 
   const handleSortingChange = (sortingValue: string) => {
-    setSortingOption(sortingValue);
     setCurrentPage(1);
-    fetchProducts(activeFilters, sortingValue, 1);
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, sort: sortingValue },
+      },
+      undefined,
+      { shallow: true },
+    );
   };
 
   const updateUrlWithFilters = (filters: { name: string; value: string }[]) => {

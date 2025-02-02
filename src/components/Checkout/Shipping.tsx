@@ -20,6 +20,7 @@ interface ShippingProps {
   setSelectedLocker: React.Dispatch<React.SetStateAction<string>>;
   setLockerSize: React.Dispatch<React.SetStateAction<string>>;
   cartTotal: number; // Pass the cart total to dynamically display shipping methods
+  cart: any; // <-- New prop (or type it properly based on your Cart type)
 }
 
 // Extend the Window interface for TypeScript
@@ -43,6 +44,7 @@ const Shipping: React.FC<ShippingProps> = ({
   setSelectedLocker,
   setLockerSize,
   cartTotal,
+  cart,
 }) => {
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,9 +75,32 @@ const Shipping: React.FC<ShippingProps> = ({
 
         const data = await response.json();
 
-        // Log the raw fetched data
-        console.log('Fetched shipping methods:', JSON.stringify(data, null, 2));
+        // Define the restricted IDs as strings.
+        const restrictedIds = [
+          '7543167',
+          '7543168',
+          '7543161',
+          '7543162',
+          '7535674',
+          '7535675',
+          '7535636',
+          '7535637',
+          '7535655',
+          '7535679',
+        ];
 
+        // Determine if any product in the cart has a restricted productId or variationId.
+        const cartContainsRestricted =
+          cart &&
+          cart.products &&
+          cart.products.some(
+            (product: any) =>
+              restrictedIds.includes(String(product.productId)) ||
+              (product.variationId &&
+                restrictedIds.includes(String(product.variationId))),
+          );
+
+        // Process the shipping zones and methods
         const updatedZones = data.map((zone: ShippingZone) => {
           let filteredMethods = zone.methods.filter(
             (method) =>
@@ -109,6 +134,7 @@ const Shipping: React.FC<ShippingProps> = ({
             }
           }
 
+          // Always add Paczkomaty InPost if it isn't already present
           if (
             !filteredMethods.some(
               (method) => method.title.toLowerCase() === 'paczkomaty inpost',
@@ -122,7 +148,13 @@ const Shipping: React.FC<ShippingProps> = ({
             });
           }
 
-          // Log each shipping zone after filtering
+          // If the cart contains any restricted items, filter out paczkomaty_inpost.
+          if (cartContainsRestricted) {
+            filteredMethods = filteredMethods.filter(
+              (method) => method.id !== 'paczkomaty_inpost',
+            );
+          }
+
           console.log(
             `Updated zone (${zone.zoneName}):`,
             JSON.stringify(filteredMethods, null, 2),
@@ -141,7 +173,7 @@ const Shipping: React.FC<ShippingProps> = ({
     };
 
     fetchShippingMethods();
-  }, [cartTotal]);
+  }, [cart, cartTotal]);
 
   // Handle dynamic shipping method change
   const handleShippingChange = (method: ShippingMethod) => {
