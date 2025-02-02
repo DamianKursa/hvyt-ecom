@@ -7,10 +7,13 @@ const Breadcrumbs: React.FC = () => {
   const router = useRouter();
   const { asPath } = router;
 
-  // Split the path into segments and filter out empty values
-  const pathSegments = asPath.split('/').filter((segment) => segment);
+  // Remove query string by splitting on "?" and taking the first part
+  const cleanPath = asPath.split('?')[0];
 
-  // Generate the breadcrumb items from the path
+  // Split the clean path into segments and filter out empty values
+  const pathSegments = cleanPath.split('/').filter((segment) => segment);
+
+  // Generate the breadcrumb items from the clean path
   const breadcrumbItems = pathSegments.map((segment, index) => {
     // Reconstruct the href for each breadcrumb step
     const href = '/' + pathSegments.slice(0, index + 1).join('/');
@@ -50,10 +53,10 @@ const Breadcrumbs: React.FC = () => {
           {index < breadcrumbItems.length - 1 && (
             <span className="mx-2">
               <Image
-                src="/icons/Breadcrumbs-divider.svg" // Update the path if necessary
+                src="/icons/Breadcrumbs-divider.svg"
                 alt="Breadcrumb Divider"
-                width={8} // Adjust the width as per design
-                height={8} // Adjust the height as per design
+                width={8}
+                height={8}
               />
             </span>
           )}

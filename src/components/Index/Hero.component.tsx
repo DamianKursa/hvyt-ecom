@@ -17,6 +17,8 @@ interface HeroProps {
   description: string;
   buttonText: string;
   buttonLink: string;
+  secondButtonText?: string;
+  secondButtonLink?: string;
   imageSrc: string;
   imageAlt: string;
   bgColor: string;
@@ -29,6 +31,8 @@ const Hero: React.FC<HeroProps> = ({
   description,
   buttonText,
   buttonLink,
+  secondButtonText,
+  secondButtonLink,
   imageSrc,
   imageAlt,
   bgColor,
@@ -138,9 +142,9 @@ const Hero: React.FC<HeroProps> = ({
               </a>
               <a
                 className="inline-block px-6 py-3 font-light text-lg border border-black text-black rounded-full hover:border-dark-pastel-red hover:bg-transparent hover:text-dark-pastel-red transition-colors"
-                href={buttonLink}
+                href={secondButtonLink || '#'}
               >
-                Zobacz gałki
+                {secondButtonText || 'Zobacz gałki'}
               </a>
             </div>
           </div>

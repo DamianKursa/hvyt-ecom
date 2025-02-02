@@ -42,10 +42,10 @@ const PasujemyWszedzie = () => {
           </p>
         </div>
         <Link
-          href="#"
+          href="/kategoria/uchwyty-meblowe"
           className="px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all self-start md:self-auto"
         >
-          Zobacz przeznaczenie →
+          Zobacz wszystkie →
         </Link>
       </div>
 
@@ -69,15 +69,17 @@ const PasujemyWszedzie = () => {
             <div
               className={`relative w-full transition-all duration-[4000ms] min-h-[350px] ${isVisible ? 'min-h-[435px]' : ''}`}
             >
-              <Image
-                src="/images/5_1.png"
-                alt="Meble pokojowe"
-                fill
-                className="object-cover rounded-lg"
-              />
-              <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                Meble pokojowe
-              </div>
+              <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-pokojowych">
+                <Image
+                  src="/images/5_1.png"
+                  alt="Meble pokojowe"
+                  fill
+                  className="object-cover rounded-lg"
+                />
+                <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
+                  Meble pokojowe
+                </div>
+              </Link>
             </div>
           </div>
 
@@ -85,28 +87,32 @@ const PasujemyWszedzie = () => {
             <div
               className={`relative transition-all duration-[4000ms] ${isVisible ? 'w-[50%] min-h-[435px]' : 'w-[70%] min-h-[350px]'}`}
             >
-              <Image
-                src="/images/4_1.png"
-                alt="Meble kuchenne"
-                fill
-                className="object-cover rounded-lg"
-              />
-              <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                Meble kuchenne
-              </div>
+              <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-kuchennych">
+                <Image
+                  src="/images/4_1.png"
+                  alt="Meble kuchenne"
+                  fill
+                  className="object-cover rounded-lg"
+                />
+                <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
+                  Meble kuchenne
+                </div>
+              </Link>
             </div>
             <div
               className={`relative transition-all duration-[4000ms] ${isVisible ? 'w-[50%] min-h-[435px]' : 'w-[30%] min-h-[350px]'}`}
             >
-              <Image
-                src="/images/6_3.png"
-                alt="Szafy"
-                fill
-                className="object-cover rounded-lg"
-              />
-              <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                Szafy
-              </div>
+              <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-szaf">
+                <Image
+                  src="/images/6_3.png"
+                  alt="Szafy"
+                  fill
+                  className="object-cover rounded-lg"
+                />
+                <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
+                  Szafy
+                </div>
+              </Link>
             </div>
           </div>
         </div>

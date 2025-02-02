@@ -36,10 +36,11 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
     >
       <div
         className="relative bg-white rounded-lg shadow-lg p-8 flex items-center justify-center overflow-auto"
-        style={{
-          maxWidth: '1440px', // Set modal max width to 1440px
-          maxHeight: '80vh', // Allow vertical scroll if the image exceeds viewport height
-        }}
+        style={
+          {
+            // Allow vertical scroll if the image exceeds viewport height
+          }
+        }
       >
         {/* Close button */}
         <button
@@ -54,8 +55,7 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
         <div
           className="relative flex items-center justify-center"
           style={{
-            maxWidth: '90vw', // Modal width should fit within the viewport width
-            maxHeight: '70vh', // Modal height should fit within the viewport height
+            maxHeight: '100vh', // Modal height should fit within the viewport height
             overflow: 'hidden', // Prevent any overflow
           }}
         >

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import { fetchNowosciPosts } from '@/utils/api/woocommerce';
 import SkeletonNowosci from '@/components/Skeletons/SkeletonNowosci';
+import { motion, useAnimation } from 'framer-motion';
 
 interface NowosciItem {
   id: number;
@@ -16,15 +17,19 @@ const NewArrivalsSection = () => {
   const [nowosciItems, setNowosciItems] = useState<NowosciItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Create animation controls for the images container and title
+  const imageControls = useAnimation();
+  const titleControls = useAnimation();
+
   useEffect(() => {
     const loadNowosci = async () => {
       try {
-        const posts = await fetchNowosciPosts(); // Fetch Nowosci posts
+        const posts = await fetchNowosciPosts();
         const items: NowosciItem[] = posts.map((post) => ({
           id: post.id,
-          src: post.imageUrl, // Use imageUrl for the image source
-          alt: post.title.rendered, // Use the rendered title for alt text
-          title: post.title.rendered, // Optional title for display
+          src: post.imageUrl,
+          alt: post.title.rendered,
+          title: post.title.rendered,
         }));
         setNowosciItems(items);
       } catch (error) {
@@ -37,6 +42,31 @@ const NewArrivalsSection = () => {
     loadNowosci();
   }, []);
 
+  // Sequence the animation with a short delay on mount
+  useEffect(() => {
+    async function runAnimationSequence() {
+      // Wait 500ms before starting
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      // Phase 1: Expand the images container to 642px
+      await imageControls.start({
+        height: 642,
+        transition: { duration: 1, ease: 'easeInOut' },
+      });
+      // Animate the title upward so it appears above the images
+      await titleControls.start({
+        y: -100,
+        transition: { duration: 1, ease: 'easeInOut' },
+      });
+      // Phase 2: Contract the images container back to 300px.
+      // Since the container’s height decreases, it animates from the bottom upward.
+      await imageControls.start({
+        height: 300,
+        transition: { duration: 1, ease: 'easeInOut' },
+      });
+    }
+    runAnimationSequence();
+  }, [imageControls, titleControls]);
+
   if (loading) {
     return <SkeletonNowosci />;
   }
@@ -46,8 +76,8 @@ const NewArrivalsSection = () => {
   }
 
   return (
-    <section className="container mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] py-16">
-      {/* Header */}
+    <section className="container mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] py-16 relative">
+      {/* Mobile Header */}
       <div className="px-[16px] flex flex-col items-start mb-8 md:hidden">
         <h2 className="font-size-h2 font-bold text-neutral-darkest">
           Zobacz nasze nowości
@@ -56,7 +86,7 @@ const NewArrivalsSection = () => {
           Nowa gałka HALOHOLD projektu Moniki Rogusz-Witkoś.
         </p>
         <Link
-          href="#"
+          href="/kategoria/uchwyty-meblowe?sort=Najnowsze+produkty"
           className="mt-4 px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
         >
           Zobacz nowości →
@@ -66,8 +96,14 @@ const NewArrivalsSection = () => {
       {/* Desktop View */}
       <div className="hidden md:flex gap-6 h-[650px]">
         {/* First Column */}
-        <div className="flex flex-col w-1/2">
-          <div className="flex flex-col h-full mb-[120px]">
+        <div className="flex flex-col w-1/2 relative">
+          {/* Animated Title Container */}
+          <motion.div
+            className="title-container"
+            initial={{ y: 0 }}
+            animate={titleControls}
+            style={{ position: 'relative', zIndex: 20 }}
+          >
             <h2 className="font-size-h2 font-bold text-neutral-darkest">
               Zobacz nasze nowości
             </h2>
@@ -75,53 +111,60 @@ const NewArrivalsSection = () => {
               Nowa gałka HALOHOLD projektu Moniki Rogusz-Witkoś.
             </p>
             <Link
-              href="#"
+              href="/kategoria/uchwyty-meblowe?sort=Najnowsze+produkty"
               className="w-1/3 mt-[40px] inline-block px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
             >
               Zobacz nowości →
             </Link>
-          </div>
-          <div className="flex gap-6">
-            <div className="w-full h-[300px]">
+          </motion.div>
+
+          {/* Animated Images Container */}
+          <motion.div
+            className="flex gap-6 overflow-hidden"
+            initial={{ height: 300 }}
+            animate={imageControls}
+            style={{ position: 'relative', zIndex: 10 }}
+          >
+            <div className="w-full relative">
               <Image
                 src={nowosciItems[0].src}
                 alt={nowosciItems[0].alt}
-                width={350}
-                height={300}
-                className="w-full h-full object-cover rounded-lg"
+                fill
+                style={{ objectFit: 'cover' }}
+                className="rounded-lg"
               />
             </div>
-            <div className="w-full h-[300px]">
+            <div className="w-full relative">
               <Image
                 src={nowosciItems[1].src}
                 alt={nowosciItems[1].alt}
-                width={350}
-                height={300}
-                className="w-full h-full object-cover rounded-lg"
+                fill
+                style={{ objectFit: 'cover' }}
+                className="rounded-lg"
               />
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Second Column */}
         <div className="flex flex-col w-1/2">
           <div className="flex gap-6 h-full">
-            <div className="w-full h-full">
+            <div className="w-full h-full relative">
               <Image
                 src={nowosciItems[2].src}
                 alt={nowosciItems[2].alt}
-                width={322}
-                height={642}
-                className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-lg"
+                fill
+                style={{ objectFit: 'cover' }}
+                className="rounded-lg"
               />
             </div>
-            <div className="w-full h-full">
+            <div className="w-full h-full relative">
               <Image
                 src={nowosciItems[3].src}
                 alt={nowosciItems[3].alt}
-                width={322}
-                height={642}
-                className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-lg"
+                fill
+                style={{ objectFit: 'cover' }}
+                className="rounded-lg"
               />
             </div>
           </div>
@@ -145,7 +188,6 @@ const NewArrivalsSection = () => {
                 style={{ objectFit: 'cover' }}
                 className="rounded-lg"
               />
-
               {item.title && (
                 <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                   {item.title}
