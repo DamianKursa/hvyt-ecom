@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import Checkbox from '@/components/UI/Checkbox';
 export interface CheckoutAddressFormProps {
   billingData: {
     firstName: string;
@@ -192,26 +192,20 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
       </div>
 
       <div className="mt-8">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={needVATInvoice}
-            onChange={() => setNeedVATInvoice(!needVATInvoice)}
-          />
-          <span>Potrzebujesz fakturę VAT</span>
-        </label>
+        <Checkbox
+          checked={needVATInvoice}
+          onChange={() => setNeedVATInvoice(!needVATInvoice)}
+          label="Potrzebujesz fakturę VAT"
+        />
       </div>
 
       {/* "Ship to a Different Address" */}
       <div className="mt-8">
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={isShippingDifferent}
-            onChange={() => setIsShippingDifferent(!isShippingDifferent)}
-          />
-          <span>Dostawa pod inny adres</span>
-        </label>
+        <Checkbox
+          checked={isShippingDifferent}
+          onChange={() => setIsShippingDifferent(!isShippingDifferent)}
+          label="Dostawa pod inny adres"
+        />
       </div>
 
       {isShippingDifferent && (
