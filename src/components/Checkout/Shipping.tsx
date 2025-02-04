@@ -193,7 +193,6 @@ const Shipping: React.FC<ShippingProps> = ({
     fetchShippingMethods();
   }, [cart, cartTotal]);
 
-  // ─── HANDLING SHIPPING METHOD CHANGE ──────────────────────────────────────
   const handleShippingChange = (method: ShippingMethod) => {
     setShippingMethod(method.id);
     setShippingTitle(method.title || 'Paczkomaty InPost');
@@ -201,7 +200,6 @@ const Shipping: React.FC<ShippingProps> = ({
     setShippingPrice(price);
   };
 
-  // ─── EASYPACK (InPost) INTEGRATION (unchanged) ───────────────────────────────
   useEffect(() => {
     const loadEasyPackScript = () => {
       if (!scriptLoadedRef.current) {
@@ -295,10 +293,9 @@ const Shipping: React.FC<ShippingProps> = ({
             window.SzybkaPaczkaMap.init({
               lang: 'PL',
               country_parcelshops: 'PL',
-              el: glsMapRef.current.id, // use the id from the ref container
+              el: glsMapRef.current.id,
               parcel_weight: '5',
               center_point: 'Przykładowe_miasto, przykładowa_ulica',
-              // Use OSM (map_type: false) to avoid Google Maps integration issues:
               map_type: false,
               mapbox_key: '',
               google_maps_key: '',
@@ -315,7 +312,6 @@ const Shipping: React.FC<ShippingProps> = ({
     }
   }, [showGlsMap]);
 
-  // ─── GLS INTEGRATION: POLL FOR SELECTION USING SzybkaPaczkaParcel ──────────
   useEffect(() => {
     let interval: number | null = null;
     if (showGlsMap && window.SzybkaPaczkaParcel) {
