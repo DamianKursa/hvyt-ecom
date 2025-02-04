@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 interface BoxConfig {
@@ -10,6 +10,7 @@ interface BoxConfig {
 interface AnimationStep {
   step: number;
   animatedBoxes: BoxConfig[];
+  overlayRotation?: number; // Added property for overlay rotation
 }
 
 interface HeroProps {
@@ -40,6 +41,8 @@ const Hero: React.FC<HeroProps> = ({
   animationSteps,
 }) => {
   const boxesRef = useRef<(HTMLDivElement | null)[]>([]);
+  // Initialize overlayRotation to 50 degrees as in step one
+  const [overlayRotation, setOverlayRotation] = useState(80);
 
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
@@ -56,9 +59,12 @@ const Hero: React.FC<HeroProps> = ({
         }
       });
 
-      // Animate boxes in steps
-      animationSteps.forEach(({ step, animatedBoxes }) => {
+      // Animate boxes in steps and control overlay rotation with delay
+      animationSteps.forEach(({ step, animatedBoxes, overlayRotation }) => {
         setTimeout(() => {
+          if (typeof overlayRotation !== 'undefined') {
+            setOverlayRotation(overlayRotation);
+          }
           animatedBoxes.forEach(({ index, bgColor, animationType }) => {
             const box = boxesRef.current[index];
             if (box) {
@@ -108,17 +114,23 @@ const Hero: React.FC<HeroProps> = ({
 
         {/* Overlay Image */}
         <div
-          className="absolute inset-0 flex justify-center items-center animate-overlay"
-          style={{ transformOrigin: 'center center' }}
+          className="absolute inset-0 flex justify-center items-center"
+          style={{
+            transformOrigin: 'center center',
+            transform: `rotate(${overlayRotation}deg)`,
+            transition: 'transform 1s ease-in-out',
+          }}
         >
-          <Image
-            src={imageSrc}
-            alt={imageAlt}
-            width={1270}
-            height={698}
-            className="animate-overlay"
-            priority
-          />
+          {/* This inner wrapper applies a continuous scale animation independent of steps */}
+          <div className="overlay-scale">
+            <Image
+              src={imageSrc}
+              alt={imageAlt}
+              width={1270}
+              height={698}
+              priority
+            />
+          </div>
         </div>
 
         {/* Hero Content */}
@@ -153,19 +165,6 @@ const Hero: React.FC<HeroProps> = ({
 
       <style jsx>{`
         @media (min-width: 768px) {
-          .animate-overlay {
-            animation: overlayScaleRotate 4s ease-in-out forwards;
-          }
-
-          @keyframes overlayScaleRotate {
-            0% {
-              transform: rotate(40deg) scale(1);
-            }
-            100% {
-              transform: rotate(0deg) scale(1.5);
-            }
-          }
-
           @keyframes slidingToTransparent {
             0% {
               left: 0%;
@@ -193,6 +192,15 @@ const Hero: React.FC<HeroProps> = ({
             }
           }
 
+          @keyframes scaleAnimation {
+            0% {
+              transform: scale(0.7);
+            }
+            100% {
+              transform: scale(1.2);
+            }
+          }
+
           .sliding-bg {
             position: absolute;
             top: 0;
@@ -200,10 +208,10 @@ const Hero: React.FC<HeroProps> = ({
             width: 100%;
             height: 100%;
           }
-          .animate-overlay {
-            max-width: 100%;
-            object-fit: cover;
-            image-rendering: auto; /* Adjust scaling behavior */
+
+          /* The overlay-scale class applies a continuous scale animation */
+          .overlay-scale {
+            animation: scaleAnimation 20s ease-in-out forwards alternate;
           }
         }
       `}</style>

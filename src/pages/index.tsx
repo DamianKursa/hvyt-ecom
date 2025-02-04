@@ -49,10 +49,12 @@ const Index: NextPage = () => (
             },
             { index: 7, bgColor: '#F5F5AD', animationType: 'slidingToBg' },
           ],
+          overlayRotation: 80,
         },
         {
           step: 2, // Fire at step 2
           animatedBoxes: [],
+          overlayRotation: 0,
         },
         {
           step: 3, // Fire at step 3
@@ -68,9 +70,10 @@ const Index: NextPage = () => (
               animationType: 'slidingToTransparent',
             },
           ],
+          overlayRotation: 50,
         },
         {
-          step: 4, // Fire at step 3
+          step: 4,
           animatedBoxes: [
             {
               index: 2,
@@ -78,6 +81,7 @@ const Index: NextPage = () => (
               animationType: 'slidingTopToBottom',
             },
           ],
+          overlayRotation: 70,
         },
       ]}
     />
