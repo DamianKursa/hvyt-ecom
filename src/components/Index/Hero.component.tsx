@@ -197,7 +197,7 @@ const Hero: React.FC<HeroProps> = ({
               transform: scale(0.7);
             }
             100% {
-              transform: scale(1.2);
+              transform: scale(1);
             }
           }
 
