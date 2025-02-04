@@ -287,13 +287,13 @@ const ProductPage = () => {
               selectedColor={selectedColor} // Pass the selected color from state
               onColorChange={handleColorChange} // Update the selected color in state
               colorMap={{
-                Złoty: '#eded87',
-                Srebrny: '#c6c6c6',
-                Czarny: '#000000',
-                Szary: '#a3a3a3',
-                Różowy: '#edbbd8',
-                Pozostałe: '#c11d51',
-                Niebieski: '#a4dae8',
+                Złoty: '#f5f5ad',
+                Srebrny: '#e9eaed',
+                Czarny: '#031926',
+                Szary: '#e9eaed',
+                Różowy: '#ebb2ad',
+                Pozostałe: '#661f30',
+                Niebieski: '#9fc1df',
                 Biały: '#fff',
               }}
             />
