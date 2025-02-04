@@ -4,12 +4,15 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { InputField } from '../components/Input/InputField.component';
 import Layout from '../components/Layout/Layout.component'; // Assuming Layout is at this path
 import SocialIcons from '@/components/UI/SocialIcons';
+import Checkbox from '@/components/UI/Checkbox';
+import { useState } from 'react';
 
 const Kontakt = () => {
   const methods = useForm();
   const onSubmit = (data: any) => {
     console.log(data);
   };
+  const [isTermsChecked, setIsTermsChecked] = useState(false);
 
   return (
     <Layout title="Hvyt | Kontakt">
@@ -122,27 +125,22 @@ const Kontakt = () => {
                   errors={methods.formState.errors}
                 />
 
-                {/* Checkbox for accepting terms */}
-                <div className="flex items-start mt-4">
-                  <input
-                    type="checkbox"
-                    id="acceptTerms"
-                    className="mr-2 mt-1"
-                  />
-                  <label
-                    htmlFor="acceptTerms"
-                    className="text-sm text-black font-light"
-                  >
-                    Akceptuję{' '}
-                    <span className="underline">
-                      <Link href="#">Regulamin </Link>{' '}
-                    </span>
-                    oraz{' '}
-                    <span className="underline">
-                      <Link href="#">Politykę Prywatności</Link>
-                    </span>
-                  </label>
-                </div>
+                <Checkbox
+                  checked={isTermsChecked}
+                  onChange={() => setIsTermsChecked(!isTermsChecked)}
+                  label={
+                    <>
+                      Akceptuję{' '}
+                      <span className="underline">
+                        <Link href="#">Regulamin</Link>
+                      </span>{' '}
+                      oraz{' '}
+                      <span className="underline">
+                        <Link href="#">Politykę Prywatności</Link>
+                      </span>
+                    </>
+                  }
+                />
 
                 {/* Submit Button */}
                 <button

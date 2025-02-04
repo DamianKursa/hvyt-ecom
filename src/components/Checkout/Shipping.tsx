@@ -19,8 +19,10 @@ interface ShippingProps {
   setShippingTitle: React.Dispatch<React.SetStateAction<string>>;
   setSelectedLocker: React.Dispatch<React.SetStateAction<string>>;
   setLockerSize: React.Dispatch<React.SetStateAction<string>>;
-  cartTotal: number; // Pass the cart total to dynamically display shipping methods
-  cart: any; // <-- New prop (or type it properly based on your Cart type)
+  cartTotal: number;
+  cart: any;
+  selectedGlsPoint: any;
+  setSelectedGlsPoint: React.Dispatch<React.SetStateAction<any>>;
 }
 
 // Extend the Window interface for TypeScript
@@ -32,6 +34,23 @@ declare global {
         callback: (point: any, modal: any) => void,
         options?: { width?: number; height?: number },
       ) => void;
+    };
+    SzybkaPaczkaMap?: {
+      init: (config: {
+        lang: string;
+        country_parcelshops: string;
+        el: string;
+        parcel_weight: string;
+        center_point: string;
+        map_type: boolean;
+        mapbox_key: string;
+        google_maps_key: string;
+        geolocation: boolean;
+        parcelshop_type: string;
+      }) => void;
+    };
+    SzybkaPaczkaParcel?: new () => {
+      getParcelObject: () => any;
     };
   }
 }
@@ -45,12 +64,18 @@ const Shipping: React.FC<ShippingProps> = ({
   setLockerSize,
   cartTotal,
   cart,
+  selectedGlsPoint,
+  setSelectedGlsPoint,
 }) => {
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedLockerData, setSelectedLockerData] = useState<any>(null);
   const scriptLoadedRef = useRef(false);
+  // Use inline container for GLS map
+  const [showGlsMap, setShowGlsMap] = useState(false);
+  // Create a ref for the GLS map container
+  const glsMapRef = useRef<HTMLDivElement>(null);
 
   const shippingIcons: Record<string, string> = {
     'kurier gls': '/icons/GLS_Logo_2021.svg',
@@ -59,23 +84,21 @@ const Shipping: React.FC<ShippingProps> = ({
     'kurier gls - darmowa wysyłka': '/icons/GLS_Logo_2021.svg',
     'darmowa dostawa': '/icons/free-shipping.svg',
     'kurier gls pobranie': '/icons/GLS_Logo_2021.svg',
+    'gls parcelshop': '/icons/GLS_Logo_2021.svg',
   };
 
-  // Fetch shipping methods
+  // ─── FETCH SHIPPING METHODS ──────────────────────────────────────────────
   useEffect(() => {
     const fetchShippingMethods = async () => {
       try {
         setLoading(true);
         setError(null);
-
         const response = await fetch('/api/shipping');
         if (!response.ok) {
           throw new Error('Failed to fetch shipping methods');
         }
-
         const data = await response.json();
-
-        // Define the restricted IDs as strings.
+        // Define restricted IDs
         const restrictedIds = [
           '7543167',
           '7543168',
@@ -88,8 +111,6 @@ const Shipping: React.FC<ShippingProps> = ({
           '7535655',
           '7535679',
         ];
-
-        // Determine if any product in the cart has a restricted productId or variationId.
         const cartContainsRestricted =
           cart &&
           cart.products &&
@@ -99,8 +120,6 @@ const Shipping: React.FC<ShippingProps> = ({
               (product.variationId &&
                 restrictedIds.includes(String(product.variationId))),
           );
-
-        // Process the shipping zones and methods
         const updatedZones = data.map((zone: ShippingZone) => {
           let filteredMethods = zone.methods.filter(
             (method) =>
@@ -110,16 +129,15 @@ const Shipping: React.FC<ShippingProps> = ({
                 cartTotal < 300
               ),
           );
-
           if (cartTotal >= 300) {
             filteredMethods = filteredMethods.filter((method) =>
               [
                 'darmowa dostawa',
                 'kurier gls - darmowa wysyłka',
                 'paczkomaty inpost',
+                'gls parcelshop', // include GLS shipping option
               ].includes(method.title.toLowerCase()),
             );
-
             if (
               !filteredMethods.some(
                 (method) => method.title.toLowerCase() === 'darmowa dostawa',
@@ -133,8 +151,6 @@ const Shipping: React.FC<ShippingProps> = ({
               });
             }
           }
-
-          // Always add Paczkomaty InPost if it isn't already present
           if (
             !filteredMethods.some(
               (method) => method.title.toLowerCase() === 'paczkomaty inpost',
@@ -147,22 +163,25 @@ const Shipping: React.FC<ShippingProps> = ({
               enabled: true,
             });
           }
-
-          // If the cart contains any restricted items, filter out paczkomaty_inpost.
+          if (
+            !filteredMethods.some(
+              (method) => method.title.toLowerCase() === 'gls parcelshop',
+            )
+          ) {
+            filteredMethods.push({
+              id: 'gls_parcelshop',
+              title: 'GLS Parcelshop',
+              cost: cartTotal >= 300 ? null : 15,
+              enabled: true,
+            });
+          }
           if (cartContainsRestricted) {
             filteredMethods = filteredMethods.filter(
               (method) => method.id !== 'paczkomaty_inpost',
             );
           }
-
-          console.log(
-            `Updated zone (${zone.zoneName}):`,
-            JSON.stringify(filteredMethods, null, 2),
-          );
-
           return { ...zone, methods: filteredMethods };
         });
-
         setShippingZones(updatedZones);
       } catch (err) {
         console.error('Error fetching shipping methods:', err);
@@ -171,40 +190,33 @@ const Shipping: React.FC<ShippingProps> = ({
         setLoading(false);
       }
     };
-
     fetchShippingMethods();
   }, [cart, cartTotal]);
 
-  // Handle dynamic shipping method change
+  // ─── HANDLING SHIPPING METHOD CHANGE ──────────────────────────────────────
   const handleShippingChange = (method: ShippingMethod) => {
-    console.log('Selected method:', method);
     setShippingMethod(method.id);
-    setShippingTitle(method.title || 'Paczkomaty InPost'); // Ensure fallback
+    setShippingTitle(method.title || 'Paczkomaty InPost');
     const price = Number(method.cost) || 0;
     setShippingPrice(price);
-    console.log(`Updated shipping title: ${method.title}, price: ${price}`);
   };
 
+  // ─── EASYPACK (InPost) INTEGRATION (unchanged) ───────────────────────────────
   useEffect(() => {
     const loadEasyPackScript = () => {
       if (!scriptLoadedRef.current) {
         scriptLoadedRef.current = true;
-
         const script = document.createElement('script');
         script.src =
           'https://geowidget.easypack24.net/js/sdk-for-javascript.js';
         script.async = true;
-
         script.onload = () => {
           initializeEasyPack();
         };
-
         script.onerror = () => {
           console.error('Failed to load EasyPack script.');
         };
-
         document.body.appendChild(script);
-
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://geowidget.easypack24.net/css/easypack.css';
@@ -213,7 +225,6 @@ const Shipping: React.FC<ShippingProps> = ({
         initializeEasyPack();
       }
     };
-
     const initializeEasyPack = () => {
       if (window.easyPack) {
         window.easyPack.init({
@@ -229,13 +240,12 @@ const Shipping: React.FC<ShippingProps> = ({
         });
       }
     };
-
     if (shippingMethod === 'paczkomaty_inpost') {
       loadEasyPackScript();
     }
   }, [shippingMethod]);
 
-  const openModal = () => {
+  const openInpostModal = () => {
     if (window.easyPack && typeof window.easyPack.modalMap === 'function') {
       window.easyPack.modalMap(
         (point: any, modal: any) => {
@@ -256,14 +266,84 @@ const Shipping: React.FC<ShippingProps> = ({
     }
   };
 
+  // ─── GLS INTEGRATION: LOAD SCRIPT & INIT INLINE MAP ─────────────────────────
+  useEffect(() => {
+    const loadGlsScript = () => {
+      return new Promise<void>((resolve, reject) => {
+        if (
+          document.querySelector(
+            'script[src="https://mapa.gls-poland.com/js/v4.0/maps_sdk.js"]',
+          )
+        ) {
+          resolve();
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://mapa.gls-poland.com/js/v4.0/maps_sdk.js';
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () =>
+          reject(new Error('Failed to load GLS map script'));
+        document.body.appendChild(script);
+      });
+    };
+
+    if (showGlsMap) {
+      loadGlsScript()
+        .then(() => {
+          if (window.SzybkaPaczkaMap && glsMapRef.current) {
+            window.SzybkaPaczkaMap.init({
+              lang: 'PL',
+              country_parcelshops: 'PL',
+              el: glsMapRef.current.id, // use the id from the ref container
+              parcel_weight: '5',
+              center_point: 'Przykładowe_miasto, przykładowa_ulica',
+              // Use OSM (map_type: false) to avoid Google Maps integration issues:
+              map_type: false,
+              mapbox_key: '',
+              google_maps_key: '',
+              geolocation: true,
+              parcelshop_type: 'pudo',
+            });
+          } else {
+            console.error('GLS container not found');
+          }
+        })
+        .catch((error) => {
+          console.error('Error loading GLS script:', error);
+        });
+    }
+  }, [showGlsMap]);
+
+  // ─── GLS INTEGRATION: POLL FOR SELECTION USING SzybkaPaczkaParcel ──────────
+  useEffect(() => {
+    let interval: number | null = null;
+    if (showGlsMap && window.SzybkaPaczkaParcel) {
+      const parcel = new window.SzybkaPaczkaParcel();
+      interval = window.setInterval(() => {
+        const result = parcel.getParcelObject();
+        // Check if result.selected exists, otherwise use result itself.
+        const selected = result && result.selected ? result.selected : result;
+        if (selected && selected.id) {
+          setSelectedGlsPoint(selected);
+          console.log('Selected GLS parcel shop:', selected);
+          if (interval !== null) clearInterval(interval);
+          setShowGlsMap(false);
+        }
+      }, 100);
+    }
+    return () => {
+      if (interval !== null) clearInterval(interval);
+    };
+  }, [showGlsMap]);
+
+  // ─── RENDERING ─────────────────────────────────────────────────────────────
   if (loading) {
     return <p>Loading shipping methods...</p>;
   }
-
   if (error) {
     return <p className="text-red-500">{error}</p>;
   }
-
   return (
     <div>
       <h2 className="text-[20px] font-bold mb-6 text-neutral-darkest">
@@ -318,7 +398,7 @@ const Shipping: React.FC<ShippingProps> = ({
                 shippingMethod === 'paczkomaty_inpost' && (
                   <div>
                     <button
-                      onClick={openModal}
+                      onClick={openInpostModal}
                       className="mt-6 text-black border border-black px-4 py-2 rounded-full flex items-center text-sm"
                     >
                       Wybierz Paczkomat
@@ -328,6 +408,36 @@ const Shipping: React.FC<ShippingProps> = ({
                         Wybrany punkt: {selectedLockerData.id} -{' '}
                         {selectedLockerData.address}, {selectedLockerData.city},{' '}
                         {selectedLockerData.postalCode}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+              {method.id === 'gls_parcelshop' &&
+                shippingMethod === 'gls_parcelshop' && (
+                  <div>
+                    <button
+                      onClick={() => {
+                        console.log('GLS button clicked');
+                        setShowGlsMap(true);
+                      }}
+                      className="mt-6 text-black border border-black px-4 py-2 rounded-full flex items-center text-sm"
+                    >
+                      Wybierz punkt GLS
+                    </button>
+                    {showGlsMap && (
+                      <div
+                        id="gls_map"
+                        ref={glsMapRef}
+                        className="szybkapaczka_map mt-4"
+                        style={{ width: '500px', height: '500px' }}
+                      ></div>
+                    )}
+                    {selectedGlsPoint && (
+                      <p className="mt-2 text-sm text-gray-700">
+                        Wybrany punkt: {selectedGlsPoint.name} –{' '}
+                        {selectedGlsPoint.street}, {selectedGlsPoint.city},{' '}
+                        {selectedGlsPoint.postal_code}
                       </p>
                     )}
                   </div>

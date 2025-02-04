@@ -188,43 +188,44 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
         />
 
         {/* Icon Box Overlay: Positioned 10px from bottom, left & right */}
-        {(isHovered || alwaysShowIcons) && (typeIcon || colorSwatch) && (
-          <div className="absolute bottom-[10px] left-[10px] right-[10px] z-30 flex justify-between items-center pointer-events-none">
-            {/* Left side: Color Swatch */}
-            {colorSwatch && (
-              <div
-                className="w-[25px] h-[25px] rounded-md border border-gray-300"
-                style={{ backgroundColor: colorSwatch }}
-              />
-            )}
-            {/* Right side: Product Type Icon */}
-            {typeIcon && (
-              <div
-                className="h-[24px] flex-shrink-0"
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minWidth: '24px', // Ensures a minimum width
-                }}
-              >
-                <Image
-                  src={typeIcon}
-                  alt="Product Type Icon"
-                  height={24} // Fixed height
-                  width={0} // Dynamic width
-                  style={{
-                    objectFit: 'contain', // Ensures aspect ratio is maintained
-                    height: '24px', // Fixed height
-                    width: 'auto', // Allows dynamic width
-                    minWidth: '24px', // Ensures icons never shrink below 24px in width
-                    maxWidth: '100%', // Prevents overflow
-                  }}
+        {(isHovered || alwaysShowIcons) &&
+          (typeIcon || (!isHovered && colorSwatch)) && (
+            <div className="absolute bottom-[10px] left-[10px] right-[10px] z-30 flex justify-between items-center pointer-events-none">
+              {/* Left side: Color Swatch (Only when not hovered) */}
+              {!isHovered && colorSwatch && (
+                <div
+                  className="w-[25px] h-[25px] rounded-md border border-gray-300"
+                  style={{ backgroundColor: colorSwatch }}
                 />
-              </div>
-            )}
-          </div>
-        )}
+              )}
+              {/* Right side: Product Type Icon */}
+              {typeIcon && (
+                <div
+                  className="h-[24px] flex-shrink-0"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    minWidth: '24px',
+                  }}
+                >
+                  <Image
+                    src={typeIcon}
+                    alt="Product Type Icon"
+                    height={24}
+                    width={0}
+                    style={{
+                      objectFit: 'contain',
+                      height: '24px',
+                      width: 'auto',
+                      minWidth: '24px',
+                      maxWidth: '100%',
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
       </div>
 
       {/* Title and Price */}

@@ -32,6 +32,8 @@ const Checkout: React.FC = () => {
 
   const [isTermsChecked, setIsTermsChecked] = useState<boolean>(false); // <-- Added state for checkbox
 
+  const [selectedGlsPoint, setSelectedGlsPoint] = useState<any>(null);
+
   const [billingData, setBillingData] = useState({
     firstName: '',
     lastName: '',
@@ -124,7 +126,6 @@ const Checkout: React.FC = () => {
   // Handle order submission
   const handleOrderSubmit = async () => {
     if (!isTermsChecked) {
-      // <-- Validation for terms checkbox
       alert(
         '*Potwierdzam, że zapoznałam/em się z treścią Regulaminu i Polityki Prywatności oraz akceptuję ich postanowienia.',
       );
@@ -187,7 +188,31 @@ const Checkout: React.FC = () => {
         { key: 'delivery_point_city', value: shippingData.city },
       );
     }
-
+    if (shippingMethod === 'gls_parcelshop') {
+      shippingMetaData.push(
+        { key: '_integration', value: 'gls' },
+        {
+          key: '_parcel_shop_id',
+          value: selectedGlsPoint ? selectedGlsPoint.id : '',
+        },
+        {
+          key: '_parcel_shop_name',
+          value: selectedGlsPoint ? selectedGlsPoint.name : '',
+        },
+        {
+          key: '_parcel_shop_address',
+          value: selectedGlsPoint ? selectedGlsPoint.street : '',
+        },
+        {
+          key: 'delivery_point_city',
+          value: selectedGlsPoint ? selectedGlsPoint.city : '',
+        },
+        {
+          key: 'delivery_point_postcode',
+          value: selectedGlsPoint ? selectedGlsPoint.postal_code : '',
+        },
+      );
+    }
     const orderData = {
       payment_method: paymentMethod,
       payment_method_title:
@@ -318,6 +343,8 @@ const Checkout: React.FC = () => {
                   setLockerSize={setLockerSize}
                   cartTotal={cart?.totalProductsPrice || 0}
                   cart={cart}
+                  selectedGlsPoint={selectedGlsPoint}
+                  setSelectedGlsPoint={setSelectedGlsPoint}
                 />
 
                 <div className="mt-8">
