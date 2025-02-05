@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import { fetchNowosciPosts } from '@/utils/api/woocommerce';
 import SkeletonNowosci from '@/components/Skeletons/SkeletonNowosci';
 import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
 
 interface NowosciItem {
   id: number;
@@ -13,12 +14,47 @@ interface NowosciItem {
   title?: string; // Optional title
 }
 
+// Constants – adjust these numbers as needed.
+const HERO_HEIGHT = 800; // When the hero is completely off-screen.
+const INITIAL_HEIGHT = 344; // Initially visible height (px)
+const FINAL_HEIGHT = 642; // Final full container height (px)
+// Calculate the initial vertical scale so that only the bottom INITIAL_HEIGHT is shown.
+const INITIAL_SCALE = INITIAL_HEIGHT / FINAL_HEIGHT;
+
+/**
+ * mergeRefs calls every ref in the array with the node.
+ * This avoids directly assigning to a ref’s `.current` (which may be read-only).
+ */
+function mergeRefs<T>(
+  ...refs: (React.Ref<T> | undefined)[]
+): React.RefCallback<T> {
+  return (node: T) => {
+    refs.forEach((ref) => {
+      if (!ref) return;
+      if (typeof ref === 'function') {
+        ref(node);
+      } else {
+        (ref as React.MutableRefObject<T | null>).current = node;
+      }
+    });
+  };
+}
+
 const NewArrivalsSection = () => {
   const [nowosciItems, setNowosciItems] = useState<NowosciItem[]>([]);
   const [loading, setLoading] = useState(true);
-  // This flag triggers the final state animation.
-  const [animateFinal, setAnimateFinal] = useState(false);
+  // heroOut becomes true when the hero is completely off-screen.
+  const [heroOut, setHeroOut] = useState(false);
 
+  // Create a ref for the section and use the Intersection Observer.
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const { ref: inViewRef, inView } = useInView({
+    threshold: 1,
+    triggerOnce: true,
+  });
+  const combinedRef = mergeRefs(sectionRef, inViewRef);
+
+  // Fetch posts.
   useEffect(() => {
     const loadNowosci = async () => {
       try {
@@ -38,13 +74,28 @@ const NewArrivalsSection = () => {
     };
 
     loadNowosci();
-
-    // Trigger final layout state after 1 second.
-    const timer = setTimeout(() => {
-      setAnimateFinal(true);
-    }, 1000);
-    return () => clearTimeout(timer);
   }, []);
+
+  // Listen to scroll events to update heroOut and lock/unlock scrolling.
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.pageYOffset >= HERO_HEIGHT && !heroOut) {
+        setHeroOut(true);
+        // Lock scrolling during the animation.
+        document.body.style.overflow = 'hidden';
+        // After the animation duration + buffer, unlock scroll.
+        setTimeout(() => {
+          document.body.style.overflow = '';
+        }, 1200);
+      } else if (window.pageYOffset < HERO_HEIGHT && heroOut) {
+        setHeroOut(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    // Check immediately in case the user is already scrolled down.
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [heroOut]);
 
   if (loading) {
     return <SkeletonNowosci />;
@@ -54,7 +105,10 @@ const NewArrivalsSection = () => {
   }
 
   return (
-    <section className="container mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] py-16">
+    <section
+      ref={combinedRef}
+      className="container mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] py-16"
+    >
       {/* Mobile View remains unchanged */}
       <div className="px-[16px] flex flex-col items-start mb-8 md:hidden">
         <h2 className="font-size-h2 font-bold text-neutral-darkest">
@@ -70,36 +124,42 @@ const NewArrivalsSection = () => {
           Zobacz nowości →
         </Link>
       </div>
+      <div className="md:hidden">
+        <ResponsiveSlider
+          items={nowosciItems.map((item) => ({
+            src: item.src,
+            alt: item.alt,
+            title: item.title,
+          }))}
+          renderItem={(item: { src: string; alt: string; title?: string }) => (
+            <div className="relative w-full h-[350px]">
+              <Image
+                src={item.src}
+                alt={item.alt}
+                fill
+                style={{ objectFit: 'cover' }}
+                className="rounded-lg"
+              />
+              {item.title && (
+                <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
+                  {item.title}
+                </div>
+              )}
+            </div>
+          )}
+        />
+      </div>
 
       {/* Desktop View */}
-      {/* Remove fixed h-[650px] to let height animate */}
-      <motion.div
-        className="hidden md:flex gap-6"
-        layout
-        initial={{ height: 650 }} // initial overall height
-        animate={{ height: animateFinal ? 642 : 650 }}
-        transition={{ duration: 1 }}
-      >
+      <div className="hidden md:flex gap-6">
         {/* Left Column */}
-        <motion.div className="flex flex-col w-1/2 relative" layout>
-          {/* Title Block */}
+        <div className="flex flex-col w-1/2 relative">
+          {/* Title Block that moves upward when heroOut is true */}
           <motion.div
-            layout
-            initial={{ marginBottom: 120, y: 0, position: 'relative' }}
-            animate={
-              animateFinal
-                ? {
-                    marginBottom: 0,
-                    y: -120,
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                  }
-                : { marginBottom: 120, y: 0, position: 'relative' }
-            }
+            initial={{ y: 0 }}
+            animate={heroOut ? { y: -300 } : { y: 0 }}
             transition={{ duration: 1 }}
-            className="flex flex-col"
+            className="flex flex-col mb-8 relative z-10"
           >
             <h2 className="font-size-h2 font-bold text-neutral-darkest">
               Zobacz nasze nowości
@@ -115,45 +175,53 @@ const NewArrivalsSection = () => {
             </Link>
           </motion.div>
 
-          {/* Images Container for Images 1 and 2 */}
-          {/* Fixed container height: 642px */}
-          <div className="flex gap-6 overflow-hidden" style={{ height: 642 }}>
-            <motion.div
-              layout
-              style={{ transformOrigin: 'bottom' }}
-              initial={{ scaleY: 300 / 642 }}
-              animate={{ scaleY: animateFinal ? 1 : 300 / 642 }}
-              transition={{ duration: 1 }}
-              className="w-full overflow-hidden flex items-end"
-            >
-              <Image
-                src={nowosciItems[0].src}
-                alt={nowosciItems[0].alt}
-                width={350}
-                height={642}
-                className="w-full h-full object-cover object-bottom rounded-lg"
-              />
-            </motion.div>
-            <motion.div
-              layout
-              style={{ transformOrigin: 'bottom' }}
-              initial={{ scaleY: 300 / 642 }}
-              animate={{ scaleY: animateFinal ? 1 : 300 / 642 }}
-              transition={{ duration: 1 }}
-              className="w-full overflow-hidden flex items-end"
-            >
-              <Image
-                src={nowosciItems[1].src}
-                alt={nowosciItems[1].alt}
-                width={350}
-                height={642}
-                className="w-full h-full object-cover object-bottom rounded-lg"
-              />
-            </motion.div>
+          {/* Left Images Container – fixed at FINAL_HEIGHT (642px) with top offset added */}
+          <div
+            className="relative"
+            style={{ height: FINAL_HEIGHT, top: '-220px' }}
+          >
+            <div className="flex gap-6 overflow-hidden h-full">
+              {/* First Left Image */}
+              <div className="w-full overflow-hidden flex items-end">
+                <motion.div
+                  className="relative w-full h-full"
+                  style={{ transformOrigin: 'bottom' }}
+                  initial={{ scaleY: INITIAL_SCALE }}
+                  animate={{ scaleY: heroOut ? 1 : INITIAL_SCALE }}
+                  transition={{ duration: 1 }}
+                >
+                  <Image
+                    src={nowosciItems[0].src}
+                    alt={nowosciItems[0].alt}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    className="rounded-lg"
+                  />
+                </motion.div>
+              </div>
+              {/* Second Left Image */}
+              <div className="w-full overflow-hidden flex items-end">
+                <motion.div
+                  className="relative w-full h-full"
+                  style={{ transformOrigin: 'bottom' }}
+                  initial={{ scaleY: INITIAL_SCALE }}
+                  animate={{ scaleY: heroOut ? 1 : INITIAL_SCALE }}
+                  transition={{ duration: 1 }}
+                >
+                  <Image
+                    src={nowosciItems[1].src}
+                    alt={nowosciItems[1].alt}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    className="rounded-lg"
+                  />
+                </motion.div>
+              </div>
+            </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Right Column remains unchanged */}
+        {/* Right Column – remains unchanged */}
         <div className="flex flex-col w-1/2">
           <div className="flex gap-6 h-full">
             <div className="w-full h-full">
@@ -176,7 +244,7 @@ const NewArrivalsSection = () => {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </section>
   );
 };
