@@ -175,10 +175,15 @@ const NewArrivalsSection = () => {
             </Link>
           </motion.div>
 
-          {/* Left Images Container – fixed at FINAL_HEIGHT (642px) with top offset added */}
-          <div
-            className="relative"
-            style={{ height: FINAL_HEIGHT, top: '-220px' }}
+          {/* Extra wrapper: animate container height from FINAL_HEIGHT (642px) to INITIAL_HEIGHT (344px) */}
+          <motion.div
+            className="relative overflow-hidden"
+            style={{ top: '-220px', height: FINAL_HEIGHT }}
+            initial={{ height: FINAL_HEIGHT }}
+            animate={
+              heroOut ? { height: INITIAL_HEIGHT } : { height: FINAL_HEIGHT }
+            }
+            transition={{ duration: 1, delay: 1 }}
           >
             <div className="flex gap-6 overflow-hidden h-full">
               {/* First Left Image */}
@@ -218,7 +223,7 @@ const NewArrivalsSection = () => {
                 </motion.div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Right Column – remains unchanged */}
