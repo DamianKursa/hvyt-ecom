@@ -138,7 +138,7 @@ const NewArrivalsSection = () => {
                 alt={item.alt}
                 fill
                 style={{ objectFit: 'cover' }}
-                className="rounded-lg"
+                className="rounded-[16px]"
               />
               {item.title && (
                 <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
@@ -200,7 +200,7 @@ const NewArrivalsSection = () => {
                     alt={nowosciItems[0].alt}
                     fill
                     style={{ objectFit: 'cover' }}
-                    className="rounded-lg"
+                    className="rounded-[16px]"
                   />
                 </motion.div>
               </div>
@@ -218,7 +218,7 @@ const NewArrivalsSection = () => {
                     alt={nowosciItems[1].alt}
                     fill
                     style={{ objectFit: 'cover' }}
-                    className="rounded-lg"
+                    className="rounded-[16px]"
                   />
                 </motion.div>
               </div>
@@ -235,7 +235,7 @@ const NewArrivalsSection = () => {
                 alt={nowosciItems[2].alt}
                 width={322}
                 height={642}
-                className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-lg"
+                className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-[16px]"
               />
             </div>
             <div className="w-full h-full">
@@ -244,7 +244,7 @@ const NewArrivalsSection = () => {
                 alt={nowosciItems[3].alt}
                 width={322}
                 height={642}
-                className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-lg"
+                className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-[16px]"
               />
             </div>
           </div>
