@@ -29,61 +29,9 @@ const WspolpracaPage = () => {
               Współpracuj z nami
             </h1>
             <p className="text-[16px] md:text-[18px] font-light text-neutral-darkest leading-6 md:leading-8">
-              Tutaj tekst opisujący co użytkownik tu może znaleźć, o co chodzi
-              na tej podstronie. Tutaj tekst opisujący co użytkownik tu może
-              znaleźć, o co chodzi na tej podstronie.
+              Dołącz do nas i twórz niezwykłe projekty! Oferujemy korzystne
+              warunki współpracy dla projektantów, przedsiębiorców i twórców.
             </p>
-          </div>
-
-          {/* Top Image Cards */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 mb-12">
-            {[
-              {
-                title: 'Współpracuj z Pracowniami Projektowymi',
-                section: 'pracownie',
-              },
-              {
-                title: 'Współpraca ze stałymi partnerami',
-                section: 'partnerzy',
-              },
-              {
-                title: 'Współpraca z Blogerami i Influencerami',
-                section: 'blogerzy',
-              },
-            ].map((item, index) => (
-              <div
-                key={index}
-                className="relative rounded-[16px] overflow-hidden"
-              >
-                <Image
-                  src={`/images/wspolpraca_boxy.png`}
-                  alt={item.title}
-                  width={400}
-                  height={300}
-                  layout="responsive"
-                  className="rounded-t-[16px]"
-                />
-                <div className="py-4 flex flex-col gap-4">
-                  <h2 className="text-[18px] font-bold text-neutral-darkest">
-                    {item.title}
-                  </h2>
-                  <button
-                    onClick={() =>
-                      scrollToSection(item.section as keyof typeof sectionRefs)
-                    }
-                    className="flex items-center justify-between w-full px-4 py-2 border border-black rounded-full text-[16px] font-light text-black"
-                  >
-                    Sprawdź szczegóły
-                    <Image
-                      src="/icons/next.svg"
-                      alt="Arrow icon"
-                      width={16}
-                      height={16}
-                    />
-                  </button>
-                </div>
-              </div>
-            ))}
           </div>
 
           {/* Collaboration Sections */}
