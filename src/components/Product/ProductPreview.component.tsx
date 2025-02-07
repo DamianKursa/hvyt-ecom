@@ -170,7 +170,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
 
       {/* Image Container */}
       <div
-        className={`relative w-full h-[${imageSize}px] overflow-hidden rounded-lg flex justify-center items-center ${imageClass}`}
+        className={`relative w-full h-[${imageSize}px] overflow-hidden rounded-[16px] flex justify-center items-center ${imageClass}`}
       >
         {isLoading && (
           <div className="absolute inset-0 bg-gradient-to-r from-gray-300 to-gray-100 animate-pulse"></div>
@@ -182,7 +182,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
           fill
           style={{ objectFit: 'cover' }}
           quality={100}
-          className="transition-all duration-300 ease-in-out"
+          className="transition-all duration-300 ease-in-out r"
           onLoad={() => setIsLoading(false)}
           onError={() => setIsLoading(false)}
         />

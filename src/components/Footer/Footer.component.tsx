@@ -221,7 +221,7 @@ const Footer = () => {
         {/* Legal Section */}
         <div className="py-[32px] flex justify-between grid grid-cols-1 lg:grid-cols-2 border-t border-beige-dark">
           <p className="mt-[24px] text-regular text-black font-light">
-            &copy; HvyT. Wszystkie prawa zastrzeżone.
+            &copy; Hvyt. Wszystkie prawa zastrzeżone.
           </p>
           <div className="gap-4 flex flex-col order-first lg:order-last lg:flex-row lg:justify-end text-regular text-black font-light underline">
             <Link href="/regulamin" className="underline lg:mx-2">

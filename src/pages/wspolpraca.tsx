@@ -182,7 +182,10 @@ const WspolpracaPage = () => {
                 <p className="text-[16px] font-light text-black leading-7 mb-6">
                   Aby dowiedzieć się więcej o naszych produktach,
                   <br /> zapraszamy do zapoznania się z naszym{' '}
-                  <Link href="#" className="underline">
+                  <Link
+                    href="/downloads/HVYT_katalog_light.pdf"
+                    className="underline"
+                  >
                     katalogiem
                   </Link>
                   <br /> Dziękujemy za zainteresowanie naszą ofertą!

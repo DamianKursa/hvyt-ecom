@@ -6,23 +6,27 @@ const CustomSlider = () => {
   const slides = [
     {
       id: 1,
-      image: '/images/01.png',
-      title: 'Jeśli właśnie się urządzasz i chcesz wyróżnić swoje wnętrze to dobrze trafiłeś!',
+      image: '/images/1.png',
+      title:
+        'Jeśli właśnie się urządzasz i chcesz wyróżnić swoje wnętrze to dobrze trafiłeś!',
     },
     {
       id: 2,
-      image: '/images/02.png',
-      title: 'Pstrokata gałka, nowoczesny uchwyt czy elegancka klamka są w stanie zmienić obraz całego mieszkania',
+      image: '/images/2.png',
+      title:
+        'Pstrokata gałka, nowoczesny uchwyt czy elegancka klamka są w stanie zmienić obraz całego mieszkania',
     },
     {
       id: 3,
-      image: '/images/03.png',
-      title: 'Jeśli natomiast masz już dość „starych” mebli. Gałki i uchwyty meblowe to doskonały pomysł na odświeżenie starej komody, szafki nocnej czy kuchni',
+      image: '/images/3.png',
+      title:
+        'Jeśli natomiast masz już dość „starych” mebli. Gałki i uchwyty meblowe to doskonały pomysł na odświeżenie starej komody, szafki nocnej czy kuchni',
     },
     {
       id: 4,
-      image: '/images/03.png',
-      title: 'Jeśli nie wiesz, który model jest dla Ciebie odpowiedni – napisz do nas.',
+      image: '/images/4-onas.png',
+      title:
+        'Jeśli nie wiesz, który model jest dla Ciebie odpowiedni – napisz do nas.',
     },
   ];
 
@@ -59,7 +63,9 @@ const CustomSlider = () => {
           {/* Numbers and Navigation Controls */}
           <div className="absolute top-0 pt-10 w-full flex justify-between items-center pr-[50px]">
             {/* Slide Numbers */}
-            <div className="text-neutral-darkest light text-large"> {/* Changed to text-base (16px) */}
+            <div className="text-neutral-darkest light text-large">
+              {' '}
+              {/* Changed to text-base (16px) */}
               <span className="text-black mr-2">{`0${currentSlide + 1}`}</span>
               <span className="text-gray-500">- 04</span>
             </div>
@@ -75,7 +81,11 @@ const CustomSlider = () => {
                 }`}
                 disabled={currentSlide === 0}
               >
-                <img src="/icons/arrow-left.svg" alt="Prev" className="h-5 w-5" />
+                <img
+                  src="/icons/arrow-left.svg"
+                  alt="Prev"
+                  className="h-5 w-5"
+                />
               </button>
               <button
                 onClick={handleNext}
@@ -86,7 +96,11 @@ const CustomSlider = () => {
                 }`}
                 disabled={currentSlide === slides.length - 1}
               >
-                <img src="/icons/arrow-right.svg" alt="Next" className="h-5 w-5" />
+                <img
+                  src="/icons/arrow-right.svg"
+                  alt="Next"
+                  className="h-5 w-5"
+                />
               </button>
             </div>
           </div>

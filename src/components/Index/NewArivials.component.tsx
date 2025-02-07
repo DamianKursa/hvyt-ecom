@@ -18,12 +18,12 @@ interface NowosciItem {
 const HERO_HEIGHT = 800; // When the hero is completely off-screen.
 const INITIAL_HEIGHT = 344; // Initially visible height (px)
 const FINAL_HEIGHT = 642; // Final full container height (px)
-// Calculate the initial vertical scale so that only the bottom INITIAL_HEIGHT is shown.
-const INITIAL_SCALE = INITIAL_HEIGHT / FINAL_HEIGHT;
+const SHIFT_AMOUNT = FINAL_HEIGHT - INITIAL_HEIGHT; // 642 - 344 = 298px
+// (We no longer use a scale factor for inner images.)
 
 /**
  * mergeRefs calls every ref in the array with the node.
- * This avoids directly assigning to a ref’s `.current` (which may be read-only).
+ * This avoids directly assigning to a ref’s .current (which may be read-only).
  */
 function mergeRefs<T>(
   ...refs: (React.Ref<T> | undefined)[]
@@ -187,12 +187,18 @@ const NewArrivalsSection = () => {
           >
             <div className="flex gap-6 overflow-hidden h-full">
               {/* First Left Image */}
-              <div className="w-full overflow-hidden flex items-end">
+              <div className="w-full relative overflow-hidden">
                 <motion.div
-                  className="relative w-full h-full"
-                  style={{ transformOrigin: 'bottom' }}
-                  initial={{ scaleY: INITIAL_SCALE }}
-                  animate={{ scaleY: heroOut ? 1 : INITIAL_SCALE }}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    transformOrigin: 'top',
+                  }}
+                  initial={{ y: SHIFT_AMOUNT }}
+                  animate={heroOut ? { y: 0 } : { y: SHIFT_AMOUNT }}
                   transition={{ duration: 1 }}
                 >
                   <Image
@@ -205,12 +211,18 @@ const NewArrivalsSection = () => {
                 </motion.div>
               </div>
               {/* Second Left Image */}
-              <div className="w-full overflow-hidden flex items-end">
+              <div className="w-full relative overflow-hidden">
                 <motion.div
-                  className="relative w-full h-full"
-                  style={{ transformOrigin: 'bottom' }}
-                  initial={{ scaleY: INITIAL_SCALE }}
-                  animate={{ scaleY: heroOut ? 1 : INITIAL_SCALE }}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    transformOrigin: 'top',
+                  }}
+                  initial={{ y: SHIFT_AMOUNT }}
+                  animate={heroOut ? { y: 0 } : { y: SHIFT_AMOUNT }}
                   transition={{ duration: 1 }}
                 >
                   <Image

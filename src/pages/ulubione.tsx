@@ -27,12 +27,12 @@ const WishlistPage = () => {
                 {/* Remove Button */}
                 <button
                   onClick={() => removeFromWishlist(product.slug)}
-                  className="mt-4 flex py-2 items-center justify-center px-4 text-sm font-light text-black border border-black hover:border-dark-pastel-red rounded-full hover:bg-dark-pastel-red hover:text-white transition"
+                  className="mt-4 flex py-1 items-center justify-center px-4 text-sm font-light text-black border border-black hover:border-dark-pastel-red rounded-full hover:bg-dark-pastel-red hover:text-white transition"
                 >
                   <img
                     src="/icons/trash-black.svg"
                     alt="Trash Icon"
-                    className="w-6 h-6 mr-2"
+                    className="w-5 h-5 mr-2"
                   />
                   Usuń z ulubionych
                 </button>
