@@ -14,7 +14,7 @@ const Instagram = () => {
         const response = await fetch('/api/instagram');
         if (!response.ok) throw new Error('Failed to fetch Instagram posts');
         const data = await response.json();
-        setPosts(data.data.slice(0, 4) || []); // Limit to 4 posts immediately
+        setPosts(data.data.slice(0, 4) || []); // Limit to 4 posts
         setLoading(false);
       } catch (error) {
         console.error('Error fetching Instagram posts:', error);
@@ -49,13 +49,21 @@ const Instagram = () => {
               key={index}
               className="relative w-[322px] h-[322px] col-span-1"
             >
-              <Image
-                src={post.media_url}
-                alt={post.caption || 'Instagram Post'}
-                fill
-                style={{ objectFit: 'cover' }}
-                className="rounded-lg"
-              />
+              {post.media_type === 'VIDEO' ? (
+                <video
+                  src={post.media_url}
+                  controls
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              ) : (
+                <Image
+                  src={post.media_url}
+                  alt={post.caption || 'Instagram Post'}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  className="rounded-lg"
+                />
+              )}
             </div>
           ))}
         </div>
@@ -79,16 +87,24 @@ const Instagram = () => {
       {/* Mobile View: Responsive Slider */}
       <div className="md:hidden">
         <ResponsiveSlider
-          items={posts} // Posts are already limited to 4
+          items={posts}
           renderItem={(post: any) => (
             <div className="relative w-full h-[322px]">
-              <Image
-                src={post.media_url}
-                alt={post.caption || 'Instagram Post'}
-                fill
-                style={{ objectFit: 'cover' }}
-                className="rounded-lg"
-              />
+              {post.media_type === 'VIDEO' ? (
+                <video
+                  src={post.media_url}
+                  controls
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              ) : (
+                <Image
+                  src={post.media_url}
+                  alt={post.caption || 'Instagram Post'}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  className="rounded-lg"
+                />
+              )}
             </div>
           )}
         />
