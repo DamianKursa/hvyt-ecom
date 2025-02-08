@@ -191,14 +191,6 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         />
       </div>
 
-      <div className="mt-8">
-        <Checkbox
-          checked={needVATInvoice}
-          onChange={() => setNeedVATInvoice(!needVATInvoice)}
-          label="Potrzebujesz fakturę VAT"
-        />
-      </div>
-
       {/* "Ship to a Different Address" */}
       <div className="mt-8">
         <Checkbox
