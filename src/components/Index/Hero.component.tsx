@@ -194,10 +194,10 @@ const Hero: React.FC<HeroProps> = ({
 
           @keyframes scaleAnimation {
             0% {
-              transform: scale(0.7);
+              transform: scale(0.6);
             }
             100% {
-              transform: scale(1);
+              transform: scale(0.8);
             }
           }
 
