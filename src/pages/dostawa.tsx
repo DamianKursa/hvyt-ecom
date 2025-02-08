@@ -39,12 +39,11 @@ const DostawaPage = () => {
                 </h3>
                 <p className="text-[18px] font-light text-neutral-darkest mb-2">
                   Staramy się zawsze wysyłać jak najszybciej możemy, dlatego
-                  średni czas wysyłki jest o wiele krótszy.
+                  średni czas wysyłki jest o wiele krótszy. W weekend nie
+                  pracujemy, dlatego poniedziałki i kolejne dni robocze po
+                  świętach są u nas zawsze bardzo pracowite.
                 </p>
-                <p className="text-[18px] font-light text-neutral-darkest mb-[40px]">
-                  W weekend nie pracujemy, dlatego poniedziałki i kolejne dni
-                  robocze po świętach są u nas zawsze bardzo pracowite.
-                </p>
+                <p className="text-[18px] font-light text-neutral-darkest mb-[40px]"></p>
 
                 <div>
                   <h3 className="text-[20px] font-bold text-neutral-darkest mb-6">
