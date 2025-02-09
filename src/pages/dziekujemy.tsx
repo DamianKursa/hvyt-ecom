@@ -13,7 +13,21 @@ const Dziekujemy = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const MAX_ATTEMPTS = 6;
+
+  // Map the english status to Polish
+  const getPolishStatus = (status: string | null) => {
+    if (!status) return 'BRAK DANYCH';
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return 'ZAKOŃCZONE';
+      case 'processing':
+        return 'W TRAKCIE REALIZACJI';
+      case 'pending':
+        return 'OCZEKUJĄCE';
+      default:
+        return status.toUpperCase();
+    }
+  };
 
   useEffect(() => {
     let currentOrderId = orderId || localStorage.getItem('recentOrderId');
@@ -67,7 +81,7 @@ const Dziekujemy = () => {
 
   return (
     <Layout title="Dziękujemy za zakupy!">
-      {/* Cart Progress - Mark current step (example prop currentStep={4}) */}
+      {/* Cart Progress - Mark current step */}
       <div className="container mx-auto px-4 mb-16 md:px-0">
         <CartProgress />
       </div>
@@ -113,7 +127,7 @@ const Dziekujemy = () => {
                     : 'bg-red-500'
             }`}
           >
-            Status: {paymentStatus?.toUpperCase()}
+            Status: {getPolishStatus(paymentStatus)}
           </span>
         </div>
 
@@ -127,8 +141,8 @@ const Dziekujemy = () => {
         {/* "Wróć na stronę główną" Button */}
         <div className="text-center mt-10">
           <Link
-            className="w-full px-8 py-4 bg-black text-neutral-white text-[24px] font-light rounded-full hover:bg-neutral-dark transition"
             href="/"
+            className="w-full px-8 py-4 bg-black text-neutral-white text-[24px] font-light rounded-full hover:bg-neutral-dark transition"
           >
             Wróć na stronę główną
           </Link>

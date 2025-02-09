@@ -42,7 +42,6 @@ export interface Address {
   country: string;
   phone?: string;
 }
-
 export interface Order {
   id: number;
   date_created: string;
@@ -54,13 +53,22 @@ export interface Order {
   tax?: string;
   phone?: string;
   email?: string;
+  // Add the new optional property:
+  payment_method?: string;
   shipping: Address; // Correctly typing shipping as an Address object
   line_items: LineItem[];
   billing: {
     first_name: string;
     last_name: string;
     email: string;
-  }; // Add this property
+    // You can also add any other new optional properties here:
+    company?: string;
+    address_1?: string;
+    city?: string;
+    postcode?: string;
+    country?: string;
+    phone?: string;
+  };
 }
 
 export interface User {
