@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const RegisterForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -183,13 +184,13 @@ const RegisterForm: React.FC = () => {
 
       <p className="text-[14px] font-light mt-4">
         Zakładając konto, akceptujesz nasz{' '}
-        <a href="/regulamin" className="underline">
+        <Link href="/regulamin" className="underline">
           Regulamin
-        </a>
+        </Link>
         . Przeczytaj naszą{' '}
-        <a href="/polityka-prywatnosci" className="underline">
+        <Link href="/polityka-prywatnosci" className="underline">
           Politykę prywatności
-        </a>
+        </Link>
         .
       </p>
 

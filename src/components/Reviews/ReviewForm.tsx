@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { submitProductReview } from '@/utils/api/woocommerce';
+import Link from 'next/link';
 
 const ReviewForm = ({
   productId,
@@ -111,13 +112,13 @@ const ReviewForm = ({
           </span>
           <span>
             Potwierdzam, że zapoznałam/em się z treścią{' '}
-            <a className="underline" href="/regulamin">
+            <Link className="underline" href="/regulamin">
               Regulaminu
-            </a>{' '}
+            </Link>{' '}
             i{' '}
-            <a className="underline" href="/polityka-prywatnosci">
+            <Link className="underline" href="/polityka-prywatnosci">
               Polityki Prywatności
-            </a>{' '}
+            </Link>{' '}
             oraz akceptuję ich postanowienia.
           </span>
         </label>
