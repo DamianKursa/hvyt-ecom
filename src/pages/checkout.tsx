@@ -151,7 +151,7 @@ const Checkout: React.FC = () => {
     const mappedBillingCountry = mapCountry(billingData.country);
     const mappedShippingCountry = mapCountry(shippingData.country);
 
-    // Use the appropriate address based on "Dostawa pod inny adres"
+    // Use appropriate address based on "Dostawa pod inny adres"
     const shippingAddress = isShippingDifferent
       ? {
           first_name: billingData.firstName,
@@ -178,17 +178,18 @@ const Checkout: React.FC = () => {
         { key: '_integration', value: 'paczkomaty' },
         { key: '_paczkomat_id', value: selectedLocker },
         { key: '_paczkomat_size', value: lockerSize || 'A' },
+        { key: 'delivery_point_address', value: shippingData.street },
         { key: 'delivery_point_id', value: selectedLocker },
         {
           key: 'delivery_point_name',
           value: `${selectedLocker}, ${shippingData.street}, ${shippingData.postalCode} ${shippingData.city}`,
         },
-        { key: 'delivery_point_address', value: shippingData.street },
+
         { key: 'delivery_point_postcode', value: shippingData.postalCode },
         { key: 'delivery_point_city', value: shippingData.city },
       );
     }
-    if (shippingMethod === 'gls_parcelshop') {
+    if (shippingMethod === 'punkty_gls') {
       shippingMetaData.push(
         { key: '_integration', value: 'gls' },
         {
@@ -254,10 +255,10 @@ const Checkout: React.FC = () => {
           : [],
       })),
       customer_note: shippingData.additionalInfo || '',
-      customer_id: user?.id || undefined,
+      customer_id: user?.id || undefined, // `undefined` for guests
     };
 
-    console.log('Order data to be sent to API:', orderData);
+    console.log('📦 Sending Order Data to API:', orderData);
 
     try {
       const response = await axios.post('/api/create-order', orderData, {
@@ -267,15 +268,22 @@ const Checkout: React.FC = () => {
       });
 
       const createdOrder = response.data;
-      console.log('Order created successfully:', createdOrder);
+      console.log('✅ Order created successfully:', createdOrder);
 
-      if (createdOrder.payment_url) {
-        // window.location.href = createdOrder.payment_url;
+      if (createdOrder.id && createdOrder.order_key) {
+        // Save order ID & order key for guests
+        localStorage.setItem('recentOrderId', createdOrder.id.toString());
+        localStorage.setItem('recentOrderKey', createdOrder.order_key);
+
+        // Redirect to Thank You page
+        router.push(
+          `/dziekujemy?orderId=${createdOrder.id}&orderKey=${createdOrder.order_key}`,
+        );
       } else {
-        alert('Zamówienie utworzone, ale brakuje linku do płatności.');
+        alert('Zamówienie utworzone, ale brakuje identyfikatora zamówienia.');
       }
     } catch (error) {
-      console.error('Error creating order:', error);
+      console.error('❌ Error creating order:', error);
       alert('Wystąpił błąd podczas składania zamówienia. Spróbuj ponownie.');
     }
   };

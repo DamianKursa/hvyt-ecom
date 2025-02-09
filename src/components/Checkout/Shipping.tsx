@@ -55,6 +55,43 @@ declare global {
   }
 }
 
+/**
+ * Helper: Extract the GLS selection.
+ * If the returned object has a nested "ParcelShop.selected" property, use that.
+ * Otherwise, if it has a "selected" property, use that.
+ * Else, return the object as-is.
+ */
+const extractSelected = (obj: any) => {
+  if (!obj) return null;
+  if (obj.ParcelShop && obj.ParcelShop.selected) {
+    return { ...obj.ParcelShop.selected };
+  }
+  if (obj.selected) {
+    return { ...obj.selected };
+  }
+  return { ...obj };
+};
+
+/**
+ * Helper: Validate that the extracted object is a valid GLS selection.
+ * We require that it is not the window object and that it has a nonempty "id" property.
+ */
+const isValidSelection = (obj: any): boolean => {
+  if (!obj || obj === window) return false;
+  if (typeof obj.id !== 'string' || obj.id.trim() === '') return false;
+  return true;
+};
+
+/**
+ * Helper: Safely retrieve a field from an object (case‑insensitive).
+ */
+const getField = (obj: any, field: string): string => {
+  if (!obj) return '';
+  return (
+    obj[field] || obj[field.toLowerCase()] || obj[field.toUpperCase()] || ''
+  );
+};
+
 const Shipping: React.FC<ShippingProps> = ({
   shippingMethod,
   setShippingMethod,
@@ -72,9 +109,9 @@ const Shipping: React.FC<ShippingProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [selectedLockerData, setSelectedLockerData] = useState<any>(null);
   const scriptLoadedRef = useRef(false);
-  // Use inline container for GLS map
+  // State to control GLS map visibility
   const [showGlsMap, setShowGlsMap] = useState(false);
-  // Create a ref for the GLS map container
+  // Ref for the GLS map container
   const glsMapRef = useRef<HTMLDivElement>(null);
 
   const shippingIcons: Record<string, string> = {
@@ -84,7 +121,7 @@ const Shipping: React.FC<ShippingProps> = ({
     'kurier gls - darmowa wysyłka': '/icons/GLS_Logo_2021.svg',
     'darmowa dostawa': '/icons/free-shipping.svg',
     'kurier gls pobranie': '/icons/GLS_Logo_2021.svg',
-    'gls parcelshop': '/icons/GLS_Logo_2021.svg',
+    'punkty gls': '/icons/GLS_Logo_2021.svg',
   };
 
   // ─── FETCH SHIPPING METHODS ──────────────────────────────────────────────
@@ -135,7 +172,7 @@ const Shipping: React.FC<ShippingProps> = ({
                 'darmowa dostawa',
                 'kurier gls - darmowa wysyłka',
                 'paczkomaty inpost',
-                'gls parcelshop', // include GLS shipping option
+                'punkty gls', // use "Punkty GLS" option
               ].includes(method.title.toLowerCase()),
             );
             if (
@@ -165,12 +202,12 @@ const Shipping: React.FC<ShippingProps> = ({
           }
           if (
             !filteredMethods.some(
-              (method) => method.title.toLowerCase() === 'gls parcelshop',
+              (method) => method.title.toLowerCase() === 'punkty gls',
             )
           ) {
             filteredMethods.push({
-              id: 'gls_parcelshop',
-              title: 'GLS Parcelshop',
+              id: 'punkty_gls',
+              title: 'Punkty GLS',
               cost: cartTotal >= 300 ? null : 15,
               enabled: true,
             });
@@ -193,13 +230,19 @@ const Shipping: React.FC<ShippingProps> = ({
     fetchShippingMethods();
   }, [cart, cartTotal]);
 
+  // ─── HANDLING SHIPPING METHOD CHANGE ──────────────────────────────────────
   const handleShippingChange = (method: ShippingMethod) => {
     setShippingMethod(method.id);
     setShippingTitle(method.title || 'Paczkomaty InPost');
     const price = Number(method.cost) || 0;
     setShippingPrice(price);
+    // When switching away from "Punkty GLS", do not reinitialize the GLS map.
+    if (method.id !== 'punkty_gls') {
+      setShowGlsMap(false);
+    }
   };
 
+  // ─── EASYPACK (InPost) INTEGRATION ───────────────────────────────────────────
   useEffect(() => {
     const loadEasyPackScript = () => {
       if (!scriptLoadedRef.current) {
@@ -295,7 +338,7 @@ const Shipping: React.FC<ShippingProps> = ({
               country_parcelshops: 'PL',
               el: glsMapRef.current.id,
               parcel_weight: '5',
-              center_point: 'Przykładowe_miasto, przykładowa_ulica',
+              center_point: 'Warszawa, Polska',
               map_type: false,
               mapbox_key: '',
               google_maps_key: '',
@@ -312,28 +355,47 @@ const Shipping: React.FC<ShippingProps> = ({
     }
   }, [showGlsMap]);
 
+  // ─── GLS INTEGRATION: POLL FOR SELECTION USING SzybkaPaczkaParcel & EVENT LISTENER ─────────
   useEffect(() => {
     let interval: number | null = null;
+
     if (showGlsMap && window.SzybkaPaczkaParcel) {
       const parcel = new window.SzybkaPaczkaParcel();
       interval = window.setInterval(() => {
         const result = parcel.getParcelObject();
-        // Check if result.selected exists, otherwise use result itself.
-        const selected = result && result.selected ? result.selected : result;
-        if (selected && selected.id) {
-          setSelectedGlsPoint(selected);
-          console.log('Selected GLS parcel shop:', selected);
-          if (interval !== null) clearInterval(interval);
+        console.log('Polling GLS result:', result);
+        const extracted = extractSelected(result);
+        console.log('Extracted GLS selection:', extracted);
+        if (isValidSelection(extracted)) {
+          setSelectedGlsPoint(extracted);
+          console.log('Selected GLS parcel shop (polling):', extracted);
+          clearInterval(interval!);
           setShowGlsMap(false);
+        } else {
+          console.log('Polling result is not a valid selection.');
         }
-      }, 100);
+      }, 200);
     }
+
+    const handleGlsEvent = (e: any) => {
+      console.log('get_parcel_shop event:', e);
+      const extracted = extractSelected(e.detail) || extractSelected(e.target);
+      if (isValidSelection(extracted)) {
+        setSelectedGlsPoint(extracted);
+        console.log('Selected GLS parcel shop (event):', extracted);
+        setShowGlsMap(false);
+      } else {
+        console.log('Event did not contain a valid selection.');
+      }
+    };
+    window.addEventListener('get_parcel_shop', handleGlsEvent);
+
     return () => {
       if (interval !== null) clearInterval(interval);
+      window.removeEventListener('get_parcel_shop', handleGlsEvent);
     };
   }, [showGlsMap]);
 
-  // ─── RENDERING ─────────────────────────────────────────────────────────────
   if (loading) {
     return <p>Loading shipping methods...</p>;
   }
@@ -409,8 +471,8 @@ const Shipping: React.FC<ShippingProps> = ({
                   </div>
                 )}
 
-              {method.id === 'gls_parcelshop' &&
-                shippingMethod === 'gls_parcelshop' && (
+              {method.id === 'punkty_gls' &&
+                shippingMethod === 'punkty_gls' && (
                   <div>
                     <button
                       onClick={() => {
@@ -419,8 +481,19 @@ const Shipping: React.FC<ShippingProps> = ({
                       }}
                       className="mt-6 text-black border border-black px-4 py-2 rounded-full flex items-center text-sm"
                     >
-                      Wybierz punkt GLS
+                      {selectedGlsPoint
+                        ? 'Zmień punkt GLS'
+                        : 'Wybierz punkt GLS'}
                     </button>
+                    {selectedGlsPoint && (
+                      <p className="mt-2 text-sm text-gray-700">
+                        Wybrany punkt:{' '}
+                        {getField(selectedGlsPoint, 'name') || 'N/A'} –{' '}
+                        {getField(selectedGlsPoint, 'street') || 'N/A'},{' '}
+                        {getField(selectedGlsPoint, 'city') || 'N/A'},{' '}
+                        {getField(selectedGlsPoint, 'postal_code') || 'N/A'}
+                      </p>
+                    )}
                     {showGlsMap && (
                       <div
                         id="gls_map"
@@ -428,13 +501,6 @@ const Shipping: React.FC<ShippingProps> = ({
                         className="szybkapaczka_map mt-4"
                         style={{ width: '500px', height: '500px' }}
                       ></div>
-                    )}
-                    {selectedGlsPoint && (
-                      <p className="mt-2 text-sm text-gray-700">
-                        Wybrany punkt: {selectedGlsPoint.name} –{' '}
-                        {selectedGlsPoint.street}, {selectedGlsPoint.city},{' '}
-                        {selectedGlsPoint.postal_code}
-                      </p>
                     )}
                   </div>
                 )}
