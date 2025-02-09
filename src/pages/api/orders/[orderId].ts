@@ -54,8 +54,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         address: order.shipping?.address_1 || '',
         city: order.shipping?.city || '',
         postcode: order.shipping?.postcode || '',
-        phone: order.billing?.phone || '',
+        country: order.shipping?.country || '',  // add country if needed
+        // You can also include additional shipping fields here if available
+      },
+      billing: {
+        first_name: order.billing?.first_name || '',
+        last_name: order.billing?.last_name || '',
         email: order.billing?.email || '',
+        phone: order.billing?.phone || '',
+        company: order.billing?.company || '',
+        address: order.billing?.address_1 || '',
+        city: order.billing?.city || '',
+        postcode: order.billing?.postcode || '',
+        country: order.billing?.country || '',
+        // And any other fields you need
       },
       items: order.line_items.map((item: any) => ({
         product_id: item.product_id,
@@ -65,6 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         image: item.image?.src || '/placeholder.jpg',
       })),
     };
+    
 
     return res.status(200).json(formattedOrder);
   } catch (error: any) {
