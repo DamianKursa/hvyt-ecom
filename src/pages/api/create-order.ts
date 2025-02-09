@@ -9,7 +9,7 @@ const WooCommerceAPI = axios.create({
   },
 });
 
-// TypeScript interface for the expected order data
+// TypeScript interface for order data
 interface OrderData {
   payment_method: string;
   payment_method_title: string;
@@ -43,17 +43,14 @@ interface OrderData {
   }[];
   line_items: {
     product_id: number;
-    variation_id?: number; // Include variation ID if applicable
+    variation_id?: number;
     quantity: number;
     subtotal: string;
     total: string;
-    meta_data?: {
-      key: string;
-      value: string;
-    }[];
+    meta_data?: { key: string; value: string }[];
   }[];
   customer_note?: string;
-  customer_id?: number; // Include customer ID for logged-in users
+  customer_id?: number;
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -63,51 +60,53 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const orderData: OrderData = req.body;
 
-  console.log('Received order data from frontend:');
-  console.log(JSON.stringify(orderData, null, 2)); // Log order data for debugging
+  console.log('📩 Received order data from frontend:');
+  console.log(JSON.stringify(orderData, null, 2));
 
   // Validate required fields
-  if (
-    !orderData.payment_method ||
-    !orderData.billing ||
-    !orderData.shipping ||
-    !orderData.shipping_lines ||
-    !orderData.line_items
-  ) {
-    console.error('Missing required order data');
+  if (!orderData.payment_method || !orderData.billing || !orderData.shipping || !orderData.shipping_lines || !orderData.line_items) {
+    console.error('❌ Missing required order data');
     return res.status(400).json({ error: 'Missing required order data' });
   }
 
-  // Debugging: Validate customer ID
+  // Validate customer ID
   if (orderData.customer_id) {
     try {
-      console.log(`Validating customer ID: ${orderData.customer_id}`);
+      console.log(`🔍 Validating customer ID: ${orderData.customer_id}`);
       const customerResponse = await WooCommerceAPI.get(`/customers/${orderData.customer_id}`);
-      console.log('Customer validation successful:', customerResponse.data);
+      console.log('✅ Customer validation successful:', customerResponse.data);
     } catch (error) {
-      console.error('Error validating customer_id:', error);
+      console.error('❌ Error validating customer_id:', error);
       return res.status(400).json({ error: 'Invalid or non-existent customer_id' });
     }
   } else {
-    console.warn('No customer_id provided. This order will be processed as a guest.');
+    console.warn('⚠️ No customer_id provided. This order will be processed as a guest.');
   }
 
   try {
-    // Create the order in WooCommerce
-    console.log('Sending order data to WooCommerce API...');
+    console.log('📤 Sending order data to WooCommerce API...');
     const response = await WooCommerceAPI.post('/orders', orderData);
 
-    console.log('Order successfully created in WooCommerce:');
-    console.log(JSON.stringify(response.data, null, 2)); // Log WooCommerce response for debugging
+    console.log('✅ Order successfully created in WooCommerce:');
+    console.log(JSON.stringify(response.data, null, 2));
 
-    res.status(200).json(response.data);
+    const createdOrder = response.data;
+
+    res.status(200).json({
+      id: createdOrder.id,
+      order_key: createdOrder.order_key, // 🔹 Include `order_key` for guest users
+      payment_url: createdOrder.payment_url || null,
+      status: createdOrder.status,
+      total: createdOrder.total,
+      currency: createdOrder.currency,
+      customer_id: createdOrder.customer_id || null,
+    });
   } catch (err: unknown) {
     const error = err as AxiosError;
 
-    console.error('Error creating order in WooCommerce:');
+    console.error('❌ Error creating order in WooCommerce:');
     console.error(error.response?.data || error.message);
 
-    // Send a detailed error response
     res.status(500).json({
       error: 'Failed to create order',
       details: error.response?.data || error.message,
