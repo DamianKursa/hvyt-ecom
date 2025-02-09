@@ -15,7 +15,7 @@ const CartProgress: React.FC = () => {
     {
       label: 'Podsumowanie',
       icon: '/icons/podsumowanie.svg',
-      path: '/podsumowanie',
+      path: '/dziekujemy',
     },
   ];
 
