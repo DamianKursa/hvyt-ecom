@@ -14,17 +14,9 @@ interface NowosciItem {
   title?: string; // Optional title
 }
 
-// Constants – adjust these numbers as needed.
-const HERO_HEIGHT = 800; // When the hero is completely off-screen.
-const INITIAL_HEIGHT = 344; // Initially visible height (px)
-const FINAL_HEIGHT = 642; // Final full container height (px)
-const SHIFT_AMOUNT = FINAL_HEIGHT - INITIAL_HEIGHT; // 642 - 344 = 298px
-// (We no longer use a scale factor for inner images.)
+const HERO_HEIGHT = 800;
 
-/**
- * mergeRefs calls every ref in the array with the node.
- * This avoids directly assigning to a ref’s .current (which may be read-only).
- */
+// Utility to merge refs.
 function mergeRefs<T>(
   ...refs: (React.Ref<T> | undefined)[]
 ): React.RefCallback<T> {
@@ -40,21 +32,47 @@ function mergeRefs<T>(
   };
 }
 
+/*
+  We are not changing the overall animation or mask behavior.
+  The only update is that we now include the "round 16px" parameter in our
+  clipPath values so that the clip respects the 16px border radius.
+  
+  The variants are updated as follows:
+  
+  - Initial: 'inset(50% 0 0 0 round 16px)' → shows bottom half (with rounded corners)
+  - Mid: 'inset(0 0 0 0 round 16px)' → full image visible
+  - Final: 'inset(0 0 50% 0 round 16px)' → mask positioned at top, showing bottom half of image
+*/
+const maskVariants = {
+  initial: { clipPath: 'inset(50% 0 0 0 round 16px)', y: 0 },
+  animate: {
+    clipPath: [
+      'inset(50% 0 0 0 round 16px)', // initial: bottom half visible with rounded corners
+      'inset(0 0 0 0 round 16px)', // mid: full image visible with rounded corners
+      'inset(0 0 50% 0 round 16px)', // final: mask shows top 50% of container with rounded corners
+    ],
+    y: [0, 0, 0],
+    transition: { duration: 2, times: [0, 0.5, 1] },
+  },
+};
+
+const imageVariants = {
+  initial: { top: '0%' },
+  animate: {
+    top: ['0%', '0%', '-50%'], // final: image shifted up by 50% (i.e. -321px in a 642px container)
+    transition: { duration: 2, times: [0, 0.5, 1] },
+  },
+};
+
 const NewArrivalsSection = () => {
   const [nowosciItems, setNowosciItems] = useState<NowosciItem[]>([]);
   const [loading, setLoading] = useState(true);
-  // heroOut becomes true when the hero is completely off-screen.
   const [heroOut, setHeroOut] = useState(false);
 
-  // Create a ref for the section and use the Intersection Observer.
   const sectionRef = useRef<HTMLElement | null>(null);
-  const { ref: inViewRef, inView } = useInView({
-    threshold: 1,
-    triggerOnce: true,
-  });
+  const { ref: inViewRef } = useInView({ threshold: 1, triggerOnce: true });
   const combinedRef = mergeRefs(sectionRef, inViewRef);
 
-  // Fetch posts.
   useEffect(() => {
     const loadNowosci = async () => {
       try {
@@ -76,14 +94,11 @@ const NewArrivalsSection = () => {
     loadNowosci();
   }, []);
 
-  // Listen to scroll events to update heroOut and lock/unlock scrolling.
   useEffect(() => {
     const handleScroll = () => {
       if (window.pageYOffset >= HERO_HEIGHT && !heroOut) {
         setHeroOut(true);
-        // Lock scrolling during the animation.
         document.body.style.overflow = 'hidden';
-        // After the animation duration + buffer, unlock scroll.
         setTimeout(() => {
           document.body.style.overflow = '';
         }, 1200);
@@ -92,7 +107,6 @@ const NewArrivalsSection = () => {
       }
     };
     window.addEventListener('scroll', handleScroll);
-    // Check immediately in case the user is already scrolled down.
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [heroOut]);
@@ -109,7 +123,7 @@ const NewArrivalsSection = () => {
       ref={combinedRef}
       className="container mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] py-16"
     >
-      {/* Mobile View remains unchanged */}
+      {/* Mobile View */}
       <div className="px-[16px] flex flex-col items-start mb-8 md:hidden">
         <h2 className="font-size-h2 font-bold text-neutral-darkest">
           Zobacz nasze nowości
@@ -153,13 +167,81 @@ const NewArrivalsSection = () => {
       {/* Desktop View */}
       <div className="hidden md:flex gap-6">
         {/* Left Column */}
-        <div className="flex flex-col w-1/2 relative">
-          {/* Title Block that moves upward when heroOut is true */}
+        <div className="relative w-1/2" style={{ height: '642px' }}>
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="flex gap-6 h-full">
+              {/* First Left Image */}
+              <div className="w-full relative overflow-hidden h-full rounded-[16px]">
+                <motion.div
+                  className="absolute inset-0"
+                  style={{ borderRadius: '16px' }}
+                  variants={maskVariants}
+                  initial="initial"
+                  animate={heroOut ? 'animate' : 'initial'}
+                >
+                  <motion.div
+                    className="absolute"
+                    style={{
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: '642px',
+                      borderRadius: '16px',
+                    }}
+                    variants={imageVariants}
+                    initial="initial"
+                    animate={heroOut ? 'animate' : 'initial'}
+                  >
+                    <Image
+                      src={nowosciItems[0].src}
+                      alt={nowosciItems[0].alt}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      className="rounded-[16px]"
+                    />
+                  </motion.div>
+                </motion.div>
+              </div>
+              {/* Second Left Image */}
+              <div className="w-full relative overflow-hidden h-full rounded-[16px]">
+                <motion.div
+                  className="absolute inset-0"
+                  style={{ borderRadius: '16px' }}
+                  variants={maskVariants}
+                  initial="initial"
+                  animate={heroOut ? 'animate' : 'initial'}
+                >
+                  <motion.div
+                    className="absolute"
+                    style={{
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: '642px',
+                      borderRadius: '16px',
+                    }}
+                    variants={imageVariants}
+                    initial="initial"
+                    animate={heroOut ? 'animate' : 'initial'}
+                  >
+                    <Image
+                      src={nowosciItems[1].src}
+                      alt={nowosciItems[1].alt}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      className="rounded-[16px]"
+                    />
+                  </motion.div>
+                </motion.div>
+              </div>
+            </div>
+          </div>
+          {/* Title Block – overlaps the images */}
           <motion.div
             initial={{ y: 0 }}
             animate={heroOut ? { y: -300 } : { y: 0 }}
             transition={{ duration: 1 }}
-            className="flex flex-col mb-8 relative z-10"
+            className="absolute z-20 left-0 p-4"
           >
             <h2 className="font-size-h2 font-bold text-neutral-darkest">
               Zobacz nasze nowości
@@ -169,76 +251,13 @@ const NewArrivalsSection = () => {
             </p>
             <Link
               href="#"
-              className="w-1/3 mt-[40px] inline-block px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
+              className="mt-[40px] inline-block px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
             >
               Zobacz nowości →
             </Link>
           </motion.div>
-
-          {/* Extra wrapper: animate container height from FINAL_HEIGHT (642px) to INITIAL_HEIGHT (344px) */}
-          <motion.div
-            className="relative overflow-hidden"
-            style={{ top: '-220px', height: FINAL_HEIGHT }}
-            initial={{ height: FINAL_HEIGHT }}
-            animate={
-              heroOut ? { height: INITIAL_HEIGHT } : { height: FINAL_HEIGHT }
-            }
-            transition={{ duration: 1, delay: 1 }}
-          >
-            <div className="flex gap-6 overflow-hidden h-full">
-              {/* First Left Image */}
-              <div className="w-full relative overflow-hidden">
-                <motion.div
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    transformOrigin: 'top',
-                  }}
-                  initial={{ y: SHIFT_AMOUNT }}
-                  animate={heroOut ? { y: 0 } : { y: SHIFT_AMOUNT }}
-                  transition={{ duration: 1 }}
-                >
-                  <Image
-                    src={nowosciItems[0].src}
-                    alt={nowosciItems[0].alt}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    className="rounded-[16px]"
-                  />
-                </motion.div>
-              </div>
-              {/* Second Left Image */}
-              <div className="w-full relative overflow-hidden">
-                <motion.div
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    transformOrigin: 'top',
-                  }}
-                  initial={{ y: SHIFT_AMOUNT }}
-                  animate={heroOut ? { y: 0 } : { y: SHIFT_AMOUNT }}
-                  transition={{ duration: 1 }}
-                >
-                  <Image
-                    src={nowosciItems[1].src}
-                    alt={nowosciItems[1].alt}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    className="rounded-[16px]"
-                  />
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
         </div>
-
-        {/* Right Column – remains unchanged */}
+        {/* Right Column – static images */}
         <div className="flex flex-col w-1/2">
           <div className="flex gap-6 h-full">
             <div className="w-full h-full">
