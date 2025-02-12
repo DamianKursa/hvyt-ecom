@@ -136,12 +136,6 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
           onClose={closeModal}
         />
       )}
-
-      {modalImages.length === 0 && (
-        <p className="text-center mt-4">
-          No images available for this product.
-        </p>
-      )}
     </div>
   );
 };

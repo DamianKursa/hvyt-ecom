@@ -47,7 +47,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
           renderItem={(image) => (
             <div
               key={image.id}
-              className="relative w-full h-[430px] overflow-hidden cursor-pointer"
+              className="relative w-full h-[330px] overflow-hidden cursor-pointer"
               onClick={() => openModal(images.indexOf(image))}
             >
               <Image

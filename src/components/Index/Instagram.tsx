@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import 'swiper/css';
 import Image from 'next/image';
 import Link from 'next/link';
-import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 
 const Instagram = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -41,7 +39,7 @@ const Instagram = () => {
         </p>
       </div>
 
-      {/* Desktop View */}
+      {/* Desktop View (unchanged) */}
       <div className="hidden md:block">
         <div className="grid grid-cols-4 gap-6">
           {posts.map((post, index) => (
@@ -84,30 +82,28 @@ const Instagram = () => {
         </div>
       </div>
 
-      {/* Mobile View: Responsive Slider */}
-      <div className="md:hidden">
-        <ResponsiveSlider
-          items={posts}
-          renderItem={(post: any) => (
-            <div className="relative w-full h-[322px]">
-              {post.media_type === 'VIDEO' ? (
-                <video
-                  src={post.media_url}
-                  controls
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              ) : (
-                <Image
-                  src={post.media_url}
-                  alt={post.caption || 'Instagram Post'}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  className="rounded-lg"
-                />
-              )}
-            </div>
-          )}
-        />
+      {/* Mobile View: Two Columns Grid with Images/Videos Sized to 158×158 */}
+      <div className="md:hidden grid grid-cols-2 gap-4 px-4">
+        {posts.map((post, index) => (
+          // The container has fixed dimensions (158×158) to force the image's size
+          <div key={index} className="relative w-[158px] h-[158px]">
+            {post.media_type === 'VIDEO' ? (
+              <video
+                src={post.media_url}
+                controls
+                className="w-full h-full object-cover rounded-lg"
+              />
+            ) : (
+              <Image
+                src={post.media_url}
+                alt={post.caption || 'Instagram Post'}
+                fill
+                style={{ objectFit: 'cover' }}
+                className="rounded-lg"
+              />
+            )}
+          </div>
+        ))}
       </div>
     </section>
   );

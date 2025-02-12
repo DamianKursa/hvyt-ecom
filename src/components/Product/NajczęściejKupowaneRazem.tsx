@@ -2,18 +2,22 @@ import React, { useState } from 'react';
 import ProductPreview from './ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import SkeletonProduct from '@/components/Skeletons/SkeletonProduct';
-import useCrossSellProducts, {
-  RecommendedProduct,
-} from '@/utils/hooks/useCrossSellProducts';
+import { RecommendedProduct } from '@/utils/hooks/useCrossSellProducts';
 
 interface NajczesciejKupowaneProps {
-  productId: string; // ID of the product to fetch cross-sell products
+  productId: string; // still available if needed for tracking purposes
+  crossSellProducts: RecommendedProduct[];
+  crossSellLoading: boolean;
 }
 
 const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
   productId,
+  crossSellProducts,
+  crossSellLoading,
 }) => {
-  const { products, loading } = useCrossSellProducts(productId);
+  // Use the passed props instead of calling the hook internally.
+  const products = crossSellProducts;
+  const loading = crossSellLoading;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemWidth = 350; // Fixed width for each item
@@ -87,7 +91,7 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
           style={{
             transform: `translateX(-${currentIndex * (itemWidth + gutter)}px)`,
             gap: `${gutter}px`,
-            width: `${totalItems * (itemWidth + gutter) - gutter}px`, // Total width
+            width: `${totalItems * (itemWidth + gutter) - gutter}px`,
           }}
         >
           {displayedProducts.map((product, idx) =>
@@ -95,9 +99,7 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
               <div
                 key={`skeleton-${idx}`}
                 className="flex-none"
-                style={{
-                  width: `${itemWidth}px`,
-                }}
+                style={{ width: `${itemWidth}px` }}
               >
                 <SkeletonProduct />
               </div>
@@ -105,9 +107,7 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
               <div
                 key={(product as RecommendedProduct).id}
                 className="flex-none"
-                style={{
-                  width: `${itemWidth}px`,
-                }}
+                style={{ width: `${itemWidth}px` }}
               >
                 <ProductPreview
                   product={{

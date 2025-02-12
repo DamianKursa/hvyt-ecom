@@ -41,14 +41,14 @@ const Hero: React.FC<HeroProps> = ({
   animationSteps,
 }) => {
   const boxesRef = useRef<(HTMLDivElement | null)[]>([]);
-  // Initialize overlayRotation to 50 degrees as in step one
+  // Initialize overlayRotation to 80 degrees (desktop default)
   const [overlayRotation, setOverlayRotation] = useState(80);
 
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
 
     if (!isMobile) {
-      // Set static backgrounds
+      // Set static backgrounds for desktop
       staticBoxes.forEach(({ index, bgColor }) => {
         const box = boxesRef.current[index];
         if (box) {
@@ -85,6 +85,9 @@ const Hero: React.FC<HeroProps> = ({
           });
         }, step * 500); // Delay animations based on step number
       });
+    } else {
+      // On mobile, set overlay rotation to 90deg.
+      setOverlayRotation(-90);
     }
   }, [staticBoxes, animationSteps]);
 
@@ -114,7 +117,7 @@ const Hero: React.FC<HeroProps> = ({
 
         {/* Overlay Image */}
         <div
-          className="absolute inset-0 flex justify-center items-center"
+          className="absolute mt-[-300px] md:mt-0 inset-0 flex justify-center items-center"
           style={{
             transformOrigin: 'center center',
             transform: `rotate(${overlayRotation}deg)`,
@@ -135,25 +138,25 @@ const Hero: React.FC<HeroProps> = ({
 
         {/* Hero Content */}
         <div className="container relative z-10 mx-auto">
-          <div className="flex flex-col items-start justify-center w-full tracking-wide lg:w-1/2">
+          <div className="mt-[250px] md:mt-0 flex flex-col items-start justify-center w-full tracking-wide lg:w-1/2">
             <h1
-              className="text-[64px] font-bold leading-tight text-dark-pastel-red mb-4"
+              className="text-[40px] md:text-[64px] font-bold leading-tight text-dark-pastel-red mb-4"
               dangerouslySetInnerHTML={{ __html: title }}
             ></h1>
             <p
-              className="text-[18px] font-light  text-neutral-darkest mb-6"
+              className="max-w-[433px] md:text-[18px] font-light  text-neutral-darkest mb-6"
               dangerouslySetInnerHTML={{ __html: description }}
             ></p>
 
             <div className="flex space-x-4">
               <a
-                className="inline-block min-w-[162px] font-light px-6 py-3 text-lg leading-relaxed text-neutral-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors"
+                className="inline-block min-w-[162px] font-light px-6 py-3  md:text-lg leading-relaxed text-neutral-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors"
                 href={buttonLink}
               >
                 {buttonText}
               </a>
               <a
-                className="inline-block px-6 py-3 font-light text-lg border border-black text-black rounded-full hover:border-dark-pastel-red hover:bg-transparent hover:text-dark-pastel-red transition-colors"
+                className="inline-block px-6 py-3 font-light md:text-lg border border-black text-black rounded-full hover:border-dark-pastel-red hover:bg-transparent hover:text-dark-pastel-red transition-colors"
                 href={secondButtonLink || '#'}
               >
                 {secondButtonText || 'Zobacz gałki'}

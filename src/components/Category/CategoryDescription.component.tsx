@@ -40,7 +40,7 @@ const CategoryDescription: React.FC<CategoryDescriptionProps> = ({
 
   return (
     <section
-      className={`bg-[#F5F5F5] my-[115px] py-[88px] ${fullWidth ? 'w-full' : 'container mx-auto'}`}
+      className={`bg-[#F5F5F5] px-4 mt-[64px] md:mt-[88px] md:mt-0 md:my-[115px] py-[88px] ${fullWidth ? 'w-full' : 'container mx-auto'}`}
       style={{ backgroundColor: 'var(--color-beige)' }}
     >
       <div className="max-w-[1440px] mx-auto">

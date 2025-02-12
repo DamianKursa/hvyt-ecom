@@ -10,7 +10,7 @@ const Logowanie = () => {
 
   return (
     <Layout title="Hvyt | Logowanie">
-      <div className="bg-[#F9F6F2] flex justify-center items-center mt-12 ">
+      <div className=" px-4 bg-[#F9F6F2] flex justify-center items-center mt-12 ">
         <div className="w-full max-w-4xl bg-white rounded-[40px] shadow-md overflow-hidden transition-all duration-500">
           {!isForgotPassword ? (
             <>

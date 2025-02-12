@@ -11,7 +11,7 @@ const ToggleSection: React.FC<ToggleSectionProps> = ({ title, content }) => {
   return (
     <div className="toggle-section border-b border-gray-300 pb-4">
       {/* Title */}
-      <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+      <h2 className="text-[28px] font-semibold mb-4">{title}</h2>
 
       {/* Content */}
       <div

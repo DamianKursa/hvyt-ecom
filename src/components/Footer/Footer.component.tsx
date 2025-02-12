@@ -32,12 +32,16 @@ const Footer = () => {
         isSpecialPage ? 'bg-beige-light' : 'bg-beige'
       } py-16 text-sm text-neutral-darkest`}
     >
-      <div className=" max-w-[1440px] container mx-auto">
+      <div className=" max-w-[1440px] container px-[16px] md:mx-auto">
         {/* First Row - Grid with 50/50 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 border-b border-beige-dark pb-8 mb-8">
           <div className=" grid grid-cols-2 lg:grid-cols-1 space-y-4">
             {/* Logo */}
-            <img src="/icons/Logo.svg" alt="HVYT Logo" className="h-10" />
+            <img
+              src="/icons/Logo.svg"
+              alt="HVYT Logo"
+              className="h-[20px] md:h-10"
+            />
             {/* Social Media Icons */}
             <SocialIcons />
           </div>
@@ -113,7 +117,7 @@ const Footer = () => {
                     <li key={index}>
                       <Link
                         href={`/${normalizeString(link)}`}
-                        className="underline text-black text-regular font-light"
+                        className="underline text-black text-[16px] font-light"
                       >
                         {link}
                       </Link>
@@ -133,7 +137,7 @@ const Footer = () => {
                     <li key={index}>
                       <Link
                         href={`/${normalizeString(link)}`}
-                        className="underline text-regular text-black font-light"
+                        className="underline text-[16px] text-black font-light"
                       >
                         {link}
                       </Link>

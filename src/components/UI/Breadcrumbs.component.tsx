@@ -32,7 +32,7 @@ const Breadcrumbs: React.FC = () => {
   return (
     <nav
       aria-label="breadcrumb"
-      className="flex items-center h-10 text-sm text-neutral-darkest"
+      className="flex flex-nowrap items-center text-sm text-neutral-darkest md:h-10"
     >
       {breadcrumbItems.map((item, index) => (
         <span key={index} className="flex items-center">

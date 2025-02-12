@@ -18,6 +18,7 @@ import { CartContext } from '@/stores/CartProvider';
 import { useWishlist } from '@/context/WhishlistContext';
 import Image from 'next/image';
 import { Product } from '@/stores/CartProvider';
+import useCrossSellProducts from '@/utils/hooks/useCrossSellProducts';
 
 const NajczęściejKupowaneRazem = dynamic(
   () => import('@/components/Product/NajczęściejKupowaneRazem'),
@@ -47,16 +48,18 @@ const ProductPage = () => {
     snackbar,
   } = state;
 
-  const [validationError, setValidationError] = useState<string | null>(null); // New state for validation error
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Fetch cross-sell products once the product is available
+  const { products: crossSellProducts, loading: crossSellLoading } =
+    useCrossSellProducts(product ? product.id.toString() : null);
 
   useEffect(() => {
     const fetchData = async () => {
       if (!slug) return;
-
       try {
         dispatch({ type: 'SET_LOADING', payload: true });
         const productData = await fetchProductBySlug(slug);
-
         if (!productData) {
           dispatch({ type: 'SET_ERROR', payload: 'No product found' });
           dispatch({
@@ -65,7 +68,6 @@ const ProductPage = () => {
           });
           return;
         }
-
         dispatch({ type: 'SET_PRODUCT', payload: productData });
       } catch (error) {
         dispatch({ type: 'SET_ERROR', payload: 'Error loading product data' });
@@ -81,14 +83,12 @@ const ProductPage = () => {
 
   const handleWishlistClick = () => {
     if (!product) return;
-
     const wishlistProduct = {
       name: product.name,
       price: selectedVariation?.price || product.price,
       slug: product.slug,
       images: product.images || [{ src: '/fallback-image.jpg' }],
     };
-
     if (isInWishlist(product.slug)) {
       removeFromWishlist(product.slug);
     } else {
@@ -104,37 +104,29 @@ const ProductPage = () => {
   };
 
   const handleAttributeChange = (attributeName: string, value: string) => {
-    setValidationError(null); // Clear error when a valid attribute is selected
-
-    // Create a temporary updated attributes object
+    setValidationError(null);
     const updatedAttributes = {
       ...selectedAttributes,
       [attributeName]: value,
     };
-
-    // Dispatch the state update for attributes
     dispatch({
       type: 'UPDATE_ATTRIBUTE',
       payload: { name: attributeName, value },
     });
-
-    // Find the matched variation using the updated attributes
     const matchedVariation = product?.baselinker_variations?.find((variation) =>
-      variation.attributes.every((attr) => {
-        return updatedAttributes[attr.name] === attr.option;
-      }),
+      variation.attributes.every(
+        (attr) => updatedAttributes[attr.name] === attr.option,
+      ),
     );
-
-    // Dispatch the updated variation
     dispatch({
       type: 'SET_VARIATION',
       payload: matchedVariation
         ? {
             ...matchedVariation,
             id: matchedVariation.id.toString(),
-            price: matchedVariation.price.toFixed(2), // Convert to string
-            regular_price: matchedVariation.regular_price.toFixed(2), // Convert to string
-            sale_price: matchedVariation.sale_price.toFixed(2), // Convert to string
+            price: matchedVariation.price.toFixed(2),
+            regular_price: matchedVariation.regular_price.toFixed(2),
+            sale_price: matchedVariation.sale_price.toFixed(2),
             image: matchedVariation.image
               ? { sourceUrl: matchedVariation.image.src }
               : undefined,
@@ -162,18 +154,14 @@ const ProductPage = () => {
       console.error('No product available to add to cart');
       return;
     }
-
     if (product.baselinker_variations?.length && !selectedVariation) {
       setValidationError('Wybierz wariant przed dodaniem do koszyka.');
       return;
     }
-
     const price = parseFloat(selectedVariation?.price || product.price);
-
     const variationOptions: {
       [key: string]: { option: string; price: number }[];
     } = {};
-
     product.baselinker_variations?.forEach((variation) => {
       variation.attributes.forEach((attr) => {
         if (!variationOptions[attr.name]) {
@@ -185,12 +173,6 @@ const ProductPage = () => {
         });
       });
     });
-
-    console.log(
-      '✅ Generated Variation Options before adding to cart:',
-      variationOptions,
-    );
-
     const cartItem: Product = {
       cartKey: selectedVariation?.id || product.id.toString(),
       name: product.name,
@@ -208,9 +190,7 @@ const ProductPage = () => {
       attributes: selectedAttributes,
       variationOptions,
     };
-
     console.log('🛒 Adding to cart:', cartItem);
-
     addCartItem(cartItem);
     dispatch({ type: 'TOGGLE_MODAL', payload: true });
   };
@@ -254,16 +234,33 @@ const ProductPage = () => {
 
   return (
     <Layout title={`Hvyt | ${product?.name || 'Ładownie...'}`}>
-      <section className="max-w-[1440px] mt-[140px] container mx-auto">
+      <section className="max-w-[1440px] mt-[88px] md:mt-[140px] container mx-auto">
+        {/*
+          For desktop (lg): a two‑column layout where the left column shows the gallery and product details combined,
+          and the right column shows title, pricing, attributes, etc.
+          For mobile: the layout order is:
+            1. Gallery only (mobile-only block)
+            2. Title, pricing, attributes, etc.
+            3. Product details (mobile-only block below)
+        */}
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
-          <div className="lg:w-8/12 flex flex-col gap-6 max-w-full">
-            {product && <SingleProductGallery images={galleryImages} />}
-            {product && <SingleProductDetails product={product} />}
+          <div className="order-1 w-full lg:order-1 lg:w-8/12">
+            {/* Mobile: Gallery only with a minimum height to ensure visibility */}
+            <div className="block lg:hidden min-h-[300px]">
+              {product && <SingleProductGallery images={galleryImages} />}
+            </div>
+            {/* Desktop: Gallery + Product Details */}
+            <div className="hidden lg:block">
+              {product && <SingleProductGallery images={galleryImages} />}
+              {product && <SingleProductDetails product={product} />}
+            </div>
           </div>
 
-          <div className="lg:w-4/12 flex flex-col gap-6 sticky mx-4 md:mx-0 top-20 self-start">
-            <h1 className="text-3xl font-semibold">{product?.name}</h1>
-            <p className="text-4xl font-bold text-dark-pastel-red">
+          <div className="order-2 w-full lg:order-2 lg:w-4/12 flex flex-col gap-6 mx-4 md:mx-0 lg:sticky lg:top-20 self-start">
+            <h1 className=" text-[24px] md:text-[32px] font-semibold">
+              {product?.name}
+            </h1>
+            <p className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
               {selectedVariation?.price
                 ? parseFloat(selectedVariation.price).toFixed(2)
                 : product?.price
@@ -271,21 +268,18 @@ const ProductPage = () => {
                   : '0.00'}{' '}
               zł
             </p>
-
-            {/* Display validation error below variation box */}
             {validationError && (
               <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg mt-2">
                 <span>{validationError}</span>
               </div>
             )}
-
             <ColorSwitcher
               options={
-                product?.attributes?.find((attr) => attr.name === 'Kolor OK') // Find the "Kolor" attribute
-                  ?.options || [] // Use its options if available
+                product?.attributes?.find((attr) => attr.name === 'Kolor OK')
+                  ?.options || []
               }
-              selectedColor={selectedColor} // Pass the selected color from state
-              onColorChange={handleColorChange} // Update the selected color in state
+              selectedColor={selectedColor}
+              onColorChange={handleColorChange}
               colorMap={{
                 Złoty: '#f5f5ad',
                 Srebrny: '#e9eaed',
@@ -297,27 +291,24 @@ const ProductPage = () => {
                 Biały: '#fff',
               }}
             />
-
             <div className="flex items-center gap-4">
               {product?.baselinker_variations?.[0]?.attributes?.length ? (
                 <>
                   <div className="flex-1">
                     {product?.baselinker_variations?.[0]?.attributes.map(
                       (attr) => {
-                        // Build a map of options to prices for the current attribute
                         const pricesMap = product.baselinker_variations?.reduce(
                           (map, variation) => {
                             const option = variation.attributes.find(
                               (a) => a.name === attr.name,
                             )?.option;
                             if (option) {
-                              map[option] = variation.price.toFixed(2); // Format price with 2 decimal places
+                              map[option] = variation.price.toFixed(2);
                             }
                             return map;
                           },
                           {} as { [key: string]: string },
                         );
-
                         return (
                           <AttributeSwitcher
                             key={attr.name}
@@ -362,11 +353,10 @@ const ProductPage = () => {
                 </div>
               )}
             </div>
-
-            <div className="flex items-center mt-4 space-x-4">
+            <div className="flex items-center mt-0 md:mt-4 space-x-4">
               <button
                 onClick={handleAddToCart}
-                className="w-4/5 py-3 text-[24px] font-light text-white bg-black rounded-full flex justify-center items-center hover:bg-dark-pastel-red transition-colors"
+                className="w-4/5 py-3 text-[16px] md:text-[24px] font-light text-white bg-black rounded-full flex justify-center items-center hover:bg-dark-pastel-red transition-colors"
               >
                 Dodaj do koszyka
                 <Image
@@ -377,15 +367,14 @@ const ProductPage = () => {
                   className="ml-2"
                 />
               </button>
-
               {product && (
                 <button
                   onClick={handleWishlistClick}
-                  className={`w-1/5 w-[64px] h-[64px] p-3 border rounded-[100px] ${
+                  className={`w-[52px] h-[52px] md:w-[64px] md:h-[64px] p-3 border rounded-[100px] ${
                     isInWishlist(product.slug)
                       ? 'border-black'
                       : 'border-black text-black'
-                  }  flex justify-center items-center transition`}
+                  } flex justify-center items-center transition`}
                 >
                   <Image
                     src={
@@ -400,40 +389,43 @@ const ProductPage = () => {
                 </button>
               )}
             </div>
-            {/* Cart Modal */}
-            {showModal && product && (
-              <CartModal
-                product={{
-                  id: product.id.toString(),
-                  name: product.name,
-                  image:
-                    selectedVariation?.image?.sourceUrl ||
-                    galleryImages[0]?.sourceUrl ||
-                    '/fallback-image.jpg',
-                  price: selectedVariation?.price
-                    ? parseFloat(selectedVariation.price).toFixed(2)
-                    : parseFloat(product.price).toFixed(2),
-                }}
-                total={(
-                  quantity *
-                  parseFloat(selectedVariation?.price || product.price || '0')
-                ).toFixed(2)} // Ensure total is a string
-                onClose={() =>
-                  dispatch({ type: 'TOGGLE_MODAL', payload: false })
-                }
-                crossSellProducts={[]} // Optional: Pass cross-sell products here
-                loading={false} // Replace with actual loading state if needed
-              />
-            )}
-
             <DeliveryReturnInfo
               onScrollToSection={handleScrollToFrequentlyBought}
             />
           </div>
         </div>
+        <div className="block lg:hidden mt-[64px] md:mt-6">
+          {product && <SingleProductDetails product={product} />}
+        </div>
       </section>
+      {showModal && product && (
+        <CartModal
+          product={{
+            id: product.id.toString(),
+            name: product.name,
+            image:
+              selectedVariation?.image?.sourceUrl ||
+              galleryImages[0]?.sourceUrl ||
+              '/fallback-image.jpg',
+            price: selectedVariation?.price
+              ? parseFloat(selectedVariation.price).toFixed(2)
+              : parseFloat(product.price).toFixed(2),
+          }}
+          total={(
+            quantity *
+            parseFloat(selectedVariation?.price || product.price || '0')
+          ).toFixed(2)}
+          onClose={() => dispatch({ type: 'TOGGLE_MODAL', payload: false })}
+          crossSellProducts={crossSellProducts}
+          loading={crossSellLoading}
+        />
+      )}
       <div ref={frequentlyBoughtTogetherRef}>
-        <NajczęściejKupowaneRazem productId={product?.id?.toString() || ''} />
+        <NajczęściejKupowaneRazem
+          productId={product?.id?.toString() || ''}
+          crossSellProducts={crossSellProducts}
+          crossSellLoading={crossSellLoading}
+        />
       </div>
       <Instagram />
       <div className="w-full">

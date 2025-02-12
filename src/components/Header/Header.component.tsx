@@ -90,7 +90,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                     <img
                       src="/icons/Logo.svg"
                       alt="HVYT Logo"
-                      className="h-10"
+                      className="h-6 md:h-10"
                     />
                   </span>
                 </Link>
@@ -263,7 +263,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               </div>
             </div>
 
-            {!isHomePage && !isMobile && (
+            {!isHomePage && (
               <div className="w-full">
                 <Breadcrumbs />
               </div>

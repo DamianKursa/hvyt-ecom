@@ -146,12 +146,12 @@ const NewArrivalsSection = () => {
             title: item.title,
           }))}
           renderItem={(item: { src: string; alt: string; title?: string }) => (
-            <div className="relative w-full h-[350px]">
+            <div className="relative w-full h-[300px]">
               <Image
                 src={item.src}
                 alt={item.alt}
                 fill
-                style={{ objectFit: 'cover' }}
+                style={{ objectFit: 'cover', objectPosition: 'center bottom' }}
                 className="rounded-[16px]"
               />
               {item.title && (
