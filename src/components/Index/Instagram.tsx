@@ -86,7 +86,7 @@ const Instagram = () => {
       <div className="md:hidden grid grid-cols-2 gap-4 px-4">
         {posts.map((post, index) => (
           // The container has fixed dimensions (158×158) to force the image's size
-          <div key={index} className="relative w-[158px] h-[158px]">
+          <div key={index} className="relative w-100% h-[158px]">
             {post.media_type === 'VIDEO' ? (
               <video
                 src={post.media_url}

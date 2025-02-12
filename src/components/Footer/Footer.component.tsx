@@ -155,31 +155,63 @@ const Footer = () => {
               promocjami.
             </h4>
 
-            <FormProvider {...methods}>
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="flex items-center"
-              >
-                <div className="flex-grow">
-                  <InputField
-                    inputLabel="Podaj swój adres e-mail"
-                    inputName="email"
-                    customValidation={{ required: true }}
-                    errors={errors}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="ml-4 px-6 py-3 bg-black text-neutral-white rounded-full font-light hover:bg-neutral-dark transition-all"
+            {/* Mobile Version */}
+            <div className="block md:hidden">
+              <FormProvider {...methods}>
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="flex flex-col"
                 >
-                  Zapisz się
-                </button>
-              </form>
-              <p className="text-neutral-darkest text-extra-small font-light">
-                Subskrybując, wyrażasz zgodę na naszą Politykę prywatności i na
-                otrzymywanie aktualizacji od naszej firmy.
-              </p>
-            </FormProvider>
+                  <div className="flex-grow">
+                    <InputField
+                      inputLabel="Podaj swój adres e-mail"
+                      inputName="email"
+                      customValidation={{ required: true }}
+                      errors={errors}
+                    />
+                  </div>
+                  <p className="text-neutral-darkest text-extra-small font-light mt-4">
+                    Subskrybując, wyrażasz zgodę na naszą Politykę prywatności i
+                    na otrzymywanie aktualizacji od naszej firmy.
+                  </p>
+                  <button
+                    type="submit"
+                    className="mt-4 w-full px-6 py-3 bg-black text-neutral-white rounded-full font-light hover:bg-neutral-dark transition-all"
+                  >
+                    Zapisz się
+                  </button>
+                </form>
+              </FormProvider>
+            </div>
+
+            {/* Desktop Version */}
+            <div className="hidden md:block">
+              <FormProvider {...methods}>
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="flex items-center"
+                >
+                  <div className="flex-grow">
+                    <InputField
+                      inputLabel="Podaj swój adres e-mail"
+                      inputName="email"
+                      customValidation={{ required: true }}
+                      errors={errors}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="ml-4 px-6 py-3 bg-black text-neutral-white rounded-full font-light hover:bg-neutral-dark transition-all"
+                  >
+                    Zapisz się
+                  </button>
+                </form>
+                <p className="text-neutral-darkest text-extra-small font-light mt-4">
+                  Subskrybując, wyrażasz zgodę na naszą Politykę prywatności i
+                  na otrzymywanie aktualizacji od naszej firmy.
+                </p>
+              </FormProvider>
+            </div>
           </div>
         </div>
 
