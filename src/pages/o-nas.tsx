@@ -14,7 +14,7 @@ const OnasPage = () => {
       <HeroOnas />
       {/* Slider Section */}
       <section className="py-16 w-full">
-        <div className="container mx-auto max-w-grid-desktop">
+        <div className="container px-4 md:px-0 mx-auto max-w-grid-desktop">
           <Slider />
         </div>
       </section>
