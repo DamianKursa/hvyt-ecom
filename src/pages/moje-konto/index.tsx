@@ -44,7 +44,7 @@ interface MojeKontoProps {
 
 const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null); // Replace `any` with proper typing
+  const [user, setUser] = useState<any>(null); // Replace `any` with proper typing if needed
   const router = useRouter();
 
   useEffect(() => {
@@ -87,9 +87,9 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
 
   return (
     <Layout title="Moje konto">
-      <div className="container mx-auto py-8  flex">
-        {/* Sidebar */}
-        <aside className="w-1/4 bg-beige p-8 max-h-[410px] rounded-[25px]">
+      <div className="container mx-auto py-8 flex">
+        {/* Sidebar (hidden on mobile) */}
+        <aside className="hidden md:block w-1/4 bg-beige  p-4 md:p-8 max-h-[410px] rounded-[25px]">
           <div className="mb-6">
             <h2 className="text-2xl font-semibold mb-4">Moje konto</h2>
           </div>
@@ -114,7 +114,7 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
         </aside>
 
         {/* Main Content */}
-        <main className="w-3/4 pl-4">
+        <main className="w-full md:w-3/4 px-4 md:pl-4">
           {children || (
             <p className="text-gray-500">
               Wybierz sekcję z menu, aby zobaczyć szczegóły.
