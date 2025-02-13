@@ -115,7 +115,7 @@ const Hero: React.FC<HeroProps> = ({
           ))}
         </div>
 
-        {/* Overlay Image */}
+        {/* Overlay Image (desktop and mobile, centered) */}
         <div
           className="absolute mt-[-300px] md:mt-0 inset-0 flex justify-center items-center"
           style={{
@@ -124,7 +124,6 @@ const Hero: React.FC<HeroProps> = ({
             transition: 'transform 1s ease-in-out',
           }}
         >
-          {/* This inner wrapper applies a continuous scale animation independent of steps */}
           <div className="overlay-scale">
             <Image
               src={imageSrc}
@@ -164,6 +163,17 @@ const Hero: React.FC<HeroProps> = ({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Second Mobile-Only Overlay at Bottom Right */}
+      <div className="absolute bottom-0 right-0 block md:hidden">
+        <Image
+          src="/images/bg-mobile-hero.svg"
+          alt={`${imageAlt} Mobile Overlay`}
+          width={300}
+          height={200}
+          priority
+        />
       </div>
 
       <style jsx>{`

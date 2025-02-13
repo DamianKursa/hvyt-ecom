@@ -249,7 +249,7 @@ const CategoryPage = ({
 
   return (
     <Layout title={`Hvyt | ${category.name || 'Loading...'}`}>
-      <div className="container max-w-[1440px] mt-[88px] px-4 md:px-0 lg:mt-[115px] mx-auto">
+      <div className="container max-w-[1440px] mt-[115px] px-4 md:px-0 mx-auto">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
 
         <div className="flex items-center mb-8">

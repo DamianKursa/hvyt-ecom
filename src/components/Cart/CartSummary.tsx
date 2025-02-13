@@ -97,7 +97,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
       <button
         onClick={handleButtonClick}
-        className="w-full py-4 bg-black text-white text-lg font-semibold rounded-full hover:bg-neutral-dark transition"
+        className="w-full py-4 bg-black text-white text-lg font-light rounded-full hover:bg-neutral-dark transition"
       >
         {isCheckoutPage ? 'Zamawiam i Płacę' : 'Przejdź do kasy'}
       </button>

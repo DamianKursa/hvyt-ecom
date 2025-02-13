@@ -19,6 +19,8 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const router = useRouter();
   const isMobile = useIsMobile();
   const isHomePage = router.pathname === '/';
+  const isKoszykPage = router.pathname === '/koszyk';
+  const isKCheckoutPage = router.pathname === '/checkout';
   const { user, logout, fetchUser } = useUserContext();
 
   let dropdownTimeout: ReturnType<typeof setTimeout>;
@@ -263,7 +265,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               </div>
             </div>
 
-            {!isHomePage && (
+            {!isHomePage && !isKoszykPage && !isKCheckoutPage && (
               <div className="w-full">
                 <Breadcrumbs />
               </div>
