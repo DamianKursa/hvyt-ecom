@@ -91,7 +91,7 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
               <td className="py-4 px-6 text-center align-middle">
                 <button
                   onClick={() => handleAddToCart(product)}
-                  className="bg-transparent border border-gray-400 rounded-full py-2 px-4 flex items-center hover:bg-gray-100 transition"
+                  className="bg-transparent border border-gray-400 rounded-full py-2 px-2 flex items-center hover:bg-gray-100 transition"
                 >
                   Dodaj do koszyka
                   <span className="ml-2 flex items-center">
