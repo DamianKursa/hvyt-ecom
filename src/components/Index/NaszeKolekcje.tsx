@@ -44,7 +44,7 @@ const NaszeKolekcje = () => {
             <h2 className="font-size-h2 font-bold text-neutral-darkest">
               Sprawdź nasze kolekcje
             </h2>
-            <p className="font-size-text-medium text-neutral-darkest">
+            <p className="font-size-text-medium text-neutral-darkest mt-[10px]">
               Zobacz co ostatnio nowego dodaliśmy dla Ciebie.
             </p>
           </div>

@@ -253,7 +253,7 @@ const CategoryPage = ({
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
 
         <div className="flex items-center mb-8">
-          <h1 className="text-[32px] md:text-[40px] font-bold text-[#661F30] flex items-center gap-4">
+          <h1 className="text-[32px] mt-[24px] md:text-[40px] font-bold text-[#661F30] flex items-center gap-4">
             {category.name}
             {icons[slug || ''] && (
               <img

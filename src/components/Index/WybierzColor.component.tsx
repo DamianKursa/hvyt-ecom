@@ -33,7 +33,7 @@ const WybierzColor = () => {
           <h2 className="font-size-h2 font-bold text-neutral-darkest">
             Wybierz kolor, który lubisz
           </h2>
-          <p className="font-size-text-medium text-neutral-darkest mt-2 md:mt-0">
+          <p className="font-size-text-medium text-neutral-darkest mt-[10px] md:mt-0">
             Diabeł tkwi w szczegółach, niech kolor podkręci Twoje wnętrze!
           </p>
         </div>

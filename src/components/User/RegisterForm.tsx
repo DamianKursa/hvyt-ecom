@@ -182,8 +182,8 @@ const RegisterForm: React.FC = () => {
         )}
       </div>
 
-      <p className="text-[14px] font-light mt-4">
-        Zakładając konto, akceptujesz nasz{' '}
+      <p className="text-[14px] ml-[8px] font-light mt-4">
+        Zakładając konto, akceptujesz nasz
         <Link href="/regulamin" className="underline">
           Regulamin
         </Link>

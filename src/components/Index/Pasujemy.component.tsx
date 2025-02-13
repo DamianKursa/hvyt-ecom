@@ -37,7 +37,7 @@ const PasujemyWszedzie = () => {
           <h2 className="font-size-h2 font-bold text-neutral-darkest">
             Pasujemy wszędzie
           </h2>
-          <p className="font-size-text-medium text-neutral-darkest mt-2 md:mt-0">
+          <p className="font-size-text-medium text-neutral-darkest mt-[10px] md:mt-0">
             Dobierz uchwyt do swojego wnętrza
           </p>
         </div>

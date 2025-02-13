@@ -8,7 +8,7 @@ interface CheckboxProps {
 
 const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange, label }) => {
   return (
-    <label className="flex items-center gap-2 text-sm cursor-pointer">
+    <label className="flex items-center ml-2 gap-2 text-sm cursor-pointer">
       {/* Hidden Checkbox Input */}
       <input
         type="checkbox"

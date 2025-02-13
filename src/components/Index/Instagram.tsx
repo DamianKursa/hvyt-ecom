@@ -34,7 +34,7 @@ const Instagram = () => {
         <h2 className="font-size-h2 font-bold text-neutral-darkest text-left">
           Hvyt w waszych domach
         </h2>
-        <p className="font-size-text-medium text-neutral-darkest text-left">
+        <p className="font-size-text-medium text-neutral-darkest mt-[10px] text-left">
           Zainspiruj się i zobacz jak nasze produkty sprawdzają się u innych.
         </p>
       </div>

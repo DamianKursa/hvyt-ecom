@@ -129,7 +129,7 @@ const Kontakt = () => {
                   checked={isTermsChecked}
                   onChange={() => setIsTermsChecked(!isTermsChecked)}
                   label={
-                    <>
+                    <span>
                       Akceptuję{' '}
                       <span className="underline">
                         <Link href="#">Regulamin</Link>
@@ -138,7 +138,7 @@ const Kontakt = () => {
                       <span className="underline">
                         <Link href="#">Politykę Prywatności</Link>
                       </span>
-                    </>
+                    </span>
                   }
                 />
 

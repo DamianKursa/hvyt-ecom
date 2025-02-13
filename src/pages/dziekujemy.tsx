@@ -113,31 +113,6 @@ const Dziekujemy = () => {
       {/* Order Confirmation Section */}
       <div className="container mx-auto px-4 md:px-0 py-10">
         {order && <OrderConfirmation order={order} />}
-
-        {/* Payment Status */}
-        <div className="text-center mt-6">
-          <span
-            className={`px-6 py-3 rounded-full text-white text-sm font-semibold ${
-              paymentStatus === 'completed'
-                ? 'bg-green-600'
-                : paymentStatus === 'processing'
-                  ? 'bg-yellow-500'
-                  : paymentStatus === 'pending'
-                    ? 'bg-blue-500'
-                    : 'bg-red-500'
-            }`}
-          >
-            Status: {getPolishStatus(paymentStatus)}
-          </span>
-        </div>
-
-        {/* Pending Payment Message */}
-        {paymentStatus === 'pending' && (
-          <p className="text-center mt-4 text-blue-500 text-lg">
-            ⏳ Oczekiwanie na potwierdzenie płatności... Prosimy o cierpliwość.
-          </p>
-        )}
-
         {/* "Wróć na stronę główną" Button */}
         <div className="text-center mt-10">
           <Link

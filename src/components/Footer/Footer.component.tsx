@@ -172,7 +172,7 @@ const Footer = () => {
                   </div>
                   <p className="text-neutral-darkest text-extra-small font-light mt-4">
                     Subskrybując, wyrażasz zgodę na naszą Politykę prywatności i
-                    na otrzymywanie aktualizacji od naszej firmy.
+                    na otrzymywanie aktualizacji <br /> od naszej firmy.
                   </p>
                   <button
                     type="submit"

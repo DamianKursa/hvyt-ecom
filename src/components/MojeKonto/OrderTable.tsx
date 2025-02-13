@@ -20,14 +20,17 @@ const getOrderStatusLabel = (status: string) => {
     case 'completed':
       return {
         label: 'Zrealizowane',
-        className: 'bg-green-200 text-green-800',
+        className: 'bg-[#EAEFEC] text-[#EAEFEC]',
       };
     case 'cancelled':
-      return { label: 'Anulowane', className: 'bg-red-200 text-red-800' };
+      return {
+        label: 'Anulowane',
+        className: 'bg-dark-pastel-red text-[#F0E0CF]',
+      };
     default:
       return {
         label: 'Nieznany status',
-        className: 'bg-gray-100 text-gray-500',
+        className: 'bg-gray-100 text-[#fff]',
       };
   }
 };

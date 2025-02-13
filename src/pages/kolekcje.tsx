@@ -36,11 +36,11 @@ const KolekcjePage = () => {
 
   return (
     <Layout title="Hvyt | Kolekcje">
-      <section className="w-full py-16">
+      <section className="w-full px-4 lg:px-0 ">
         <div className="container mx-auto max-w-grid-desktop">
           {/* Page Title and Two-Column Text Section */}
           <div className="text-left mb-12">
-            <h1 className="font-size-h1 font-bold text-dark-pastel-red">
+            <h1 className="font-[40px] font-bold text-dark-pastel-red">
               Kolekcje
             </h1>
           </div>
