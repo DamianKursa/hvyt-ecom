@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { CartContext } from '@/stores/CartProvider';
 import ProductPreview from '@/components/Product/ProductPreview.component';
+import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 
 interface RecommendedProduct {
   id: string;
@@ -21,8 +22,8 @@ interface CartModalProps {
   };
   total: string;
   onClose: () => void;
-  crossSellProducts: RecommendedProduct[]; // Cross-sell products from the hook
-  loading: boolean; // Loading state from the hook
+  crossSellProducts: RecommendedProduct[];
+  loading: boolean;
 }
 
 const CartModal: React.FC<CartModalProps> = ({
@@ -102,15 +103,31 @@ const CartModal: React.FC<CartModalProps> = ({
         {/* Recommended Products */}
         <div className="pt-10 border-t border-[#DAD3C8]">
           <h3 className="text-lg font-semibold mb-4">Uzupełnij zamówienie</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {/* Desktop View: Grid */}
+          <div className="hidden md:grid grid-cols-2 sm:grid-cols-3 gap-4">
             {loading ? (
               <p className="text-center text-gray-500">Ładowanie...</p>
-            ) : crossSellProducts.slice(0, 3).length > 0 ? ( // Display only the first 3 products
+            ) : crossSellProducts.slice(0, 3).length > 0 ? (
               crossSellProducts
                 .slice(0, 3)
                 .map((item) => (
                   <ProductPreview key={item.id} isSmall product={item} />
                 ))
+            ) : (
+              <p className="text-center text-gray-500">Brak rekomendacji</p>
+            )}
+          </div>
+          {/* Mobile View: Responsive Slider */}
+          <div className="md:hidden">
+            {loading ? (
+              <p className="text-center text-gray-500">Ładowanie...</p>
+            ) : crossSellProducts.slice(0, 3).length > 0 ? (
+              <ResponsiveSlider
+                items={crossSellProducts.slice(0, 3)}
+                renderItem={(item: RecommendedProduct) => (
+                  <ProductPreview key={item.id} isSmall product={item} />
+                )}
+              />
             ) : (
               <p className="text-center text-gray-500">Brak rekomendacji</p>
             )}
