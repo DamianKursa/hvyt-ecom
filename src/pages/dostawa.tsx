@@ -8,25 +8,9 @@ const DostawaPage = () => {
       <section className="w-full py-16 px-4 md:px-0 bg-light-beige">
         <div className="container mx-auto max-w-grid-desktop">
           {/* Delivery Section */}
-          <div
-            className="grid rounded-[24px] bg-pastel-brown gap-4"
-            style={{
-              gridTemplateColumns: 'minmax(860px, 1fr) minmax(500px, 1fr)',
-            }}
-          >
-            {/* Image Section */}
-            <div className="overflow-hidden rounded-[24px] md:order-last relative min-w-[500px]">
-              <Image
-                src="/images/hvyt(1).png"
-                alt="Dostawa"
-                layout="fill"
-                objectFit="cover"
-                className="rounded-[16px] object-cover"
-              />
-            </div>
-
+          <div className="grid grid-cols-1 md:grid-cols-[minmax(860px,1fr)_minmax(500px,1fr)] rounded-[24px] bg-pastel-brown gap-4 md:p-4 md:p-0">
             {/* Content Section */}
-            <div className="my-[75px] flex flex-col justify-between px-10 min-w-[860px]">
+            <div className="my-[75px] flex flex-col justify-between px-4 md:px-10 min-w-0 md:min-w-[860px]">
               {/* Heading */}
               <div className="text-left mb-[40px]">
                 <h1 className="text-[40px] md:text-[56px] font-bold text-neutral-darkest">
@@ -55,7 +39,7 @@ const DostawaPage = () => {
                         <span className="text-[16px] text-neutral-darkest font-light">
                           Kurierem inPost
                         </span>
-                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white p-2 rounded-[8px]">
+                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
                           <Image
                             src="/icons/truck.svg"
                             alt="Truck Icon"
@@ -70,11 +54,11 @@ const DostawaPage = () => {
                       <span className="text-[18px] font-bold">12,00 zł</span>
                     </li>
                     <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex justify-between flex items-center space-x-4">
+                      <div className="w-[340px] flex justify-between items-center space-x-4">
                         <span className="text-[16px] text-neutral-darkest font-light">
                           Kurierem GLS
                         </span>
-                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white p-2 rounded-[8px]">
+                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
                           <Image
                             src="/icons/truck.svg"
                             alt="Truck Icon"
@@ -89,11 +73,11 @@ const DostawaPage = () => {
                       <span className="text-[18px] font-bold">12,99 zł</span>
                     </li>
                     <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex justify-between flex items-center space-x-4">
+                      <div className="w-[340px] flex justify-between items-center space-x-4">
                         <span className="text-[16px] text-neutral-darkest font-light">
                           Kurierem GLS (powyżej 300 zł)
                         </span>
-                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white p-2 rounded-[8px]">
+                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
                           <Image
                             src="/icons/truck.svg"
                             alt="Truck Icon"
@@ -115,6 +99,17 @@ const DostawaPage = () => {
                   </p>
                 </div>
               </div>
+            </div>
+
+            {/* Image Section */}
+            <div className="overflow-hidden rounded-[24px] relative min-w-0 md:min-w-[500px] h-64 md:h-auto">
+              <Image
+                src="/images/hvyt(1).png"
+                alt="Dostawa"
+                layout="fill"
+                objectFit="cover"
+                className="rounded-[16px] object-cover"
+              />
             </div>
           </div>
         </div>

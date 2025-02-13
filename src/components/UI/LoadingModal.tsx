@@ -13,7 +13,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
 }) => {
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center ${
+      className={`fixed inset-0 z-50 flex p-4 items-center justify-center ${
         showOverlay ? '' : 'bg-transparent'
       }`}
       style={{

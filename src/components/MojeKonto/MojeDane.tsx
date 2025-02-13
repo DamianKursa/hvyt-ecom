@@ -59,7 +59,9 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
             onClick={() => setIsEditContactModalOpen(true)}
             className="text-black border border-black px-4 py-2 rounded-full flex items-center"
           >
-            Edytuj Dane kontaktowe
+            {/* On mobile show only "Edytuj", on larger screens show full text */}
+            <span className="md:hidden">Edytuj</span>
+            <span className="hidden md:inline">Edytuj Dane kontaktowe</span>
             <img src="/icons/edit.svg" alt="Edytuj" className="w-4 h-4 ml-2" />
           </button>
         </div>
@@ -74,7 +76,8 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
             onClick={() => setIsEditPasswordModalOpen(true)}
             className="text-black border border-black px-4 py-2 rounded-full flex items-center"
           >
-            Edytuj Hasło
+            <span className="md:hidden">Edytuj</span>
+            <span className="hidden md:inline">Edytuj Hasło</span>
             <img src="/icons/edit.svg" alt="Edytuj" className="w-4 h-4 ml-2" />
           </button>
         </div>
@@ -97,6 +100,7 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
           <span>{successMessage}</span>
         </div>
       )}
+
       {/* Modals */}
       {isEditContactModalOpen && (
         <EditContactModal

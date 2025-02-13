@@ -153,7 +153,9 @@ const MyAddresses: React.FC = () => {
                   onClick={() => handleEditAddress(address)}
                   className="text-black border border-black px-4 py-2 rounded-full flex items-center"
                 >
-                  Edytuj Adres dostawy
+                  {/* Mobile: show "Edytuj", Desktop: show full text */}
+                  <span className="md:hidden">Edytuj</span>
+                  <span className="hidden md:inline">Edytuj Adres dostawy</span>
                   <img
                     src="/icons/edit.svg"
                     alt="Edytuj"
@@ -171,7 +173,8 @@ const MyAddresses: React.FC = () => {
                   onClick={handleAddAddress}
                   className="text-white bg-[#000] border border-black px-4 py-2 rounded-full flex items-center"
                 >
-                  Dodaj Adres dostawy
+                  <span className="md:hidden">Dodaj</span>
+                  <span className="hidden md:inline">Dodaj Adres dostawy</span>
                   <span className="ml-2">+</span>
                 </button>
               </div>
