@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Checkbox from '@/components/UI/Checkbox';
+
 export interface CheckoutAddressFormProps {
   billingData: {
     firstName: string;
@@ -62,7 +63,6 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   setIsShippingDifferent,
 }) => {
   const [loading, setLoading] = useState<boolean>(true);
-
   const [needVATInvoice, setNeedVATInvoice] = useState<boolean>(false);
 
   useEffect(() => {
@@ -120,9 +120,9 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   }
 
   return (
-    <div className="p-[24px_16px] border border-beige-dark rounded-[24px] bg-white mt-8">
+    <div className=" p-0 md:p-[24px_16px] md:border md:border-beige-dark rounded-[24px] bg-white mt-8">
       {/* Billing Address */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-4">
         <input
           type="text"
           placeholder="Nazwa ulicy*"
@@ -170,10 +170,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           placeholder="Kod pocztowy*"
           value={billingData.postalCode}
           onChange={(e) =>
-            setBillingData((prev) => ({
-              ...prev,
-              postalCode: e.target.value,
-            }))
+            setBillingData((prev) => ({ ...prev, postalCode: e.target.value }))
           }
           className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
@@ -203,7 +200,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
       {isShippingDifferent && (
         <div className="mt-4">
           <h3 className="text-lg font-bold mb-4">Wpisz inny adres</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-4">
             <input
               type="text"
               placeholder="Nazwa ulicy*"
@@ -279,7 +276,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                   additionalInfo: e.target.value,
                 }))
               }
-              className="col-span-2 border border-black rounded-[8px] p-4 bg-white focus:outline-none placeholder:font-light placeholder:text-black mt-4"
+              className="col-span-1 md:col-span-2 border border-black rounded-[8px] p-4 bg-white focus:outline-none placeholder:font-light placeholder:text-black mt-4"
             />
           </div>
         </div>

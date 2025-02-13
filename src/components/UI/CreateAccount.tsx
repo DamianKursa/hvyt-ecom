@@ -16,7 +16,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onSave }) => {
 
   return (
     <div className="rounded-[16px] bg-[#E1DFE080] my-6 p-[12px]">
-      <div className="grid grid-cols-2 items-center gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-8">
         {/* Left Column */}
         <div>
           <h3 className="text-[20px] font-semibold mb-2">Stwórz konto</h3>

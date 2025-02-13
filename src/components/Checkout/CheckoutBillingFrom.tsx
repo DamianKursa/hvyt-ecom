@@ -127,11 +127,11 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
   }
 
   return (
-    <div className="p-[24px_16px] border border-beige-dark rounded-[24px] bg-white">
+    <div className="p-0 md:p-[24px_16px] md:border border-beige-dark rounded-[24px] bg-white">
       {error && <p className="text-red-500">{error}</p>}
 
       {/* Customer Type Toggle */}
-      <div className="flex gap-4 mb-4">
+      <div className="flex gap-6 md:gap-4 mb-4">
         <label className="flex items-center">
           <input
             type="radio"
@@ -167,9 +167,8 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
           <span className="ml-2">Firma</span>
         </label>
       </div>
-
       {/* Dynamic Fields */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {customerType === 'individual' ? (
           <>
             <input
@@ -233,16 +232,10 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
         />
         <label
           htmlFor="newsletter"
-          className={`flex items-center cursor-pointer w-5 h-5 border border-black rounded ${
-            subscribeNewsletter ? 'bg-black' : ''
-          }`}
+          className="flex items-center cursor-pointer w-5 h-5 border border-black rounded"
         >
           {subscribeNewsletter && (
-            <img
-              src="/icons/check.svg"
-              alt="check"
-              className="w-4 h-4 text-white"
-            />
+            <img src="/icons/check.svg" alt="check" className="w-4 h-4" />
           )}
         </label>
         <span className="text-sm">Zapisz się do newslettera</span>

@@ -409,17 +409,17 @@ const Shipping: React.FC<ShippingProps> = ({
       </h2>
       {shippingZones.map((zone) => (
         <div key={zone.zoneName}>
-          <h3 className="text-lg font-medium mb-2">{zone.zoneName}</h3>
           {zone.methods.map((method) => (
             <div key={method.id}>
               <label
-                className={`grid grid-cols-3 items-center py-[16px] border-b ${
+                className={`grid grid-cols-[60%_20%_20%] sm:grid-cols-3 items-center py-[16px] border-b ${
                   shippingMethod === method.id
                     ? 'border-dark-pastel-red'
                     : 'border-beige-dark'
                 }`}
               >
-                <div className="flex items-center gap-4">
+                {/* First Column: Shipping Name (60% on mobile) */}
+                <div className="flex items-center gap-4 w-full">
                   <input
                     type="radio"
                     value={method.id}
@@ -435,21 +435,27 @@ const Shipping: React.FC<ShippingProps> = ({
                         : 'border-2 border-gray-400'
                     }`}
                   ></span>
-                  <span>{method.title}</span>
+                  <span className="truncate">{method.title}</span>
                 </div>
-                <span className="text-center">
+
+                {/* Second Column: Price (20%) */}
+                <span className="text-sm text-gray-700 text-center w-full">
                   {method.cost
                     ? `${parseFloat(String(method.cost)).toFixed(2)} zł`
                     : 'Darmowa'}
                 </span>
-                <img
-                  src={
-                    shippingIcons[method.title.toLowerCase()] ||
-                    '/icons/default.svg'
-                  }
-                  alt={`${method.title} Icon`}
-                  className="w-[55px] h-auto mx-auto"
-                />
+
+                {/* Third Column: Icon (20%) */}
+                <div className="flex justify-center w-full">
+                  <img
+                    src={
+                      shippingIcons[method.title.toLowerCase()] ||
+                      '/icons/default.svg'
+                    }
+                    alt={`${method.title} Icon`}
+                    className="w-[50px] sm:w-[55px] h-auto"
+                  />
+                </div>
               </label>
 
               {method.id === 'paczkomaty_inpost' &&

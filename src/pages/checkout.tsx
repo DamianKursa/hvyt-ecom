@@ -295,24 +295,25 @@ const Checkout: React.FC = () => {
 
         <div className="flex flex-col lg:flex-row gap-8 mt-8">
           <div className="md:w-8/12 bg-white p-6 rounded-2xl shadow-lg">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-6">
               <h2 className="text-2xl font-bold text-dark-pastel-red">
                 Dane osobowe
               </h2>
               {!user && (
                 <Link
                   href="/logowanie"
-                  className="text-black border border-black px-4 py-2 rounded-full flex items-center text-sm"
+                  className="text-black underline md:border md:border-black md:px-4 md:py-2 rounded-full flex items-center text-sm mt-0 mb-4 md:mb-0 md:mt-0"
                 >
                   Masz już konto? Zaloguj się
                   <img
                     src="/icons/user.svg"
                     alt="User"
-                    className="w-4 h-4 ml-2"
+                    className="w-4 h-4 md:ml-2"
                   />
                 </Link>
               )}
             </div>
+
             <CheckoutBillingForm
               setPassword={setPassword}
               customerType={customerType}
@@ -341,7 +342,7 @@ const Checkout: React.FC = () => {
               <h2 className="text-2xl font-bold mb-6 text-dark-pastel-red">
                 Dostawa i płatność
               </h2>
-              <div className="border rounded-[24px] px-[16px] py-[24px]">
+              <div className="md:border rounded-[24px] px-0 md:px-[16px] py-[24px]">
                 <Shipping
                   shippingMethod={shippingMethod}
                   setShippingMethod={setShippingMethod}
@@ -363,36 +364,42 @@ const Checkout: React.FC = () => {
                   />
                   {/* Terms and Privacy Checkbox */}
                   <div className="mt-6">
-                    <label className="flex items-center gap-2 text-sm">
+                    <label className="flex items-center gap-3 text-sm cursor-pointer w-full">
+                      {/* Hidden Checkbox */}
                       <input
                         type="checkbox"
                         checked={isTermsChecked}
                         onChange={() => setIsTermsChecked((prev) => !prev)}
                         className="hidden"
                       />
+
+                      {/* Styled Checkbox with Fixed Size */}
                       <span
-                        className={`w-5 h-5 flex items-center justify-center border rounded ${
-                          isTermsChecked
-                            ? 'bg-black text-white'
-                            : 'border-black'
-                        }`}
+                        className={`w-5 h-5 flex items-center justify-center border rounded 
+        ${isTermsChecked ? 'bg-black text-white' : 'border-black'}`}
                       >
                         {isTermsChecked && (
-                          <img src="/icons/check.svg" alt="check" />
+                          <img
+                            src="/icons/check.svg"
+                            alt="check"
+                            className="w-4 h-4"
+                          />
                         )}
                       </span>
-                      <span>
+
+                      {/* Text is now aligned and spans full width */}
+                      <span className="text-sm leading-tight w-full">
                         *Potwierdzam, że zapoznałam/em się z treścią{' '}
-                        <Link className="underline " href="/regulamin">
+                        <Link className="underline" href="/regulamin">
                           Regulaminu
                         </Link>{' '}
                         i{' '}
                         <Link
-                          className="underline "
+                          className="underline"
                           href="/polityka-prywatnosci"
                         >
                           Polityki Prywatności
-                        </Link>
+                        </Link>{' '}
                         oraz akceptuję ich postanowienia.
                       </span>
                     </label>
