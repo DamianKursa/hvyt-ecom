@@ -1,16 +1,17 @@
+import React from 'react';
 import Image from 'next/image';
-import React, { useEffect, useRef } from 'react';
 
 const HeroOnas = () => {
-  // Specify the ref type as HTMLDivElement or the specific element type.
-  const imageRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (imageRef.current) {
-      imageRef.current.style.animation =
-        'overlayAnimation 3s ease-in-out forwards';
-    }
-  }, []);
+  // Define staticBoxes as on your index page.
+  const staticBoxes = [
+    { index: 2, bgColor: '#F5F5AD' },
+    { index: 5, bgColor: '#F5F5AD' },
+    { index: 4, bgColor: '#F5F5AD' },
+    { index: 6, bgColor: '#F5F5AD' },
+    { index: 8, bgColor: '#F5F5AD' },
+    { index: 10, bgColor: '#F5F5AD' },
+    { index: 11, bgColor: '#F5F5AD' },
+  ];
 
   return (
     <section
@@ -22,37 +23,34 @@ const HeroOnas = () => {
       }}
     >
       <div className="container mx-auto max-w-grid-desktop h-full flex justify-between items-center">
-        {/* Background boxes for future animation */}
+        {/* Static Background Boxes */}
         <div className="absolute right-0 top-0 grid grid-cols-3 grid-rows-4 gap-0 justify-end items-center overflow-hidden">
           {Array.from({ length: 12 }).map((_, idx) => {
-            const hasBackground =
-              idx === 2 || // 1st column, 3rd row (top to bottom)
-              idx === 4 ||
-              idx === 7 || // 2nd column, 2nd and 4th rows
-              idx >= 8; // 3rd column, all rows
-
+            const boxConfig = staticBoxes.find((box) => box.index === idx);
             return (
               <div
                 key={idx}
-                className="w-[200px] h-[200px]"
+                className="w-[200px] h-[200px] relative"
                 style={{
-                  background: hasBackground ? '#F5F5AD' : 'transparent',
+                  background: boxConfig ? boxConfig.bgColor : 'transparent',
                 }}
-              />
+              >
+                {idx === 6 && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Image
+                      src="/icons/onas-ikon.svg"
+                      alt="Onas Icon"
+                      width={65}
+                      height={89}
+                    />
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
 
-        {/* Overlay Image centered with animation */}
-        <div
-          className="absolute inset-0 flex justify-center items-center"
-          ref={imageRef} // Apply ref to the element you want to animate
-          style={{
-            transformOrigin: 'center center',
-          }}
-        ></div>
-
-        {/* Content in the Hero */}
+        {/* Hero Content */}
         <div className="container relative z-10 mx-auto">
           <div className="flex flex-col items-start justify-center w-full tracking-wide lg:w-1/2">
             <h1 className="text-6xl font-bold leading-tight text-dark-pastel-red mb-4">
@@ -75,50 +73,6 @@ const HeroOnas = () => {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes overlayAnimation {
-          0% {
-            transform: rotate(-20deg);
-            width: 1270px;
-            height: 698px;
-          }
-          25% {
-            transform: rotate(20deg);
-            width: 1270px;
-            height: 698px;
-          }
-          50% {
-            transform: rotate(0deg);
-            width: 1270px;
-            height: 698px;
-          }
-          75% {
-            transform: rotate(20deg);
-            width: 1270px;
-            height: 698px;
-          }
-          100% {
-            transform: rotate(20deg);
-            width: 1995.75px;
-            height: 1096.88px;
-          }
-        }
-
-        .animate-overlay {
-          max-width: 100%; /* Ensure the image stays within the hero section */
-          object-fit: cover;
-        }
-
-        a {
-          padding: 12px 24px; /* 12px top/bottom and 24px left/right */
-          font-weight: 300; /* Light font */
-        }
-
-        .hover-bg {
-          background-color: #dad3c8;
-        }
-      `}</style>
     </section>
   );
 };
