@@ -80,9 +80,10 @@ const CartItem: React.FC<CartItemProps> = ({
             />
           </div>
           <div className="ml-4">
-            <h3 className="text-base font-semibold text-neutral-darkest">
+            <h3 className="text-base font-semibold text-neutral-darkest max-w-[200px] whitespace-normal break-words">
               {product.name}
             </h3>
+
             {product.attributes &&
               Object.entries(product.attributes).map(([name, value]) => {
                 if (!variationOptions[name]) return null;

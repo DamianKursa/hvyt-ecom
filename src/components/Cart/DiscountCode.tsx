@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import Snackbar from '@/components/UI/Snackbar.component'; // Adjust the path to your Snackbar component
+// Removed Snackbar import since we now render inline messages
 import { validateDiscountCode } from '@/utils/api/woocommerce'; // Adjust the path as needed
 import { CartContext } from '@/stores/CartProvider'; // Use CartContext for global state
 
@@ -169,11 +169,16 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         </div>
       )}
 
-      <Snackbar
-        message={snackbar.message}
-        type={snackbar.type}
-        visible={snackbar.visible}
-      />
+      {/* Inline Message for Success or Error */}
+      {snackbar.visible && (
+        <div
+          className={`mt-4 px-4 py-2 rounded-lg flex items-center ${
+            snackbar.type === 'success' ? 'bg-[#2A5E45]' : 'bg-red-500'
+          } text-white`}
+        >
+          <span>{snackbar.message}</span>
+        </div>
+      )}
     </div>
   );
 };

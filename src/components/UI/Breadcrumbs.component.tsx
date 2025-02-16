@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
@@ -6,6 +6,26 @@ import { useRouter } from 'next/router';
 const Breadcrumbs: React.FC = () => {
   const router = useRouter();
   const { asPath } = router;
+  const [showBreadcrumbs, setShowBreadcrumbs] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Hide breadcrumbs if scroll position is greater than 50px
+      if (window.scrollY > 50) {
+        setShowBreadcrumbs(false);
+      } else {
+        setShowBreadcrumbs(true);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // If breadcrumbs should not be shown, don't render anything
+  if (!showBreadcrumbs) {
+    return null;
+  }
 
   // Remove query string by splitting on "?" and taking the first part
   const cleanPath = asPath.split('?')[0];
