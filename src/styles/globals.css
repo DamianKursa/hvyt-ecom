@@ -124,7 +124,9 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
   color: #0E0B0C;
   font-weight: lighter;
 }
-
+.formatted-content a {
+text-decoration: underline;
+}
 .formatted-content p {
   margin-bottom: 1.5em;
 

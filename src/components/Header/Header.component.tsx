@@ -265,7 +265,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               </div>
             </div>
 
-            {!isHomePage && !isKoszykPage && !isKCheckoutPage && (
+            {!isHomePage && !isKoszykPage && !isKCheckoutPage && !menuOpen && (
               <div className="w-full">
                 <Breadcrumbs />
               </div>

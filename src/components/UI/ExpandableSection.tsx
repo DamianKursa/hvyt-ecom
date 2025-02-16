@@ -28,14 +28,14 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
     const strippedContent = stripHTMLTags(content); // Strip HTML tags
     const lines = strippedContent.split('\n'); // Split content into lines
     return (
-      <div className="grid grid-cols-2 gap-x-4 gap-y-4">
+      <div className="grid grid-cols-[100px_1fr] md:grid-cols-[300px_1fr] gap-x-2 gap-y-4">
         {lines.map((line, index) => {
           const [label, value] = line.split(':'); // Split label and value
           if (!label || !value) return null; // Skip invalid lines
           return (
             <React.Fragment key={index}>
               <div className="font-light text-black">{label.trim()}:</div>
-              <div className=" text-black">{value.trim()}</div>
+              <div className="text-black">{value.trim()}</div>
             </React.Fragment>
           );
         })}

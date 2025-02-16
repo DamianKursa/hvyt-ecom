@@ -231,6 +231,15 @@ const ProductPage = () => {
       </Layout>
     );
   }
+  const totalStock =
+    product?.baselinker_variations?.reduce((sum, variation) => {
+      const qty = Number((variation as any).stock_quantity);
+      return sum + (isNaN(qty) ? 0 : qty);
+    }, 0) || 0;
+
+  const displayedStock = selectedVariation
+    ? Number((selectedVariation as any).stock_quantity)
+    : totalStock;
 
   return (
     <Layout title={`Hvyt | ${product?.name || 'Ładownie...'}`}>
@@ -391,6 +400,7 @@ const ProductPage = () => {
             </div>
             <DeliveryReturnInfo
               onScrollToSection={handleScrollToFrequentlyBought}
+              stock={displayedStock}
             />
           </div>
         </div>
