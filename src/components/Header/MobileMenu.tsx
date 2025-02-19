@@ -128,7 +128,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                     </li>
                     <li>
                       <Link
-                        href="moje-konto/moje-dane"
+                        href="/moje-konto/moje-dane"
                         onClick={() => {
                           toggleMenu();
                           setAccountDropdownOpen(false);
