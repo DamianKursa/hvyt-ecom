@@ -27,7 +27,7 @@ const OnasPage = () => {
       {/* New Arrivals Section */}
       <section className="py-16 w-full">
         <div className="container mx-auto max-w-grid-desktop">
-          <NewArrivalsSection />
+          <NewArrivalsSection useInViewTrigger={true} />
         </div>
       </section>
       {/* Footer Section */}

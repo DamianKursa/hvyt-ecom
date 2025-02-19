@@ -20,6 +20,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const isMobile = useIsMobile();
   const isHomePage = router.pathname === '/';
   const isKoszykPage = router.pathname === '/koszyk';
+  const isOnasPage = router.pathname === '/o-nas';
   const isKCheckoutPage = router.pathname === '/checkout';
   const { user, logout, fetchUser } = useUserContext();
 
@@ -265,11 +266,15 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               </div>
             </div>
 
-            {!isHomePage && !isKoszykPage && !isKCheckoutPage && !menuOpen && (
-              <div className="w-full">
-                <Breadcrumbs />
-              </div>
-            )}
+            {!isHomePage &&
+              !isOnasPage &&
+              !isKoszykPage &&
+              !isKCheckoutPage &&
+              !menuOpen && (
+                <div className="w-full">
+                  <Breadcrumbs />
+                </div>
+              )}
           </div>
         </nav>
       </header>
