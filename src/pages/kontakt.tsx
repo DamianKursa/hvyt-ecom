@@ -16,17 +16,18 @@ const Kontakt = () => {
 
   return (
     <Layout title="Hvyt | Kontakt">
-      <section className="container">
+      {/* Container provides mobile horizontal padding (16px) and no padding on desktop */}
+      <section className="container mx-auto mt-[55px] px-4 md:px-0">
         {/* First Row */}
-        <div className="flex flex-col md:flex-row justify-between rounded-[24px] overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-stretch justify-between rounded-[24px] overflow-hidden">
           {/* Left Side (Contact Information) */}
           <div
-            className="bg-[#F5F5AD] w-full text-black"
+            className="bg-[#F5F5AD] w-full text-black p-5 md:p-0 max-w-full md:max-w-[500px]"
             style={{ maxWidth: '500px' }}
           >
             {/* Title Row */}
             <div className="w-full pt-4 mb-[32px]">
-              <h1 className="text-[65px] pl-[48px] text-dark-pastel-red font-bold text-center md:text-left">
+              <h1 className="text-[40px] md:text-[65px] md:pl-[48px] text-dark-pastel-red font-bold text-start md:text-left">
                 Kontakt
               </h1>
             </div>
@@ -34,7 +35,7 @@ const Kontakt = () => {
             {/* Two Columns */}
             <div className="grid grid-cols-2">
               {/* Left Column (UL Content) */}
-              <div className="w-[250px] pl-[48px]">
+              <div className="w-[250px] md:pl-[48px]">
                 <ul className="space-y-[48px] pb-[54px] font-light text-[18px]">
                   <li className="flex items-start">
                     <img
@@ -79,8 +80,8 @@ const Kontakt = () => {
                 </ul>
               </div>
 
-              {/* Right Column (Image) */}
-              <div className="relative w-[250px] h-full flex">
+              {/* Right Column (Image) - Only visible on desktop */}
+              <div className="relative w-[250px] h-full flex hidden md:flex">
                 <div
                   className="w-[250px] h-[250px] bg-cover bg-bottom absolute bottom-0"
                   style={{
@@ -93,7 +94,7 @@ const Kontakt = () => {
 
           {/* Right Side (Contact Form) */}
           <div className="w-full md:w-8/12 bg-white py-[56px] md:pl-[72px] md:pr-[120px]">
-            <h2 className="text-[40px] font-bold text-dark-pastel-red mb-6">
+            <h2 className="text-[24px] md:text-[40px] font-bold text-dark-pastel-red mb-6">
               Napisz do nas
             </h2>
 
@@ -145,7 +146,7 @@ const Kontakt = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-[240px] mt-8 py-3 font-light px-4 bg-black text-neutral-white rounded-full hover:bg-dark-pastel-red transition-all"
+                  className="w-full md:w-[240px] mt-8 py-3 font-light px-4 bg-black text-neutral-white rounded-full hover:bg-dark-pastel-red transition-all"
                 >
                   Wyślij wiadomość
                 </button>
@@ -154,14 +155,10 @@ const Kontakt = () => {
           </div>
         </div>
 
-        {/* Second Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2">
-          {/* Left Column with Two Sub-Columns */}
+        {/* Second Row - Visible on desktop only */}
+        <div className="hidden md:grid grid-cols-1 md:grid-cols-2">
           <div className="grid grid-cols-2 w-[500px]">
-            {/* Left Sub-Column */}
             <div></div>
-
-            {/* Right Sub-Column */}
             <div className="min-h-[250px] bg-[#F5F5AD]"></div>
           </div>
         </div>
