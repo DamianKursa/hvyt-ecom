@@ -10,11 +10,18 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [popularSearches, setPopularSearches] = useState<any[]>([]);
   const [latestKolekcja, setLatestKolekcja] = useState<any>(null);
 
   useEffect(() => {
-    // Fetch the latest Kolekcja when the component mounts
+    // Disable scrolling when modal is open
+    document.body.style.overflow = 'hidden';
+    return () => {
+      // Re-enable scrolling when component unmounts
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const latestCollection = await fetchLatestKolekcja();
@@ -31,14 +38,14 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
     setQuery(value);
 
     if (value.length < 3) {
-      setResults([]); // Clear results if query is too short
+      setResults([]);
       return;
     }
 
     setLoading(true);
     try {
       const products = await searchProducts(value);
-      setResults(products); // Set search results
+      setResults(products);
     } catch (error) {
       console.error('Error fetching search results:', error);
     } finally {
@@ -51,7 +58,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
       className="fixed inset-0 flex items-center justify-center z-50"
       style={{ backgroundColor: 'rgba(54, 49, 50, 0.4)' }}
     >
-      <div className="bg-white rounded-xl shadow-lg p-6 w-[90%] max-w-[800px] max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-xl shadow-lg p-6 w-[90%] max-w-[800px] max-h-[80vh] flex flex-col">
         {/* Header (fixed) */}
         <div className="flex items-center justify-between pb-2 mb-4 flex-shrink-0">
           <input
@@ -68,7 +75,6 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
 
         {/* Content area (scrollable) */}
         <div className="flex-grow overflow-y-auto">
-          {/* Search Results */}
           {loading ? (
             <div className="mt-6 text-center">Wyszukuje...</div>
           ) : results.length > 0 ? (
@@ -85,7 +91,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
                   >
                     <div
                       className="flex flex-col items-start text-start cursor-pointer"
-                      onClick={onClose} // Close the modal when clicking on a product
+                      onClick={onClose}
                     >
                       <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
                         <Image
@@ -116,16 +122,15 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
             )
           )}
 
-          {/* Static Sections */}
+          {/* Static Section */}
           <div className="mt-6 flex w-full">
-            {/* Co nowego Section - 30% width */}
             <div className="w-3/10">
               <h3 className="text-sm font-semibold mb-2">Co nowego?</h3>
               {latestKolekcja && (
                 <Link href={`/kolekcje/${latestKolekcja.slug}`} passHref>
                   <div
                     className="flex flex-col items-start text-start cursor-pointer"
-                    onClick={onClose} // Close the modal when clicking on the latest Kolekcja
+                    onClick={onClose}
                   >
                     <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
                       <Image
