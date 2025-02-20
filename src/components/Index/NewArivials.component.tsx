@@ -16,7 +16,6 @@ interface NowosciItem {
 
 const HERO_HEIGHT = 800;
 
-// Utility to merge refs.
 function mergeRefs<T>(
   ...refs: (React.Ref<T> | undefined)[]
 ): React.RefCallback<T> {
@@ -32,24 +31,13 @@ function mergeRefs<T>(
   };
 }
 
-/*
-  We are not changing the overall animation or mask behavior.
-  The only update is that we now include the "round 16px" parameter in our
-  clipPath values so that the clip respects the 16px border radius.
-  
-  The variants are updated as follows:
-  
-  - Initial: 'inset(50% 0 0 0 round 16px)' → shows bottom half (with rounded corners)
-  - Mid: 'inset(0 0 0 0 round 16px)' → full image visible
-  - Final: 'inset(0 0 50% 0 round 16px)' → mask positioned at top, showing bottom half of image
-*/
 const maskVariants = {
   initial: { clipPath: 'inset(50% 0 0 0 round 16px)', y: 0 },
   animate: {
     clipPath: [
-      'inset(50% 0 0 0 round 16px)', // initial: bottom half visible with rounded corners
-      'inset(0 0 0 0 round 16px)', // mid: full image visible with rounded corners
-      'inset(0 0 50% 0 round 16px)', // final: mask shows top 50% of container with rounded corners
+      'inset(50% 0 0 0 round 16px)',
+      'inset(0 0 0 0 round 16px)',
+      'inset(0 0 50% 0 round 16px)',
     ],
     y: [0, 0, 0],
     transition: { duration: 2, times: [0, 0.5, 1] },
@@ -59,18 +47,31 @@ const maskVariants = {
 const imageVariants = {
   initial: { top: '0%' },
   animate: {
-    top: ['0%', '0%', '-50%'], // final: image shifted up by 50% (i.e. -321px in a 642px container)
+    top: ['0%', '0%', '-50%'],
     transition: { duration: 2, times: [0, 0.5, 1] },
   },
 };
 
-const NewArrivalsSection = () => {
+interface NewArrivalsSectionProps {
+  /** If true, the animation will be triggered based on the intersection observer
+      (i.e. when the entire New Arrivals section is in view).
+      Otherwise, it uses the heroOut scroll logic (as on the main page). */
+  useInViewTrigger?: boolean;
+}
+
+const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
+  useInViewTrigger = false,
+}) => {
   const [nowosciItems, setNowosciItems] = useState<NowosciItem[]>([]);
   const [loading, setLoading] = useState(true);
+  // heroOut is your current scroll-based trigger.
   const [heroOut, setHeroOut] = useState(false);
 
   const sectionRef = useRef<HTMLElement | null>(null);
-  const { ref: inViewRef } = useInView({ threshold: 1, triggerOnce: true });
+  const { ref: inViewRef, inView } = useInView({
+    threshold: 1,
+    triggerOnce: true,
+  });
   const combinedRef = mergeRefs(sectionRef, inViewRef);
 
   useEffect(() => {
@@ -95,21 +96,24 @@ const NewArrivalsSection = () => {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.pageYOffset >= HERO_HEIGHT && !heroOut) {
-        setHeroOut(true);
-        document.body.style.overflow = 'hidden';
-        setTimeout(() => {
-          document.body.style.overflow = '';
-        }, 1200);
-      } else if (window.pageYOffset < HERO_HEIGHT && heroOut) {
-        setHeroOut(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [heroOut]);
+    if (!useInViewTrigger) {
+      // Only use scroll-based trigger if not overriding with inView
+      const handleScroll = () => {
+        if (window.pageYOffset >= HERO_HEIGHT && !heroOut) {
+          setHeroOut(true);
+          document.body.style.overflow = 'hidden';
+          setTimeout(() => {
+            document.body.style.overflow = '';
+          }, 1200);
+        } else if (window.pageYOffset < HERO_HEIGHT && heroOut) {
+          setHeroOut(false);
+        }
+      };
+      window.addEventListener('scroll', handleScroll);
+      handleScroll();
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
+  }, [heroOut, useInViewTrigger]);
 
   if (loading) {
     return <SkeletonNowosci />;
@@ -117,6 +121,9 @@ const NewArrivalsSection = () => {
   if (nowosciItems.length < 4) {
     return <p>Insufficient Nowosci data available.</p>;
   }
+
+  // Choose the trigger based on the prop: if useInViewTrigger is true, use inView; otherwise, use heroOut.
+  const animationTrigger = useInViewTrigger ? inView : heroOut;
 
   return (
     <section
@@ -177,7 +184,7 @@ const NewArrivalsSection = () => {
                   style={{ borderRadius: '16px' }}
                   variants={maskVariants}
                   initial="initial"
-                  animate={heroOut ? 'animate' : 'initial'}
+                  animate={animationTrigger ? 'animate' : 'initial'}
                 >
                   <motion.div
                     className="absolute"
@@ -190,7 +197,7 @@ const NewArrivalsSection = () => {
                     }}
                     variants={imageVariants}
                     initial="initial"
-                    animate={heroOut ? 'animate' : 'initial'}
+                    animate={animationTrigger ? 'animate' : 'initial'}
                   >
                     <Image
                       src={nowosciItems[0].src}
@@ -209,7 +216,7 @@ const NewArrivalsSection = () => {
                   style={{ borderRadius: '16px' }}
                   variants={maskVariants}
                   initial="initial"
-                  animate={heroOut ? 'animate' : 'initial'}
+                  animate={animationTrigger ? 'animate' : 'initial'}
                 >
                   <motion.div
                     className="absolute"
@@ -222,7 +229,7 @@ const NewArrivalsSection = () => {
                     }}
                     variants={imageVariants}
                     initial="initial"
-                    animate={heroOut ? 'animate' : 'initial'}
+                    animate={animationTrigger ? 'animate' : 'initial'}
                   >
                     <Image
                       src={nowosciItems[1].src}
@@ -239,7 +246,7 @@ const NewArrivalsSection = () => {
           {/* Title Block – overlaps the images */}
           <motion.div
             initial={{ y: 0 }}
-            animate={heroOut ? { y: -300 } : { y: 0 }}
+            animate={animationTrigger ? { y: -300 } : { y: 0 }}
             transition={{ duration: 1 }}
             className="absolute z-20 left-0 p-4"
           >

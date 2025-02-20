@@ -36,21 +36,22 @@ const KolekcjePage = () => {
 
   return (
     <Layout title="Hvyt | Kolekcje">
-      <section className="w-full px-4 lg:px-0 md:mt-[115px] ">
+      <section className="w-full px-4 lg:px-0 mt-[115px] mb-[150px]">
         <div className="container mx-auto max-w-grid-desktop">
-          {/* Page Title and Two-Column Text Section */}
+          {/* Page Title and Text Section */}
           <div className="text-left mb-12">
             <h1 className="text-[32px] pt-[24px] md:text-[40px] font-bold text-dark-pastel-red">
               Kolekcje
             </h1>
           </div>
-          <div className="grid grid-cols-2 gap-8 mb-12">
+          {/* On mobile, display text in one column; on desktop, two columns */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             <div>
               <p className="text-[18px] font-light text-black">
                 <span className="font-bold">Zanurz się</span> w piękno
                 minimalistycznych linii, geometrycznych kształtów
-                <br />i eleganckich wykończeń, które łatwo dopełnią Twoje
-                wnętrze.
+                <br className="hidden md:block" /> i eleganckich wykończeń,
+                które łatwo dopełnią Twoje wnętrze.
               </p>
               <p className="text-[18px] font-light text-black">
                 <span className="font-bold">Poznaj uchwyty</span> wykonane z
@@ -80,13 +81,13 @@ const KolekcjePage = () => {
             <SkeletonKolekcjePage />
           ) : (
             <>
-              {/* First Row - 3 Columns, First Column Takes 2 Columns */}
-              <div className="grid grid-cols-4 gap-6 mb-8">
+              {/* First Row - On mobile one column, on desktop 4 columns with first card spanning 2 */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                 {kolekcjePosts.slice(0, 3).map((kolekcja, index) => (
                   <div
                     key={kolekcja.id}
                     className={`relative transition-all duration-300 ${
-                      index === 0 ? 'col-span-2' : 'col-span-1'
+                      index === 0 ? 'md:col-span-2' : 'md:col-span-1'
                     }`}
                     style={{ height: '445px' }}
                   >
@@ -95,7 +96,7 @@ const KolekcjePage = () => {
                         src={kolekcja.imageUrl || '/placeholder.jpg'}
                         alt={kolekcja.title.rendered}
                         layout="fill"
-                        objectFit="cover" // Ensure the image covers the full container
+                        objectFit="cover"
                         quality={100}
                         className="transition-transform duration-500 rounded-[16px] transform group-hover:scale-105"
                       />
@@ -118,12 +119,12 @@ const KolekcjePage = () => {
                 ))}
               </div>
 
-              {/* Rest of the Rows - 4 Columns */}
-              <div className="grid grid-cols-4 gap-6">
+              {/* Rest of the Rows - On mobile one column, on desktop 4 columns */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {kolekcjePosts.slice(3).map((kolekcja) => (
                   <div
                     key={kolekcja.id}
-                    className="relative col-span-1 transition-all duration-300"
+                    className="relative transition-all duration-300 col-span-1"
                     style={{ height: '445px' }}
                   >
                     <Link href={`/kolekcje/${kolekcja.slug}`}>
@@ -131,7 +132,7 @@ const KolekcjePage = () => {
                         src={kolekcja.imageUrl}
                         alt={kolekcja.title.rendered}
                         layout="fill"
-                        objectFit="cover" // Ensure the image covers the full container
+                        objectFit="cover"
                         quality={100}
                         className="transition-transform rounded-[16px] duration-500 transform group-hover:scale-105"
                       />

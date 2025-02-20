@@ -19,6 +19,7 @@ const HeroOnas = () => {
       style={{
         backgroundImage: 'url("/images/o-nas-hero-bg.png")',
         backgroundSize: 'cover',
+        backgroundPosition: 'center center',
       }}
     >
       <div className="container mx-auto max-w-grid-desktop h-full flex justify-between items-center">
