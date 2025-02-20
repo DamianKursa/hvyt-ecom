@@ -51,8 +51,9 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
       className="fixed inset-0 flex items-center justify-center z-50"
       style={{ backgroundColor: 'rgba(54, 49, 50, 0.4)' }}
     >
-      <div className="bg-white rounded-xl shadow-lg p-6 w-[90%] max-w-[800px]">
-        <div className="flex items-center justify-between pb-2 mb-4">
+      <div className="bg-white rounded-xl shadow-lg p-6 w-[90%] max-w-[800px] max-h-[90vh] flex flex-col">
+        {/* Header (fixed) */}
+        <div className="flex items-center justify-between pb-2 mb-4 flex-shrink-0">
           <input
             type="text"
             value={query}
@@ -65,103 +66,83 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
           </button>
         </div>
 
-        {/* Search Results */}
-        {loading ? (
-          <div className="mt-6 text-center">Wyszukuje...</div>
-        ) : results.length > 0 ? (
-          <div className="mt-6">
-            <h3 className="text-sm font-semibold mb-2">Wyniki wyszukiwania</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {results.map((product) => (
-                <Link
-                  href={`/produkt/${product.slug}`}
-                  key={product.id}
-                  passHref
-                >
+        {/* Content area (scrollable) */}
+        <div className="flex-grow overflow-y-auto">
+          {/* Search Results */}
+          {loading ? (
+            <div className="mt-6 text-center">Wyszukuje...</div>
+          ) : results.length > 0 ? (
+            <div className="mt-6">
+              <h3 className="text-sm font-semibold mb-2">
+                Wyniki wyszukiwania
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {results.map((product) => (
+                  <Link
+                    href={`/produkt/${product.slug}`}
+                    key={product.id}
+                    passHref
+                  >
+                    <div
+                      className="flex flex-col items-start text-start cursor-pointer"
+                      onClick={onClose} // Close the modal when clicking on a product
+                    >
+                      <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
+                        <Image
+                          height={140}
+                          width={140}
+                          src={product.images[0]?.src}
+                          alt={product.name}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      </div>
+                      <p className="text-sm font-medium">{product.name}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : (
+            query.length >= 3 && (
+              <div className="mt-6 text-center text-black text-regular">
+                <p>
+                  Niestety nie znaleziono żadnych wyników dla &quot;{query}
+                  &quot;.
+                </p>
+                <p>
+                  Spróbuj ponownie używając innej pisowni lub słów kluczowych.
+                </p>
+              </div>
+            )
+          )}
+
+          {/* Static Sections */}
+          <div className="mt-6 flex w-full">
+            {/* Co nowego Section - 30% width */}
+            <div className="w-3/10">
+              <h3 className="text-sm font-semibold mb-2">Co nowego?</h3>
+              {latestKolekcja && (
+                <Link href={`/kolekcje/${latestKolekcja.slug}`} passHref>
                   <div
                     className="flex flex-col items-start text-start cursor-pointer"
-                    onClick={onClose} // Close the modal when clicking on a product
+                    onClick={onClose} // Close the modal when clicking on the latest Kolekcja
                   >
                     <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
                       <Image
                         height={140}
                         width={140}
-                        src={product.images[0]?.src}
-                        alt={product.name}
+                        src={latestKolekcja.imageUrl}
+                        alt={latestKolekcja.title.rendered}
                         className="w-full h-full object-cover rounded-lg"
                       />
                     </div>
-                    <p className="text-sm font-medium">{product.name}</p>
+                    <p className="text-sm font-medium">
+                      {latestKolekcja.title.rendered}
+                    </p>
                   </div>
                 </Link>
-              ))}
+              )}
             </div>
-          </div>
-        ) : (
-          query.length >= 3 && (
-            <div className="mt-6 text-center text-black text-regular">
-              <p>
-                Niestety nie znaleziono żadnych wyników dla &quot;{query}&quot;.
-              </p>
-              <p>
-                Spróbuj ponownie używając innej pisowni lub słów kluczowych.
-              </p>
-            </div>
-          )
-        )}
-
-        {/* Static Sections in One Row */}
-        <div className="mt-6 flex w-full">
-          {/* Najczęściej wyszukiwane Section - 70% width */}
-          {/*<div className="w-7/10 pr-4">
-            <h3 className="text-sm font-semibold mb-2">
-              Najczęściej wyszukiwane
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {popularSearches.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex flex-col items-center text-center"
-                >
-                  <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
-                    <Image
-                      src={item.images[0]?.src}
-                      alt={item.name}
-                      height={140}
-                      width={140}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  </div>
-                  <p className="text-sm font-medium">{item.name}</p>
-                </div>
-              ))}
-            </div>
-          </div> */}
-
-          {/* Co nowego Section - 30% width */}
-          <div className="w-3/10">
-            <h3 className="text-sm font-semibold mb-2">Co nowego?</h3>
-            {latestKolekcja && (
-              <Link href={`/kolekcje/${latestKolekcja.slug}`} passHref>
-                <div
-                  className="flex flex-col items-start text-start cursor-pointer"
-                  onClick={onClose} // Close the modal when clicking on the latest Kolekcja
-                >
-                  <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
-                    <Image
-                      height={140}
-                      width={140}
-                      src={latestKolekcja.imageUrl}
-                      alt={latestKolekcja.title.rendered}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  </div>
-                  <p className="text-sm font-medium">
-                    {latestKolekcja.title.rendered}
-                  </p>
-                </div>
-              </Link>
-            )}
           </div>
         </div>
       </div>
