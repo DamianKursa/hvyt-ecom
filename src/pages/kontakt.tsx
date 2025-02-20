@@ -93,7 +93,7 @@ const Kontakt = () => {
           </div>
 
           {/* Right Side (Contact Form) */}
-          <div className="w-full md:w-8/12 bg-white py-[56px] md:pl-[72px] md:pr-[120px]">
+          <div className="w-full md:w-8/12 bg-white py-[56px] px-[20px] md:px-0 md:pl-[72px] md:pr-[120px]">
             <h2 className="text-[24px] md:text-[40px] font-bold text-dark-pastel-red mb-6">
               Napisz do nas
             </h2>

@@ -57,7 +57,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
             {activeFilters.map((filter) => (
               <span
                 key={`${filter.name}-${filter.value}`}
-                className="flex items-center px-3 py-1 bg-gray-200 text-sm rounded-full"
+                className="flex items-center px-3 py-1 text-[#661F30] capitalize bg-beige text-sm rounded-full"
               >
                 {filter.value}
                 <button
@@ -69,7 +69,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                       ),
                     )
                   }
-                  className="ml-2 text-red-500"
+                  className="text-[#857C7F] ml-2 text-[20px]"
                 >
                   &times;
                 </button>
@@ -91,11 +91,11 @@ const FilterModal: React.FC<FilterModalProps> = ({
         </div>
 
         {/* Footer Buttons */}
-        <div className="p-4 border-t border-gray-200 sticky bottom-0 bg-white z-10">
+        <div className="p-4 border-t border-gray-200 sticky bottom-0 bg-beige z-10">
           <button
             onClick={handleClearFilters}
             disabled={activeFilters.length === 0} // Disable if no filters applied
-            className={`w-full mb-2 py-3 text-black border border-black rounded-full text-lg font-semibold hover:bg-gray-100 transition ${
+            className={`w-full mb-2 py-3 text-black border border-black rounded-full text-lg font-light hover:bg-gray-100 transition ${
               activeFilters.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
@@ -104,7 +104,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
           <button
             onClick={onApplyFilters}
             disabled={productsCount === 0 && activeFilters.length > 0} // Disable if no products found
-            className={`w-full py-3 text-white bg-black rounded-full text-lg font-semibold hover:bg-gray-800 transition ${
+            className={`w-full py-3 text-white bg-black rounded-full text-lg font-light hover:bg-gray-800 transition ${
               productsCount === 0 && activeFilters.length > 0
                 ? 'opacity-50 cursor-not-allowed'
                 : ''

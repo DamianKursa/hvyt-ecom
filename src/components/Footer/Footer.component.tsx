@@ -107,7 +107,7 @@ const Footer = () => {
                 <p className="text-regular font-light">REGON: 384282914</p>
               </div>
               <div>
-                <h4 className="text-lg font-semibold lg:mt-[24px]">Kontakt</h4>
+                <h4 className="text-lg font-semibold lg:mt-[24px]">Kontakt:</h4>
                 <p className="text-regular font-light">hello@hvyt.pl</p>
               </div>
             </div>

@@ -24,8 +24,8 @@ const WspolpracaPage = () => {
       <section className="w-full px-4 md:px-0">
         <div className="container max-w-grid-desktop mx-auto">
           {/* Header Section */}
-          <div className="text-left mb-8">
-            <h1 className="text-[36px] md:text-[56px] font-bold text-dark-pastel-red leading-tight mb-4">
+          <div className="text-left mb-8 md:pt-0 pt-[64px]">
+            <h1 className="text-[36px]  md:py-0 md:text-[56px] font-bold text-dark-pastel-red leading-tight mb-4">
               Współpracuj z nami
             </h1>
             <p className="text-[16px] md:text-[18px] font-light text-neutral-darkest leading-6 md:leading-8">
@@ -173,9 +173,9 @@ const WspolpracaPage = () => {
             {/* Section 4 */}
             <div
               ref={sectionRefs.produkty}
-              className=" h-auto md:h-[520px] grid border border-beige-dark rounded-[24px] md:grid-cols-2 items-center gap-8"
+              className="grid h-auto md:h-[520px] gap-8 border border-beige-dark rounded-[24px] md:p-0 md:grid-cols-2 items-center"
             >
-              <div className="order-2 md:order-none md:pr-[72px] md:pl-[24px]">
+              <div className="order-2 md:order-none md:pr-[72px] px-4 md:px-0 md:pl-[24px]">
                 <h3 className="text-[40px] font-bold text-black mb-4">
                   Poznaj nasze produkty
                 </h3>
@@ -191,7 +191,7 @@ const WspolpracaPage = () => {
                   <br /> Dziękujemy za zainteresowanie naszą ofertą!
                 </p>
               </div>
-              <div className="h-[520px] overflow-hidden rounded-[24px] order-1 md:order-none">
+              <div className="h-[300px] md:h-[520px] overflow-hidden rounded-[24px] order-1 md:order-none">
                 <Image
                   src="/images/kolekcje_4_new.png"
                   alt="Poznaj nasze produkty"

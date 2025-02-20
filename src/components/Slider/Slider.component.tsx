@@ -149,7 +149,7 @@ const CustomSlider = () => {
               </div>
             </div>
             {/* Slide Title (24px text) placed after navigation */}
-            <h3 className="mt-4 text-2xl font-bold text-neutral-darkest mt-[60px] leading-tight">
+            <h3 className="mt-4 text-[24px] font-bold text-black mt-[60px]">
               {slides[currentSlide].title}
             </h3>
           </div>

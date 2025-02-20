@@ -1,6 +1,7 @@
 import React from 'react';
 import { Order } from '@/utils/functions/interfaces';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface OrderTableProps {
   content: Order[];
@@ -48,12 +49,45 @@ const getPaymentStatusLabel = (paymentStatus: string) => {
 };
 
 const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
+  if (!content || content.length === 0) {
+    return (
+      <div className="mt-[64px] md:mt-0 rounded-[25px]  bg-white p-4 flex flex-col items-center justify-center">
+        <img
+          src="/icons/brak-zamowien.svg"
+          alt="Brak zamówień"
+          className="w-28 h-28 mb-4"
+        />
+        <h2 className="text-[18px] md:text-[28px] text-center font-semibold mb-4 text-black">
+          Nie masz jeszcze żadnych zamówień
+        </h2>
+        <p className="text-[16px] md:text-[18px] text-black text-center font-light mb-6">
+          Zacznij buszować i znajdź coś dla siebie
+        </p>
+        <div className="flex gap-4">
+          <div className="flex gap-4">
+            <Link
+              href="/kolekcje"
+              className="flex items-center px-10 md:px-16 py-3 bg-black text-white rounded-full font-light text-[16px]"
+            >
+              Sprawdź nasze kolekcje
+              <span className="ml-2">
+                <Image
+                  src="/icons/sprawdz-kolekcje.svg"
+                  alt="Ikona kolekcji"
+                  width={16}
+                  height={16}
+                />
+              </span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* 
-        DESKTOP TABLE 
-        (visible on md+ screens, unchanged)
-      */}
+      {/* DESKTOP TABLE VIEW */}
       <div className="hidden md:block">
         <table className="w-full table-auto rounded-[25px] overflow-hidden">
           <thead className="bg-beige">
@@ -127,17 +161,11 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
         </table>
       </div>
 
-      {/* 
-        MOBILE CARD VIEW 
-        (visible on screens below md)
-      */}
+      {/* MOBILE CARD VIEW */}
       <div className="md:hidden">
         {content.map((order) => {
           const { label: orderLabel, className: orderClassName } =
             getOrderStatusLabel(order.status);
-
-          // Payment label is not displayed on mobile anymore
-          // const paymentLabel = getPaymentStatusLabel(order.payment_status);
 
           return (
             <div

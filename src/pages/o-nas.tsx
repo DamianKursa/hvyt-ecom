@@ -2,7 +2,7 @@ import React from 'react';
 import Slider from '../components/Slider/Slider.component';
 import NaszeKolekcje from '../components/Index/NaszeKolekcje';
 import NewArrivalsSection from '../components/Index/NewArivials.component';
-import Footer from '../components/Footer/Footer.component';
+
 import Layout from '@/components/Layout/Layout.component'; // Use Layout to include the header and other layout-related aspects
 import HeroOnas from '@/components/Onas/HeroOnas.component';
 
@@ -19,7 +19,7 @@ const OnasPage = () => {
         </div>
       </section>
       {/* Nasze Kolekcje Section */}
-      <section className="py-16 bg-beige w-full">
+      <section className="bg-beige w-full">
         <div className="container mx-auto max-w-grid-desktop">
           <NaszeKolekcje />
         </div>

@@ -50,7 +50,7 @@ const NaszeKolekcje = () => {
           </div>
           <Link
             href="/kolekcje"
-            className="block w-full md:w-auto px-6 py-3 mt-6 md:mt-0 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
+            className="block w-full md:w-auto px-6 py-3 mt-6 md:mt-0 text-black text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
           >
             Zobacz wszystkie kolekcje →
           </Link>

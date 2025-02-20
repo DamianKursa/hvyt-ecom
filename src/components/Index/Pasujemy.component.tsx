@@ -9,6 +9,7 @@ interface PasujemyWszedzieItem {
   src: string;
   alt: string;
   title: string;
+  href: string;
 }
 
 const PasujemyWszedzie = () => {
@@ -20,15 +21,31 @@ const PasujemyWszedzie = () => {
       src: '/images/6_2.png',
       alt: 'Meble dziecięce',
       title: 'Meble dziecięce',
+      href: '/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-dzieciecych',
     },
-    { src: '/images/5_1.png', alt: 'Meble pokojowe', title: 'Meble pokojowe' },
-    { src: '/images/4_1.png', alt: 'Meble kuchenne', title: 'Meble kuchenne' },
-    { src: '/images/6_3.png', alt: 'Szafy', title: 'Szafy' },
+    {
+      src: '/images/5_1.png',
+      alt: 'Meble pokojowe',
+      title: 'Meble pokojowe',
+      href: '/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-pokojowych',
+    },
+    {
+      src: '/images/4_1.png',
+      alt: 'Meble kuchenne',
+      title: 'Meble kuchenne',
+      href: '/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-kuchennych',
+    },
+    {
+      src: '/images/6_3.png',
+      alt: 'Szafy',
+      title: 'Szafy',
+      href: '/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-szaf',
+    },
   ];
 
   return (
     <section
-      className="container mx-auto max-w-grid-desktop  mt-0 lg:mt-[115px] pb-[88px] py-16"
+      className="container mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] pb-[88px] py-16"
       ref={sectionRef}
     >
       {/* Title, Description, and Button */}
@@ -54,7 +71,9 @@ const PasujemyWszedzie = () => {
         <div className="space-y-6">
           <div className="flex gap-6">
             <div
-              className={`relative w-full transition-all duration-[4000ms] min-h-[350px] ${isVisible ? 'min-h-[435px]' : ''}`}
+              className={`relative w-full transition-all duration-[4000ms] min-h-[350px] ${
+                isVisible ? 'min-h-[435px]' : ''
+              }`}
             >
               <Image
                 src="/images/6_2.png"
@@ -67,7 +86,9 @@ const PasujemyWszedzie = () => {
               </div>
             </div>
             <div
-              className={`relative w-full transition-all duration-[4000ms] min-h-[350px] ${isVisible ? 'min-h-[435px]' : ''}`}
+              className={`relative w-full transition-all duration-[4000ms] min-h-[350px] ${
+                isVisible ? 'min-h-[435px]' : ''
+              }`}
             >
               <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-pokojowych">
                 <Image
@@ -85,7 +106,9 @@ const PasujemyWszedzie = () => {
 
           <div className="flex gap-6">
             <div
-              className={`relative transition-all duration-[4000ms] ${isVisible ? 'w-[50%] min-h-[435px]' : 'w-[70%] min-h-[350px]'}`}
+              className={`relative transition-all duration-[4000ms] ${
+                isVisible ? 'w-[50%] min-h-[435px]' : 'w-[70%] min-h-[350px]'
+              }`}
             >
               <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-kuchennych">
                 <Image
@@ -100,7 +123,9 @@ const PasujemyWszedzie = () => {
               </Link>
             </div>
             <div
-              className={`relative transition-all duration-[4000ms] ${isVisible ? 'w-[50%] min-h-[435px]' : 'w-[30%] min-h-[350px]'}`}
+              className={`relative transition-all duration-[4000ms] ${
+                isVisible ? 'w-[50%] min-h-[435px]' : 'w-[30%] min-h-[350px]'
+              }`}
             >
               <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-szaf">
                 <Image
@@ -118,22 +143,24 @@ const PasujemyWszedzie = () => {
         </div>
       </div>
 
-      {/* Mobile View: Responsive Slider */}
+      {/* Mobile View: Responsive Slider (with Links) */}
       <div className="md:hidden">
         <ResponsiveSlider
           items={pasujemyItems}
           renderItem={(item: PasujemyWszedzieItem) => (
-            <div className="relative w-full h-[350px]">
-              <Image
-                src={item.src}
-                alt={item.alt}
-                fill
-                className="object-cover rounded-lg"
-              />
-              <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                {item.title}
+            <Link href={item.href}>
+              <div className="relative w-full h-[350px]">
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  fill
+                  className="object-cover rounded-lg"
+                />
+                <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
+                  {item.title}
+                </div>
               </div>
-            </div>
+            </Link>
           )}
         />
       </div>

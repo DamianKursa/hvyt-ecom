@@ -28,7 +28,7 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
   if (!post) {
     return (
       <Layout title="Post Not Found">
-        <div className="container mx-auto py-16">
+        <div className="container mx-auto py-16 px-4">
           <h1 className="text-[56px] font-bold text-black">Post Not Found</h1>
           <p className="text-[18px] font-light text-black">
             The post you are looking for does not exist or has been removed.
@@ -40,10 +40,10 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
 
   return (
     <Layout title={post.title.rendered}>
-      <div className="container mx-auto py-16 max-w-[1130px]">
+      <div className="container mx-auto py-16 max-w-[1130px] px-4 md:px-0">
         {/* Title */}
         <h1
-          className="text-[56px] font-bold text-black mb-6"
+          className="text-[40px] md:text-[56px] font-bold text-black mb-6"
           dangerouslySetInnerHTML={{ __html: post.title.rendered }}
         />
 
@@ -56,7 +56,7 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
             <img
               src={post.featuredImage}
               alt={post.title.rendered}
-              className="w-full h-[635px] object-cover rounded-lg"
+              className="w-full h-[200px] md:h-[635px] object-cover rounded-lg"
             />
           </div>
         )}
