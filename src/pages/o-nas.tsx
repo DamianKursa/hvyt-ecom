@@ -30,8 +30,6 @@ const OnasPage = () => {
           <NewArrivalsSection useInViewTrigger={true} />
         </div>
       </section>
-      {/* Footer Section */}
-      <Footer />
     </Layout>
   );
 };

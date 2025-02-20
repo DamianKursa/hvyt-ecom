@@ -128,7 +128,7 @@ const CollectionPage = () => {
                 />
               )}
               <h1 className="font-size-h1 capitalize mb-[32px] font-bold text-dark-pastel-red">
-                {slugString}
+                {slugString?.split('-').join(' ')}
               </h1>
               <p className="font-size-text-medium mb-[48px] text-neutral-darkest">
                 {content}

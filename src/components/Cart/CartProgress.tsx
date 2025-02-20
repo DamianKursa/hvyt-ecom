@@ -21,7 +21,7 @@ const CartProgress: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex mt-6 md:mt-0 flex-col gap-4 w-full">
       {/* Back Link */}
       <div
         className="flex items-center gap-2 text-sm text-black mb-6 cursor-pointer"

@@ -87,7 +87,7 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
 
   return (
     <Layout title="Moje konto">
-      <div className="container mx-auto py-8 flex">
+      <div className="container mx-auto py-[64px] md:py-8 flex">
         {/* Sidebar (hidden on mobile) */}
         <aside className="hidden md:block w-1/4 bg-beige  p-4 md:p-8 max-h-[410px] rounded-[25px]">
           <div className="mb-6">

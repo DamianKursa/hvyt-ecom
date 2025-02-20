@@ -8,6 +8,7 @@ interface ColorItem {
   src: string;
   alt: string;
   title: string;
+  href: string;
 }
 
 const WybierzColor = () => {
@@ -15,10 +16,30 @@ const WybierzColor = () => {
   const isVisible = useAnimateOnScroll(sectionRef);
 
   const colorItems: ColorItem[] = [
-    { src: '/images/6.png', alt: 'Srebro', title: 'Srebro' },
-    { src: '/images/5.png', alt: 'Czerń', title: 'Czerń' },
-    { src: '/images/zloto.png', alt: 'Złoto', title: 'Złoto' },
-    { src: '/images/4.png', alt: 'Kolory', title: 'Kolory' },
+    {
+      src: '/images/6.png',
+      alt: 'Srebro',
+      title: 'Srebro',
+      href: '/kategoria/uchwyty-meblowe?pa_kolor=srebrny',
+    },
+    {
+      src: '/images/5.png',
+      alt: 'Czerń',
+      title: 'Czerń',
+      href: '/kategoria/uchwyty-meblowe?pa_kolor=czarny',
+    },
+    {
+      src: '/images/zloto.png',
+      alt: 'Złoto',
+      title: 'Złoto',
+      href: '/kategoria/uchwyty-meblowe?pa_kolor=zloty',
+    },
+    {
+      src: '/images/4.png',
+      alt: 'Kolory',
+      title: 'Kolory',
+      href: '/kategoria/uchwyty-meblowe?pa_kolor=pozostale',
+    },
   ];
 
   return (
@@ -63,7 +84,6 @@ const WybierzColor = () => {
                   style={{ objectFit: 'cover' }}
                   className="rounded-lg"
                 />
-
                 <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                   Srebro
                 </div>
@@ -82,7 +102,6 @@ const WybierzColor = () => {
                   style={{ objectFit: 'cover' }}
                   className="rounded-lg"
                 />
-
                 <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                   Czerń
                 </div>
@@ -103,7 +122,6 @@ const WybierzColor = () => {
                   style={{ objectFit: 'cover' }}
                   className="rounded-lg"
                 />
-
                 <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                   Złoto
                 </div>
@@ -122,7 +140,6 @@ const WybierzColor = () => {
                   style={{ objectFit: 'cover' }}
                   className="rounded-lg"
                 />
-
                 <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                   Kolory
                 </div>
@@ -132,24 +149,25 @@ const WybierzColor = () => {
         </div>
       </div>
 
-      {/* Mobile View: Responsive Slider */}
+      {/* Mobile View: Responsive Slider (with links) */}
       <div className="md:hidden">
         <ResponsiveSlider
           items={colorItems}
           renderItem={(item: ColorItem) => (
-            <div className="relative w-full h-[350px]">
-              <Image
-                src={item.src}
-                alt={item.alt}
-                fill
-                style={{ objectFit: 'cover' }}
-                className="rounded-lg"
-              />
-
-              <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                {item.title}
+            <Link href={item.href}>
+              <div className="relative w-full h-[350px]">
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  className="rounded-lg"
+                />
+                <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
+                  {item.title}
+                </div>
               </div>
-            </div>
+            </Link>
           )}
         />
       </div>

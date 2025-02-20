@@ -11,23 +11,7 @@ const Dziekujemy = () => {
   const router = useRouter();
   const { orderId, orderKey } = router.query;
   const [order, setOrder] = useState<Order | null>(null);
-  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  // Map the english status to Polish
-  const getPolishStatus = (status: string | null) => {
-    if (!status) return 'BRAK DANYCH';
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return 'ZAKOŃCZONE';
-      case 'processing':
-        return 'W TRAKCIE REALIZACJI';
-      case 'pending':
-        return 'OCZEKUJĄCE';
-      default:
-        return status.toUpperCase();
-    }
-  };
 
   useEffect(() => {
     let currentOrderId = orderId || localStorage.getItem('recentOrderId');
@@ -69,7 +53,6 @@ const Dziekujemy = () => {
         };
 
         setOrder(formattedOrder);
-        setPaymentStatus(fetchedOrder.status);
       } catch (err) {
         console.error('❌ Error fetching order:', err);
         setError('Nie udało się załadować zamówienia.');
@@ -82,12 +65,12 @@ const Dziekujemy = () => {
   return (
     <Layout title="Dziękujemy za zakupy!">
       {/* Cart Progress - Mark current step */}
-      <div className="container mx-auto px-4 mb-16 md:px-0">
+      <div className="mt-[55px] md:mt-0 container mx-auto px-4 mb-16 md:px-0">
         <CartProgress />
       </div>
-      {/* Hero Section */}
-      <div className="grid grid-cols-10 min-h-[750px] rounded-[24px] overflow-hidden">
-        {/* Left Column - 30% (Text & Background) */}
+      {/* Desktop Version */}
+      <div className="mx-4 xl:mx-0 hidden md:grid grid-cols-10 min-h-[750px] rounded-[24px] overflow-hidden mb-10">
+        {/* Left Column - 40% (Text & Background) */}
         <div className="col-span-4 bg-[#F0E0CF] flex flex-col justify-center pl-[40px]">
           <h1 className="text-[48px] font-bold text-black leading-tight">
             Dziękujemy za
@@ -98,15 +81,42 @@ const Dziekujemy = () => {
             zamówienia <span className="font-bold">#{order?.id}</span>.
           </p>
         </div>
-        {/* Right Column - 70% (Image Background & Overlay Box) */}
+        {/* Right Column - 60% (Image Background & Overlay Box) */}
         <div
-          className="col-span-6 relative bg-cover bg-center"
+          className="col-span-6 relative bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: "url('/images/dziekujemy-hero.png')",
           }}
         >
-          {/* Overlay Box - Positioned Bottom Left */}
+          {/* Overlay Box positioned at bottom left as before */}
           <div className="absolute bottom-0 left-0 bg-[#F0E0CF] w-[250px] h-[250px]" />
+        </div>
+      </div>
+
+      {/* Mobile Version */}
+      <div className=" block md:hidden mb-10 mx-4 rounded-[24px] overflow-hidden">
+        {/* Text Section */}
+        <div className="bg-[#F0E0CF] p-4">
+          <h1 className="text-[36px] mt-4 font-bold text-black leading-tight">
+            Dziękujemy za
+            <br /> zakupy w naszym sklepie!
+          </h1>
+          <p className="text-[18px] pb-8 mt-4 font-light text-black">
+            Na podany adres e-mail wysłaliśmy potwierdzenie <br /> zakupu
+            zamówienia <span className="font-bold">#{order?.id}</span>.
+          </p>
+        </div>
+        {/* Image Section with fixed height and overlay */}
+        <div className="relative" style={{ height: '250px' }}>
+          <img
+            src="/images/dziekujemy-hero.png"
+            alt="Dziękujemy Hero"
+            className="w-full h-full object-cover"
+          />
+          <div
+            className="absolute top-0 left-0 bg-[#F0E0CF]"
+            style={{ width: '154px', height: '154px' }}
+          />
         </div>
       </div>
 

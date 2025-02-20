@@ -26,22 +26,32 @@ const Footer = () => {
     console.log('Newsletter form data:', data);
   };
 
+  // Mapping for category links
+  const categoryLinks: { [key: string]: string } = {
+    Uchwyty: 'uchwyty-meblowe',
+    Klamki: 'klamki',
+    Wieszaki: 'wieszaki',
+    Gałki: 'galki',
+  };
+
   return (
     <footer
       className={`${
         isSpecialPage ? 'bg-beige-light' : 'bg-beige'
       } py-16 text-sm text-neutral-darkest`}
     >
-      <div className=" max-w-[1440px] container px-[16px] md:mx-auto">
+      <div className="max-w-[1440px] container px-[16px] md:mx-auto">
         {/* First Row - Grid with 50/50 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 border-b border-beige-dark pb-8 mb-8">
-          <div className=" grid grid-cols-2 lg:grid-cols-1 space-y-4">
+          {/* Left Column */}
+          <div className="grid grid-cols-2 lg:grid-cols-1 space-y-0 md:space-y-4">
             {/* Logo */}
             <img
               src="/icons/Logo.svg"
               alt="HVYT Logo"
               className="h-[20px] md:h-10"
             />
+
             {/* Social Media Icons */}
             <SocialIcons />
           </div>
@@ -70,7 +80,7 @@ const Footer = () => {
                 desc: 'Przez formularz i social media',
               },
             ].map((item, index) => (
-              <div key={index} className="text-left ">
+              <div key={index} className="text-left">
                 <img src={item.src} alt={item.title} className="h-6 mb-2" />
                 <span className="block font-semibold font-size-text-small">
                   {item.title}
@@ -113,16 +123,21 @@ const Footer = () => {
                     'Gałki',
                     'Kolekcje',
                     'Blog',
-                  ].map((link, index) => (
-                    <li key={index}>
-                      <Link
-                        href={`/${normalizeString(link)}`}
-                        className="underline text-black text-[16px] font-light"
-                      >
-                        {link}
-                      </Link>
-                    </li>
-                  ))}
+                  ].map((link, index) => {
+                    const href = categoryLinks[link]
+                      ? `/kategoria/${categoryLinks[link]}`
+                      : `/${normalizeString(link)}`;
+                    return (
+                      <li key={index}>
+                        <Link
+                          href={href}
+                          className="underline text-black text-[16px] font-light"
+                        >
+                          {link}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
               <div>
@@ -238,7 +253,7 @@ const Footer = () => {
           </div>
           <div className="col-span-2 lg:col-span-6">
             <h4 className="text-lg font-semibold mb-4">Metody płatności:</h4>
-            <div className="flex items-center  space-x-4">
+            <div className="flex items-center space-x-4">
               {['blik', 'przelewy', 'visa', 'mastercard'].map(
                 (payment, index) => (
                   <Link href="#" key={index}>

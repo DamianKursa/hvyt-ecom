@@ -46,11 +46,11 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center"
+      className="fixed inset-0  flex items-center justify-center"
       style={{ backgroundColor: 'rgba(54, 49, 50, 0.4)' }} // Overlay color
     >
       <div
-        className="bg-beige-light rounded-[25px] w-full max-w-[800px] relative"
+        className="mx-4 md:mx-0 bg-beige-light rounded-[25px] w-full max-w-[800px] relative"
         style={{ padding: '40px 32px', maxWidth: '650px' }} // Modal padding
       >
         {/* Title and Close Button */}

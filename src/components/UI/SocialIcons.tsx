@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 const SocialIcons = () => {
   return (
-    <div className="flex md:justify-end lg:justify-normal  space-x-4 mt-0 mt-0 md:mt-[-20px]">
+    <div className="flex md:justify-end lg:justify-normal space-x-4 mt-0 md:mt-[-20px]">
       <Link href="#" aria-label="Facebook">
         <img src="/icons/Facebook.svg" alt="Facebook" className="h-6" />
       </Link>

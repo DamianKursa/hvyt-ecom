@@ -65,7 +65,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
       style={{ backgroundColor: 'rgba(54, 49, 50, 0.4)' }}
     >
       <div
-        className="bg-beige-light rounded-[25px] w-full max-w-[800px] relative"
+        className="bg-beige-light mx-4 md:mx-0 rounded-[25px] w-full max-w-[800px] relative"
         style={{ padding: '40px 32px', maxWidth: '650px' }}
       >
         {/* Title and Close Button */}
