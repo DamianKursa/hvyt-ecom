@@ -35,7 +35,7 @@ const DostawaPage = () => {
                   </h3>
                   <ul className="space-y-8">
                     <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex justify-between items-center space-x-4">
+                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
                         <span className="text-[16px] text-neutral-darkest font-light">
                           Kurierem inPost
                         </span>
@@ -51,10 +51,12 @@ const DostawaPage = () => {
                           </span>
                         </div>
                       </div>
-                      <span className="text-[18px] font-bold">12,00 zł</span>
+                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
+                        12,00 zł
+                      </span>
                     </li>
                     <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex justify-between items-center space-x-4">
+                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
                         <span className="text-[16px] text-neutral-darkest font-light">
                           Kurierem GLS
                         </span>
@@ -70,10 +72,12 @@ const DostawaPage = () => {
                           </span>
                         </div>
                       </div>
-                      <span className="text-[18px] font-bold">12,99 zł</span>
+                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
+                        12,99 zł
+                      </span>
                     </li>
                     <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex justify-between items-center space-x-4">
+                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
                         <span className="text-[16px] text-neutral-darkest font-light">
                           Kurierem GLS (powyżej 300 zł)
                         </span>
@@ -89,7 +93,9 @@ const DostawaPage = () => {
                           </span>
                         </div>
                       </div>
-                      <span className="text-[18px] font-bold">0,00 zł</span>
+                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
+                        0,00 zł
+                      </span>
                     </li>
                   </ul>
                   <p className="text-[18px] font-light text-neutral-darkest mt-10">

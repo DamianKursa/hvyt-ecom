@@ -99,7 +99,7 @@ const CollectionPage = () => {
     <Layout title={`Hvyt | ${slugString || 'Ładowanie...'}`}>
       <section className="w-full py-16">
         {/* Use px-4 for horizontal padding on mobile, centered on larger screens */}
-        <div className="container mx-auto max-w-grid-desktop px-4">
+        <div className="container mx-auto max-w-grid-desktop px-4 md:px-0">
           {/* HERO SECTION */}
           <div
             className="grid grid-cols-1 md:grid-cols-2 mb-12 rounded-[25px] relative"

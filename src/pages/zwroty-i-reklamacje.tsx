@@ -1,16 +1,16 @@
 import React from 'react';
 import Image from 'next/image';
-import Layout from '@/components/Layout/Layout.component'; // Adjust based on your project structure
+import Layout from '@/components/Layout/Layout.component';
 import Link from 'next/link';
 
 const ZwrotyReklamacjePage = () => {
   return (
     <Layout title="Zwroty i Reklamacje">
       <section className="w-full">
-        {/* Heading */}
-        <div className="container mx-auto max-w-[1440px]">
+        {/* Main container with responsive padding and top margin */}
+        <div className="container mx-auto max-w-[1440px] px-4 md:px-0 mt-16 md:mt-4">
           {/* Zwroty Section */}
-          <div className="flex flex-col md:flex-row gap-10 font-light text-[18px] items-start">
+          <div className="flex flex-col md:flex-row gap-10 font-light text-[18px] items-start mb-12">
             {/* Text Column */}
             <div className="flex-1 md:flex-[3]">
               <h1 className="font-size-h1 font-bold text-black mb-6">Zwroty</h1>
@@ -73,13 +73,13 @@ const ZwrotyReklamacjePage = () => {
             </div>
 
             {/* Image Column */}
-            <div className="flex-1 md:flex-[2] h-[400px] md:h-[500px] lg:h-[600px] rounded-lg overflow-hidden relative">
+            <div className="w-full h-[400px] md:flex-[2] md:h-[500px] lg:h-[600px] rounded-lg overflow-hidden relative">
               <Image
                 src="/images/zwroty-zdjecie.png"
                 alt="Zwroty"
                 layout="fill"
                 objectFit="cover"
-                className="rounded-lg"
+                className="rounded-[16px]"
               />
             </div>
           </div>
@@ -88,7 +88,7 @@ const ZwrotyReklamacjePage = () => {
           <div className="flex flex-col md:flex-row gap-8 font-light text-[18px] items-start">
             {/* Text Column */}
             <div className="flex-1 md:flex-[3]">
-              <h2 className="font-size-h1 font-bold mt-8 mb-6">Reklamacje</h2>
+              <h2 className="font-size-h1 font-bold mb-6">Reklamacje</h2>
               <p className="text-dark">
                 Niestety, czasem rzeczy nie idą zawsze zgodnie z planem. Jeśli
                 zauważysz wadę w zakupionym produkcie, nie wahaj się złożyć
@@ -124,8 +124,10 @@ const ZwrotyReklamacjePage = () => {
               </p>
             </div>
 
-            {/* Image Column */}
-            <div className="flex-1 md:flex-[2]"></div>
+            {/* Image Column for Reklamacje (optional, if needed) */}
+            <div className="flex-1 md:flex-[2]">
+              {/* Optionally add an image here if your design requires it */}
+            </div>
           </div>
         </div>
       </section>
