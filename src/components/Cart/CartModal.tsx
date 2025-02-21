@@ -39,8 +39,8 @@ const CartModal: React.FC<CartModalProps> = ({
   const totalPrice = cart?.totalProductsPrice.toFixed(2) || '0.00';
 
   return (
-    <div className="fixed px-4 md:px-0 inset-0 bg-[#363132] bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-beige-light rounded-2xl px-8 py-10 md:px-12 md:py-14 w-full max-w-[830px] min-w-[90%] md:min-w-[830px] relative shadow-lg">
+    <div className="fixed inset-0 bg-[#363132] bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-beige-light w-full h-full md:h-auto md:max-w-[830px] md:min-w-[830px] px-6 py-6 md:px-12 md:py-14 rounded-none md:rounded-2xl relative shadow-lg">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold">Twój koszyk</h2>
