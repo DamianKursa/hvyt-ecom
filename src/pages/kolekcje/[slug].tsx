@@ -4,7 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import Layout from '@/components/Layout/Layout.component';
-import IconRenderer from '@/components/UI/IconRenderer'; // Import IconRenderer
+import IconRenderer from '@/components/UI/IconRenderer';
 import { Kolekcja } from '../../utils/functions/interfaces';
 import SkeletonCollectionPage from '@/components/Skeletons/SkeletonCollectionPage';
 import ProductPreview from '../../components/Product/ProductPreview.component';
@@ -12,18 +12,15 @@ import {
   fetchKolekcjePostsWithImages,
   fetchMediaById,
 } from '../../utils/api/woocommerce';
-
 import {
   fetchCategoryBySlug,
   fetchProductsByCategoryId,
 } from '../../utils/api/category';
-
 import { useRouter } from 'next/router';
 
 const CollectionPage = () => {
   const router = useRouter();
   const { slug } = router.query;
-
   const slugString = Array.isArray(slug) ? slug[0] : slug;
 
   const [productsData, setProductsData] = useState<{
@@ -46,30 +43,25 @@ const CollectionPage = () => {
     const fetchData = async () => {
       try {
         if (!slugString) return;
-
         const categoryData = await fetchCategoryBySlug(slugString);
         const fetchedProducts = await fetchProductsByCategoryId(
           categoryData.id,
         );
         setProductsData(fetchedProducts);
-
         const fetchedKolekcje = await fetchKolekcjePostsWithImages();
         setKolekcjeData(fetchedKolekcje);
-
         const currentKolekcja = fetchedKolekcje.find(
           (kolekcja: Kolekcja) => kolekcja.slug === slugString,
         );
         setContent(
           stripHTML(currentKolekcja?.content.rendered || 'Opis kolekcji.'),
         );
-
         if (currentKolekcja?.featured_media) {
           const featuredImageUrl = await fetchMediaById(
             currentKolekcja.featured_media,
           );
           setFeaturedImage(featuredImageUrl);
         }
-
         setLoading(false);
       } catch (error) {
         console.error('Error fetching collection data:', error);
@@ -77,7 +69,6 @@ const CollectionPage = () => {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [slugString]);
 
@@ -97,7 +88,7 @@ const CollectionPage = () => {
   if (errorMessage) {
     return (
       <Layout title="Error">
-        <div className="container mx-auto">
+        <div className="container mx-auto px-4">
           <p className="text-red-500">{errorMessage}</p>
         </div>
       </Layout>
@@ -107,53 +98,59 @@ const CollectionPage = () => {
   return (
     <Layout title={`Hvyt | ${slugString || 'Ładowanie...'}`}>
       <section className="w-full py-16">
-        <div className="container mx-auto max-w-grid-desktop">
-          {/* First Section: Title, Content, Featured Image */}
+        {/* Use px-4 for horizontal padding on mobile, centered on larger screens */}
+        <div className="container mx-auto max-w-grid-desktop px-4">
+          {/* HERO SECTION */}
           <div
-            className="grid grid-cols-2 gap-8 mb-12 rounded-[25px] relative"
+            className="grid grid-cols-1 md:grid-cols-2 mb-12 rounded-[25px] relative"
             style={{ minHeight: '521px', backgroundColor: '#E9E5DF' }}
           >
-            <div className="flex flex-col justify-end p-6 relative">
-              {kolekcjeData && (
-                <IconRenderer
-                  icons={[
-                    kolekcjeData[0]?.acf?.ikonka_1 ?? '',
-                    kolekcjeData[0]?.acf?.ikonka_2 ?? '',
-                    kolekcjeData[0]?.acf?.ikonka_3 ?? '',
-                    kolekcjeData[0]?.acf?.ikonka_4 ?? '',
-                  ]}
-                  iconPath="/icons/kolekcja/"
-                  iconHeight={24}
-                  gap={5}
-                />
-              )}
-              <h1 className="font-size-h1 capitalize mb-[32px] font-bold text-dark-pastel-red">
-                {slugString?.split('-').join(' ')}
-              </h1>
-              <p className="font-size-text-medium mb-[48px] text-neutral-darkest">
-                {content}
-              </p>
-            </div>
-            <div className="relative h-full overflow-hidden">
+            {/* MOBILE: Image first, Desktop: Image second */}
+            <div className="relative order-1 md:order-2 overflow-hidden h-[280px] md:h-auto">
               {featuredImage && (
                 <Image
                   src={featuredImage}
                   alt={slugString as string}
                   layout="fill"
                   objectFit="cover"
-                  className="rounded-[25px] h-full"
+                  className="rounded-[25px]"
                 />
               )}
             </div>
+
+            {/* MOBILE: Content second, Desktop: Content first */}
+            <div className="flex flex-col justify-start md:justify-end px-6 relative order-2 md:order-1">
+              {kolekcjeData && (
+                <div className="mb-16">
+                  <IconRenderer
+                    icons={[
+                      kolekcjeData[0]?.acf?.ikonka_1 ?? '',
+                      kolekcjeData[0]?.acf?.ikonka_2 ?? '',
+                      kolekcjeData[0]?.acf?.ikonka_3 ?? '',
+                      kolekcjeData[0]?.acf?.ikonka_4 ?? '',
+                    ]}
+                    iconPath="/icons/kolekcja/"
+                    iconHeight={24}
+                    gap={5}
+                  />
+                </div>
+              )}
+              <h1 className="font-size-h1 capitalize mb-[32px] font-bold text-dark-pastel-red">
+                {slugString?.replace(/-/g, ' ')}
+              </h1>
+              <p className="font-size-text-medium mb-[48px] text-neutral-darkest">
+                {content}
+              </p>
+            </div>
           </div>
 
-          {/* Second Section: Slider */}
+          {/* SWIPER SLIDER (mobile: 1.5 slides) */}
           <div className="mb-12">
             <Swiper
               spaceBetween={16}
               slidesPerView={6}
               breakpoints={{
-                320: { slidesPerView: 1.3 },
+                320: { slidesPerView: 1.5 },
                 768: { slidesPerView: 3.3 },
                 1024: { slidesPerView: 4.3 },
                 1280: { slidesPerView: 6.3 },
@@ -166,7 +163,6 @@ const CollectionPage = () => {
                     style={{ backgroundColor: 'var(--color-beige)' }}
                     onClick={() => handleCollectionClick(kolekcja.slug)}
                   >
-                    {/* IconRenderer */}
                     <IconRenderer
                       icons={[
                         kolekcja.acf?.ikonka_1 ?? '',
@@ -175,11 +171,9 @@ const CollectionPage = () => {
                         kolekcja.acf?.ikonka_4 ?? '',
                       ]}
                       iconPath="/icons/kolekcja/"
-                      iconHeight={24} // Uniform height
-                      gap={5} // Adjust gap between icons
+                      iconHeight={24}
+                      gap={5}
                     />
-
-                    {/* Background Image */}
                     <Image
                       src={kolekcja.imageUrl || '/placeholder.jpg'}
                       alt={kolekcja.title.rendered}
@@ -187,8 +181,6 @@ const CollectionPage = () => {
                       objectFit="cover"
                       className="rounded-lg"
                     />
-
-                    {/* Title */}
                     <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-neutral-darkest bg-white z-10">
                       {kolekcja.title.rendered}
                     </div>
@@ -198,8 +190,8 @@ const CollectionPage = () => {
             </Swiper>
           </div>
 
-          {/* Third Section: Product Preview */}
-          <div className="grid grid-cols-3 gap-6">
+          {/* PRODUCTS LIST (mobile: 1 column, desktop: 3 columns) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {productsData?.products.map((product) => (
               <ProductPreview key={product.id} product={product} />
             ))}
