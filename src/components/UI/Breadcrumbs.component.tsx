@@ -52,7 +52,7 @@ const Breadcrumbs: React.FC = () => {
   return (
     <nav
       aria-label="breadcrumb"
-      className="flex flex-nowrap items-center text-sm text-neutral-darkest md:h-10"
+      className="flex flex-wrap items-center text-sm text-neutral-darkest md:h-10 text-left"
     >
       {breadcrumbItems.map((item, index) => (
         <span key={index} className="flex items-center">
@@ -64,7 +64,7 @@ const Breadcrumbs: React.FC = () => {
               {item.title}
             </Link>
           ) : (
-            <span className="font-light text-neutral-darkest text-[14px]">
+            <span className="font-light text-neutral-darkest text-[14px] block">
               {item.title}
             </span>
           )}

@@ -37,7 +37,7 @@ const DostawaPage = () => {
                     <li className="flex justify-between items-center">
                       <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
                         <span className="text-[16px] text-neutral-darkest font-light">
-                          Kurierem inPost
+                          Kurierem InPost
                         </span>
                         <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
                           <Image
@@ -52,7 +52,49 @@ const DostawaPage = () => {
                         </div>
                       </div>
                       <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
-                        12,00 zł
+                        18,00 zł
+                      </span>
+                    </li>
+                    <li className="flex justify-between items-center">
+                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
+                        <span className="text-[16px] text-neutral-darkest font-light">
+                          Paczkomaty InPost
+                        </span>
+                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
+                          <Image
+                            src="/icons/truck.svg"
+                            alt="Truck Icon"
+                            width={14}
+                            height={14}
+                          />
+                          <span className="text-[14px] ml-[8px] font-bold">
+                            InPost
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
+                        15,00 zł
+                      </span>
+                    </li>
+                    <li className="flex justify-between items-center">
+                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
+                        <span className="text-[16px] text-neutral-darkest font-light">
+                          Punkty GLS
+                        </span>
+                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
+                          <Image
+                            src="/icons/truck.svg"
+                            alt="Truck Icon"
+                            width={14}
+                            height={14}
+                          />
+                          <span className="text-[14px] ml-[8px] font-bold">
+                            GLS
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
+                        15,00 zł
                       </span>
                     </li>
                     <li className="flex justify-between items-center">
@@ -73,7 +115,28 @@ const DostawaPage = () => {
                         </div>
                       </div>
                       <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
-                        12,99 zł
+                        15,00 zł
+                      </span>
+                    </li>
+                    <li className="flex justify-between items-center">
+                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
+                        <span className="text-[16px] text-neutral-darkest font-light">
+                          Kurierem GLS Pobranie
+                        </span>
+                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
+                          <Image
+                            src="/icons/truck.svg"
+                            alt="Truck Icon"
+                            width={14}
+                            height={14}
+                          />
+                          <span className="text-[14px] ml-[8px] font-bold">
+                            GLS
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
+                        25,00 zł
                       </span>
                     </li>
                     <li className="flex justify-between items-center">

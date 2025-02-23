@@ -281,12 +281,6 @@ const Footer = () => {
             <Link href="/polityka-prywatnosci" className="underline lg:mx-2">
               Polityka prywatności
             </Link>
-            <Link
-              href="/ustawienia-plikow-cookie"
-              className="underline lg:mx-2"
-            >
-              Ustawienia plików Cookie
-            </Link>
           </div>
         </div>
       </div>

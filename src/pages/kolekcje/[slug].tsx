@@ -72,6 +72,11 @@ const CollectionPage = () => {
     fetchData();
   }, [slugString]);
 
+  // Compute currentKolekcja on render so that it is available everywhere
+  const currentKolekcja = kolekcjeData?.find(
+    (kolekcja: Kolekcja) => kolekcja.slug === slugString,
+  );
+
   const handleCollectionClick = (kolekcjaSlug: string) => {
     setLoading(true);
     router.push(`/kolekcje/${kolekcjaSlug}`);
@@ -96,21 +101,21 @@ const CollectionPage = () => {
   }
 
   return (
-    <Layout title={`Hvyt | ${slugString || 'Ładowanie...'}`}>
+    <Layout
+      title={`Hvyt | ${currentKolekcja?.title.rendered || slugString || 'Ładowanie...'}`}
+    >
       <section className="w-full py-16">
-        {/* Use px-4 for horizontal padding on mobile, centered on larger screens */}
         <div className="container mx-auto max-w-grid-desktop px-4 md:px-0">
           {/* HERO SECTION */}
           <div
             className="grid grid-cols-1 md:grid-cols-2 mb-12 rounded-[25px] relative"
             style={{ minHeight: '521px', backgroundColor: '#E9E5DF' }}
           >
-            {/* MOBILE: Image first, Desktop: Image second */}
             <div className="relative order-1 md:order-2 overflow-hidden h-[280px] md:h-auto">
               {featuredImage && (
                 <Image
                   src={featuredImage}
-                  alt={slugString as string}
+                  alt={slugString || 'Default collection title'}
                   layout="fill"
                   objectFit="cover"
                   className="rounded-[25px]"
@@ -118,7 +123,6 @@ const CollectionPage = () => {
               )}
             </div>
 
-            {/* MOBILE: Content second, Desktop: Content first */}
             <div className="flex flex-col justify-start md:justify-end px-6 relative order-2 md:order-1">
               {kolekcjeData && (
                 <div className="mb-16">
@@ -136,8 +140,9 @@ const CollectionPage = () => {
                 </div>
               )}
               <h1 className="font-size-h1 capitalize mb-[32px] font-bold text-dark-pastel-red">
-                {slugString?.replace(/-/g, ' ')}
+                {currentKolekcja?.title.rendered || 'Domyślny Tytuł Kolekcji'}
               </h1>
+
               <p className="font-size-text-medium mb-[48px] text-neutral-darkest">
                 {content}
               </p>
