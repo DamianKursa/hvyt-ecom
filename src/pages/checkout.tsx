@@ -147,11 +147,11 @@ const Checkout: React.FC = () => {
       return;
     }
 
-    // Map countries to codes before submitting
+    // Map country names to codes
     const mappedBillingCountry = mapCountry(billingData.country);
     const mappedShippingCountry = mapCountry(shippingData.country);
 
-    // Use appropriate address based on "Dostawa pod inny adres"
+    // Choose shipping address based on "Dostawa pod inny adres"
     const shippingAddress = isShippingDifferent
       ? {
           first_name: billingData.firstName,
@@ -172,6 +172,7 @@ const Checkout: React.FC = () => {
           country: mappedBillingCountry,
         };
 
+    // Prepare shipping meta data (if any)
     const shippingMetaData = [];
     if (shippingMethod === 'paczkomaty_inpost') {
       shippingMetaData.push(
@@ -184,7 +185,6 @@ const Checkout: React.FC = () => {
           key: 'delivery_point_name',
           value: `${selectedLocker}, ${shippingData.street}, ${shippingData.postalCode} ${shippingData.city}`,
         },
-
         { key: 'delivery_point_postcode', value: shippingData.postalCode },
         { key: 'delivery_point_city', value: shippingData.city },
       );
@@ -214,6 +214,7 @@ const Checkout: React.FC = () => {
         },
       );
     }
+
     const orderData = {
       payment_method: paymentMethod,
       payment_method_title:
@@ -255,27 +256,37 @@ const Checkout: React.FC = () => {
           : [],
       })),
       customer_note: shippingData.additionalInfo || '',
-      customer_id: user?.id || undefined, // `undefined` for guests
+      customer_id: user?.id || undefined,
     };
 
     console.log('📦 Sending Order Data to API:', orderData);
 
     try {
       const response = await axios.post('/api/create-order', orderData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
-
       const createdOrder = response.data;
       console.log('✅ Order created successfully:', createdOrder);
 
-      if (createdOrder.id && createdOrder.order_key) {
-        // Save order ID & order key for guests
-        localStorage.setItem('recentOrderId', createdOrder.id.toString());
-        localStorage.setItem('recentOrderKey', createdOrder.order_key);
+      // Save order details locally (for guest users, if needed)
+      localStorage.setItem('recentOrderId', createdOrder.id.toString());
+      localStorage.setItem('recentOrderKey', createdOrder.order_key);
 
-        // Redirect to Thank You page
+      // If using Przelewy24 and a payment URL is returned, redirect immediately.
+      if (paymentMethod === 'przelewy24' && createdOrder.payment_url) {
+        try {
+          // Create a URL object from the returned payment_url
+          const url = new URL(createdOrder.payment_url);
+          // Remove the 'pay_for_order' query parameter
+          url.searchParams.delete('pay_for_order');
+          // Redirect to the modified URL
+          router.push(url.toString());
+        } catch (error) {
+          console.error('Error modifying payment URL:', error);
+          // Fallback: redirect to the original URL
+          router.push(createdOrder.payment_url);
+        }
+      } else if (createdOrder.id && createdOrder.order_key) {
         router.push(
           `/dziekujemy?orderId=${createdOrder.id}&orderKey=${createdOrder.order_key}`,
         );
