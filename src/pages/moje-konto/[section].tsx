@@ -40,7 +40,6 @@ const SectionPage: React.FC = () => {
 
           if (response.ok) {
             const userData = await response.json();
-            console.log('Fetched user data:', userData);
 
             setUser({
               id: userData.id || 0,
@@ -115,8 +114,6 @@ const SectionPage: React.FC = () => {
       if (!updatedUser.id) {
         throw new Error('User ID is missing');
       }
-
-      console.log('Updating user:', updatedUser);
 
       const response = await fetch(`/api/moje-konto/moje-dane`, {
         method: 'POST',

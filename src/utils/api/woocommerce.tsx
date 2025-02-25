@@ -44,8 +44,6 @@ export const fetchProductBySlug = async (slug: string) => {
       },
     });
 
-    console.log('Fetched product data:', response.data); // Log the returned data
-
     return response.data[0]; // Return the first product matching the slug
   } catch (error) {
     console.error('Error fetching product by slug:', error);
@@ -165,15 +163,11 @@ export const fetchProductAttributesWithTerms = async (categoryId: number) => {
     const attributesResponse = await WooCommerceAPI.get('/products/attributes');
     const attributes: Attribute[] = attributesResponse.data;
 
-    console.log('Fetched attributes:', attributes);
-
     const attributesWithTerms = await Promise.all(
       attributes.map(async (attribute: Attribute) => {
         const termsResponse = await WooCommerceAPI.get(
           `/products/attributes/${attribute.id}/terms`,
         );
-
-        console.log(`Fetched terms for ${attribute.name}:`, termsResponse.data);
 
         return {
           ...attribute,
@@ -252,7 +246,6 @@ export const fetchCrossSellProducts = async (productId: string) => {
     // Check if cross-sell IDs are available
     const crossSellIds = productData.cross_sell_ids || [];
     if (crossSellIds.length === 0) {
-      console.log(`No cross-sell products found for product ID: ${productId}`);
       return { products: [] };
     }
 
@@ -264,7 +257,6 @@ export const fetchCrossSellProducts = async (productId: string) => {
       }),
     );
 
-    console.log('Fetched Cross-Sell Products:', crossSellProducts);
     return { products: crossSellProducts };
   } catch (error) {
     console.error('Error fetching cross-sell products:', error);

@@ -86,18 +86,8 @@ export const fetchProductsByCategoryId = async (
       params.order = sortingParams.order;
     }
 
-    // Log the final API request parameters for debugging
-    console.log(
-      'Sending API request to fetch products with parameters:',
-      params,
-    );
-
     // Fetch products from WooCommerce API
     const response = await WooCommerceAPI.get('/products', { params });
-
-    // Log the fetched products and total count for debugging
-    console.log('Products fetched from WooCommerce:', response.data);
-    console.log('Total Products:', response.headers['x-wp-total']);
 
     return {
       products: response.data || [],
@@ -119,8 +109,6 @@ export const fetchProductAttributesWithTerms = async (categoryId: number) => {
     const response = await CustomAPI.get('/attributes', {
       params: { category: categoryId },
     });
-
-    console.log('Fetched attributes from Custom API:', response.data);
 
     return response.data.map((attribute: any) => ({
       id: attribute.id,
@@ -175,8 +163,6 @@ export const fetchProductsWithFilters = async (
   try {
     const response = await CustomAPI.get('/filtered-products', { params });
 
-    console.log('Filtered products fetched:', response.data);
-
     return {
       products: response.data.products || [],
       totalProducts: response.data.total || 0,
@@ -203,8 +189,6 @@ export const fetchSortedProducts = async (
       orderby,
       order,
     };
-
-    console.log('Sending API request to fetch sorted products:', params);
 
     const response = await CustomAPI.get('/sorted-products', { params });
 

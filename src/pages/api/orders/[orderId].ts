@@ -9,7 +9,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Order ID and Order Key are required' });
   }
 
-  console.log(`🔍 Verifying order with ID: ${orderId} and Order Key: ${orderKey}`);
 
   // Ensure WooCommerce API credentials exist
   const API_URL = process.env.NEXT_PUBLIC_REST_API;
@@ -38,7 +37,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(403).json({ error: 'Unauthorized: Invalid Order Key' });
     }
 
-    console.log('✅ Order data received and verified:', order.id);
 
     // Format the response data
     const formattedOrder = {

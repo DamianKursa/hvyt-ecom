@@ -9,7 +9,6 @@ export const getSinglePost = async (slug: string) => {
     const url = `${process.env.WORDPRESS_API_URL}/wp-json/wp/v2/posts?slug=${encodeURIComponent(
       slug,
     )}&_embed`;
-    console.log('Fetching post from URL:', url);
 
     const response = await fetch(url);
 
@@ -18,10 +17,8 @@ export const getSinglePost = async (slug: string) => {
     }
 
     const data = await response.json();
-    console.log('Raw API response:', data);
 
     if (data.length === 0) {
-      console.log('No post found for slug:', slug);
       return null;
     }
 
@@ -41,8 +38,6 @@ export const getSinglePost = async (slug: string) => {
       categories: data[0]._embedded?.['wp:term']?.[0] || [],
       tags: data[0]._embedded?.['wp:term']?.[1] || [],
     };
-
-    console.log('Mapped post object:', post);
 
     return post;
   } catch (error) {

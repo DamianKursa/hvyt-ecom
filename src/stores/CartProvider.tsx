@@ -102,8 +102,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const addCartItem = (product: Product) => {
-    console.log('🛒 Adding Product to Cart:', product);
-
     setCart((prevCart) => {
       const updatedCart = { ...prevCart };
       const existingProduct = updatedCart.products.find(
@@ -114,7 +112,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         existingProduct.qty += product.qty;
         existingProduct.totalPrice += product.totalPrice;
       } else {
-        console.log('✅ Storing Product in Cart:', product);
         updatedCart.products.push({
           ...product,
           attributes: product.attributes || {},
@@ -156,7 +153,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
       if (product) {
         const cleanName = name.replace(/^Atrybut produktu:\s*/, '').trim();
-        console.log(`🛒 Updating Variation: ${cleanName} -> ${newVariation}`);
 
         product.attributes = {
           ...product.attributes,
@@ -164,7 +160,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         };
 
         if (typeof newPrice !== 'undefined') {
-          console.log(`💰 Updating price for ${cleanName}: ${newPrice} zł`);
           product.price = newPrice;
           product.totalPrice = newPrice * product.qty;
         }
@@ -172,7 +167,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         // ✅ Ensure variationOptions stays in the cart
         product.variationOptions = product.variationOptions || {};
 
-        console.log('✅ Updated Product:', product);
         return recalculateCartTotals(updatedCart);
       }
 
