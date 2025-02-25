@@ -237,9 +237,15 @@ const ProductPage = () => {
       return sum + (isNaN(qty) ? 0 : qty);
     }, 0) || 0;
 
+  // Compute displayedStock based on the raw stock value
   const displayedStock = selectedVariation
-    ? Number((selectedVariation as any).stock_quantity)
-    : totalStock;
+    ? (selectedVariation as any).stock_quantity !== '' &&
+      (selectedVariation as any).stock_quantity !== null
+      ? Number((selectedVariation as any).stock_quantity)
+      : null
+    : totalStock !== 0
+      ? totalStock
+      : null;
 
   return (
     <Layout title={`Hvyt | ${product?.name || 'Ładownie...'}`}>
@@ -401,6 +407,11 @@ const ProductPage = () => {
             <DeliveryReturnInfo
               onScrollToSection={handleScrollToFrequentlyBought}
               stock={displayedStock}
+              stockStatus={
+                selectedVariation
+                  ? (selectedVariation as any).stock_status
+                  : product && (product as any).stock_status
+              }
             />
           </div>
         </div>
