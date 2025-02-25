@@ -39,12 +39,13 @@ const Kontakt = () => {
       }
 
       const result = await res.json();
-      console.log('Form submitted successfully!', result);
-      setSubmitMessage('Form submitted successfully!');
+
+      setSubmitMessage('Formularz został pomyślnie wysłany!');
       setSubmitMessageType('success');
     } catch (error) {
-      console.error('Error submitting form:', error);
-      setSubmitMessage('Error submitting form. Please try again.');
+      setSubmitMessage(
+        'Formularz nie został wysłany! Spróbuj ponownie później.',
+      );
       setSubmitMessageType('error');
     }
   };
