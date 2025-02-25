@@ -1,40 +1,73 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { useForm, FormProvider } from 'react-hook-form';
 import { InputField } from '../components/Input/InputField.component';
-import Layout from '../components/Layout/Layout.component'; // Assuming Layout is at this path
+import Layout from '../components/Layout/Layout.component';
 import SocialIcons from '@/components/UI/SocialIcons';
 import Checkbox from '@/components/UI/Checkbox';
 import { useState } from 'react';
 
 const Kontakt = () => {
   const methods = useForm();
-  const onSubmit = (data: any) => {
-    console.log(data);
-  };
   const [isTermsChecked, setIsTermsChecked] = useState(false);
+  const [termsError, setTermsError] = useState('');
+  const [submitMessage, setSubmitMessage] = useState('');
+  const [submitMessageType, setSubmitMessageType] = useState(''); // "success" or "error"
+
+  const onSubmit = async (data: any) => {
+    console.log('onSubmit triggered, isTermsChecked:', isTermsChecked);
+    // Check if terms are accepted
+    if (!isTermsChecked) {
+      setTermsError('Musisz zaakceptować Regulamin oraz Politykę Prywatności');
+      setSubmitMessage(''); // Clear any previous submission message
+      return;
+    } else {
+      setTermsError('');
+    }
+
+    try {
+      console.log('Submitting data:', data);
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        throw new Error('Form submission failed');
+      }
+
+      const result = await res.json();
+      console.log('Form submitted successfully!', result);
+      setSubmitMessage('Form submitted successfully!');
+      setSubmitMessageType('success');
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      setSubmitMessage('Error submitting form. Please try again.');
+      setSubmitMessageType('error');
+    }
+  };
+
+  const onError = (errors: any) => {
+    console.log('Validation errors: ', errors);
+  };
 
   return (
     <Layout title="Hvyt | Kontakt">
-      {/* Container provides mobile horizontal padding (16px) and no padding on desktop */}
       <section className="container mx-auto mt-[55px] px-4 md:px-0">
-        {/* First Row */}
         <div className="flex flex-col md:flex-row md:items-stretch justify-between rounded-[24px] overflow-hidden">
           {/* Left Side (Contact Information) */}
           <div
             className="bg-[#F5F5AD] w-full text-black p-5 md:p-0 max-w-full md:max-w-[500px]"
             style={{ maxWidth: '500px' }}
           >
-            {/* Title Row */}
             <div className="w-full pt-4 mb-[32px]">
               <h1 className="text-[40px] md:text-[65px] md:pl-[48px] text-dark-pastel-red font-bold text-start md:text-left">
                 Kontakt
               </h1>
             </div>
-
-            {/* Two Columns */}
             <div className="grid grid-cols-2">
-              {/* Left Column (UL Content) */}
               <div className="w-[250px] md:pl-[48px]">
                 <ul className="space-y-[48px] pb-[54px] font-light text-[18px]">
                   <li className="flex items-start">
@@ -80,7 +113,6 @@ const Kontakt = () => {
                 </ul>
               </div>
 
-              {/* Right Column (Image) - Only visible on desktop */}
               <div className="relative w-[250px] h-full flex hidden md:flex">
                 <div
                   className="w-[250px] h-[250px] bg-cover bg-bottom absolute bottom-0"
@@ -98,10 +130,8 @@ const Kontakt = () => {
               Napisz do nas
             </h2>
 
-            {/* Form with react-hook-form */}
             <FormProvider {...methods}>
-              <form onSubmit={methods.handleSubmit(onSubmit)}>
-                {/* Input fields */}
+              <form onSubmit={methods.handleSubmit(onSubmit, onError)}>
                 <InputField
                   inputLabel="Imię i nazwisko"
                   inputName="name"
@@ -121,7 +151,11 @@ const Kontakt = () => {
                   type="textarea"
                   customValidation={{
                     required: 'To pole jest wymagane',
-                    minLength: 10,
+                    minLength: {
+                      value: 10,
+                      message:
+                        'Treść wiadomości musi mieć przynajmniej 10 znaków',
+                    },
                   }}
                   errors={methods.formState.errors}
                 />
@@ -143,7 +177,24 @@ const Kontakt = () => {
                   }
                 />
 
-                {/* Submit Button */}
+                {/* Inline error message if terms are not accepted */}
+                {termsError && (
+                  <div className="mt-2 px-4 py-2 rounded-lg flex items-center bg-red-500 text-white">
+                    <span>{termsError}</span>
+                  </div>
+                )}
+                {/* Submission snackbar message */}
+                {submitMessage && (
+                  <div
+                    className={`mt-2 px-4 py-2 rounded-lg flex items-center ${
+                      submitMessageType === 'success'
+                        ? 'bg-green-500 text-white'
+                        : 'bg-red-500 text-white'
+                    }`}
+                  >
+                    <span>{submitMessage}</span>
+                  </div>
+                )}
                 <button
                   type="submit"
                   className="w-full md:w-[240px] mt-8 py-3 font-light px-4 bg-black text-neutral-white rounded-full hover:bg-dark-pastel-red transition-all"
@@ -155,7 +206,6 @@ const Kontakt = () => {
           </div>
         </div>
 
-        {/* Second Row - Visible on desktop only */}
         <div className="hidden md:grid grid-cols-1 md:grid-cols-2">
           <div className="grid grid-cols-2 w-[500px]">
             <div></div>

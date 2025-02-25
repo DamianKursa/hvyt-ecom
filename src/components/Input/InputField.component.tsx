@@ -48,7 +48,7 @@ export const InputField = ({
       {/* Error message under input */}
       {errors && errors[inputName] ? (
         <p className="mt-2 text-sm text-bright-pastel-red">
-          {errors[inputName]}
+          {errors[inputName].message}
         </p>
       ) : (
         <p className="mt-2 text-sm text-neutral-dark">
