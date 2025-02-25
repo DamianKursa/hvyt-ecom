@@ -9,20 +9,18 @@ const RegisterForm: React.FC = () => {
     email: '',
     password: '',
   });
-  const [focusedField, setFocusedField] = useState<string | null>(null); // Track focused field
-  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [passwordError, setPasswordError] = useState(''); // Password validation error
+  const [passwordError, setPasswordError] = useState('');
   const router = useRouter();
 
-  // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
 
-    // Validate password length
     if (name === 'password' && value.length < 8) {
       setPasswordError('Hasło musi mieć co najmniej 8 znaków.');
     } else {
@@ -49,11 +47,13 @@ const RegisterForm: React.FC = () => {
           router.push(`/aktywacja-konta?email=${formData.email}`);
         }, 1500);
       } else {
-        const data = await response.json();
-        setError(data.message || 'Wystąpił błąd podczas tworzenia konta');
+        // Use a friendlier error message
+        setError(
+          'Wystąpił błąd podczas rejestracji, spróbuj ponownie później.',
+        );
       }
     } catch (err) {
-      setError('Wystąpił błąd sieci. Spróbuj ponownie później.');
+      setError('Wystąpił błąd podczas rejestracji, spróbuj ponownie później.');
     } finally {
       setLoading(false);
     }
@@ -61,15 +61,15 @@ const RegisterForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Success and Error Messages */}
+      {/* Error Message */}
       {error && (
-        <div
-          className="bg-red-500 text-white px-4 py-2 rounded-lg flex flex-col"
-          dangerouslySetInnerHTML={{ __html: error }}
-        ></div>
+        <div className="mt-4 px-4 py-2 rounded-lg flex items-center bg-red-500 text-white">
+          <span>{error}</span>
+        </div>
       )}
+      {/* Success Message */}
       {success && (
-        <div className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center">
+        <div className="mt-4 px-4 py-2 rounded-lg flex items-center bg-[#2A5E45] text-white">
           <img
             src="/icons/circle-check.svg"
             alt="Success"
@@ -183,7 +183,7 @@ const RegisterForm: React.FC = () => {
       </div>
 
       <p className="text-[14px] ml-[8px] font-light mt-4">
-        Zakładając konto, akceptujesz nasz
+        Zakładając konto, akceptujesz nasz{' '}
         <Link href="/regulamin" className="underline">
           Regulamin
         </Link>

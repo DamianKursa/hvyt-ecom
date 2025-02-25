@@ -5,11 +5,16 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
   onForgotPassword,
 }) => {
   const [formData, setFormData] = useState({ username: '', password: '' });
-  const [focusedField, setFocusedField] = useState<string | null>(null); // Track focused field
-  const [showPassword, setShowPassword] = useState(false); // Toggle password visibility
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter(); // Next.js router for redirection
+  const router = useRouter();
+
+  // Function to strip HTML tags from a string
+  const stripHtmlTags = (html: string): string => {
+    return html.replace(/<[^>]*>?/gm, '');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,14 +29,18 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
       });
 
       if (response.ok) {
-        // Redirect to user account page
         router.push('/moje-konto/moje-zamowienia');
       } else {
         const data = await response.json();
-        setError(data.message || 'Invalid credentials');
+        // Strip HTML tags from the error message
+        const cleanedMessage =
+          data.message && typeof data.message === 'string'
+            ? stripHtmlTags(data.message)
+            : 'Wystąpił błąd podczas logowania, spróbuj ponownie później.';
+        setError(cleanedMessage);
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      setError('Wystąpił błąd podczas logowania, spróbuj ponownie później.');
     } finally {
       setLoading(false);
     }
@@ -102,7 +111,11 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
       </p>
 
       {/* Error Message */}
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && (
+        <div className="mt-4 px-4 py-2 rounded-lg flex items-center bg-red-500 text-white">
+          <span>{error}</span>
+        </div>
+      )}
 
       {/* Submit Button */}
       <button
