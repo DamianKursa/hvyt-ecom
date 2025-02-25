@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { CartContext, Product } from '@/stores/CartProvider';
 import QuantityChanger from '@/components/UI/QuantityChanger';
 import AttributeSwitcher from '@/components/UI/AttributeSwitcher.component';
@@ -17,6 +18,8 @@ const CartItem: React.FC<CartItemProps> = ({
   onDecreaseQuantity,
   onRemoveItem,
 }) => {
+  const router = useRouter();
+  const isKoszykPage = router.pathname === '/koszyk'; // Detect if we are on the "koszyk" page
   const { updateCartVariation } = React.useContext(CartContext);
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedVariation, setSelectedVariation] = useState<string | null>(
@@ -67,7 +70,7 @@ const CartItem: React.FC<CartItemProps> = ({
 
   return (
     <>
-      {/* Desktop Layout: Use existing layout */}
+      {/* Desktop Layout */}
       <div className="hidden md:flex items-center justify-between mb-6 border-b pb-4 last:border-none last:pb-0">
         <div className="flex items-center">
           <div className="w-[90px] h-[90px] relative rounded-[24px] overflow-hidden">
@@ -83,7 +86,6 @@ const CartItem: React.FC<CartItemProps> = ({
             <h3 className="text-base font-semibold text-neutral-darkest max-w-[200px] whitespace-normal break-words">
               {product.name}
             </h3>
-
             {product.attributes &&
               Object.entries(product.attributes).map(([name, value]) => {
                 if (!variationOptions[name]) return null;
@@ -162,6 +164,8 @@ const CartItem: React.FC<CartItemProps> = ({
               onDecrease={() =>
                 onDecreaseQuantity && onDecreaseQuantity(product)
               }
+              // On mobile in the "koszyk" page, remove default p-2 and set width to 130px
+              className={isKoszykPage ? 'w-[130px] p-0' : undefined}
             />
           </div>
           <div className="mt-1">
