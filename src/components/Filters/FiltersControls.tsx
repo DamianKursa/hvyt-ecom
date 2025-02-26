@@ -40,7 +40,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
         {/* Toggle Filters Button */}
         <button
           onClick={toggleFilters}
-          className="filters-toggle border rounded-[24px] p-[7px_16px] mr-[32px] font-bold flex justify-between items-center w-1/2"
+          className="filters-toggle border border-beige-dark rounded-[24px] p-[7px_16px] mr-[32px] font-bold flex justify-between items-center w-1/2"
         >
           <span className="font-semibold text-left">Filtry</span>
           {!isMobile && (
@@ -76,7 +76,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
       <div className="w-1/4 flex items-center pr-8">
         <button
           onClick={toggleFilters}
-          className="filters-toggle border rounded-[24px] p-[7px_16px] font-bold w-full flex justify-between items-center"
+          className="filters-toggle border border-beige-dark rounded-[24px] p-[7px_16px] font-bold w-full flex justify-between items-center"
         >
           <span className="font-semibold text-left">Filtry</span>
           <img

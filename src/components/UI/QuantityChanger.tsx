@@ -14,7 +14,7 @@ const QuantityChanger: React.FC<QuantityChangerProps> = ({
   className,
 }) => {
   const baseClasses =
-    'flex items-center justify-between space-x-3 border border-gray-300 rounded-full lg:min-w-[140px]';
+    'flex items-center justify-between space-x-3 border border-beige-dark rounded-full lg:min-w-[140px]';
   // If a custom className is provided, use it; otherwise, default to "p-2"
   const paddingClass = className !== undefined ? className : 'p-2';
 

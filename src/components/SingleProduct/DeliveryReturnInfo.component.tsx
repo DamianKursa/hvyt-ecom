@@ -14,11 +14,6 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
 }) => {
   const items = [
     {
-      icon: '/icons/wysylka-w-24.svg',
-      text: 'Wysyłka w 24h',
-      alt: 'Shipping within 24 hours',
-    },
-    {
       icon: '/icons/zwrot.svg',
       text: '30 dni na zwrot',
       alt: 'Return Policy',
@@ -39,7 +34,7 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
   const totalRows = items.length + (shouldRenderStockRow ? 1 : 0);
 
   return (
-    <div className="mt-4 border border-[#DAD3C8] rounded-[24px]">
+    <div className="mt-4 border border-beige-dark rounded-[24px]">
       {items.map((item, index) => (
         <div
           key={index}
@@ -85,7 +80,7 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
               ? stock >= 50
                 ? 'Ponad 50 szt. na stanie. Wysyłka w 24h!'
                 : `Tylko ${stock} szt. na stanie. Wysyłka w 24h!`
-              : stockStatus === 'instock' && 'Na stanie. Wysyłka w 25h'}
+              : stockStatus === 'instock' && 'Na stanie. Wysyłka w 24h!'}
           </span>
         </div>
       )}

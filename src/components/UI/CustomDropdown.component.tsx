@@ -51,10 +51,10 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
       <button
         className={`w-full ${
           isProductPage ? 'px-[20px] py-3' : 'p-[7px_16px]'
-        } text-[16px] font-bold flex justify-between items-center border ${
+        } text-[16px] font-bold flex justify-between items-center border  ${
           isOpen
             ? 'border-dark-pastel-red border-b-0 rounded-t-[24px]'
-            : 'border-gray-300 rounded-[24px]'
+            : 'border-beige-dark rounded-[24px]'
         } bg-beige-light`}
         onClick={toggleDropdown}
         aria-haspopup="listbox"

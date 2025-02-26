@@ -188,7 +188,7 @@ const Filters = ({
   }
 
   return (
-    <div className="filters w-full rounded-[24px] p-[12px_16px] border">
+    <div className="filters w-full rounded-[24px] p-[12px_16px] border border-beige-dark">
       {attributes.map((attribute) => (
         <div key={attribute.slug} className="mb-4">
           <button
