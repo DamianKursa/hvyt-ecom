@@ -2,10 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 
 const WooCommerceAPI = axios.create({
-  baseURL: process.env.REST_API, // WooCommerce REST API base URL
+  baseURL: process.env.NEXT_PUBLIC_REST_API, // WooCommerce REST API base URL
   auth: {
-    username: process.env.WC_CONSUMER_KEY || '', // Consumer Key
-    password: process.env.WC_CONSUMER_SECRET || '', // Consumer Secret
+    username: process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || '', // Consumer Key
+    password: process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || '', // Consumer Secret
   },
 });
 
