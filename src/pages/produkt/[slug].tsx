@@ -231,6 +231,7 @@ const ProductPage = () => {
       </Layout>
     );
   }
+  // Calculate total stock
   const totalStock =
     product?.baselinker_variations?.reduce((sum, variation) => {
       const qty = Number((variation as any).stock_quantity);
@@ -246,6 +247,12 @@ const ProductPage = () => {
     : totalStock !== 0
       ? totalStock
       : null;
+
+  // If no stock or stock is zero, mark product as out of stock
+  const isOutOfStock =
+    displayedStock !== null
+      ? displayedStock === 0
+      : (product as any)?.stock_status === 'outofstock';
 
   return (
     <Layout title={`Hvyt | ${product?.name || 'Ładownie...'}`}>
@@ -369,38 +376,26 @@ const ProductPage = () => {
               )}
             </div>
             <div className="flex items-center mt-0 md:mt-4 space-x-4">
-              <button
-                onClick={handleAddToCart}
-                className="w-4/5 py-3 text-[16px] md:text-[24px] font-light text-white bg-black rounded-full flex justify-center items-center hover:bg-dark-pastel-red transition-colors"
-              >
-                Dodaj do koszyka
-                <Image
-                  src="/icons/dodaj-do-koszyka.svg"
-                  alt="Add to Cart"
-                  width={28}
-                  height={28}
-                  className="ml-2"
-                />
-              </button>
               {product && (
                 <button
-                  onClick={handleWishlistClick}
-                  className={`w-[52px] h-[52px] md:w-[64px] md:h-[64px] p-3 border rounded-[100px] ${
-                    isInWishlist(product.slug)
-                      ? 'border-black'
-                      : 'border-black text-black'
-                  } flex justify-center items-center transition`}
+                  onClick={isOutOfStock ? undefined : handleAddToCart}
+                  disabled={isOutOfStock}
+                  className={`w-4/5 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors ${
+                    isOutOfStock
+                      ? 'bg-neutral-light text-white cursor-not-allowed'
+                      : 'bg-black text-white hover:bg-dark-pastel-red'
+                  }`}
                 >
-                  <Image
-                    src={
-                      isInWishlist(product.slug)
-                        ? '/icons/heart-added.svg'
-                        : '/icons/wishlist.svg'
-                    }
-                    alt="Wishlist"
-                    width={34}
-                    height={31}
-                  />
+                  {isOutOfStock ? 'Produkt niedostępny' : 'Dodaj do koszyka'}
+                  {!isOutOfStock && (
+                    <Image
+                      src="/icons/dodaj-do-koszyka.svg"
+                      alt="Add to Cart"
+                      width={28}
+                      height={28}
+                      className="ml-2"
+                    />
+                  )}
                 </button>
               )}
             </div>
