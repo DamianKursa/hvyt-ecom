@@ -11,7 +11,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const cookies = parse(req.headers.cookie || '');
   const token = cookies.token;
 
-  console.log('Parsed token from cookies:', token); // Debug token parsing
 
   if (!token) {
     return res.status(401).json({ message: 'Unauthorized' });
@@ -22,7 +21,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    console.log('Fetched user from WordPress:', response.data); // Debug fetched data
     // Destructure id along with name, username, email
     const { id, name, username, email } = response.data;
     res.status(200).json({ id, name, username, email });
