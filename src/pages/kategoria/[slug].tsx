@@ -12,7 +12,7 @@ import {
   fetchProductsByCategoryId,
   fetchProductsWithFilters,
   fetchSortedProducts,
-} from '@/utils/api/category';
+} from '@/pages/api/category';
 
 interface Category {
   id: number;

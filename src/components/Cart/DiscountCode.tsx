@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 // Removed Snackbar import since we now render inline messages
-import { validateDiscountCode } from '@/utils/api/woocommerce'; // Adjust the path as needed
+import { validateDiscountCode } from '@/pages/api/woocommerce'; // Adjust the path as needed
 import { CartContext } from '@/stores/CartProvider'; // Use CartContext for global state
 
 interface DiscountCodeProps {

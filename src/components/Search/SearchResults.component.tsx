@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   searchProducts,
   fetchLatestKolekcja,
-} from '../../utils/api/woocommerce';
+} from '../../pages/api/woocommerce';
 import Link from 'next/link';
 import Image from 'next/image';
 

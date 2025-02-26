@@ -5,18 +5,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { orderId, orderKey } = req.query;
 
   if (!orderId || !orderKey) {
-    console.error('❌ Missing orderId or orderKey in request');
     return res.status(400).json({ error: 'Order ID and Order Key are required' });
   }
 
 
   // Ensure WooCommerce API credentials exist
-  const API_URL = process.env.NEXT_PUBLIC_REST_API;
-  const CONSUMER_KEY = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
-  const CONSUMER_SECRET = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET;
+  const API_URL = process.env.REST_API;
+  const CONSUMER_KEY = process.env.WC_CONSUMER_KEY;
+  const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET;
 
   if (!API_URL || !CONSUMER_KEY || !CONSUMER_SECRET) {
-    console.error('❌ WooCommerce API credentials are missing.');
+
     return res.status(500).json({ error: 'Internal server error: API credentials missing' });
   }
 
@@ -79,7 +78,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json(formattedOrder);
   } catch (error: any) {
-    console.error('❌ Error fetching order:', error.response?.data || error.message);
     return res.status(500).json({ error: 'Failed to fetch order' });
   }
 }

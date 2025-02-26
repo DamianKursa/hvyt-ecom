@@ -13,7 +13,7 @@ import AttributeSwitcher from '@/components/UI/AttributeSwitcher.component';
 import Reviews from '@/components/Reviews/Reviews';
 import QuantityChanger from '@/components/UI/QuantityChanger';
 import { useProductState } from '@/utils/hooks/useProductState';
-import { fetchProductBySlug } from '@/utils/api/woocommerce';
+import { fetchProductBySlug } from '@/pages/api/woocommerce';
 import { CartContext } from '@/stores/CartProvider';
 import { useWishlist } from '@/context/WhishlistContext';
 import Image from 'next/image';

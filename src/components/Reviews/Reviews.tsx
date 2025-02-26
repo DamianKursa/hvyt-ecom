@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReviewItem from './ReviewItem';
 import ReviewForm from './ReviewForm';
-import { fetchProductReviews } from '@/utils/api/woocommerce';
+import { fetchProductReviews } from '@/pages/api/woocommerce';
 
 interface Review {
   id: number;

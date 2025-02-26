@@ -1,12 +1,12 @@
 import axios from 'axios';
-import { Kolekcja } from '../functions/interfaces'; // Adjust the import path
-import { NowosciPost } from '../functions/interfaces';
+import { Kolekcja } from '../../utils/functions/interfaces'; // Adjust the import path
+import { NowosciPost } from '../../utils/functions/interfaces';
 // Setup the WooCommerce API instance with the necessary credentials.
 const WooCommerceAPI = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_REST_API, // WooCommerce REST API base URL
+  baseURL: process.env.REST_API, // WooCommerce REST API base URL
   auth: {
-    username: process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || '', // Consumer Key
-    password: process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || '', // Consumer Secret
+    username: process.env.WC_CONSUMER_KEY || '', // Consumer Key
+    password: process.env.WC_CONSUMER_SECRET || '', // Consumer Secret
   },
 });
 

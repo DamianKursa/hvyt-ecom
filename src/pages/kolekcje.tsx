@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component'; // Import Layout
-import { fetchKolekcjePostsWithImages } from '@/utils/api/woocommerce'; // API call for Kolekcje
+import { fetchKolekcjePostsWithImages } from '@/pages/api/woocommerce'; // API call for Kolekcje
 import SkeletonKolekcjePage from '../components/Skeletons/SkeletonKolekcjePage'; // Import your custom skeleton loader
 import IconRenderer from '@/components/UI/IconRenderer'; // Reusable component for rendering icons
 

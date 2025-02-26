@@ -5,7 +5,7 @@ import PriceSlider from '@/components/UI/PriceSlider';
 import {
   fetchProductsWithFilters,
   fetchProductAttributesWithTerms,
-} from '@/utils/api/category';
+} from '@/pages/api/category';
 
 interface FilterOption {
   name: string;
