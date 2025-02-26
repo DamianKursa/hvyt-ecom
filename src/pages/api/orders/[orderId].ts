@@ -5,14 +5,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { orderId, orderKey } = req.query;
 
   if (!orderId || !orderKey) {
+
     return res.status(400).json({ error: 'Order ID and Order Key are required' });
   }
 
 
   // Ensure WooCommerce API credentials exist
-  const API_URL = process.env.REST_API;
-  const CONSUMER_KEY = process.env.WC_CONSUMER_KEY;
-  const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET;
+  const API_URL = process.env.NEXT_PUBLIC_REST_API;
+  const CONSUMER_KEY = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
+  const CONSUMER_SECRET = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET;
 
   if (!API_URL || !CONSUMER_KEY || !CONSUMER_SECRET) {
 
@@ -78,6 +79,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     return res.status(200).json(formattedOrder);
   } catch (error: any) {
+
     return res.status(500).json({ error: 'Failed to fetch order' });
   }
 }
