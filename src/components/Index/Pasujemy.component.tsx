@@ -60,7 +60,7 @@ const PasujemyWszedzie = () => {
         </div>
         <Link
           href="/kategoria/uchwyty-meblowe"
-          className="px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all self-start md:self-auto"
+          className="px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all self-start md:self-auto"
         >
           Zobacz wszystkie →
         </Link>

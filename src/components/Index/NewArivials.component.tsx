@@ -9,8 +9,9 @@ import { useInView } from 'react-intersection-observer';
 
 interface NowosciItem {
   id: number;
-  src: string; // Image URL
-  alt: string; // Image Alt Text
+  src: string; // Main image URL (desktop)
+  mobileSrc: string; // Mobile image URL from new_arrivals_mobile
+  alt: string; // Alt text (using title here)
   title?: string; // Optional title
 }
 
@@ -78,9 +79,14 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
     const loadNowosci = async () => {
       try {
         const posts = await fetchNowosciPosts();
-        const items: NowosciItem[] = posts.map((post) => ({
+        // Map posts to NowosciItem including mobileSrc
+        const items: NowosciItem[] = posts.map((post: any) => ({
           id: post.id,
+          // For desktop image use the featured image
           src: post.imageUrl,
+          // For mobile image, use the ACF field new_arrivals_mobile if available,
+          // otherwise fallback to the featured image.
+          mobileSrc: post.acf?.new_arrivals_mobile || post.imageUrl,
           alt: post.title.rendered,
           title: post.title.rendered,
         }));
@@ -139,8 +145,8 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
           Nowa gałka HALOHOLD projektu Moniki Rogusz-Witkoś.
         </p>
         <Link
-          href="#"
-          className="mt-4 px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
+          href="/kategoria/uchwyty-meblowe?sort=Najnowsze+produkty"
+          className="mt-4 px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
         >
           Zobacz nowości →
         </Link>
@@ -148,7 +154,8 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
       <div className="md:hidden">
         <ResponsiveSlider
           items={nowosciItems.map((item) => ({
-            src: item.src,
+            // On mobile, use the mobileSrc if available
+            src: item.mobileSrc,
             alt: item.alt,
             title: item.title,
           }))}
@@ -257,8 +264,8 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
               Nowa gałka HALOHOLD projektu Moniki Rogusz-Witkoś.
             </p>
             <Link
-              href="#"
-              className="mt-[40px] inline-block px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
+              href="/kategoria/uchwyty-meblowe?sort=Najnowsze+produkty"
+              className="mt-[40px] inline-block px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
             >
               Zobacz nowości →
             </Link>
