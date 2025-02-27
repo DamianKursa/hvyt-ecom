@@ -36,16 +36,20 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const fetchUser = async () => {
     if (user) return; // Avoid redundant API calls if the user is already loaded
     try {
+      console.log('Verifying token...');
       const validateResponse = await fetch('/api/auth/verify', {
         method: 'POST',
         credentials: 'include',
       });
 
       if (!validateResponse.ok) {
+        console.warn('Token is invalid. User is not authenticated.');
         setUser(null);
         localStorage.removeItem('user'); // Clear stale user data
         return;
       }
+
+      console.log('Fetching user profile...');
       const profileResponse = await fetch('/api/auth/profile', {
         method: 'GET',
         credentials: 'include',
@@ -62,6 +66,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
             email: data.email,
           }),
         ); // Persist user data including id
+        console.log('Fetched user profile:', data);
       } else {
         setUser(null);
         localStorage.removeItem('user');

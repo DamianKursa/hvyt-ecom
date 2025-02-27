@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
-import { fetchNowosciPosts } from '@/pages/api/woocommerce';
+import { fetchNowosciPosts } from '@/utils/api/woocommerce';
 import SkeletonNowosci from '@/components/Skeletons/SkeletonNowosci';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';

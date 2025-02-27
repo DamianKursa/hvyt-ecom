@@ -221,6 +221,7 @@ const Shipping: React.FC<ShippingProps> = ({
         });
         setShippingZones(updatedZones);
       } catch (err) {
+        console.error('Error fetching shipping methods:', err);
         setError('An error occurred while fetching shipping methods.');
       } finally {
         setLoading(false);
@@ -362,12 +363,12 @@ const Shipping: React.FC<ShippingProps> = ({
       const parcel = new window.SzybkaPaczkaParcel();
       interval = window.setInterval(() => {
         const result = parcel.getParcelObject();
-
+        console.log('Polling GLS result:', result);
         const extracted = extractSelected(result);
         console.log('Extracted GLS selection:', extracted);
         if (isValidSelection(extracted)) {
           setSelectedGlsPoint(extracted);
-
+          console.log('Selected GLS parcel shop (polling):', extracted);
           clearInterval(interval!);
           setShowGlsMap(false);
         } else {

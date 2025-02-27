@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { submitProductReview } from '@/pages/api/woocommerce';
+import { submitProductReview } from '@/utils/api/woocommerce';
 import Link from 'next/link';
 
 const ReviewForm = ({

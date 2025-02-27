@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import IconRenderer from '@/components/UI/IconRenderer'; // Import IconRenderer
-import { fetchKolekcjePostsWithImages } from '@/pages/api/woocommerce';
+import { fetchKolekcjePostsWithImages } from '@/utils/api/woocommerce';
 import SkeletonNaszeKolekcje from '@/components/Skeletons/SkeletonNaszeKolekcje';
 
 const NaszeKolekcje = () => {

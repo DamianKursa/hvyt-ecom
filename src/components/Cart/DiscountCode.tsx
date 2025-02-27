@@ -1,5 +1,7 @@
 import React, { useState, useContext } from 'react';
-import { CartContext } from '@/stores/CartProvider';
+// Removed Snackbar import since we now render inline messages
+import { validateDiscountCode } from '@/utils/api/woocommerce'; // Adjust the path as needed
+import { CartContext } from '@/stores/CartProvider'; // Use CartContext for global state
 
 interface DiscountCodeProps {
   cartTotal: number;
@@ -10,9 +12,9 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
   cartTotal,
   setCartTotal,
 }) => {
-  const { applyCoupon, removeCoupon, cart } = useContext(CartContext);
+  const { applyCoupon, removeCoupon, cart } = useContext(CartContext); // Access cart context
   const [isOpen, setIsOpen] = useState(false);
-  const [code, setCode] = useState(cart?.coupon?.code || '');
+  const [code, setCode] = useState(cart?.coupon?.code || ''); // Preload existing coupon
   const [snackbar, setSnackbar] = useState<{
     message: string;
     type: 'success' | 'error';
@@ -34,28 +36,21 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     setSnackbar((prev) => ({ ...prev, visible: false }));
 
     try {
-      const response = await fetch('/api/discount', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: code.trim() }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to validate discount code');
-      }
-
-      const { valid, discountValue, discountType } = await response.json();
+      const { valid, discountValue, discountType } = await validateDiscountCode(
+        code.trim(),
+      );
 
       if (valid) {
         let discountApplied = 0;
+
         if (discountType === 'percent') {
-          discountApplied = (cartTotal * discountValue) / 100;
+          discountApplied = (cartTotal * discountValue) / 100; // Calculate percentage discount
         } else if (discountType === 'fixed') {
-          discountApplied = discountValue;
+          discountApplied = discountValue; // Apply fixed discount
         }
 
-        applyCoupon({ code, discountValue: discountApplied, discountType });
-        setCartTotal(cartTotal - discountApplied);
+        applyCoupon({ code, discountValue: discountApplied, discountType }); // Save coupon globally
+        setCartTotal(cartTotal - discountApplied); // Update local cart total
         setSnackbar({
           message: 'Kod rabatowy został dodany',
           type: 'success',
@@ -86,7 +81,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
   const handleRemoveCode = () => {
     setCode('');
-    removeCoupon();
+    removeCoupon(); // Clear global coupon state
     setSnackbar({
       message: 'Kod rabatowy został usunięty',
       type: 'success',

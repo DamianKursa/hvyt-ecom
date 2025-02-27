@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchCrossSellProducts } from '@/pages/api/woocommerce';
+import { fetchCrossSellProducts } from '@/utils/api/woocommerce';
 
 export interface RecommendedProduct {
   id: string;

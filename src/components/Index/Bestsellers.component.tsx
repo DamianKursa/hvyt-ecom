@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ProductPreview from '../Product/ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import SkeletonProduct from '@/components/Skeletons/SkeletonProduct';
-import { fetchProductsByCategoryId } from '../../pages/api/category';
+import { fetchProductsByCategoryId } from '../../utils/api/category';
 
 interface Product {
   id: string;

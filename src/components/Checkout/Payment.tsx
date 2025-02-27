@@ -36,7 +36,7 @@ const Payment: React.FC<PaymentProps> = ({
         setLoading(true);
         const response = await fetch('/api/payment');
         const data = await response.json();
-
+        console.log('Fetched payment methods:', data);
         setPaymentMethods(data);
       } catch (err) {
         setError((err as Error).message || 'An error occurred');
@@ -51,6 +51,7 @@ const Payment: React.FC<PaymentProps> = ({
   // Filter payment methods based on the selected shipping method
   const getFilteredPaymentMethods = () => {
     const mappedShippingMethod = shippingMethodMapping[shippingMethod];
+    console.log('Mapped Shipping Method:', mappedShippingMethod);
 
     if (mappedShippingMethod === 'kurier_gls_pobranie') {
       return paymentMethods.filter((method) => method.id === 'cod'); // "Za pobraniem"

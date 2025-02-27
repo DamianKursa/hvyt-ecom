@@ -11,11 +11,11 @@ import ProductPreview from '../../components/Product/ProductPreview.component';
 import {
   fetchKolekcjePostsWithImages,
   fetchMediaById,
-} from '../../pages/api/woocommerce';
+} from '../../utils/api/woocommerce';
 import {
   fetchCategoryBySlug,
   fetchProductsByCategoryId,
-} from '../../pages/api/category';
+} from '../../utils/api/category';
 import { useRouter } from 'next/router';
 
 const CollectionPage = () => {
