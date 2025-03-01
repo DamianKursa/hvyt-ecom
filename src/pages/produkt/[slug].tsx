@@ -19,6 +19,8 @@ import { useWishlist } from '@/context/WhishlistContext';
 import Image from 'next/image';
 import { Product } from '@/stores/CartProvider';
 import useCrossSellProducts from '@/utils/hooks/useCrossSellProducts';
+import { InputField } from '@/components/Input/InputField.component';
+import { useForm, FormProvider } from 'react-hook-form';
 
 const NajczęściejKupowaneRazem = dynamic(
   () => import('@/components/Product/NajczęściejKupowaneRazem'),
@@ -28,6 +30,10 @@ const NajczęściejKupowaneRazem = dynamic(
 const Instagram = dynamic(() => import('@/components/Index/Instagram'), {
   ssr: false,
 });
+
+interface NotifyFormData {
+  notifyEmail: string;
+}
 
 const ProductPage = () => {
   const { query } = useRouter();
@@ -49,8 +55,27 @@ const ProductPage = () => {
   } = state;
 
   const [validationError, setValidationError] = useState<string | null>(null);
+  // State to control visibility of notify form and to hold the success message
+  const [showNotifyForm, setShowNotifyForm] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>('');
 
-  // Fetch cross-sell products once the product is available
+  // Set up react-hook-form for notify email
+  const methods = useForm<NotifyFormData>({
+    defaultValues: { notifyEmail: '' },
+  });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    reset,
+  } = methods;
+
+  const notifyEmailValue = watch('notifyEmail');
+  const isNotifyEmailValid =
+    !!notifyEmailValue && /\S+@\S+\.\S+/.test(notifyEmailValue);
+
+  // Fetch cross‑sell products once the product is available
   const { products: crossSellProducts, loading: crossSellLoading } =
     useCrossSellProducts(product ? product.id.toString() : null);
 
@@ -151,7 +176,6 @@ const ProductPage = () => {
 
   const handleAddToCart = () => {
     if (!product) {
-      console.error('No product available to add to cart');
       return;
     }
     if (product.baselinker_variations?.length && !selectedVariation) {
@@ -190,9 +214,18 @@ const ProductPage = () => {
       attributes: selectedAttributes,
       variationOptions,
     };
-    console.log('🛒 Adding to cart:', cartItem);
+
     addCartItem(cartItem);
     dispatch({ type: 'TOGGLE_MODAL', payload: true });
+  };
+
+  // Handler for notify form submission
+  const onNotifySubmit = (data: NotifyFormData) => {
+    setSuccessMessage(
+      'Zapisalismy Twój adres. Wyślemy Ci powiadomienie kiedy produkt pojawi się w sprzedaży',
+    );
+    reset();
+    setShowNotifyForm(false);
   };
 
   const galleryImages = useMemo(
@@ -248,7 +281,7 @@ const ProductPage = () => {
       ? totalStock
       : null;
 
-  // If no stock or stock is zero, mark product as out of stock
+  // Determine out‑of‑stock status
   const isOutOfStock =
     displayedStock !== null
       ? displayedStock === 0
@@ -257,21 +290,11 @@ const ProductPage = () => {
   return (
     <Layout title={`Hvyt | ${product?.name || 'Ładownie...'}`}>
       <section className="max-w-[1440px] mt-[88px] md:mt-[140px] container mx-auto">
-        {/*
-          For desktop (lg): a two‑column layout where the left column shows the gallery and product details combined,
-          and the right column shows title, pricing, attributes, etc.
-          For mobile: the layout order is:
-            1. Gallery only (mobile-only block)
-            2. Title, pricing, attributes, etc.
-            3. Product details (mobile-only block below)
-        */}
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
           <div className="order-1 w-full lg:order-1 lg:w-8/12">
-            {/* Mobile: Gallery only with a minimum height to ensure visibility */}
             <div className="block lg:hidden min-h-[300px]">
               {product && <SingleProductGallery images={galleryImages} />}
             </div>
-            {/* Desktop: Gallery + Product Details */}
             <div className="hidden lg:block">
               {product && <SingleProductGallery images={galleryImages} />}
               {product && <SingleProductDetails product={product} />}
@@ -375,30 +398,88 @@ const ProductPage = () => {
                 </div>
               )}
             </div>
-            <div className="flex items-center mt-0 md:mt-4 space-x-4">
-              {product && (
-                <button
-                  onClick={isOutOfStock ? undefined : handleAddToCart}
-                  disabled={isOutOfStock}
-                  className={`w-4/5 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors ${
-                    isOutOfStock
-                      ? 'bg-neutral-light text-white cursor-not-allowed'
-                      : 'bg-black text-white hover:bg-dark-pastel-red'
-                  }`}
-                >
-                  {isOutOfStock ? 'Produkt niedostępny' : 'Dodaj do koszyka'}
-                  {!isOutOfStock && (
-                    <Image
-                      src="/icons/dodaj-do-koszyka.svg"
-                      alt="Add to Cart"
-                      width={28}
-                      height={28}
-                      className="ml-2"
-                    />
+            {/* Out‑of‑stock Notify Section */}
+            {isOutOfStock ? (
+              <FormProvider {...methods}>
+                <form onSubmit={handleSubmit(onNotifySubmit)}>
+                  {showNotifyForm && (
+                    <div className="mb-4">
+                      <InputField
+                        inputLabel="Podaj adres email"
+                        inputName="notifyEmail"
+                        type="email"
+                        customValidation={{
+                          required: 'To pole jest wymagane',
+                          pattern: {
+                            value: /\S+@\S+\.\S+/,
+                            message: 'Niepoprawny adres email',
+                          },
+                        }}
+                        errors={errors}
+                        {...register('notifyEmail', {
+                          required: 'To pole jest wymagane',
+                          pattern: {
+                            value: /\S+@\S+\.\S+/,
+                            message: 'Niepoprawny adres email',
+                          },
+                        })}
+                      />
+                    </div>
                   )}
-                </button>
-              )}
-            </div>
+                  <button
+                    type="submit"
+                    onClick={(e) => {
+                      if (!showNotifyForm) {
+                        e.preventDefault();
+                        setShowNotifyForm(true);
+                      }
+                    }}
+                    disabled={showNotifyForm && !isNotifyEmailValid}
+                    className={`w-4/5 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors ${
+                      showNotifyForm && !isNotifyEmailValid
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-black text-white hover:bg-dark-pastel-red'
+                    }`}
+                  >
+                    Powiadom o dostępności
+                  </button>
+                </form>
+              </FormProvider>
+            ) : (
+              <button
+                onClick={handleAddToCart}
+                type="button"
+                className="w-4/5 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors bg-black text-white hover:bg-dark-pastel-red"
+              >
+                Dodaj do koszyka
+                <Image
+                  src="/icons/dodaj-do-koszyka.svg"
+                  alt="Add to Cart"
+                  width={28}
+                  height={28}
+                  className="ml-2"
+                />
+              </button>
+            )}
+            {/* Success Message */}
+            {successMessage && (
+              <div className="bg-[#2A5E45] text-white px-4 py-2 rounded-lg mt-4 flex items-center">
+                <img
+                  src="/icons/circle-check.svg"
+                  alt="Success"
+                  className="w-5 h-5 mr-2"
+                />
+                <span>
+                  <strong>Zapisalismy Twój adres.</strong>
+                  <br />
+                  <span className="font-light">
+                    Wyślemy Ci powiadomienie kiedy produkt pojawi się w
+                    sprzedaży
+                  </span>
+                </span>
+              </div>
+            )}
+
             <DeliveryReturnInfo
               onScrollToSection={handleScrollToFrequentlyBought}
               stock={displayedStock}

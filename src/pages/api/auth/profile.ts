@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { id, name, username, email } = response.data;
     res.status(200).json({ id, name, username, email });
   } catch (error: any) {
-    console.error('Error fetching user from WordPress:', error.response?.data || error.message);
+
     res.status(error.response?.status || 500).json({ message: 'Failed to fetch user profile' });
   }
 }
