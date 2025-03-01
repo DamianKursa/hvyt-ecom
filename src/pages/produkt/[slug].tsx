@@ -219,13 +219,31 @@ const ProductPage = () => {
     dispatch({ type: 'TOGGLE_MODAL', payload: true });
   };
 
-  // Handler for notify form submission
-  const onNotifySubmit = (data: NotifyFormData) => {
-    setSuccessMessage(
-      'Zapisalismy Twój adres. Wyślemy Ci powiadomienie kiedy produkt pojawi się w sprzedaży',
-    );
-    reset();
-    setShowNotifyForm(false);
+  // Inside your ProductPage component
+  const onNotifySubmit = async (data: NotifyFormData) => {
+    try {
+      const res = await fetch('/api/waiting-list', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: data.notifyEmail,
+          product_id: product?.id,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error('Failed to subscribe');
+      }
+      // Set the success message with your desired formatting.
+      setSuccessMessage(
+        'Zapisalismy Twój adres. Wyślemy Ci powiadomienie kiedy produkt pojawi się w sprzedaży',
+      );
+      reset();
+      setShowNotifyForm(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const galleryImages = useMemo(
@@ -461,7 +479,6 @@ const ProductPage = () => {
                 />
               </button>
             )}
-            {/* Success Message */}
             {successMessage && (
               <div className="bg-[#2A5E45] text-white px-4 py-2 rounded-lg mt-4 flex items-center">
                 <img
