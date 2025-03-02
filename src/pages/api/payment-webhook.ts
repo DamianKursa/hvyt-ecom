@@ -22,12 +22,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Update WooCommerce order status
     const response = await axios.put(
-      `${process.env.NEXT_PUBLIC_REST_API}/orders/${orderId}`,
+      `${process.env.REST_API}/orders/${orderId}`,
       { status: wcStatus },
       {
         auth: {
-          username: process.env.NEXT_PUBLIC_WC_CONSUMER_KEY!,
-          password: process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET!,
+          username: process.env.WC_CONSUMER_KEY!,
+          password: process.env.WC_CONSUMER_SECRET!,
         },
       }
     );

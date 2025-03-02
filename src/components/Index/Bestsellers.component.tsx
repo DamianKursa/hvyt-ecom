@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import ProductPreview from '../Product/ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import SkeletonProduct from '@/components/Skeletons/SkeletonProduct';
-import { fetchProductsByCategoryId } from '../../utils/api/category';
 
 interface Product {
   id: string;
@@ -26,11 +25,19 @@ const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
 
   useEffect(() => {
     const fetchBestsellers = async () => {
-      setLoading(true); // Set loading state to true initially
+      setLoading(true);
       try {
-        const categoryId = 123; // Replace with actual category ID
-        const { products: fetchedProducts } =
-          await fetchProductsByCategoryId(categoryId);
+        const categoryId = 123; // Replace with your actual category ID
+        // Here we use an empty filters array, but you can adjust as needed.
+        const filters = JSON.stringify([]);
+        const response = await fetch(
+          `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryId}&page=1&perPage=12&sortingOption=default&filters=${encodeURIComponent(filters)}`,
+        );
+        if (!response.ok) {
+          throw new Error('Failed to fetch products');
+        }
+        const data = await response.json();
+        const fetchedProducts = data.products || [];
         const formattedProducts = fetchedProducts.map((product: any) => ({
           id: product.id,
           slug: product.slug,
@@ -42,14 +49,14 @@ const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
       } catch (error) {
         console.error('Error fetching Bestsellers:', error);
       } finally {
-        setLoading(false); // Set loading state to false after data is fetched
+        setLoading(false);
       }
     };
 
     fetchBestsellers();
   }, []);
 
-  const totalItems = loading ? 4 : products.length; // Use 4 skeletons during loading
+  const totalItems = loading ? 4 : products.length;
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < totalItems - itemsPerPage;
 
@@ -67,7 +74,6 @@ const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
             {description || 'Poznaj nasze najpopularniejsze modele.'}
           </p>
         </div>
-
         {/* Custom Navigation - Desktop Only */}
         <div className="hidden md:flex items-center space-x-4">
           <button

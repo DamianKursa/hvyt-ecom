@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { fetchCrossSellProducts } from '@/utils/api/woocommerce';
 
 export interface RecommendedProduct {
   id: string;
@@ -23,8 +22,14 @@ const useCrossSellProducts = (productId: string | null) => {
 
       try {
         setLoading(true);
-        const { products: fetchedProducts } = await fetchCrossSellProducts(productId);
-        const formattedProducts = fetchedProducts.map((product: any) => ({
+        const res = await fetch(
+          `/api/woocommerce?action=fetchCrossSellProducts&productId=${productId}`
+        );
+        if (!res.ok) {
+          throw new Error('Error fetching cross-sell products');
+        }
+        const data = await res.json();
+        const formattedProducts = data.products.map((product: any) => ({
           id: product.id,
           slug: product.slug,
           name: product.name,

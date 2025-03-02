@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
-import IconRenderer from '@/components/UI/IconRenderer'; // Import IconRenderer
-import { fetchKolekcjePostsWithImages } from '@/utils/api/woocommerce';
+import IconRenderer from '@/components/UI/IconRenderer';
 import SkeletonNaszeKolekcje from '@/components/Skeletons/SkeletonNaszeKolekcje';
 
 const NaszeKolekcje = () => {
@@ -14,8 +13,14 @@ const NaszeKolekcje = () => {
   useEffect(() => {
     const fetchKolekcje = async () => {
       try {
-        const kolekcjeWithImages = await fetchKolekcjePostsWithImages();
-        setKolekcjePosts(kolekcjeWithImages);
+        const res = await fetch(
+          '/api/woocommerce?action=fetchKolekcjePostsWithImages',
+        );
+        if (!res.ok) {
+          throw new Error('Failed to fetch Kolekcje posts');
+        }
+        const data = await res.json();
+        setKolekcjePosts(data);
         setLoading(false);
       } catch (error) {
         setErrorMessage(
@@ -30,6 +35,10 @@ const NaszeKolekcje = () => {
 
   if (loading) {
     return <SkeletonNaszeKolekcje />;
+  }
+
+  if (errorMessage) {
+    return <p className="text-center text-red-500">{errorMessage}</p>;
   }
 
   return (
@@ -59,7 +68,7 @@ const NaszeKolekcje = () => {
         {/* Desktop View */}
         <div className="hidden md:grid grid-cols-4 gap-6">
           {kolekcjePosts.slice(0, 4).map((kolekcja) => (
-            <a
+            <Link
               href={`/kolekcje/${kolekcja.slug}`}
               key={kolekcja.id}
               className="relative w-full"
@@ -85,12 +94,12 @@ const NaszeKolekcje = () => {
                 iconHeight={24}
                 top={16}
                 left={32}
-                gap={5} // Space between icons
+                gap={5}
               />
-              <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red">
+              <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red bg-white z-10">
                 {kolekcja.title.rendered}
               </div>
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -99,7 +108,7 @@ const NaszeKolekcje = () => {
           <ResponsiveSlider
             items={kolekcjePosts}
             renderItem={(kolekcja) => (
-              <a
+              <Link
                 href={`/kolekcje/${kolekcja.slug}`}
                 className="relative w-full"
               >
@@ -121,14 +130,14 @@ const NaszeKolekcje = () => {
                       kolekcja.acf?.ikonka_4,
                     ]}
                     iconPath="/icons/kolekcja/"
-                    iconHeight={24} // Set the desired height for the icons
-                    gap={5} // Space between icons
+                    iconHeight={24}
+                    gap={5}
                   />
                   <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
                     {kolekcja.title.rendered}
                   </div>
                 </div>
-              </a>
+              </Link>
             )}
           />
         </div>

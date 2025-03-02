@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import Layout from '@/components/Layout/Layout.component'; // Import Layout
-import { fetchKolekcjePostsWithImages } from '@/utils/api/woocommerce'; // API call for Kolekcje
-import SkeletonKolekcjePage from '../components/Skeletons/SkeletonKolekcjePage'; // Import your custom skeleton loader
-import IconRenderer from '@/components/UI/IconRenderer'; // Reusable component for rendering icons
+import Layout from '@/components/Layout/Layout.component';
+import SkeletonKolekcjePage from '../components/Skeletons/SkeletonKolekcjePage';
+import IconRenderer from '@/components/UI/IconRenderer';
 
 const KolekcjePage = () => {
   const [kolekcjePosts, setKolekcjePosts] = useState<any[]>([]);
@@ -14,11 +13,14 @@ const KolekcjePage = () => {
   useEffect(() => {
     const fetchKolekcje = async () => {
       try {
-        const kolekcjeWithImages = await fetchKolekcjePostsWithImages(); // Fetch Kolekcje with images
-
-        // Log the API response to inspect the structure
+        const res = await fetch(
+          '/api/woocommerce?action=fetchKolekcjePostsWithImages',
+        );
+        if (!res.ok) {
+          throw new Error('Failed to fetch Kolekcje posts');
+        }
+        const kolekcjeWithImages = await res.json();
         console.log('Fetched Kolekcje API Response:', kolekcjeWithImages);
-
         setKolekcjePosts(kolekcjeWithImages);
         setLoading(false);
       } catch (error) {

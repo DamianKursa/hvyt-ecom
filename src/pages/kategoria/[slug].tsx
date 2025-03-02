@@ -7,16 +7,17 @@ import ProductArchive from '@/components/Product/ProductArchive';
 import FiltersControls from '@/components/Filters/FiltersControls';
 import CategoryDescription from '@/components/Category/CategoryDescription.component';
 import FilterModal from '@/components/Filters/FilterModal';
-import {
-  fetchCategoryBySlug,
-  fetchProductsByCategoryId,
-  fetchProductsWithFilters,
-  fetchSortedProducts,
-} from '@/utils/api/category';
 
 interface Category {
   id: number;
   name: string;
+  slug: string;
+}
+
+interface CategoryPageProps {
+  category: Category;
+  initialProducts: any[];
+  initialTotalProducts: number;
 }
 
 const icons: Record<string, string> = {
@@ -24,12 +25,6 @@ const icons: Record<string, string> = {
   klamki: '/icons/klamki-kształty.svg',
   wieszaki: '/icons/wieszaki-kształty.svg',
 };
-
-interface CategoryPageProps {
-  category: Category;
-  initialProducts: any[];
-  initialTotalProducts: number;
-}
 
 const CategoryPage = ({
   category,
@@ -71,7 +66,7 @@ const CategoryPage = ({
     wieszaki: ['Kolor OK', 'Materiał'],
   };
 
-  // Parse filters from URL query parameters
+  // Update filters from URL query parameters
   useEffect(() => {
     const updateFiltersFromQuery = () => {
       const queryFilters: { name: string; value: string }[] = [];
@@ -80,10 +75,8 @@ const CategoryPage = ({
 
       queryKeys.forEach((key) => {
         if (key === 'sort') {
-          // Save the sort query parameter separately
           sortFromQuery = router.query[key] as string;
         } else if (key !== 'slug') {
-          // Treat other keys as filters
           const values = router.query[key];
           if (Array.isArray(values)) {
             values.forEach((value) => queryFilters.push({ name: key, value }));
@@ -93,13 +86,10 @@ const CategoryPage = ({
         }
       });
 
-      // Update the sorting option if provided
       if (sortFromQuery !== 'Sortowanie') {
         setSortingOption(sortFromQuery);
       }
       setActiveFilters(queryFilters);
-
-      // Fetch products with the proper sorting option
       fetchProducts(queryFilters, sortFromQuery, 1);
     };
 
@@ -120,7 +110,7 @@ const CategoryPage = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Prevent default category reset on first load
+  // Prevent resetting on first load
   useEffect(() => {
     if (!initialLoadRef.current) {
       setProducts(initialProducts);
@@ -129,7 +119,7 @@ const CategoryPage = ({
       setActiveFilters([]);
       setSortingOption('Sortowanie');
     } else {
-      initialLoadRef.current = false; // Mark initial load as complete
+      initialLoadRef.current = false;
     }
   }, [category.id]);
 
@@ -139,48 +129,44 @@ const CategoryPage = ({
     page: number = currentPage,
   ) => {
     const fetchParams = JSON.stringify({ filters, sortOption, page });
-
     if (fetchParams === lastFetchParams.current) return;
     lastFetchParams.current = fetchParams;
 
     setLoading(true);
-
     try {
+      let res;
       if (filters.length > 0) {
-        const { products: fetchedProducts, totalProducts } =
-          await fetchProductsWithFilters(category.id, filters, page, 12);
-        setProducts(fetchedProducts);
-        setFilteredProductCount(totalProducts);
+        // Call API route for filtered products
+        res = await fetch(
+          `/api/category?action=fetchProductsWithFilters&categoryId=${category.id}&filters=${encodeURIComponent(
+            JSON.stringify(filters),
+          )}&page=${page}&perPage=12`,
+        );
       } else if (sortOption !== 'Sortowanie') {
+        // Map sortOption to orderby and order parameters
         const sortingMap: Record<string, { orderby: string; order: string }> = {
           Bestsellers: { orderby: 'popularity', order: 'asc' },
           'Najnowsze produkty': { orderby: 'date', order: 'desc' },
           'Najwyższa cena': { orderby: 'price', order: 'desc' },
           'Najniższa cena': { orderby: 'price', order: 'asc' },
         };
-
         const sortingParams = sortingMap[sortOption] || {
           orderby: 'menu_order',
           order: 'asc',
         };
 
-        const { products: sortedProducts, totalProducts } =
-          await fetchSortedProducts(
-            category.id,
-            sortingParams.orderby,
-            sortingParams.order,
-            page,
-            12,
-          );
-
-        setProducts(sortedProducts);
-        setFilteredProductCount(totalProducts);
+        res = await fetch(
+          `/api/category?action=fetchSortedProducts&categoryId=${category.id}&orderby=${sortingParams.orderby}&order=${sortingParams.order}&page=${page}&perPage=12`,
+        );
       } else {
-        const { products: fetchedProducts, totalProducts } =
-          await fetchProductsByCategoryId(category.id, page, 12);
-        setProducts(fetchedProducts);
-        setFilteredProductCount(totalProducts);
+        res = await fetch(
+          `/api/category?action=fetchProductsByCategoryId&categoryId=${category.id}&page=${page}&perPage=12`,
+        );
       }
+      if (!res.ok) throw new Error('Error fetching products');
+      const data = await res.json();
+      setProducts(data.products);
+      setFilteredProductCount(data.totalProducts);
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -202,7 +188,6 @@ const CategoryPage = ({
     setFilteredProductCount(initialTotalProducts);
     setProducts(initialProducts);
     setCurrentPage(1);
-
     router.push({ pathname: router.pathname, query: { slug: slug || '' } });
   };
 
@@ -224,12 +209,10 @@ const CategoryPage = ({
 
   const updateUrlWithFilters = (filters: { name: string; value: string }[]) => {
     const query: Record<string, string | string[]> = { slug: slug || '' };
-
     filters.forEach((filter) => {
       if (!query[filter.name]) {
         query[filter.name] = [];
       }
-
       if (Array.isArray(query[filter.name])) {
         if (!(query[filter.name] as string[]).includes(filter.value)) {
           query[filter.name] = [
@@ -241,7 +224,6 @@ const CategoryPage = ({
         query[filter.name] = [filter.value];
       }
     });
-
     router.push({ pathname: router.pathname, query }, undefined, {
       shallow: true,
     });
@@ -344,17 +326,29 @@ const CategoryPage = ({
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const slug = context.params?.slug as string;
+  // Build an absolute URL using an environment variable (or fallback to localhost)
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   try {
-    const fetchedCategory = await fetchCategoryBySlug(slug);
-    const { products: fetchedProducts, totalProducts } =
-      await fetchProductsByCategoryId(fetchedCategory.id, 1, 12);
+    const categoryRes = await fetch(
+      `${baseUrl}/api/category?action=fetchCategoryBySlug&slug=${encodeURIComponent(
+        slug,
+      )}`,
+    );
+    if (!categoryRes.ok) throw new Error('Error fetching category');
+    const fetchedCategory = await categoryRes.json();
+
+    const productsRes = await fetch(
+      `${baseUrl}/api/category?action=fetchProductsByCategoryId&categoryId=${fetchedCategory.id}&page=1&perPage=12`,
+    );
+    if (!productsRes.ok) throw new Error('Error fetching products');
+    const productsData = await productsRes.json();
 
     return {
       props: {
         category: fetchedCategory,
-        initialProducts: fetchedProducts,
-        initialTotalProducts: totalProducts,
+        initialProducts: productsData.products,
+        initialTotalProducts: productsData.totalProducts,
       },
       revalidate: 60,
     };

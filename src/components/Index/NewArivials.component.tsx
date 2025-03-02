@@ -2,16 +2,15 @@ import React, { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
-import { fetchNowosciPosts } from '@/utils/api/woocommerce';
 import SkeletonNowosci from '@/components/Skeletons/SkeletonNowosci';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
 interface NowosciItem {
   id: number;
-  src: string; // Main image URL (desktop)
+  src: string; // Desktop image URL
   mobileSrc: string; // Mobile image URL from new_arrivals_mobile
-  alt: string; // Alt text (using title here)
+  alt: string; // Alt text (using title)
   title?: string; // Optional title
 }
 
@@ -54,9 +53,8 @@ const imageVariants = {
 };
 
 interface NewArrivalsSectionProps {
-  /** If true, the animation will be triggered based on the intersection observer
-      (i.e. when the entire New Arrivals section is in view).
-      Otherwise, it uses the heroOut scroll logic (as on the main page). */
+  /** If true, the animation is triggered by intersection (i.e. when the section is in view).
+      Otherwise, it uses scroll-based trigger (heroOut logic). */
   useInViewTrigger?: boolean;
 }
 
@@ -65,7 +63,7 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
 }) => {
   const [nowosciItems, setNowosciItems] = useState<NowosciItem[]>([]);
   const [loading, setLoading] = useState(true);
-  // heroOut is your current scroll-based trigger.
+  // heroOut used for scroll-based trigger if not using inView.
   const [heroOut, setHeroOut] = useState(false);
 
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -78,21 +76,23 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
   useEffect(() => {
     const loadNowosci = async () => {
       try {
-        const posts = await fetchNowosciPosts();
-        // Map posts to NowosciItem including mobileSrc
+        // Call the secure API route instead of a direct utility function.
+        const res = await fetch('/api/woocommerce?action=fetchNowosciPosts');
+        if (!res.ok) {
+          throw new Error('Failed to fetch nowości posts');
+        }
+        const posts = await res.json();
+        // Map the posts into NowosciItem objects.
         const items: NowosciItem[] = posts.map((post: any) => ({
           id: post.id,
-          // For desktop image use the featured image
-          src: post.imageUrl,
-          // For mobile image, use the ACF field new_arrivals_mobile if available,
-          // otherwise fallback to the featured image.
-          mobileSrc: post.acf?.new_arrivals_mobile || post.imageUrl,
+          src: post.imageUrl, // Desktop image from featured image
+          mobileSrc: post.acf?.new_arrivals_mobile || post.imageUrl, // Use ACF field if available
           alt: post.title.rendered,
           title: post.title.rendered,
         }));
         setNowosciItems(items);
       } catch (error) {
-        console.error('Error fetching Nowosci items:', error);
+        console.error('Error fetching nowości items:', error);
       } finally {
         setLoading(false);
       }
@@ -103,7 +103,7 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
 
   useEffect(() => {
     if (!useInViewTrigger) {
-      // Only use scroll-based trigger if not overriding with inView
+      // Use scroll-based trigger if inView is not used.
       const handleScroll = () => {
         if (window.pageYOffset >= HERO_HEIGHT && !heroOut) {
           setHeroOut(true);
@@ -125,10 +125,10 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
     return <SkeletonNowosci />;
   }
   if (nowosciItems.length < 4) {
-    return <p>Insufficient Nowosci data available.</p>;
+    return <p>Insufficient nowości data available.</p>;
   }
 
-  // Choose the trigger based on the prop: if useInViewTrigger is true, use inView; otherwise, use heroOut.
+  // Use inView trigger if enabled, otherwise heroOut.
   const animationTrigger = useInViewTrigger ? inView : heroOut;
 
   return (
@@ -154,7 +154,6 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
       <div className="md:hidden">
         <ResponsiveSlider
           items={nowosciItems.map((item) => ({
-            // On mobile, use the mobileSrc if available
             src: item.mobileSrc,
             alt: item.alt,
             title: item.title,

@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
-import { submitProductReview } from '@/utils/api/woocommerce';
 import Link from 'next/link';
 
-const ReviewForm = ({
+const ReviewForm: React.FC<{ productId: number; onSubmit: () => void }> = ({
   productId,
   onSubmit,
-}: {
-  productId: number;
-  onSubmit: () => void;
 }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -30,13 +26,20 @@ const ReviewForm = ({
     }
 
     try {
-      await submitProductReview(
-        productId,
-        formData.name,
-        formData.email,
-        formData.content,
-        formData.rating,
-      );
+      const res = await fetch('/api/woocommerce?action=submitProductReview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId,
+          name: formData.name,
+          email: formData.email,
+          content: formData.content,
+          rating: formData.rating,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error('Error submitting review');
+      }
       onSubmit();
     } catch (error) {
       console.error('Error submitting review:', error);
@@ -92,7 +95,6 @@ const ReviewForm = ({
         required
         onChange={(e) => setFormData({ ...formData, content: e.target.value })}
       />
-      {/* Styled Checkbox */}
       <div className="mt-6">
         <label className="flex items-center gap-2 text-sm">
           <input

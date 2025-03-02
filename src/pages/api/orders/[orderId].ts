@@ -11,9 +11,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
   // Ensure WooCommerce API credentials exist
-  const API_URL = process.env.NEXT_PUBLIC_REST_API;
-  const CONSUMER_KEY = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY;
-  const CONSUMER_SECRET = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET;
+  const API_URL = process.env.REST_API;
+  const CONSUMER_KEY = process.env.WC_CONSUMER_KEY;
+  const CONSUMER_SECRET = process.env.WC_CONSUMER_SECRET;
 
   if (!API_URL || !CONSUMER_KEY || !CONSUMER_SECRET) {
     console.error('❌ WooCommerce API credentials are missing.');

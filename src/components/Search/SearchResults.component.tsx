@@ -1,8 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {
-  searchProducts,
-  fetchLatestKolekcja,
-} from '../../utils/api/woocommerce';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -22,15 +18,19 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
   }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchLatest = async () => {
       try {
-        const latestCollection = await fetchLatestKolekcja();
-        setLatestKolekcja(latestCollection);
+        const res = await fetch('/api/woocommerce?action=fetchLatestKolekcja');
+        if (!res.ok) {
+          throw new Error('Failed to fetch latest Kolekcja');
+        }
+        const latest = await res.json();
+        setLatestKolekcja(latest);
       } catch (error) {
         console.error('Error fetching the latest Kolekcja:', error);
       }
     };
-    fetchData();
+    fetchLatest();
   }, []);
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +44,13 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
 
     setLoading(true);
     try {
-      const products = await searchProducts(value);
+      const res = await fetch(
+        `/api/woocommerce?action=searchProducts&query=${encodeURIComponent(value)}`,
+      );
+      if (!res.ok) {
+        throw new Error('Error fetching search results');
+      }
+      const products = await res.json();
       setResults(products);
     } catch (error) {
       console.error('Error fetching search results:', error);
@@ -97,7 +103,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
                         <Image
                           height={140}
                           width={140}
-                          src={product.images[0]?.src}
+                          src={product.images?.[0]?.src}
                           alt={product.name}
                           className="w-full h-full object-cover rounded-lg"
                         />

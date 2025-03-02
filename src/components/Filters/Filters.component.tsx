@@ -2,10 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import SkeletonFilter from '../Skeletons/SkeletonFilter.component';
 import Snackbar from '../UI/Snackbar.component';
 import PriceSlider from '@/components/UI/PriceSlider';
-import {
-  fetchProductsWithFilters,
-  fetchProductAttributesWithTerms,
-} from '@/utils/api/category';
 
 interface FilterOption {
   name: string;
@@ -24,7 +20,7 @@ interface FiltersProps {
   onFilterChange: (selectedFilters: { name: string; value: string }[]) => void;
   setProducts: (products: any[]) => void;
   setTotalProducts: (total: number) => void;
-  filterOrder?: string[]; // Define the order of filters
+  filterOrder?: string[];
 }
 
 const Filters = ({
@@ -47,16 +43,17 @@ const Filters = ({
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const previousCategoryId = useRef<number | null>(null);
 
-  // Fetch attributes and reset price when category changes
+  // Fetch attributes (with terms) when the category changes.
   useEffect(() => {
     const fetchAttributes = async () => {
       if (previousCategoryId.current === categoryId) return;
-
       setLoading(true);
       try {
-        const fetchedAttributes: FilterAttribute[] =
-          await fetchProductAttributesWithTerms(categoryId);
-
+        const res = await fetch(
+          `/api/category?action=fetchProductAttributesWithTerms&categoryId=${categoryId}`,
+        );
+        if (!res.ok) throw new Error('Failed to fetch attributes');
+        const fetchedAttributes: FilterAttribute[] = await res.json();
         const orderedAttributes =
           filterOrder.length > 0
             ? filterOrder
@@ -65,13 +62,9 @@ const Filters = ({
                 )
                 .filter((attr): attr is FilterAttribute => !!attr)
             : fetchedAttributes;
-
         setAttributes(orderedAttributes);
-
-        // Reset price filter
         setPriceRange([0, 500]);
-
-        // Initialize expanded state for the first 3 attributes
+        // Initialize expanded state for the first 3 attributes.
         const initialExpandedFilters = orderedAttributes.slice(0, 3).reduce(
           (acc: { [key: string]: boolean }, attr: FilterAttribute) => ({
             ...acc,
@@ -80,7 +73,6 @@ const Filters = ({
           { price: false },
         );
         setExpandedFilters(initialExpandedFilters);
-
         previousCategoryId.current = categoryId;
       } catch (error) {
         setErrorMessage('Failed to load filters');
@@ -113,14 +105,15 @@ const Filters = ({
     }
 
     try {
-      const { products, totalProducts } = await fetchProductsWithFilters(
-        categoryId,
-        updatedFilters,
-        1,
-        12,
+      const res = await fetch(
+        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${encodeURIComponent(
+          JSON.stringify(updatedFilters),
+        )}&page=1&perPage=12`,
       );
-      setProducts(products);
-      setTotalProducts(totalProducts);
+      if (!res.ok) throw new Error('Error fetching filtered products');
+      const data = await res.json();
+      setProducts(data.products);
+      setTotalProducts(data.totalProducts);
     } catch (error) {
       console.error('Error fetching filtered products:', error);
     }
@@ -142,14 +135,15 @@ const Filters = ({
     onFilterChange(updatedFilters);
 
     try {
-      const { products, totalProducts } = await fetchProductsWithFilters(
-        categoryId,
-        updatedFilters,
-        1,
-        12,
+      const res = await fetch(
+        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${encodeURIComponent(
+          JSON.stringify(updatedFilters),
+        )}&page=1&perPage=12`,
       );
-      setProducts(products);
-      setTotalProducts(totalProducts);
+      if (!res.ok) throw new Error('Error applying price filter');
+      const data = await res.json();
+      setProducts(data.products);
+      setTotalProducts(data.totalProducts);
     } catch (error) {
       console.error('Error applying price filter:', error);
     }
@@ -221,7 +215,6 @@ const Filters = ({
               className="w-4 h-4"
             />
           </button>
-
           {expandedFilters[attribute.slug] && attribute.options && (
             <div className="pl-0">
               {attribute.options
@@ -264,7 +257,7 @@ const Filters = ({
                           <img
                             src="/icons/check.svg"
                             alt="check"
-                            className="w-4 h-4 text-white"
+                            className="w-4 h-4"
                           />
                         )}
                       </label>
@@ -301,7 +294,6 @@ const Filters = ({
               className="w-4 h-4"
             />
           </button>
-
           {expandedFilters['price'] && (
             <PriceSlider
               minPrice={0}

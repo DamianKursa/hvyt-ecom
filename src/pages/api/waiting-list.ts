@@ -14,10 +14,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const consumerKey = process.env.NEXT_PUBLIC_WC_CONSUMER_KEY || '';
-    const consumerSecret = process.env.NEXT_PUBLIC_WC_CONSUMER_SECRET || '';
+    const consumerKey = process.env.WC_CONSUMER_KEY || '';
+    const consumerSecret = process.env.WC_CONSUMER_SECRET || '';
     const endpoint =
-      process.env.NEXT_PUBLIC_BISN_ENDPOINT ||
+      process.env.BISN_ENDPOINT ||
       'https://hvyt.pl/wp-json/wc-instocknotifier/v3/create_subscriber';
 
     // Build the payload with required fields.

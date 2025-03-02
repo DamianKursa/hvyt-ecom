@@ -13,7 +13,6 @@ import AttributeSwitcher from '@/components/UI/AttributeSwitcher.component';
 import Reviews from '@/components/Reviews/Reviews';
 import QuantityChanger from '@/components/UI/QuantityChanger';
 import { useProductState } from '@/utils/hooks/useProductState';
-import { fetchProductBySlug } from '@/utils/api/woocommerce';
 import { CartContext } from '@/stores/CartProvider';
 import { useWishlist } from '@/context/WhishlistContext';
 import Image from 'next/image';
@@ -84,7 +83,13 @@ const ProductPage = () => {
       if (!slug) return;
       try {
         dispatch({ type: 'SET_LOADING', payload: true });
-        const productData = await fetchProductBySlug(slug);
+        const res = await fetch(
+          `/api/woocommerce?action=fetchProductBySlug&slug=${encodeURIComponent(slug)}`,
+        );
+        if (!res.ok) {
+          throw new Error('No product found');
+        }
+        const productData = await res.json();
         if (!productData) {
           dispatch({ type: 'SET_ERROR', payload: 'No product found' });
           dispatch({

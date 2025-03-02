@@ -8,14 +8,6 @@ import IconRenderer from '@/components/UI/IconRenderer';
 import { Kolekcja } from '../../utils/functions/interfaces';
 import SkeletonCollectionPage from '@/components/Skeletons/SkeletonCollectionPage';
 import ProductPreview from '../../components/Product/ProductPreview.component';
-import {
-  fetchKolekcjePostsWithImages,
-  fetchMediaById,
-} from '../../utils/api/woocommerce';
-import {
-  fetchCategoryBySlug,
-  fetchProductsByCategoryId,
-} from '../../utils/api/category';
 import { useRouter } from 'next/router';
 
 const CollectionPage = () => {
@@ -33,6 +25,7 @@ const CollectionPage = () => {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Utility to remove HTML tags
   const stripHTML = (html: string) => {
     const div = document.createElement('div');
     div.innerHTML = html;
@@ -43,24 +36,48 @@ const CollectionPage = () => {
     const fetchData = async () => {
       try {
         if (!slugString) return;
-        const categoryData = await fetchCategoryBySlug(slugString);
-        const fetchedProducts = await fetchProductsByCategoryId(
-          categoryData.id,
+
+        // 1. Fetch category data by slug via the secure API route
+        const categoryRes = await fetch(
+          `/api/category?action=fetchCategoryBySlug&slug=${encodeURIComponent(
+            slugString,
+          )}`,
         );
-        setProductsData(fetchedProducts);
-        const fetchedKolekcje = await fetchKolekcjePostsWithImages();
-        setKolekcjeData(fetchedKolekcje);
-        const currentKolekcja = fetchedKolekcje.find(
+        if (!categoryRes.ok) throw new Error('Error fetching category');
+        const categoryData = await categoryRes.json();
+
+        // 2. Fetch products for that category via the secure API route
+        const productsRes = await fetch(
+          `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryData.id}&page=1&perPage=12`,
+        );
+        if (!productsRes.ok) throw new Error('Error fetching products');
+        const productsJson = await productsRes.json();
+        setProductsData(productsJson);
+
+        // 3. Fetch Kolekcje posts with images via the secure WooCommerce API route
+        const kolekcjeRes = await fetch(
+          `/api/woocommerce?action=fetchKolekcjePostsWithImages`,
+        );
+        if (!kolekcjeRes.ok) throw new Error('Error fetching Kolekcje posts');
+        const kolekcjeJson = await kolekcjeRes.json();
+        setKolekcjeData(kolekcjeJson);
+
+        // 4. Find the current Kolekcja by slug and update description
+        const currentKolekcja = kolekcjeJson.find(
           (kolekcja: Kolekcja) => kolekcja.slug === slugString,
         );
         setContent(
           stripHTML(currentKolekcja?.content.rendered || 'Opis kolekcji.'),
         );
+
+        // 5. If a featured_media exists, fetch its image URL via the secure API route
         if (currentKolekcja?.featured_media) {
-          const featuredImageUrl = await fetchMediaById(
-            currentKolekcja.featured_media,
+          const mediaRes = await fetch(
+            `/api/woocommerce?action=fetchMediaById&mediaId=${currentKolekcja.featured_media}`,
           );
-          setFeaturedImage(featuredImageUrl);
+          if (!mediaRes.ok) throw new Error('Error fetching media');
+          const mediaJson = await mediaRes.json();
+          setFeaturedImage(mediaJson.source_url);
         }
         setLoading(false);
       } catch (error) {
@@ -72,7 +89,7 @@ const CollectionPage = () => {
     fetchData();
   }, [slugString]);
 
-  // Compute currentKolekcja on render so that it is available everywhere
+  // Determine the current Kolekcja for display
   const currentKolekcja = kolekcjeData?.find(
     (kolekcja: Kolekcja) => kolekcja.slug === slugString,
   );
@@ -102,7 +119,9 @@ const CollectionPage = () => {
 
   return (
     <Layout
-      title={`Hvyt | ${currentKolekcja?.title.rendered || slugString || 'Ładowanie...'}`}
+      title={`Hvyt | ${
+        currentKolekcja?.title.rendered || slugString || 'Ładowanie...'
+      }`}
     >
       <section className="w-full py-16">
         <div className="container mx-auto max-w-grid-desktop px-4 md:px-0">
@@ -122,7 +141,6 @@ const CollectionPage = () => {
                 />
               )}
             </div>
-
             <div className="flex flex-col justify-start md:justify-end px-6 relative order-2 md:order-1">
               {kolekcjeData && (
                 <div className="mb-16">
@@ -142,7 +160,6 @@ const CollectionPage = () => {
               <h1 className="font-size-h1 capitalize mb-[32px] font-bold text-dark-pastel-red">
                 {currentKolekcja?.title.rendered || 'Domyślny Tytuł Kolekcji'}
               </h1>
-
               <p className="font-size-text-medium mb-[48px] text-neutral-darkest">
                 {content}
               </p>
