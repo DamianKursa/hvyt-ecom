@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReviewItem from './ReviewItem';
 import ReviewForm from './ReviewForm';
-import { fetchProductReviews } from '@/utils/api/woocommerce';
 
 interface Review {
   id: number;
@@ -20,36 +19,37 @@ const Reviews = ({ productId }: { productId: number }) => {
 
   const itemsPerPage = 2; // Number of reviews visible at a time
 
-  useEffect(() => {
-    const loadReviews = async () => {
-      try {
-        setLoading(true);
-        const data = await fetchProductReviews(productId);
-        setReviews(data);
-      } catch (error) {
-        console.error('Error fetching reviews:', error);
-      } finally {
-        setLoading(false);
+  const loadReviews = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/reviews?productId=${productId}`);
+      if (!res.ok) {
+        throw new Error('Error fetching reviews');
       }
-    };
+      const data = await res.json();
+      setReviews(data);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadReviews();
   }, [productId]);
 
   const handleReviewSubmit = async () => {
     setSubmitted(true);
     setShowForm(false);
-
     try {
-      const data = await fetchProductReviews(productId);
-      setReviews(data);
+      await loadReviews();
     } catch (error) {
       console.error('Error refreshing reviews:', error);
     }
   };
 
   const totalSlides = Math.ceil(reviews.length / itemsPerPage);
-
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < totalSlides - 1;
 
@@ -106,9 +106,7 @@ const Reviews = ({ productId }: { productId: number }) => {
         <div className="overflow-hidden">
           <div
             className="flex transition-transform duration-300"
-            style={{
-              transform: `translateX(-${currentIndex * 100}%)`,
-            }}
+            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
           >
             {Array.from({ length: totalSlides }).map((_, slideIndex) => (
               <div

@@ -26,7 +26,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void }> = ({
     }
 
     try {
-      const res = await fetch('/api/woocommerce?action=submitProductReview', {
+      const res = await fetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -95,6 +95,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void }> = ({
         required
         onChange={(e) => setFormData({ ...formData, content: e.target.value })}
       />
+      {/* Styled Checkbox */}
       <div className="mt-6">
         <label className="flex items-center gap-2 text-sm">
           <input

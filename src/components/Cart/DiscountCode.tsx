@@ -1,7 +1,5 @@
 import React, { useState, useContext } from 'react';
-// Removed Snackbar import since we now render inline messages
-import { validateDiscountCode } from '@/utils/api/woocommerce'; // Adjust the path as needed
-import { CartContext } from '@/stores/CartProvider'; // Use CartContext for global state
+import { CartContext } from '@/stores/CartProvider';
 
 interface DiscountCodeProps {
   cartTotal: number;
@@ -12,9 +10,9 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
   cartTotal,
   setCartTotal,
 }) => {
-  const { applyCoupon, removeCoupon, cart } = useContext(CartContext); // Access cart context
+  const { applyCoupon, removeCoupon, cart } = useContext(CartContext);
   const [isOpen, setIsOpen] = useState(false);
-  const [code, setCode] = useState(cart?.coupon?.code || ''); // Preload existing coupon
+  const [code, setCode] = useState(cart?.coupon?.code || '');
   const [snackbar, setSnackbar] = useState<{
     message: string;
     type: 'success' | 'error';
@@ -36,21 +34,28 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     setSnackbar((prev) => ({ ...prev, visible: false }));
 
     try {
-      const { valid, discountValue, discountType } = await validateDiscountCode(
-        code.trim(),
-      );
+      const response = await fetch('/api/discount', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code.trim() }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Błąd podczas weryfikacji kodu rabatowego');
+      }
+
+      const { valid, discountValue, discountType } = await response.json();
 
       if (valid) {
         let discountApplied = 0;
-
         if (discountType === 'percent') {
-          discountApplied = (cartTotal * discountValue) / 100; // Calculate percentage discount
+          discountApplied = (cartTotal * discountValue) / 100;
         } else if (discountType === 'fixed') {
-          discountApplied = discountValue; // Apply fixed discount
+          discountApplied = discountValue;
         }
 
-        applyCoupon({ code, discountValue: discountApplied, discountType }); // Save coupon globally
-        setCartTotal(cartTotal - discountApplied); // Update local cart total
+        applyCoupon({ code, discountValue: discountApplied, discountType });
+        setCartTotal(cartTotal - discountApplied);
         setSnackbar({
           message: 'Kod rabatowy został dodany',
           type: 'success',
@@ -81,7 +86,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
   const handleRemoveCode = () => {
     setCode('');
-    removeCoupon(); // Clear global coupon state
+    removeCoupon();
     setSnackbar({
       message: 'Kod rabatowy został usunięty',
       type: 'success',
