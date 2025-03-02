@@ -5,7 +5,7 @@ import {
   fetchProductAttributesWithTerms,
   fetchProductsWithFilters,
   fetchSortedProducts,
-} from '../../utils/api/category-off';
+} from '../../utils/api/category';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Allow only GET requests

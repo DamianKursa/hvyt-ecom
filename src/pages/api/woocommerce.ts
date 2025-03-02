@@ -12,7 +12,7 @@ import {
   searchProducts,
   fetchInstagramPosts,
 
-} from '../../utils/api/woocommerce-off';
+} from '../../utils/api/woocommerce';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { action } = req.query;
