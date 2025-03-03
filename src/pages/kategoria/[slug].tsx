@@ -12,6 +12,7 @@ interface Category {
   id: number;
   name: string;
   slug: string;
+  // include any other fields as needed
 }
 
 interface CategoryPageProps {
@@ -327,7 +328,7 @@ const CategoryPage = ({
 export const getStaticProps: GetStaticProps = async (context) => {
   const slug = context.params?.slug as string;
   // Build an absolute URL using an environment variable (or fallback to localhost)
-  const baseUrl = process.env.WORDPRESS_API_URL || 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   try {
     const categoryRes = await fetch(
