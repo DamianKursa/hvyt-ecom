@@ -363,12 +363,12 @@ const Shipping: React.FC<ShippingProps> = ({
       const parcel = new window.SzybkaPaczkaParcel();
       interval = window.setInterval(() => {
         const result = parcel.getParcelObject();
-        console.log('Polling GLS result:', result);
+
         const extracted = extractSelected(result);
-        console.log('Extracted GLS selection:', extracted);
+
         if (isValidSelection(extracted)) {
           setSelectedGlsPoint(extracted);
-          console.log('Selected GLS parcel shop (polling):', extracted);
+
           clearInterval(interval!);
           setShowGlsMap(false);
         } else {
@@ -382,7 +382,6 @@ const Shipping: React.FC<ShippingProps> = ({
       const extracted = extractSelected(e.detail) || extractSelected(e.target);
       if (isValidSelection(extracted)) {
         setSelectedGlsPoint(extracted);
-        console.log('Selected GLS parcel shop (event):', extracted);
         setShowGlsMap(false);
       } else {
         console.log('Event did not contain a valid selection.');
@@ -482,7 +481,6 @@ const Shipping: React.FC<ShippingProps> = ({
                   <div>
                     <button
                       onClick={() => {
-                        console.log('GLS button clicked');
                         setShowGlsMap(true);
                       }}
                       className="mt-6 text-black border border-black px-4 py-2 rounded-full flex items-center text-sm"
