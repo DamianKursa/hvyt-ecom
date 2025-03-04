@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log('Received token verification request', { cookies: req.cookies });
 
   const { token } = req.cookies;
 

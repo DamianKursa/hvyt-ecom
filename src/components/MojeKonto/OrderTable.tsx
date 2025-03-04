@@ -98,9 +98,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
               <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
                 Data zamówienia
               </th>
-              <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
-                Status płatności
-              </th>
+              <th className="py-4 px-4 text-left font-semibold text-neutral-darker"></th>
               <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
                 Status realizacji
               </th>
@@ -122,11 +120,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
                   <td className="py-3 px-4">
                     {new Date(order.date_created).toLocaleDateString()}
                   </td>
-                  <td className="py-3 px-4">
-                    <span className="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">
-                      {paymentLabel}
-                    </span>
-                  </td>
+                  <td className="py-3 px-4"></td>
                   <td className="py-3 px-4">
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-semibold ${orderClassName}`}

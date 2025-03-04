@@ -36,7 +36,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const fetchUser = async () => {
     if (user) return; // Avoid redundant API calls if the user is already loaded
     try {
-      console.log('Verifying token...');
       const validateResponse = await fetch('/api/auth/verify', {
         method: 'POST',
         credentials: 'include',
@@ -48,8 +47,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         localStorage.removeItem('user'); // Clear stale user data
         return;
       }
-
-      console.log('Fetching user profile...');
       const profileResponse = await fetch('/api/auth/profile', {
         method: 'GET',
         credentials: 'include',

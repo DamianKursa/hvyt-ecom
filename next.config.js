@@ -65,7 +65,7 @@ const nextConfig = {
       { source: '/waiting-list/:path*', destination: '/waiting-list/:path*' },
       { source: '/woocommerce/:path*', destination: '/woocommerce/:path*' },
       { source: '/checkout/:path*', destination: '/checkout/:path*' },
-      { source: '/dostawka/:path*', destination: '/dostawka/:path*' },
+      { source: '/dostawa/:path*', destination: '/dostawa/:path*' },
       { source: '/dziekujemy/:path*', destination: '/dziekujemy/:path*' },
       { source: '/hvyt-objects/:path*', destination: '/hvyt-objects/:path*' },
       { source: '/kase/:path*', destination: '/kase/:path*' },
