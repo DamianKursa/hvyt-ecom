@@ -1,22 +1,25 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Layout from '@/components/Layout/Layout.component';
 import { CartContext, Product } from '@/stores/CartProvider';
 import CartProgress from '@/components/Cart/CartProgress';
 import CartItems from '@/components/Cart/CartItems';
 import CartSummary from '@/components/Cart/CartSummary';
 import Link from 'next/link';
-import Bestsellers from '@/components/Index/Bestsellers.component'; // Import the Bestsellers component
+import Bestsellers from '@/components/Index/Bestsellers.component';
 
 const Koszyk: React.FC = () => {
   const { cart, updateCartItem, removeCartItem } = useContext(CartContext);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Prevent rendering on the server/hydration mismatch
+  if (!mounted) return <div>Loading...</div>;
 
   const handleIncreaseQuantity = (product: Product) => {
     updateCartItem(product.cartKey, product.qty + 1);
-  };
-
-  const handleCheckout = () => {
-    console.log('Przechodze do checkout...');
-    // Add your checkout logic here, e.g., redirecting to a checkout page
   };
 
   const handleDecreaseQuantity = (product: Product) => {
@@ -29,9 +32,11 @@ const Koszyk: React.FC = () => {
     removeCartItem(product.cartKey);
   };
 
-  const formatPrice = (price: number) => price.toFixed(2);
+  const handleCheckout = () => {
+    console.log('Przechodze do checkout...');
+    // Add your checkout logic here, e.g., redirecting to a checkout page
+  };
 
-  // Check if the cart is empty using totalProductsPrice or other properties
   const isCartEmpty = !cart || cart.totalProductsPrice === 0;
 
   return (
@@ -69,8 +74,6 @@ const Koszyk: React.FC = () => {
           <div>
             <CartProgress />
             <div className="flex flex-col lg:flex-row gap-8">
-              {' '}
-              {/* Keep the cart layout intact */}
               <CartItems
                 onIncreaseQuantity={handleIncreaseQuantity}
                 onDecreaseQuantity={handleDecreaseQuantity}
@@ -84,7 +87,6 @@ const Koszyk: React.FC = () => {
           </div>
         )}
 
-        {/* Add Bestsellers Section */}
         <div className="mt-16">
           <Bestsellers
             title="Produkty, które mogą Ci się spodobać"
