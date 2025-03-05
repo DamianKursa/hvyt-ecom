@@ -60,23 +60,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const orderData: OrderData = req.body;
 
-  console.log('📩 Received order data from frontend:');
-  console.log(JSON.stringify(orderData, null, 2));
+
 
   // Validate required fields
   if (!orderData.payment_method || !orderData.billing || !orderData.shipping || !orderData.shipping_lines || !orderData.line_items) {
-    console.error('❌ Missing required order data');
+  
     return res.status(400).json({ error: 'Missing required order data' });
   }
 
   // Validate customer ID
   if (orderData.customer_id) {
     try {
-      console.log(`🔍 Validating customer ID: ${orderData.customer_id}`);
       const customerResponse = await WooCommerceAPI.get(`/customers/${orderData.customer_id}`);
-      console.log('✅ Customer validation successful:', customerResponse.data);
     } catch (error) {
-      console.error('❌ Error validating customer_id:', error);
       return res.status(400).json({ error: 'Invalid or non-existent customer_id' });
     }
   } else {
@@ -84,11 +80,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    console.log('📤 Sending order data to WooCommerce API...');
     const response = await WooCommerceAPI.post('/orders', orderData);
-
-    console.log('✅ Order successfully created in WooCommerce:');
-    console.log(JSON.stringify(response.data, null, 2));
 
     const createdOrder = response.data;
 
@@ -104,8 +96,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (err: unknown) {
     const error = err as AxiosError;
 
-    console.error('❌ Error creating order in WooCommerce:');
-    console.error(error.response?.data || error.message);
 
     res.status(500).json({
       error: 'Failed to create order',

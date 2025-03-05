@@ -275,20 +275,15 @@ const Checkout: React.FC = () => {
       // If using Przelewy24 and a payment URL is returned, redirect immediately.
       if (paymentMethod === 'przelewy24' && createdOrder.payment_url) {
         try {
-          // Call our API endpoint with the order details.
-          const { data } = await axios.get('/api/final-payment-url', {
-            params: {
-              orderId: createdOrder.id,
-              orderKey: createdOrder.order_key,
-            },
-          });
-          if (data.finalUrl) {
-            router.push(data.finalUrl);
-          } else {
-            router.push(createdOrder.payment_url);
-          }
+          // Create a URL object from the returned payment_url
+          const url = new URL(createdOrder.payment_url);
+          // Remove the 'pay_for_order' query parameter
+          url.searchParams.delete('pay_for_order');
+          // Redirect to the modified URL
+          router.push(url.toString());
         } catch (error) {
-          console.error('Error getting final payment URL:', error);
+          console.error('Error modifying payment URL:', error);
+          // Fallback: redirect to the original URL
           router.push(createdOrder.payment_url);
         }
       } else if (createdOrder.id && createdOrder.order_key) {
