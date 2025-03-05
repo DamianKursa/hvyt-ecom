@@ -273,6 +273,7 @@ const Checkout: React.FC = () => {
       localStorage.setItem('recentOrderKey', createdOrder.order_key);
 
       // If using Przelewy24 and a payment URL is returned, redirect immediately.
+      // Inside your handleOrderSubmit function
       if (paymentMethod === 'przelewy24' && createdOrder.payment_url) {
         try {
           const { data } = await axios.get('/api/final-payment-url', {
