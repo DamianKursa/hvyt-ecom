@@ -25,8 +25,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const err = error as any;
     const statusCode = err.response?.status || 500;
     const message = err.response?.data?.message || err.message || 'Validation failed';
-
-    console.error('Token validation error:', { statusCode, message });
     res.status(statusCode).json({ message: `Invalid token: ${message}` });
   }
 }

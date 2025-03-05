@@ -42,7 +42,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       });
 
       if (!validateResponse.ok) {
-        console.warn('Token is invalid. User is not authenticated.');
         setUser(null);
         localStorage.removeItem('user'); // Clear stale user data
         return;
@@ -63,13 +62,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
             email: data.email,
           }),
         ); // Persist user data including id
-        console.log('Fetched user profile:', data);
       } else {
         setUser(null);
         localStorage.removeItem('user');
       }
     } catch (error) {
-      console.error('Error fetching user:', error);
       setUser(null);
       localStorage.removeItem('user');
     }
@@ -104,7 +101,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       }
 
       const data = await response.json();
-      console.log('Registration successful:', data);
 
       // Automatically log in the user after registration
       setUser({ id: data.id || null, name: username, email }); // Include id
