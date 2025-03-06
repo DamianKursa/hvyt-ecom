@@ -49,10 +49,10 @@ const nextConfig = {
       { source: '/_next/:path*', destination: '/_next/:path*' },
       { source: '/api/:path*', destination: '/api/:path*' },
       { source: '/static/:path*', destination: '/static/:path*' },
-  
+
       // Serve Next.js homepage
       { source: '/', destination: '/' },
-  
+
       // Explicit Next.js routes (folders & files)
       { source: '/auth/:path*', destination: '/auth/:path*' },
       { source: '/moje-konto/:path*', destination: '/moje-konto/:path*' },
@@ -88,11 +88,24 @@ const nextConfig = {
       { source: '/zwroty-i-reklamacje/:path*', destination: '/zwroty-i-reklamacje/:path*' },
       // New explicit route for /produkt
       { source: '/produkt/:path*', destination: '/produkt/:path*' },
-  
+
       // Proxy WordPress API calls: ensure /wp-json is served from hvyt.pl
       { source: '/wp-json/:path*', destination: 'https://wp.hvyt.pl/wp-json/:path*' },
-  
-      // Catch-all: Any route not matched above is proxied to WordPress
+
+      // NEW: Catch requests to "/" that include a wc-api query parameter and proxy them to wp.hvyt.pl.
+      {
+        source: '/',
+        has: [
+          {
+            type: 'query',
+            key: 'wc-api',
+            value: '(.*)',
+          },
+        ],
+        destination: 'https://wp.hvyt.pl/',
+      },
+
+      // Catch-all: Any route not matched above is proxied to WordPress.
       {
         source: '/:path((?!_next|api|static|wp-json|wp-admin|auth|moje-konto|orders|posts|blog|kategoria|kolekcje|category|contact|create-order|payment-webhooks|payment|reviews|shipping|waiting-list|woocommerce|checkout|dostawa|dziekujemy|hvyt-objects|kase|koszyk|logowanie|o-nas|polityka-prywatnosci|potwierdzenie-email|regulamin|ulubione|wspolpraca|wygodne-zwroty|zapomniane-haslo|zwroty-i-reklamacje|produkt).+)',
         destination: 'https://wp.hvyt.pl/:path*',
@@ -100,5 +113,5 @@ const nextConfig = {
     ];
   },
 };
-  
+
 module.exports = nextConfig;
