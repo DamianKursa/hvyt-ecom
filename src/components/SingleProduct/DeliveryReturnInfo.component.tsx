@@ -26,9 +26,9 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
     },
   ];
 
-  // Render stock row if either a numeric stock value is provided or if stockStatus is instock.
+  // Render stock row only if stock is a positive number or stockStatus is instock.
   const shouldRenderStockRow =
-    (typeof stock === 'number' && !isNaN(stock)) || stockStatus === 'instock';
+    (typeof stock === 'number' && stock > 0) || stockStatus === 'instock';
 
   // Determine total number of rows.
   const totalRows = items.length + (shouldRenderStockRow ? 1 : 0);
@@ -76,7 +76,7 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
             height={24}
           />
           <span className="text-black font-medium">
-            {typeof stock === 'number' && !isNaN(stock)
+            {typeof stock === 'number' && stock > 0
               ? stock >= 50
                 ? 'Ponad 50 szt. na stanie. Wysyłka w 24h!'
                 : `Tylko ${stock} szt. na stanie. Wysyłka w 24h!`

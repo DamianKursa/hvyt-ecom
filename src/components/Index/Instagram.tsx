@@ -105,6 +105,19 @@ const Instagram = () => {
           </div>
         ))}
       </div>
+      <div className="flex justify-center mt-8">
+        <Link
+          href="https://www.instagram.com/hvyt_pl"
+          className="px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all flex items-center space-x-2"
+        >
+          <span>Zobacz nasz Instagram</span>
+          <img
+            src="/icons/Instagram.svg"
+            alt="Instagram Icon"
+            className="h-5 w-5"
+          />
+        </Link>
+      </div>
     </section>
   );
 };
