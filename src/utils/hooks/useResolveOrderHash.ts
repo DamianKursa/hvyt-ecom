@@ -10,24 +10,22 @@ const useResolveOrderHash = () => {
     if (!router.isReady) return;
 
     const { 'wc-api': wcApi, order_hash } = router.query;
-
-    // Proceed only if the wc-api parameter and order_hash exist
-    if (wcApi && order_hash) {
-      // Call the custom WordPress REST endpoint to resolve the order details.
+    // Check if both wc-api and order_hash exist in the URL
+    if (wcApi === 'WC_Gateway_Przelewy24' && order_hash) {
       axios
-        .get(`https://wp.hvyt.pl/wp-json/custom/v1/resolve-order`, {
+        .get('https://wp.hvyt.pl/wp-json/custom/v1/resolve-order', {
           params: { order_hash },
         })
         .then(response => {
           const { order_id, order_key } = response.data;
           if (order_id && order_key) {
-            // Redirect to your frontend thank-you page with the order details.
-            router.push(`/dziekujemy?order_id=${order_id}&key=${order_key}`);
+            // Redirect to your frontend thank-you page
+            router.replace(`/dziekujemy?order_id=${order_id}&key=${order_key}`);
           }
         })
         .catch(err => {
           console.error('Error resolving order hash:', err);
-          // Optionally, handle error (show a message, etc.)
+          // Optionally, you can show an error message or redirect to a fallback page
         });
     }
   }, [router]);
