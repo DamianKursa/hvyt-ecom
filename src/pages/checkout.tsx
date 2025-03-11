@@ -259,14 +259,11 @@ const Checkout: React.FC = () => {
       customer_id: user?.id || undefined,
     };
 
-    console.log('📦 Sending Order Data to API:', orderData);
-
     try {
       const response = await axios.post('/api/create-order', orderData, {
         headers: { 'Content-Type': 'application/json' },
       });
       const createdOrder = response.data;
-      console.log('✅ Order created successfully:', createdOrder);
 
       // Save order details locally (for guest users, if needed)
       localStorage.setItem('recentOrderId', createdOrder.id.toString());
