@@ -55,19 +55,24 @@ const Payment: React.FC<PaymentProps> = ({
       return paymentMethods.filter((method) => method.id === 'cod'); // "Za pobraniem"
     }
 
-    return paymentMethods.filter((method) => method.id === 'przelewy24');
+    // Accept both legacy and new Przelewy24 payment IDs
+    return paymentMethods.filter((method) =>
+      ['przelewy24', 'p24-online-payments'].includes(method.id),
+    );
   };
 
   const availableMethods = getFilteredPaymentMethods();
 
-  // Automatically adjust the selected payment method
+  // Automatically adjust the selected payment method based on shipping method
   useEffect(() => {
     if (shippingMethod === 'paczkomaty_inpost') {
-      setPaymentMethod('przelewy24');
+      // Use the new payment method by default if available
+      setPaymentMethod('p24-online-payments');
     } else if (shippingMethod === 'kurier_gls_pobranie') {
       setPaymentMethod('cod');
     } else {
-      setPaymentMethod('przelewy24');
+      // Default to the new Przelewy24 ID
+      setPaymentMethod('p24-online-payments');
     }
   }, [shippingMethod, setPaymentMethod]);
 
