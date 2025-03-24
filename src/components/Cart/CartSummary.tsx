@@ -5,7 +5,7 @@ import DiscountCode from '@/components/Cart/DiscountCode';
 interface CartSummaryProps {
   totalProductsPrice: number;
   shippingPrice?: number;
-  onCheckout: () => void;
+  onCheckout: () => Promise<void> | void;
   isCheckoutPage?: boolean;
 }
 
@@ -17,6 +17,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 }) => {
   const [totalPrice, setTotalPrice] = useState(totalProductsPrice);
   const [loading, setLoading] = useState(false);
+  // Local loading state to disable the button during submission
+  const [localLoading, setLocalLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,9 +37,15 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   const formatPrice = (price: number) =>
     price.toFixed(2).replace('.', ',') + ' zł';
 
-  const handleButtonClick = () => {
+  // Wrap the onCheckout function to set the local loading state
+  const handleButtonClick = async () => {
     if (isCheckoutPage) {
-      onCheckout();
+      setLocalLoading(true);
+      try {
+        await onCheckout();
+      } catch (error) {
+        setLocalLoading(false);
+      }
     } else {
       router.push('/checkout');
     }
@@ -97,9 +105,16 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
       <button
         onClick={handleButtonClick}
-        className="w-full py-4 bg-black text-white text-lg font-light rounded-full hover:bg-neutral-dark transition"
+        disabled={localLoading}
+        className={`w-full py-4 bg-black text-white text-lg font-light rounded-full hover:bg-neutral-dark transition ${
+          localLoading ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
       >
-        {isCheckoutPage ? 'Zamawiam i Płacę' : 'Przejdź do kasy'}
+        {localLoading
+          ? 'Przetwarzanie...'
+          : isCheckoutPage
+            ? 'Zamawiam i Płacę'
+            : 'Przejdź do kasy'}
       </button>
 
       <style jsx>{`
