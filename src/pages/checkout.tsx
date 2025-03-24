@@ -25,12 +25,15 @@ const Checkout: React.FC = () => {
   const [selectedLocker, setSelectedLocker] = useState<string>('');
   const [lockerSize, setLockerSize] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<string>('przelewy24');
+  // Updated default to new payment method ID
+  const [paymentMethod, setPaymentMethod] = useState<string>(
+    'p24-online-payments',
+  );
   const [email, setEmail] = useState<string>('');
   const [subscribeNewsletter, setSubscribeNewsletter] =
     useState<boolean>(false);
 
-  const [isTermsChecked, setIsTermsChecked] = useState<boolean>(false); // <-- Added state for checkbox
+  const [isTermsChecked, setIsTermsChecked] = useState<boolean>(false);
 
   const [selectedGlsPoint, setSelectedGlsPoint] = useState<any>(null);
 
@@ -65,9 +68,7 @@ const Checkout: React.FC = () => {
 
   // Map country name to country code
   const mapCountry = (country: string): string => {
-    const countryMapping: Record<string, string> = {
-      Polska: 'PL',
-    };
+    const countryMapping: Record<string, string> = { Polska: 'PL' };
     return countryMapping[country] || country;
   };
 
@@ -112,8 +113,8 @@ const Checkout: React.FC = () => {
           .find((method: any) => method.id === shippingMethod);
 
         if (selectedMethod) {
-          setShippingTitle(selectedMethod.title); // Update title
-          setShippingPrice(Number(selectedMethod.cost) || 0); // Update price
+          setShippingTitle(selectedMethod.title);
+          setShippingPrice(Number(selectedMethod.cost) || 0);
         }
       } catch (error) {
         console.error('Error updating shipping title:', error);
@@ -217,8 +218,12 @@ const Checkout: React.FC = () => {
 
     const orderData = {
       payment_method: paymentMethod,
+      // Update payment_method_title to support both legacy and new IDs
       payment_method_title:
-        paymentMethod === 'przelewy24' ? 'Przelewy24' : shippingTitle,
+        paymentMethod === 'przelewy24' ||
+        paymentMethod === 'p24-online-payments'
+          ? 'Przelewy24'
+          : shippingTitle,
       set_paid: false,
       billing: {
         first_name: billingData.firstName,
@@ -269,20 +274,13 @@ const Checkout: React.FC = () => {
       localStorage.setItem('recentOrderId', createdOrder.id.toString());
       localStorage.setItem('recentOrderKey', createdOrder.order_key);
 
-      // If using Przelewy24 and a payment URL is returned, redirect immediately.
-      if (paymentMethod === 'przelewy24' && createdOrder.payment_url) {
-        try {
-          // Create a URL object from the returned payment_url
-          const url = new URL(createdOrder.payment_url);
-          // Remove the 'pay_for_order' query parameter
-          url.searchParams.delete('pay_for_order');
-          // Redirect to the modified URL
-          router.push(url.toString());
-        } catch (error) {
-          console.error('Error modifying payment URL:', error);
-          // Fallback: redirect to the original URL
-          router.push(createdOrder.payment_url);
-        }
+      // For both legacy and new Przelewy24, redirect using the provided payment_url without modifying it.
+      if (
+        (paymentMethod === 'przelewy24' ||
+          paymentMethod === 'p24-online-payments') &&
+        createdOrder.payment_url
+      ) {
+        router.push(createdOrder.payment_url);
       } else if (createdOrder.id && createdOrder.order_key) {
         router.push(
           `/dziekujemy?orderId=${createdOrder.id}&orderKey=${createdOrder.order_key}`,
@@ -373,18 +371,18 @@ const Checkout: React.FC = () => {
                   {/* Terms and Privacy Checkbox */}
                   <div className="mt-6">
                     <label className="flex items-center gap-3 text-sm cursor-pointer w-full">
-                      {/* Hidden Checkbox */}
                       <input
                         type="checkbox"
                         checked={isTermsChecked}
                         onChange={() => setIsTermsChecked((prev) => !prev)}
                         className="hidden"
                       />
-
-                      {/* Styled Checkbox with Fixed Size */}
                       <span
-                        className={`w-5 h-5 flex items-center justify-center border rounded 
-        ${isTermsChecked ? 'bg-black text-white' : 'border-black'}`}
+                        className={`w-5 h-5 flex items-center justify-center border rounded ${
+                          isTermsChecked
+                            ? 'bg-black text-white'
+                            : 'border-black'
+                        }`}
                       >
                         {isTermsChecked && (
                           <img
@@ -394,8 +392,6 @@ const Checkout: React.FC = () => {
                           />
                         )}
                       </span>
-
-                      {/* Text is now aligned and spans full width */}
                       <span className="text-sm leading-tight w-full">
                         *Potwierdzam, że zapoznałam/em się z treścią{' '}
                         <Link className="underline" href="/regulamin">
