@@ -26,7 +26,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         path: '/',
-        domain: '.hvyt.pl', 
         maxAge: 60 * 60 * 24, // 1 day
       })
     );

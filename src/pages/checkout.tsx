@@ -218,12 +218,13 @@ const Checkout: React.FC = () => {
 
     const orderData = {
       payment_method: paymentMethod,
-      // Update payment_method_title to support both legacy and new IDs
       payment_method_title:
-        paymentMethod === 'przelewy24' ||
-        paymentMethod === 'p24-online-payments'
-          ? 'Przelewy24'
-          : shippingTitle,
+        paymentMethod === 'pay_by_paynow_pl_pbl'
+          ? 'paynow.pl - Online payments'
+          : paymentMethod === 'przelewy24' ||
+              paymentMethod === 'p24-online-payments'
+            ? 'Przelewy24'
+            : shippingTitle,
       set_paid: false,
       billing: {
         first_name: billingData.firstName,
@@ -270,14 +271,16 @@ const Checkout: React.FC = () => {
       });
       const createdOrder = response.data;
 
-      // Save order details locally (for guest users, if needed)
+      // Save order info locally (if needed)
       localStorage.setItem('recentOrderId', createdOrder.id.toString());
       localStorage.setItem('recentOrderKey', createdOrder.order_key);
 
-      // For both legacy and new Przelewy24, redirect using the provided payment_url without modifying it.
+      // If the payment method is one of our online gateways (including PayNow),
+      // then check for the payment_url and redirect the customer.
       if (
         (paymentMethod === 'przelewy24' ||
-          paymentMethod === 'p24-online-payments') &&
+          paymentMethod === 'p24-online-payments' ||
+          paymentMethod === 'pay_by_paynow_pl_pbl') &&
         createdOrder.payment_url
       ) {
         router.push(createdOrder.payment_url);

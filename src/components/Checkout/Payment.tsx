@@ -21,12 +21,12 @@ const Payment: React.FC<PaymentProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Shipping method mapping
+  // Shipping method mapping (adjust if needed)
   const shippingMethodMapping: Record<string, string> = {
     '1': 'kurier_gls',
     '3': 'kurier_gls_pobranie', // Match this to the value for Kurier GLS Pobranie
     '13': 'paczkomaty_inpost',
-    kurier_gls_pobranie: 'kurier_gls_pobranie', // Include full mapping for safety
+    kurier_gls_pobranie: 'kurier_gls_pobranie', // For safety
   };
 
   // Fetch payment methods on component mount
@@ -36,6 +36,7 @@ const Payment: React.FC<PaymentProps> = ({
         setLoading(true);
         const response = await fetch('/api/payment');
         const data = await response.json();
+        console.log('Fetched payment methods:', data);
         setPaymentMethods(data);
       } catch (err) {
         setError((err as Error).message || 'An error occurred');
@@ -47,18 +48,30 @@ const Payment: React.FC<PaymentProps> = ({
     fetchPaymentMethods();
   }, []);
 
+  // Log payment method IDs when they update
+  useEffect(() => {
+    console.log(
+      'Current payment method IDs:',
+      paymentMethods.map((m) => m.id),
+    );
+  }, [paymentMethods]);
+
   // Filter payment methods based on the selected shipping method
   const getFilteredPaymentMethods = () => {
     const mappedShippingMethod = shippingMethodMapping[shippingMethod];
 
+    // If shipping method requires COD only:
     if (mappedShippingMethod === 'kurier_gls_pobranie') {
-      return paymentMethods.filter((method) => method.id === 'cod'); // "Za pobraniem"
+      return paymentMethods.filter((method) => method.id === 'cod');
     }
 
-    // Accept both legacy and new Przelewy24 payment IDs
-    return paymentMethods.filter((method) =>
-      ['przelewy24', 'p24-online-payments'].includes(method.id),
-    );
+    // Accept legacy Przelewy24, new Przelewy24, and PayNow (with correct ID "pay_by_paynow_pl_pbl")
+    const accepted = [
+      'przelewy24',
+      'p24-online-payments',
+      'pay_by_paynow_pl_pbl',
+    ];
+    return paymentMethods.filter((method) => accepted.includes(method.id));
   };
 
   const availableMethods = getFilteredPaymentMethods();
@@ -66,15 +79,18 @@ const Payment: React.FC<PaymentProps> = ({
   // Automatically adjust the selected payment method based on shipping method
   useEffect(() => {
     if (shippingMethod === 'paczkomaty_inpost') {
-      // Use the new payment method by default if available
       setPaymentMethod('p24-online-payments');
     } else if (shippingMethod === 'kurier_gls_pobranie') {
       setPaymentMethod('cod');
     } else {
-      // Default to the new Przelewy24 ID
-      setPaymentMethod('p24-online-payments');
+      // Prefer PayNow if available, else fallback to p24-online-payments
+      if (paymentMethods.find((m) => m.id === 'pay_by_paynow_pl_pbl')) {
+        setPaymentMethod('pay_by_paynow_pl_pbl');
+      } else {
+        setPaymentMethod('p24-online-payments');
+      }
     }
-  }, [shippingMethod, setPaymentMethod]);
+  }, [shippingMethod, paymentMethods, setPaymentMethod]);
 
   if (loading) {
     return <p>Loading payment methods...</p>;
