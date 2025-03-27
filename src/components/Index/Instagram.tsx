@@ -12,7 +12,9 @@ const Instagram = () => {
         const response = await fetch('/api/instagram');
         if (!response.ok) throw new Error('Failed to fetch Instagram posts');
         const data = await response.json();
-        setPosts(data.data.slice(0, 4) || []); // Limit to 4 posts
+        console.log('Instagram API response:', data);
+        // Only slice if data.data is defined
+        setPosts(data.data ? data.data.slice(0, 4) : []);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching Instagram posts:', error);
@@ -29,7 +31,6 @@ const Instagram = () => {
 
   return (
     <section className="container mx-auto max-w-grid-desktop py-16 md:px-0">
-      {/* Heading and Description */}
       <div className="px-4 md:px-0 mb-8">
         <h2 className="font-size-h2 font-bold text-neutral-darkest text-left">
           Hvyt w waszych domach
@@ -39,7 +40,6 @@ const Instagram = () => {
         </p>
       </div>
 
-      {/* Desktop View (unchanged) */}
       <div className="hidden md:block">
         <div className="grid grid-cols-4 gap-6">
           {posts.map((post, index) => (
@@ -65,8 +65,6 @@ const Instagram = () => {
             </div>
           ))}
         </div>
-
-        {/* Centered Button with Instagram Icon */}
         <div className="flex justify-center mt-8">
           <Link
             href="https://www.instagram.com/hvyt_pl"
@@ -82,11 +80,9 @@ const Instagram = () => {
         </div>
       </div>
 
-      {/* Mobile View: Two Columns Grid with Images/Videos Sized to 158×158 */}
       <div className="md:hidden grid grid-cols-2 gap-4 px-4">
         {posts.map((post, index) => (
-          // The container has fixed dimensions (158×158) to force the image's size
-          <div key={index} className="relative w-100% h-[158px]">
+          <div key={index} className="relative w-full h-[158px]">
             {post.media_type === 'VIDEO' ? (
               <video
                 src={post.media_url}
