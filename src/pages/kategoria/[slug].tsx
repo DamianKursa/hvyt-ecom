@@ -68,7 +68,6 @@ const CategoryPage = ({
   };
   const ignoredParams = new Set([
     'slug',
-    'sort',
     'gad_source',
     'gclid',
     'utm_source',
