@@ -41,6 +41,8 @@ const ProductPage = () => {
   const { addCartItem } = React.useContext(CartContext);
   const frequentlyBoughtTogetherRef = useRef<HTMLDivElement>(null);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const [waitingListError, setWaitingListError] = useState<string | null>(null);
+
   const {
     product,
     loading,
@@ -309,7 +311,6 @@ const ProductPage = () => {
     addCartItem(cartItem);
     dispatch({ type: 'TOGGLE_MODAL', payload: true });
   };
-
   const onNotifySubmit = async (data: NotifyFormData) => {
     try {
       const res = await fetch('/api/waiting-list', {
@@ -323,15 +324,24 @@ const ProductPage = () => {
         }),
       });
       if (!res.ok) {
-        throw new Error('Failed to subscribe');
+        const errorData = await res.json();
+        if (errorData.code === 'woocommerce_rest_cannot_view') {
+          throw new Error(
+            'Wygląda na to, że ten adres email został już zapisany do listy oczekujących.',
+          );
+        } else {
+          throw new Error('Nie udało się zapisać do listy oczekujących.');
+        }
       }
       setSuccessMessage(
-        'Zapisalismy Twój adres. Wyślemy Ci powiadomienie kiedy produkt pojawi się w sprzedaży',
+        'Zapisaliśmy Twój adres. Wyślemy Ci powiadomienie, kiedy produkt pojawi się w sprzedaży.',
       );
       reset();
       setShowNotifyForm(false);
+      setWaitingListError(null);
     } catch (error) {
-      console.error(error);
+      console.error('Error subscribing to waiting list:', error);
+      setWaitingListError((error as Error).message);
     }
   };
 
