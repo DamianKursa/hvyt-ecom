@@ -2,7 +2,7 @@
 import React, { ReactNode, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { SpeedInsights } from '@vercel/speed-insights/next'; // Import SpeedInsights
-
+import { Analytics } from '@vercel/analytics/next';
 // Components
 import Header from '@/components/Header/Header.component';
 import Footer from '@/components/Footer/Footer.component';
@@ -61,6 +61,7 @@ const Layout: React.FC<ILayoutProps> = ({ children, title }) => {
         }
       >
         {children}
+        <Analytics />
       </main>
 
       <Footer />
