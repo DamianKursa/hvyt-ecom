@@ -48,11 +48,12 @@ export const fetchProductsByCategoryId = async (
   sortingOption: string = 'default',
 ) => {
   try {
-    // Initialize API request parameters
+    // Initialize API request parameters and include published status
     const params: Record<string, any> = {
       category: categoryId,
       page,
       per_page: perPage,
+      status: 'publish', // Only published products will be returned
     };
 
     // Add filters to the request
@@ -70,14 +71,13 @@ export const fetchProductsByCategoryId = async (
 
     // Map the sortingOption to WooCommerce-compatible parameters
     const sortingMap: Record<string, { orderby: string; order?: string }> = {
-      default: { orderby: 'menu_order' }, // Default sorting by WooCommerce menu order
-      'price-asc': { orderby: 'price', order: 'asc' }, // Sort by lowest price
-      'price-desc': { orderby: 'price', order: 'desc' }, // Sort by highest price
-      newest: { orderby: 'date', order: 'desc' }, // Sort by newest products
-      bestsellers: { orderby: 'popularity' }, // Sort by popularity
+      default: { orderby: 'menu_order' },
+      'price-asc': { orderby: 'price', order: 'asc' },
+      'price-desc': { orderby: 'price', order: 'desc' },
+      newest: { orderby: 'date', order: 'desc' },
+      bestsellers: { orderby: 'popularity' },
     };
 
-    // Use the sorting map to set WooCommerce-compatible sorting
     const sortingParams =
       sortingMap[sortingOption.toLowerCase()] || sortingMap.default;
     params.orderby = sortingParams.orderby;
@@ -95,8 +95,6 @@ export const fetchProductsByCategoryId = async (
     };
   } catch (error) {
     console.error('Error in fetchProductsByCategoryId:', error);
-
-    // Return empty results in case of failure
     return {
       products: [],
       totalProducts: 0,
