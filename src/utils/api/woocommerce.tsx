@@ -271,6 +271,7 @@ export const searchProducts = async (query: string, perPage = 10) => {
       params: {
         search: query,
         per_page: perPage,
+        status: 'publish',
       },
     });
 
