@@ -330,7 +330,9 @@ const ProductPage = () => {
             'Wygląda na to, że ten adres email został już zapisany do listy oczekujących.',
           );
         } else {
-          throw new Error('Nie udało się zapisać do listy oczekujących.');
+          throw new Error(
+            'Nie udało się zapisać, email jest już zapisany do listy oczekujących. ',
+          );
         }
       }
       setSuccessMessage(
@@ -543,6 +545,11 @@ const ProductPage = () => {
                   >
                     Powiadom o dostępności
                   </button>
+                  {waitingListError && (
+                    <p className="text-red-500 mt-2">
+                      Błąd: {waitingListError}
+                    </p>
+                  )}
                 </form>
               </FormProvider>
             ) : (

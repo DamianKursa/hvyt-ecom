@@ -401,7 +401,7 @@ const Shipping: React.FC<ShippingProps> = ({
   }, [showGlsMap]);
 
   if (loading) {
-    return <p>Ładowanie medod dostawy...</p>;
+    return <p>Ładowanie metod dostawy...</p>;
   }
   if (error) {
     return <p className="text-red-500">{error}</p>;
