@@ -232,13 +232,20 @@ const Checkout: React.FC = () => {
         email,
         phone: billingData.phone,
         company: customerType === 'company' ? billingData.company : '',
-        vat_number: customerType === 'company' ? billingData.vatNumber : '',
+        billing_nip: customerType === 'company' ? billingData.vatNumber : '',
         address_1: `${billingData.street} ${billingData.buildingNumber}`,
         address_2: billingData.apartmentNumber || '',
         city: billingData.city,
         postcode: billingData.postalCode,
         country: mappedBillingCountry,
       },
+      meta_data: [
+        {
+          key: 'billing_nip',
+          value: customerType === 'company' ? billingData.vatNumber : '',
+        },
+      ],
+
       shipping: shippingAddress,
       shipping_lines: [
         {
