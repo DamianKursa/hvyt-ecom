@@ -1,6 +1,7 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
+import Head from 'next/head';
 import Layout from '@/components/Layout/Layout.component';
 import Filters from '@/components/Filters/Filters.component';
 import ProductArchive from '@/components/Product/ProductArchive';
@@ -12,13 +13,19 @@ interface Category {
   id: number;
   name: string;
   slug: string;
-  // include any other fields as needed
+}
+
+interface SEOData {
+  yoastTitle: string;
+  yoastDescription: string;
+  description: string;
 }
 
 interface CategoryPageProps {
   category: Category;
   initialProducts: any[];
   initialTotalProducts: number;
+  seoData: SEOData | null;
 }
 
 const icons: Record<string, string> = {
@@ -31,11 +38,20 @@ const CategoryPage = ({
   category,
   initialProducts,
   initialTotalProducts,
+  seoData,
 }: CategoryPageProps) => {
   const router = useRouter();
   const slug = Array.isArray(router.query.slug)
     ? router.query.slug[0]
     : router.query.slug;
+
+  // Use SEO data if available or fallback to default title
+  const seoTitle =
+    seoData && seoData.yoastTitle
+      ? seoData.yoastTitle
+      : `HVYT | ${category.name}`;
+  const seoDescription =
+    seoData && seoData.yoastDescription ? seoData.yoastDescription : '';
 
   const [products, setProducts] = useState(initialProducts);
   const [currentPage, setCurrentPage] = useState(1);
@@ -245,6 +261,13 @@ const CategoryPage = ({
 
   return (
     <Layout title={`Hvyt | ${category.name || 'Loading...'}`}>
+      <Head>
+        <title>{seoTitle}</title>
+        {seoDescription && <meta name="description" content={seoDescription} />}
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDescription} />
+        <link rel="canonical" href={`https://hvyt.pl/category/${slug}`} />
+      </Head>
       <div className="container max-w-[1440px] mt-[115px] px-4 md:px-0 mx-auto">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
 
@@ -358,11 +381,29 @@ export const getStaticProps: GetStaticProps = async (context) => {
     if (!productsRes.ok) throw new Error('Error fetching products');
     const productsData = await productsRes.json();
 
+    // Load SEO data from a JSON file
+    const fs = require('fs');
+    const path = require('path');
+    const seoFilePath = path.join(process.cwd(), 'data', 'seo-data.json');
+    const seoContent = fs.readFileSync(seoFilePath, 'utf-8');
+    const seoJSON = JSON.parse(seoContent);
+    const seoArray: any[] = seoJSON.categories || [];
+    const seoEntry = seoArray.find((entry) => entry.slug === slug);
+    let seoData = null;
+    if (seoEntry) {
+      seoData = {
+        yoastTitle: seoEntry.yoastTitle || '',
+        yoastDescription: seoEntry.yoastDescription || '',
+        description: seoEntry.description || '',
+      };
+    }
+
     return {
       props: {
         category: fetchedCategory,
         initialProducts: productsData.products,
         initialTotalProducts: productsData.totalProducts,
+        seoData,
       },
       revalidate: 60,
     };
