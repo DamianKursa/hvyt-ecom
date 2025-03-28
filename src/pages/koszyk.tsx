@@ -19,6 +19,11 @@ const Koszyk: React.FC = () => {
   if (!mounted) return <div>Loading...</div>;
 
   const handleIncreaseQuantity = (product: Product) => {
+    // Check availableStock before increasing quantity
+    if (product.availableStock && product.qty >= product.availableStock) {
+      console.log(`Reached maximum stock for ${product.name}`);
+      return;
+    }
     updateCartItem(product.cartKey, product.qty + 1);
   };
 
@@ -33,8 +38,8 @@ const Koszyk: React.FC = () => {
   };
 
   const handleCheckout = () => {
-    console.log('Przechodze do checkout...');
-    // Add your checkout logic here, e.g., redirecting to a checkout page
+    console.log('Proceeding to checkout...');
+    // Add your checkout logic here
   };
 
   const isCartEmpty = !cart || cart.totalProductsPrice === 0;

@@ -19,51 +19,34 @@ const CartItem: React.FC<CartItemProps> = ({
   onRemoveItem,
 }) => {
   const router = useRouter();
-  const isKoszykPage = router.pathname === '/koszyk'; // Detect if we are on the "koszyk" page
+  const isKoszykPage = router.pathname === '/koszyk';
   const { updateCartVariation } = React.useContext(CartContext);
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedVariation, setSelectedVariation] = useState<string | null>(
     null,
   );
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-  const [modalHeight, setModalHeight] = useState<string>('auto');
 
   const variationOptions = product.variationOptions ?? {};
 
   const handleSaveVariation = (name: string, newValue: string) => {
-    console.log(`✅ Saving Variation in CartItem: ${name} -> ${newValue}`);
+    console.log(`Saving Variation: ${name} -> ${newValue}`);
     setSelectedVariation(newValue);
-
     const fullAttributeName = Object.keys(variationOptions).find(
       (key) =>
         key.trim().toLowerCase().endsWith(name.trim().toLowerCase()) ||
         key.trim().toLowerCase() === name.trim().toLowerCase(),
     );
-
-    console.log(`🔍 Looking for attribute: ${fullAttributeName}`);
-
-    if (!fullAttributeName) {
-      console.warn(
-        `⚠️ Attribute name "${name}" not found in variationOptions.`,
-      );
-      return;
-    }
-
-    const matchingVariation = variationOptions?.[fullAttributeName]?.find(
+    if (!fullAttributeName) return;
+    const matchingVariation = variationOptions[fullAttributeName]?.find(
       (option) => option.option.trim() === newValue.trim(),
     );
-
     if (matchingVariation) {
-      console.log(`✅ Found Matching Variation:`, matchingVariation);
       updateCartVariation(
         product.cartKey,
         fullAttributeName,
         newValue,
         matchingVariation.price,
-      );
-    } else {
-      console.warn(
-        `⚠️ No matching variation found for ${fullAttributeName} -> ${newValue}`,
       );
     }
   };
@@ -137,7 +120,6 @@ const CartItem: React.FC<CartItemProps> = ({
 
       {/* Mobile Layout */}
       <div className="block md:hidden flex items-center justify-between mb-4 border-b pb-4">
-        {/* Column 1: Image */}
         <div className="flex-shrink-0">
           <div className="w-[75px] h-[75px] relative rounded-[12px] overflow-hidden">
             <Image
@@ -149,8 +131,6 @@ const CartItem: React.FC<CartItemProps> = ({
             />
           </div>
         </div>
-
-        {/* Column 2: Title, Quantity, Variation */}
         <div className="flex-1 px-3">
           <h3 className="text-sm font-semibold text-neutral-darkest">
             {product.name}
@@ -164,7 +144,6 @@ const CartItem: React.FC<CartItemProps> = ({
               onDecrease={() =>
                 onDecreaseQuantity && onDecreaseQuantity(product)
               }
-              // On mobile in the "koszyk" page, remove default p-2 and set width to 130px
               className={isKoszykPage ? 'w-[130px] p-0' : undefined}
             />
           </div>
@@ -183,8 +162,6 @@ const CartItem: React.FC<CartItemProps> = ({
               )}
           </div>
         </div>
-
-        {/* Column 3: Price and Edit Button */}
         <div className="flex flex-col items-end">
           <p className="text-sm font-bold text-neutral-darkest">
             {product.totalPrice.toFixed(2)} zł
@@ -203,21 +180,18 @@ const CartItem: React.FC<CartItemProps> = ({
         </div>
       </div>
 
-      {/* Modal for Attribute Selection (common for both layouts) */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-[#36313266] flex items-center justify-center z-50">
           <div
             className="bg-[#FAF7F5] px-[48px] py-[40px] w-full max-w-[650px] rounded-[24px] relative shadow-lg transition-all duration-300 ease-in-out"
-            style={{ maxHeight: modalHeight, overflowY: 'auto' }}
+            style={{ maxHeight: 'auto', overflowY: 'auto' }}
           >
-            {/* Close Button */}
             <button
               className="absolute top-4 right-4 text-black text-2xl font-bold"
               onClick={() => setModalOpen(false)}
             >
               &times;
             </button>
-            {/* Modal Header */}
             <h3 className="text-[24px] font-semibold text-[#1C1C1C] mb-[24px]">
               Edytuj rozstaw produktu
             </h3>

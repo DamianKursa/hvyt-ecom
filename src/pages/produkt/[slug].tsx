@@ -303,6 +303,7 @@ const ProductPage = () => {
         : undefined,
       attributes: selectedAttributes,
       variationOptions,
+      availableStock,
     };
 
     addCartItem(cartItem);

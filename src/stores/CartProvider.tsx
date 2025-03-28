@@ -1,3 +1,4 @@
+// CartProvider.tsx
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 
 export interface Product {
@@ -17,6 +18,7 @@ export interface Product {
     price: number;
     attributes: { name: string; option: string }[];
   }[];
+  availableStock?: number; // NEW: holds the maximum stock available
 }
 
 export interface Coupon {
@@ -115,7 +117,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         updatedCart.products.push({
           ...product,
           attributes: product.attributes || {},
-          variationOptions: product.variationOptions || {}, // ✅ Ensure variationOptions is stored
+          variationOptions: product.variationOptions || {},
         });
       }
 
@@ -164,7 +166,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
           product.totalPrice = newPrice * product.qty;
         }
 
-        // ✅ Ensure variationOptions stays in the cart
         product.variationOptions = product.variationOptions || {};
 
         return recalculateCartTotals(updatedCart);
