@@ -243,21 +243,20 @@ export const fetchCrossSellProducts = async (productId: string) => {
     const productResponse = await WooCommerceAPI.get(`/products/${productId}`);
     const productData = productResponse.data;
 
-    // Check if cross-sell IDs are available
-    const crossSellIds = productData.cross_sell_ids || [];
+    // Limit cross-sell IDs to maximum of 6 products
+    const crossSellIds = (productData.cross_sell_ids || []).slice(0, 6);
+
     if (crossSellIds.length === 0) {
       return { products: [] };
     }
 
-    // Fetch details for each cross-sell product by ID
-    const crossSellProducts = await Promise.all(
-      crossSellIds.map(async (id: string) => {
-        const response = await WooCommerceAPI.get(`/products/${id}`);
-        return response.data;
-      }),
-    );
+    // Fetch cross-sell products in a single batch API request
+    const response = await WooCommerceAPI.get('/products', {
+      params: { include: crossSellIds.join(','), per_page: 6 },
+      timeout: 5000, // 5 seconds timeout per batch request
+    });
 
-    return { products: crossSellProducts };
+    return { products: response.data };
   } catch (error) {
     console.error('Error fetching cross-sell products:', error);
     return { products: [] };
