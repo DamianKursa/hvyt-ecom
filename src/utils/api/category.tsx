@@ -71,7 +71,7 @@ export const fetchProductsByCategoryId = async (
 
     // Map the sortingOption to WooCommerce-compatible parameters
     const sortingMap: Record<string, { orderby: string; order?: string }> = {
-      default: { orderby: 'menu_order' },
+      default: { orderby: 'date', order: 'desc' },
       'price-asc': { orderby: 'price', order: 'asc' },
       'price-desc': { orderby: 'price', order: 'desc' },
       newest: { orderby: 'date', order: 'desc' },
