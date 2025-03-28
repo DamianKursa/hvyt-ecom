@@ -29,17 +29,27 @@ const Payment: React.FC<PaymentProps> = ({
     kurier_gls_pobranie: 'kurier_gls_pobranie', // For safety
   };
 
-  // Fetch payment methods on component mount
+  // Fetch payment methods on component mount, with auto-retry if error occurs
   useEffect(() => {
     const fetchPaymentMethods = async () => {
       try {
         setLoading(true);
+        setError(null);
         const response = await fetch('/api/payment');
+        if (!response.ok) {
+          throw new Error('Nie udało się pobrać metod płatności');
+        }
         const data = await response.json();
         console.log('Fetched payment methods:', data);
         setPaymentMethods(data);
       } catch (err) {
-        setError((err as Error).message || 'An error occurred');
+        console.error('Błąd podczas pobierania metod płatności:', err);
+        setError(
+          'Wystąpił błąd podczas pobierania metod płatności. Ponowna próba za 5 sekund.',
+        );
+        setTimeout(() => {
+          fetchPaymentMethods();
+        }, 5000);
       } finally {
         setLoading(false);
       }
@@ -93,7 +103,7 @@ const Payment: React.FC<PaymentProps> = ({
   }, [shippingMethod, paymentMethods, setPaymentMethod]);
 
   if (loading) {
-    return <p>Loading payment methods...</p>;
+    return <p>Ładowanie metod płatności...</p>;
   }
 
   if (error) {
@@ -136,7 +146,7 @@ const Payment: React.FC<PaymentProps> = ({
         </div>
       ) : (
         <p className="text-red-500 mt-4">
-          No payment methods available for the selected shipping method.
+          Brak dostępnych metod płatności dla wybranej metody dostawy.
         </p>
       )}
     </div>

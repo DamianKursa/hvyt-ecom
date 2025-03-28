@@ -132,7 +132,7 @@ const Shipping: React.FC<ShippingProps> = ({
         setError(null);
         const response = await fetch('/api/shipping');
         if (!response.ok) {
-          throw new Error('Failed to fetch shipping methods');
+          throw new Error('Nie udało się pobrać metod dostawy');
         }
         const data = await response.json();
         // Define restricted IDs
@@ -221,8 +221,13 @@ const Shipping: React.FC<ShippingProps> = ({
         });
         setShippingZones(updatedZones);
       } catch (err) {
-        console.error('Error fetching shipping methods:', err);
-        setError('An error occurred while fetching shipping methods.');
+        console.error('Błąd podczas pobierania metod dostawy:', err);
+        setError(
+          'Wystąpił błąd podczas ładowania metod dostawy. Ponowna próba za 5 sekund.',
+        );
+        setTimeout(() => {
+          fetchShippingMethods();
+        }, 5000);
       } finally {
         setLoading(false);
       }
@@ -255,7 +260,7 @@ const Shipping: React.FC<ShippingProps> = ({
           initializeEasyPack();
         };
         script.onerror = () => {
-          console.error('Failed to load EasyPack script.');
+          console.error('Nie udało się załadować skryptu EasyPack.');
         };
         document.body.appendChild(script);
         const link = document.createElement('link');
@@ -303,7 +308,7 @@ const Shipping: React.FC<ShippingProps> = ({
         { width: 500, height: 600 },
       );
     } else {
-      console.error('EasyPack modalMap is not available.');
+      console.error('Funkcja modalMap EasyPack jest niedostępna.');
     }
   };
 
@@ -324,7 +329,7 @@ const Shipping: React.FC<ShippingProps> = ({
         script.async = true;
         script.onload = () => resolve();
         script.onerror = () =>
-          reject(new Error('Failed to load GLS map script'));
+          reject(new Error('Nie udało się załadować skryptu map GLS'));
         document.body.appendChild(script);
       });
     };
@@ -346,11 +351,11 @@ const Shipping: React.FC<ShippingProps> = ({
               parcelshop_type: 'pudo',
             });
           } else {
-            console.error('GLS container not found');
+            console.error('Kontener GLS nie został znaleziony.');
           }
         })
         .catch((error) => {
-          console.error('Error loading GLS script:', error);
+          console.error('Błąd ładowania skryptu map GLS:', error);
         });
     }
   }, [showGlsMap]);
@@ -417,7 +422,7 @@ const Shipping: React.FC<ShippingProps> = ({
                     : 'border-beige-dark'
                 }`}
               >
-                {/* First Column: Shipping Name (60% on mobile) */}
+                {/* First Column: Shipping Name */}
                 <div className="flex items-center gap-4 w-full">
                   <input
                     type="radio"
@@ -437,14 +442,14 @@ const Shipping: React.FC<ShippingProps> = ({
                   <span className="truncate">{method.title}</span>
                 </div>
 
-                {/* Second Column: Price (20%) */}
+                {/* Second Column: Price */}
                 <span className="text-sm text-gray-700 text-center w-full">
                   {method.cost
                     ? `${parseFloat(String(method.cost)).toFixed(2)} zł`
                     : 'Darmowa'}
                 </span>
 
-                {/* Third Column: Icon (20%) */}
+                {/* Third Column: Icon */}
                 <div className="flex justify-center w-full">
                   <img
                     src={
