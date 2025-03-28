@@ -37,13 +37,14 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   const formatPrice = (price: number) =>
     price.toFixed(2).replace('.', ',') + ' zł';
 
-  // Wrap the onCheckout function to set the local loading state
   const handleButtonClick = async () => {
     if (isCheckoutPage) {
       setLocalLoading(true);
       try {
         await onCheckout();
       } catch (error) {
+        console.error('Error during checkout:', error);
+      } finally {
         setLocalLoading(false);
       }
     } else {

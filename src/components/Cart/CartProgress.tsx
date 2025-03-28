@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 const CartProgress: React.FC = () => {
   const router = useRouter();
   const isCheckoutPage = router.pathname === '/checkout';
+  const isThankYouPage = router.pathname === '/dziekujemy';
 
   // Define the steps with their corresponding paths
   const steps = [
@@ -22,21 +23,26 @@ const CartProgress: React.FC = () => {
 
   return (
     <div className="flex mt-6 md:mt-0 flex-col gap-4 w-full">
-      {/* Back Link */}
-      <div
-        className="flex items-center gap-2 text-sm text-black mb-6 cursor-pointer"
-        onClick={() => router.back()}
-      >
-        <img src="/icons/arrow-left-black.svg" alt="Back" className="w-4 h-4" />
-        <span>Wróć do produktów</span>
-      </div>
+      {/* Back Link: only show if not on the thank you page */}
+      {!isThankYouPage && (
+        <div
+          className="flex items-center gap-2 text-sm text-black mb-6 cursor-pointer"
+          onClick={() => router.back()}
+        >
+          <img
+            src="/icons/arrow-left-black.svg"
+            alt="Back"
+            className="w-4 h-4"
+          />
+          <span>Wróć do produktów</span>
+        </div>
+      )}
 
       {/* Steps */}
       <div className="flex items-center w-full rounded-full border border-[#E0D6CD] bg-[#F8F5F1]">
         {steps.map((step, index) => {
           const isActive = router.pathname === step.path;
-          // On mobile, if we are on checkout page, then the checkout step gets a larger flex:
-          // Otherwise, use equal flex for all steps.
+          // On mobile, if on checkout page, make the checkout step larger; otherwise equal flex.
           const mobileFlexClass = isCheckoutPage
             ? step.path === '/checkout'
               ? 'flex-[2]'
