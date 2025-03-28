@@ -12,7 +12,6 @@ const ActivationPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-lg p-8 text-center max-w-md">
           <h1 className="text-2xl font-bold mb-4">Potwierdź email</h1>
           <p className="text-sm mb-6">
-            Link do ustawienia hasła został wysłany na adres e-mail:
             <span className="font-medium text-gray-700"> {email}</span>.
             <br />W celu zakończenia rejestracji kliknij w link.
           </p>
@@ -28,12 +27,6 @@ const ActivationPage: React.FC = () => {
             Mail nie dotarł?{' '}
             <a href="#" className="text-red-500">
               Wyślij ponownie
-            </a>
-            .
-            <br />
-            Sprawdź czy podany przez Ciebie mail jest poprawny, jeśli nie –{' '}
-            <a href="#" className="text-red-500">
-              popraw mail
             </a>
             .
           </p>

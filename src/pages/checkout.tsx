@@ -148,6 +148,35 @@ const Checkout: React.FC = () => {
       return;
     }
 
+    // Check required fields before creating an account
+    if (
+      !user &&
+      (!billingData.firstName || !billingData.lastName || !email || !password)
+    ) {
+      alert(
+        'Uzupełnij wszystkie wymagane pola: imię, nazwisko, email i hasło.',
+      );
+      return;
+    }
+
+    // If the user is not logged in and has provided a password, create an account
+    if (!user && password) {
+      try {
+        const registerResponse = await axios.post('/api/auth/register', {
+          first_name: billingData.firstName,
+          last_name: billingData.lastName,
+          email,
+          password,
+        });
+        console.log('Account created:', registerResponse.data);
+        // Optionally, update your user context with the new user info here
+      } catch (err) {
+        console.error('Error creating account:', err);
+        alert('Błąd przy tworzeniu konta. Spróbuj ponownie.');
+        return;
+      }
+    }
+
     // Map country names to codes
     const mappedBillingCountry = mapCountry(billingData.country);
     const mappedShippingCountry = mapCountry(shippingData.country);
