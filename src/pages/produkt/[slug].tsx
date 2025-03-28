@@ -54,11 +54,9 @@ const ProductPage = () => {
   } = state;
 
   const [validationError, setValidationError] = useState<string | null>(null);
-  // State to control visibility of notify form and to hold the success message
   const [showNotifyForm, setShowNotifyForm] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
 
-  // Set up react-hook-form for notify email
   const methods = useForm<NotifyFormData>({
     defaultValues: { notifyEmail: '' },
   });
@@ -74,10 +72,10 @@ const ProductPage = () => {
   const isNotifyEmailValid =
     !!notifyEmailValue && /\S+@\S+\.\S+/.test(notifyEmailValue);
 
-  // Fetch cross‑sell products once the product is available
   const { products: crossSellProducts, loading: crossSellLoading } =
     useCrossSellProducts(product ? product.id.toString() : null);
 
+  // Fetch product data on slug change
   useEffect(() => {
     const fetchData = async () => {
       if (!slug) return;
@@ -110,6 +108,13 @@ const ProductPage = () => {
 
     fetchData();
   }, [slug, dispatch]);
+
+  // Reset quantity to 1 when a new product loads
+  useEffect(() => {
+    if (product) {
+      dispatch({ type: 'SET_QUANTITY', payload: 1 });
+    }
+  }, [product, dispatch]);
 
   const handleWishlistClick = () => {
     if (!product) return;
@@ -172,21 +177,101 @@ const ProductPage = () => {
     });
   };
 
+  // **********************************************
+  // Stock Logic – works for both simple and variable products
+  // **********************************************
+  let availableStock = 0;
+  if (product) {
+    if (
+      product.baselinker_variations &&
+      product.baselinker_variations.length > 0
+    ) {
+      // For variable products:
+      // If a variation is selected and it has a defined stock_quantity, use it.
+      if (
+        selectedVariation &&
+        (selectedVariation as any).stock_quantity !== null &&
+        (selectedVariation as any).stock_quantity !== ''
+      ) {
+        availableStock = Number((selectedVariation as any).stock_quantity);
+      }
+      // Fallback: if the main product defines stock_quantity, use that.
+      else if ((product as any).stock_quantity) {
+        availableStock = Number((product as any).stock_quantity);
+      }
+      // Otherwise, sum the stock quantities of all variations.
+      else {
+        availableStock = product.baselinker_variations.reduce(
+          (sum, variation) => {
+            const qty =
+              (variation as any).stock_quantity !== null &&
+              (variation as any).stock_quantity !== ''
+                ? Number((variation as any).stock_quantity)
+                : 0;
+            return sum + qty;
+          },
+          0,
+        );
+      }
+    } else {
+      // For simple products:
+      availableStock = Number((product as any).stock_quantity || 0);
+    }
+  }
+  console.log('[DEBUG] availableStock computed:', availableStock);
+
   const handleQuantityChange = (type: 'increase' | 'decrease') => {
-    dispatch({
-      type: 'SET_QUANTITY',
-      payload: type === 'increase' ? quantity + 1 : Math.max(1, quantity - 1),
+    console.log('[DEBUG] handleQuantityChange', {
+      type,
+      quantity,
+      availableStock,
+      selectedVariation,
     });
+    if (type === 'increase') {
+      if (quantity >= availableStock) {
+        console.log(
+          '[DEBUG] Maximum quantity reached:',
+          quantity,
+          availableStock,
+        );
+        setValidationError(
+          'Nie można dodać więcej produktów niż dostępne w magazynie.',
+        );
+        return;
+      }
+      dispatch({ type: 'SET_QUANTITY', payload: quantity + 1 });
+    } else {
+      if (validationError) setValidationError(null);
+      dispatch({ type: 'SET_QUANTITY', payload: Math.max(1, quantity - 1) });
+    }
   };
 
   const handleAddToCart = () => {
-    if (!product) {
+    console.log('[DEBUG] handleAddToCart', {
+      quantity,
+      availableStock,
+      selectedVariation,
+    });
+    if (!product) return;
+
+    if (quantity > availableStock) {
+      console.log(
+        '[DEBUG] Trying to add more than available stock:',
+        quantity,
+        availableStock,
+      );
+      setValidationError(
+        'Nie można dodać więcej produktów niż dostępne w magazynie.',
+      );
       return;
     }
+
     if (product.baselinker_variations?.length && !selectedVariation) {
       setValidationError('Wybierz wariant przed dodaniem do koszyka.');
       return;
     }
+
+    // Proceed with add-to-cart logic
     const price = parseFloat(selectedVariation?.price || product.price);
     const variationOptions: {
       [key: string]: { option: string; price: number }[];
@@ -224,7 +309,6 @@ const ProductPage = () => {
     dispatch({ type: 'TOGGLE_MODAL', payload: true });
   };
 
-  // Inside your ProductPage component
   const onNotifySubmit = async (data: NotifyFormData) => {
     try {
       const res = await fetch('/api/waiting-list', {
@@ -240,7 +324,6 @@ const ProductPage = () => {
       if (!res.ok) {
         throw new Error('Failed to subscribe');
       }
-      // Set the success message with your desired formatting.
       setSuccessMessage(
         'Zapisalismy Twój adres. Wyślemy Ci powiadomienie kiedy produkt pojawi się w sprzedaży',
       );
@@ -287,31 +370,15 @@ const ProductPage = () => {
       </Layout>
     );
   }
-  // Calculate total stock
-  const totalStock =
-    product?.baselinker_variations?.reduce((sum, variation) => {
-      const qty = Number((variation as any).stock_quantity);
-      return sum + (isNaN(qty) ? 0 : qty);
-    }, 0) || 0;
 
-  // Compute displayedStock based on the raw stock value
-  const displayedStock = selectedVariation
-    ? (selectedVariation as any).stock_quantity !== '' &&
-      (selectedVariation as any).stock_quantity !== null
-      ? Number((selectedVariation as any).stock_quantity)
-      : null
-    : totalStock !== 0
-      ? totalStock
-      : null;
-
-  // Determine out‑of‑stock status
+  // Determine out‑of‑stock status based on availableStock
   const isOutOfStock =
-    displayedStock !== null
-      ? displayedStock === 0
+    availableStock !== null
+      ? availableStock === 0
       : (product as any)?.stock_status === 'outofstock';
 
   return (
-    <Layout title={`Hvyt | ${product?.name || 'Ładownie...'}`}>
+    <Layout title={`Hvyt | ${product?.name || 'Ładowanie...'}`}>
       <section className="max-w-[1440px] mt-[88px] md:mt-[140px] container mx-auto">
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
           <div className="order-1 w-full lg:order-1 lg:w-8/12">
@@ -421,7 +488,6 @@ const ProductPage = () => {
                 </div>
               )}
             </div>
-            {/* Out‑of‑stock Notify Section */}
             {isOutOfStock ? (
               <FormProvider {...methods}>
                 <form onSubmit={handleSubmit(onNotifySubmit)}>
@@ -504,7 +570,7 @@ const ProductPage = () => {
 
             <DeliveryReturnInfo
               onScrollToSection={handleScrollToFrequentlyBought}
-              stock={displayedStock}
+              stock={availableStock}
               stockStatus={
                 selectedVariation
                   ? (selectedVariation as any).stock_status
