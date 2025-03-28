@@ -66,24 +66,38 @@ const CategoryPage = ({
     klamki: ['Kształt rozety', 'Kolor OK', 'Materiał'],
     wieszaki: ['Kolor OK', 'Materiał'],
   };
+  const ignoredParams = new Set([
+    'slug',
+    'sort',
+    'gad_source',
+    'gclid',
+    'utm_source',
+    'utm_medium',
+    'utm_campaign',
+  ]);
 
   // Update filters from URL query parameters
   useEffect(() => {
     const updateFiltersFromQuery = () => {
       const queryFilters: { name: string; value: string }[] = [];
       const queryKeys = Object.keys(router.query);
-      let sortFromQuery = 'Sortowanie'; // default value
+      let sortFromQuery = 'Sortowanie';
 
       queryKeys.forEach((key) => {
+        if (ignoredParams.has(key)) {
+          return; // Skip these
+        }
+        // If the key is 'sort', handle sorting
         if (key === 'sort') {
           sortFromQuery = router.query[key] as string;
-        } else if (key !== 'slug') {
-          const values = router.query[key];
-          if (Array.isArray(values)) {
-            values.forEach((value) => queryFilters.push({ name: key, value }));
-          } else if (typeof values === 'string') {
-            queryFilters.push({ name: key, value: values });
-          }
+          return;
+        }
+
+        const values = router.query[key];
+        if (Array.isArray(values)) {
+          values.forEach((value) => queryFilters.push({ name: key, value }));
+        } else if (typeof values === 'string') {
+          queryFilters.push({ name: key, value: values });
         }
       });
 
