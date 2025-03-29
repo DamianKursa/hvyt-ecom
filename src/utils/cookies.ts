@@ -19,7 +19,7 @@ export const setCookie = (
     path: options.path || '/',
     httpOnly: options.httpOnly ?? true,
     secure: options.secure ?? process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'none',
   });
 
   res.setHeader('Set-Cookie', serializedCookie);
