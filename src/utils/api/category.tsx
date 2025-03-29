@@ -43,7 +43,7 @@ export const fetchCategoryBySlug = async (slug: string) => {
 export const fetchProductsByCategoryId = async (
   categoryId: number,
   page = 1,
-  perPage = 12,
+  perPage = 10,
   filters: { name: string; value: string }[] = [],
   sortingOption: string = 'default',
 ) => {
@@ -54,6 +54,7 @@ export const fetchProductsByCategoryId = async (
       page,
       per_page: perPage,
       status: 'publish', // Only published products will be returned
+      _fields: 'id,name,price,slug,images',
     };
 
     // Add filters to the request
