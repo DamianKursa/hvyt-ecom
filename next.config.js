@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-      unoptimized: true,
+    unoptimized: true,
     remotePatterns: [
       // Existing domains
       {
@@ -43,6 +43,15 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: '/kategoria/uchwyty-meblowe/page/:page(\\d+)',
+        destination: 'https://wp.hvyt.pl/kategoria/uchwyty-meblowe',
+        permanent: true,
+      },
+    ];
   },
   async rewrites() {
     return [
