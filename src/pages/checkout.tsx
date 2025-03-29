@@ -268,7 +268,15 @@ const Checkout: React.FC = () => {
           value: customerType === 'company' ? billingData.vatNumber : '',
         },
       ],
-
+      coupon_lines: cart?.coupon
+        ? [
+            {
+              code: cart.coupon.code,
+              discount: cart.coupon.discountValue.toFixed(2),
+              discount_tax: '0.00',
+            },
+          ]
+        : [],
       shipping: shippingAddress,
       shipping_lines: [
         {
