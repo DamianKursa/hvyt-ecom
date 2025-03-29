@@ -3,25 +3,16 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(req: NextRequest) {
   const token = req.cookies.get('token');
-  const userAgent = req.headers.get('user-agent') || '';
 
-  // Detect common in‑app browser signatures from Facebook/Instagram
-  const inAppBrowserRegex = /(FBAN|FBAV|Instagram)/i;
-  const isInAppBrowser = inAppBrowserRegex.test(userAgent);
-
-  console.log('User Agent:', userAgent, 'isInAppBrowser:', isInAppBrowser);
-  console.log('Token:', token);
-
-  // If no token is present, only force redirect for non‑in‑app browsers
-  if (!token && !isInAppBrowser) {
-    const loginUrl = new URL('/logowanie', req.url);
+  if (!token) {
+    const loginUrl = new URL('/logowanie', req.url); // Redirect to login page
     return NextResponse.redirect(loginUrl);
   }
-  
-  // Otherwise, proceed normally
-  return NextResponse.next();
+
+  // Debug: Log token for verification
+  console.log('Token found:', token);
 }
 
 export const config = {
-  matcher: ['/moje-konto', '/moje-konto/:path*'],
+  matcher: ['/moje-konto', '/moje-konto/:path*'], // Protect these routes
 };
