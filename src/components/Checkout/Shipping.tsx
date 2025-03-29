@@ -128,11 +128,13 @@ const Shipping: React.FC<ShippingProps> = ({
       try {
         setLoading(true);
         setError(null);
+
         const response = await fetch('/api/shipping');
         if (!response.ok) {
           throw new Error('Nie udało się pobrać metod dostawy');
         }
         const data = await response.json();
+
         // Define restricted IDs
         const restrictedIds = [
           '7543167',
@@ -147,32 +149,40 @@ const Shipping: React.FC<ShippingProps> = ({
           '7535679',
         ];
         const cartContainsRestricted =
-          cart &&
-          cart.products &&
-          cart.products.some(
+          cart?.products?.some(
             (product: any) =>
               restrictedIds.includes(String(product.productId)) ||
               (product.variationId &&
                 restrictedIds.includes(String(product.variationId))),
-          );
-        const updatedZones = data.map((zone: ShippingZone) => {
-          let filteredMethods = zone.methods.filter(
-            (method) =>
-              !method.title.toLowerCase().includes('flexible shipping') &&
-              !(
-                method.title.toLowerCase().includes('darmowa') &&
-                cartTotal < 300
-              ),
-          );
+          ) || false;
+
+        let updatedZones = data.map((zone: ShippingZone) => {
+          let filteredMethods = zone.methods.filter((method) => {
+            // Filter out any 'flexible shipping' references
+            if (method.title.toLowerCase().includes('flexible shipping')) {
+              return false;
+            }
+            // Filter out 'darmowa' if cartTotal < 300
+            if (
+              method.title.toLowerCase().includes('darmowa') &&
+              cartTotal < 300
+            ) {
+              return false;
+            }
+            return true;
+          });
+
+          // If cartTotal >= 300, keep only certain methods
           if (cartTotal >= 300) {
             filteredMethods = filteredMethods.filter((method) =>
               [
                 'darmowa dostawa',
                 'kurier gls - darmowa wysyłka',
                 'paczkomaty inpost',
-                'punkty gls', // use "Punkty GLS" option
+                'punkty gls',
               ].includes(method.title.toLowerCase()),
             );
+            // If 'darmowa dostawa' not present, add it
             if (
               !filteredMethods.some(
                 (method) => method.title.toLowerCase() === 'darmowa dostawa',
@@ -186,10 +196,13 @@ const Shipping: React.FC<ShippingProps> = ({
               });
             }
           }
+
+          // Conditionally add Paczkomaty InPost
           if (
             !filteredMethods.some(
               (method) => method.title.toLowerCase() === 'paczkomaty inpost',
-            )
+            ) &&
+            !cartContainsRestricted // add only if no restricted items
           ) {
             filteredMethods.push({
               id: 'paczkomaty_inpost',
@@ -198,10 +211,13 @@ const Shipping: React.FC<ShippingProps> = ({
               enabled: true,
             });
           }
+
+          // Conditionally add Punkty GLS
           if (
             !filteredMethods.some(
               (method) => method.title.toLowerCase() === 'punkty gls',
-            )
+            ) &&
+            !cartContainsRestricted // add only if no restricted items
           ) {
             filteredMethods.push({
               id: 'punkty_gls',
@@ -210,14 +226,22 @@ const Shipping: React.FC<ShippingProps> = ({
               enabled: true,
             });
           }
+
+          // Final filter pass: remove if cartContainsRestricted
           if (cartContainsRestricted) {
-            filteredMethods = filteredMethods.filter(
-              (method) =>
-                method.id !== 'paczkomaty_inpost' && method.id !== 'punkty_gls',
-            );
+            filteredMethods = filteredMethods.filter((method) => {
+              return (
+                method.id !== 'paczkomaty_inpost' && method.id !== 'punkty_gls'
+              );
+            });
           }
+
           return { ...zone, methods: filteredMethods };
         });
+
+        console.log('cartContainsRestricted:', cartContainsRestricted);
+        console.log('updatedZones:', updatedZones);
+
         setShippingZones(updatedZones);
       } catch (err) {
         console.error('Błąd podczas pobierania metod dostawy:', err);

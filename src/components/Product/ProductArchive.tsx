@@ -24,6 +24,7 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
   const handlePageClick = (pageNum: number) => {
     if (pageNum > 0 && pageNum <= totalPages) {
       onPageChange(pageNum);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
