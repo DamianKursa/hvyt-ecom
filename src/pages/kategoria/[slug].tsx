@@ -90,6 +90,7 @@ const CategoryPage = ({
     'utm_medium',
     'utm_campaign',
     'srsltid',
+    'gbraid',
   ]);
 
   // Update filters from URL query parameters
