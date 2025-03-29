@@ -26,7 +26,7 @@ export const fetchCategoryBySlug = async (slug: string) => {
     const response = await WooCommerceAPI.get('/products/categories', {
       params: {
         slug,
-        per_page: 50, // Adjust as necessary
+        per_page: 12, // Adjust as necessary
       },
     });
     if (response.data.length === 0) {
@@ -96,10 +96,7 @@ export const fetchProductsByCategoryId = async (
     };
   } catch (error) {
     console.error('Error in fetchProductsByCategoryId:', error);
-    return {
-      products: [],
-      totalProducts: 0,
-    };
+    return { products: [], totalProducts: 0 };
   }
 };
 
@@ -137,11 +134,7 @@ export const fetchProductsWithFilters = async (
     );
   }
 
-  const params: any = {
-    category: categoryId,
-    page,
-    per_page: perPage,
-  };
+  const params: any = { category: categoryId, page, per_page: perPage };
 
   filters.forEach((filter) => {
     if (filter.name === 'price') {
@@ -152,10 +145,7 @@ export const fetchProductsWithFilters = async (
     } else {
       // Add attribute filter to params
       params.attributes = params.attributes || [];
-      params.attributes.push({
-        key: filter.name,
-        value: filter.value,
-      });
+      params.attributes.push({ key: filter.name, value: filter.value });
     }
   });
 

@@ -48,7 +48,7 @@ const nextConfig = {
     return [
       {
         source: '/kategoria/uchwyty-meblowe/page/:page(\\d+)',
-        destination: 'https://wp.hvyt.pl/kategoria/uchwyty-meblowe',
+        destination: 'https://hvyt.pl/kategoria/uchwyty-meblowe',
         permanent: true,
       },
     ];
