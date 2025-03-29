@@ -34,7 +34,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
   const router = useRouter();
 
   const fetchUser = async () => {
-    if (user) return; // Avoid redundant API calls if the user is already loaded
+    if (user !== null) return; // Avoid fetching again if user exists
+
     try {
       const validateResponse = await fetch('/api/auth/verify', {
         method: 'POST',
@@ -43,9 +44,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
       if (!validateResponse.ok) {
         setUser(null);
-        localStorage.removeItem('user'); // Clear stale user data
+        localStorage.removeItem('user');
         return;
       }
+
       const profileResponse = await fetch('/api/auth/profile', {
         method: 'GET',
         credentials: 'include',
@@ -53,7 +55,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
       if (profileResponse.ok) {
         const data = await profileResponse.json();
-        setUser({ id: data.id || null, name: data.name, email: data.email }); // Include id
+        setUser({ id: data.id || null, name: data.name, email: data.email });
         localStorage.setItem(
           'user',
           JSON.stringify({
@@ -61,7 +63,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
             name: data.name,
             email: data.email,
           }),
-        ); // Persist user data including id
+        );
       } else {
         setUser(null);
         localStorage.removeItem('user');
@@ -118,10 +120,16 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser)); // Restore user from localStorage
+    const hasToken = document.cookie.includes('token=');
+
+    if (user !== null) return; // User already loaded, skip fetching again
+
+    if (savedUser && hasToken) {
+      setUser(JSON.parse(savedUser));
+    } else if (hasToken) {
+      fetchUser();
     } else {
-      fetchUser(); // Fetch user if not found in localStorage
+      setUser(null); // no token, no saved user
     }
   }, []);
 
