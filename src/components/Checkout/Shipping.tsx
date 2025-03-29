@@ -49,9 +49,7 @@ declare global {
         parcelshop_type: string;
       }) => void;
     };
-    SzybkaPaczkaParcel?: new () => {
-      getParcelObject: () => any;
-    };
+    SzybkaPaczkaParcel?: new () => { getParcelObject: () => any };
   }
 }
 
@@ -214,7 +212,8 @@ const Shipping: React.FC<ShippingProps> = ({
           }
           if (cartContainsRestricted) {
             filteredMethods = filteredMethods.filter(
-              (method) => method.id !== 'paczkomaty_inpost',
+              (method) =>
+                method.id !== 'paczkomaty_inpost' && method.id !== 'punkty_gls',
             );
           }
           return { ...zone, methods: filteredMethods };
@@ -277,12 +276,8 @@ const Shipping: React.FC<ShippingProps> = ({
           defaultLocale: 'pl',
           mapType: 'osm',
           searchType: 'osm',
-          points: {
-            types: ['parcel_locker'],
-          },
-          map: {
-            initialTypes: ['parcel_locker'],
-          },
+          points: { types: ['parcel_locker'] },
+          map: { initialTypes: ['parcel_locker'] },
         });
       }
     };
