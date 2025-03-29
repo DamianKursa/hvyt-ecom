@@ -15,6 +15,10 @@ interface Attribute {
   id: number;
   name: string;
 }
+interface MediaItem {
+  id: number;
+  source_url: string;
+}
 
 // Fetch category data by slug
 export const fetchCategoryBySlug = async (slug: string) => {
@@ -66,59 +70,58 @@ export const fetchMediaById = async (mediaId: number) => {
 
 export const fetchKolekcjePostsWithImages = async () => {
   try {
-    // Fetch Kolekcje posts
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`,
       {
-        params: {
-          per_page: 50, // Adjust as necessary
-        },
+        params: { per_page: 50 },
       },
     );
 
     const kolekcje: Kolekcja[] = response.data;
 
-    // Fetch featured media for each Kolekcja post
-    const kolekcjeWithImages = await Promise.all(
-      kolekcje.map(async (kolekcja: Kolekcja) => {
-        let imageUrl = '/placeholder.jpg'; // Default image
+    const mediaIds = kolekcje
+      .map((k) => k.featured_media)
+      .filter(Boolean)
+      .join(',');
 
-        // Fetch the featured media if available
-        if (kolekcja.featured_media) {
-          try {
-            const mediaResponse = await axios.get(
-              `${process.env.NEXT_PUBLIC_WP_REST_API}/media/${kolekcja.featured_media}`,
-            );
-            imageUrl = mediaResponse.data.source_url;
-          } catch (error) {
-            console.error(
-              `Error fetching media for Kolekcja ${kolekcja.id}:`,
-              error,
-            );
-          }
-        } else if (kolekcja.yoast_head_json?.og_image?.[0]?.url) {
-          imageUrl = kolekcja.yoast_head_json.og_image[0].url; // Fallback to Yoast's og:image
-        }
-
-        // Build icon paths from ACF fields
-        const icons = [
-          kolekcja.acf?.ikonka_1,
-          kolekcja.acf?.ikonka_2,
-          kolekcja.acf?.ikonka_3,
-          kolekcja.acf?.ikonka_4,
-        ]
-          .filter((iconName) => iconName) // Remove null or undefined values
-          .map((iconName) => `/icons/kolekcja/${iconName}.svg`);
-
-        // Add imageUrl, description, and icons to the returned kolekcja
-        return {
-          ...kolekcja,
-          imageUrl,
-          description: kolekcja.content?.rendered || 'No description available', // Example fallback
-          icons, // Array of icon file paths
-        };
-      }),
+    const mediaResponse = await axios.get(
+      `${process.env.NEXT_PUBLIC_WP_REST_API}/media`,
+      {
+        params: { include: mediaIds, per_page: 50 },
+        timeout: 5000,
+      },
     );
+
+    const mediaItems: MediaItem[] = mediaResponse.data;
+
+    const kolekcjeWithImages = kolekcje.map((kolekcja: Kolekcja) => {
+      let imageUrl = '/placeholder.jpg';
+
+      const media = mediaItems.find(
+        (m: MediaItem) => m.id === kolekcja.featured_media,
+      );
+      if (media) {
+        imageUrl = media.source_url;
+      } else if (kolekcja.yoast_head_json?.og_image?.[0]?.url) {
+        imageUrl = kolekcja.yoast_head_json.og_image[0].url;
+      }
+
+      const icons = [
+        kolekcja.acf?.ikonka_1,
+        kolekcja.acf?.ikonka_2,
+        kolekcja.acf?.ikonka_3,
+        kolekcja.acf?.ikonka_4,
+      ]
+        .filter(Boolean)
+        .map((iconName) => `/icons/kolekcja/${iconName}.svg`);
+
+      return {
+        ...kolekcja,
+        imageUrl,
+        description: kolekcja.content?.rendered || 'No description available',
+        icons,
+      };
+    });
 
     return kolekcjeWithImages;
   } catch (error) {

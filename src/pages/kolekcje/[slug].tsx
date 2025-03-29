@@ -37,16 +37,14 @@ const CollectionPage = () => {
       try {
         if (!slugString) return;
 
-        // 1. Fetch category data by slug via the secure API route
+        // Fetch category data
         const categoryRes = await fetch(
-          `/api/category?action=fetchCategoryBySlug&slug=${encodeURIComponent(
-            slugString,
-          )}`,
+          `/api/category?action=fetchCategoryBySlug&slug=${encodeURIComponent(slugString)}`,
         );
         if (!categoryRes.ok) throw new Error('Error fetching category');
         const categoryData = await categoryRes.json();
 
-        // 2. Fetch products for that category via the secure API route
+        // Fetch products for that category
         const productsRes = await fetch(
           `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryData.id}&page=1&perPage=12`,
         );
@@ -54,7 +52,7 @@ const CollectionPage = () => {
         const productsJson = await productsRes.json();
         setProductsData(productsJson);
 
-        // 3. Fetch Kolekcje posts with images via the secure WooCommerce API route
+        // Fetch Kolekcje posts with images (already optimized)
         const kolekcjeRes = await fetch(
           `/api/woocommerce?action=fetchKolekcjePostsWithImages`,
         );
@@ -62,7 +60,7 @@ const CollectionPage = () => {
         const kolekcjeJson = await kolekcjeRes.json();
         setKolekcjeData(kolekcjeJson);
 
-        // 4. Find the current Kolekcja by slug and update description
+        // Find the current Kolekcja by slug
         const currentKolekcja = kolekcjeJson.find(
           (kolekcja: Kolekcja) => kolekcja.slug === slugString,
         );
@@ -70,15 +68,9 @@ const CollectionPage = () => {
           stripHTML(currentKolekcja?.content.rendered || 'Opis kolekcji.'),
         );
 
-        // 5. If a featured_media exists, fetch its image URL via the secure API route
-        if (currentKolekcja?.featured_media) {
-          const mediaRes = await fetch(
-            `/api/woocommerce?action=fetchMediaById&mediaId=${currentKolekcja.featured_media}`,
-          );
-          if (!mediaRes.ok) throw new Error('Error fetching media');
-          const mediaJson = await mediaRes.json();
-          setFeaturedImage(mediaJson.source_url);
-        }
+        // Directly use image URL from optimized data (no additional fetch)
+        setFeaturedImage(currentKolekcja?.imageUrl || '/placeholder.jpg');
+
         setLoading(false);
       } catch (error) {
         console.error('Error fetching collection data:', error);
