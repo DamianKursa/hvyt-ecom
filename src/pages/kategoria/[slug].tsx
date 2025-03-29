@@ -72,15 +72,15 @@ const CategoryPage = ({
   const filterOrder: Record<string, string[]> = {
     'uchwyty-meblowe': [
       'Rodzaj',
-      'Kolor OK',
+      'Kolor',
       'Rozstaw',
       'Materiał',
       'Styl',
       'Kolekcja',
       'Przeznaczenie',
     ],
-    klamki: ['Kształt rozety', 'Kolor OK', 'Materiał'],
-    wieszaki: ['Kolor OK', 'Materiał'],
+    klamki: ['Kształt rozety', 'Kolor', 'Materiał'],
+    wieszaki: ['Kolor', 'Materiał'],
   };
   const ignoredParams = new Set([
     'slug',
