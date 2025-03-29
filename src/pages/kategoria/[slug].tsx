@@ -89,6 +89,7 @@ const CategoryPage = ({
     'utm_source',
     'utm_medium',
     'utm_campaign',
+    'srsltid',
   ]);
 
   // Update filters from URL query parameters
