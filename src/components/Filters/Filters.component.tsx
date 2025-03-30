@@ -41,6 +41,7 @@ const Filters = ({
     [key: string]: boolean;
   }>({});
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
+  const [isFetchingProducts, setIsFetchingProducts] = useState(false);
   const previousCategoryId = useRef<number | null>(null);
 
   // Fetch attributes (with terms) when the category changes.
@@ -89,6 +90,8 @@ const Filters = ({
     optionSlug: string,
     checked: boolean,
   ) => {
+    if (isFetchingProducts) return; // Block further interactions while fetching
+
     const updatedFilters = checked
       ? [...activeFilters, { name: attributeSlug, value: optionSlug }]
       : activeFilters.filter(
@@ -98,17 +101,17 @@ const Filters = ({
 
     onFilterChange(updatedFilters);
 
-    if (updatedFilters.length === 0) {
-      setProducts([]);
-      setTotalProducts(0);
-      return;
-    }
+    // Instead of clearing products when filters are empty,
+    // we re-fetch the archive (with an empty filters parameter)
+    const filtersParam =
+      updatedFilters.length > 0
+        ? encodeURIComponent(JSON.stringify(updatedFilters))
+        : '';
 
+    setIsFetchingProducts(true);
     try {
       const res = await fetch(
-        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${encodeURIComponent(
-          JSON.stringify(updatedFilters),
-        )}&page=1&perPage=12`,
+        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12`,
       );
       if (!res.ok) throw new Error('Error fetching filtered products');
       const data = await res.json();
@@ -116,10 +119,14 @@ const Filters = ({
       setTotalProducts(data.totalProducts);
     } catch (error) {
       console.error('Error fetching filtered products:', error);
+    } finally {
+      setIsFetchingProducts(false);
     }
   };
 
   const handlePriceChange = async (newRange: [number, number]) => {
+    if (isFetchingProducts) return; // Block interactions while fetching
+
     setPriceRange(newRange);
 
     const priceFilter = {
@@ -134,11 +141,15 @@ const Filters = ({
 
     onFilterChange(updatedFilters);
 
+    const filtersParam =
+      updatedFilters.length > 0
+        ? encodeURIComponent(JSON.stringify(updatedFilters))
+        : '';
+
+    setIsFetchingProducts(true);
     try {
       const res = await fetch(
-        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${encodeURIComponent(
-          JSON.stringify(updatedFilters),
-        )}&page=1&perPage=12`,
+        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12`,
       );
       if (!res.ok) throw new Error('Error applying price filter');
       const data = await res.json();
@@ -146,6 +157,8 @@ const Filters = ({
       setTotalProducts(data.totalProducts);
     } catch (error) {
       console.error('Error applying price filter:', error);
+    } finally {
+      setIsFetchingProducts(false);
     }
   };
 
@@ -188,6 +201,7 @@ const Filters = ({
           <button
             className="font-bold mb-2 flex items-center justify-between w-full"
             onClick={() => toggleFilter(attribute.slug)}
+            disabled={isFetchingProducts}
           >
             <div className="flex items-center">
               <span>{attribute.name}</span>
@@ -245,6 +259,7 @@ const Filters = ({
                             e.target.checked,
                           )
                         }
+                        disabled={isFetchingProducts}
                         className="hidden"
                       />
                       <label
@@ -269,6 +284,7 @@ const Filters = ({
                 <button
                   className="underline text-[14px]"
                   onClick={() => toggleMoreOptions(attribute.slug)}
+                  disabled={isFetchingProducts}
                 >
                   {moreOptionsVisible[attribute.slug] ? 'Mniej' : 'Wiecej'}
                 </button>
@@ -282,6 +298,7 @@ const Filters = ({
           <button
             className="font-bold mb-2 flex items-center justify-between w-full"
             onClick={() => toggleFilter('price')}
+            disabled={isFetchingProducts}
           >
             <span>Cena</span>
             <img
