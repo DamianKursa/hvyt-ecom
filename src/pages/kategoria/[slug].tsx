@@ -26,6 +26,7 @@ interface CategoryPageProps {
   initialProducts: any[];
   initialTotalProducts: number;
   seoData: SEOData | null;
+  initialAttributes: any[]; // New prop for attributes
 }
 
 const icons: Record<string, string> = {
@@ -39,6 +40,7 @@ const CategoryPage = ({
   initialProducts,
   initialTotalProducts,
   seoData,
+  initialAttributes,
 }: CategoryPageProps) => {
   const router = useRouter();
   const slug = Array.isArray(router.query.slug)
@@ -309,7 +311,7 @@ const CategoryPage = ({
 
         <div className="flex">
           {!isMobile && filtersVisible && (
-            <div className="w-1/4 pr-8">
+            <div className={`w-1/4 pr-8 ${filtersVisible ? '' : 'hidden'}`}>
               <Filters
                 categoryId={category.id}
                 activeFilters={activeFilters}
@@ -317,6 +319,7 @@ const CategoryPage = ({
                 setProducts={setProducts}
                 setTotalProducts={setFilteredProductCount}
                 filterOrder={filterOrder[slug || ''] || []}
+                initialAttributes={initialAttributes} // Pass down the initial attributes!
               />
             </div>
           )}
@@ -369,21 +372,14 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   try {
-    const categoryRes = await fetch(
-      `${baseUrl}/api/category?action=fetchCategoryBySlug&slug=${encodeURIComponent(
-        slug,
-      )}`,
+    // Call the aggregator endpoint to get category, products, and attributes at once.
+    const aggregatorRes = await fetch(
+      `${baseUrl}/api/category-aggregator?slug=${encodeURIComponent(slug)}&page=1&perPage=12`,
     );
-    if (!categoryRes.ok) throw new Error('Error fetching category');
-    const fetchedCategory = await categoryRes.json();
+    if (!aggregatorRes.ok) throw new Error('Error fetching aggregated data');
+    const aggregatorData = await aggregatorRes.json();
 
-    const productsRes = await fetch(
-      `${baseUrl}/api/category?action=fetchProductsByCategoryId&categoryId=${fetchedCategory.id}&page=1&perPage=12`,
-    );
-    if (!productsRes.ok) throw new Error('Error fetching products');
-    const productsData = await productsRes.json();
-
-    // Load SEO data from a JSON file
+    // Load SEO data from a JSON file (unchanged)
     const fs = require('fs');
     const path = require('path');
     const seoFilePath = path.join(process.cwd(), 'data', 'seo-data.json');
@@ -402,9 +398,10 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
     return {
       props: {
-        category: fetchedCategory,
-        initialProducts: productsData.products,
-        initialTotalProducts: productsData.totalProducts,
+        category: aggregatorData.category,
+        initialProducts: aggregatorData.products,
+        initialTotalProducts: aggregatorData.totalProducts,
+        initialAttributes: aggregatorData.attributes, // Pass attributes down
         seoData,
       },
       revalidate: 60,
@@ -413,15 +410,19 @@ export const getStaticProps: GetStaticProps = async (context) => {
     return { notFound: true };
   }
 };
-
 export const getStaticPaths: GetStaticPaths = async () => {
+  // You can hardcode the slugs if the list is known.
+  // If you have an API, fetch the list of categories here.
   const paths = [
     { params: { slug: 'uchwyty-meblowe' } },
     { params: { slug: 'klamki' } },
     { params: { slug: 'wieszaki' } },
   ];
 
-  return { paths, fallback: 'blocking' };
+  return {
+    paths,
+    fallback: 'blocking', // Other options are 'false' or 'true'
+  };
 };
 
 export default CategoryPage;

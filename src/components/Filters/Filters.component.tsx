@@ -8,7 +8,7 @@ interface FilterOption {
   slug: string;
 }
 
-interface FilterAttribute {
+export interface FilterAttribute {
   name: string;
   slug: string;
   options?: FilterOption[];
@@ -21,6 +21,7 @@ interface FiltersProps {
   setProducts: (products: any[]) => void;
   setTotalProducts: (total: number) => void;
   filterOrder?: string[];
+  initialAttributes?: FilterAttribute[];
 }
 
 const Filters = ({
@@ -30,9 +31,11 @@ const Filters = ({
   setProducts,
   setTotalProducts,
   filterOrder = [],
+  initialAttributes = [],
 }: FiltersProps) => {
-  const [attributes, setAttributes] = useState<FilterAttribute[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [attributes, setAttributes] =
+    useState<FilterAttribute[]>(initialAttributes);
+  const [loading, setLoading] = useState(initialAttributes.length === 0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [expandedFilters, setExpandedFilters] = useState<{
     [key: string]: boolean;
@@ -44,9 +47,25 @@ const Filters = ({
   const [isFetchingProducts, setIsFetchingProducts] = useState(false);
   const previousCategoryId = useRef<number | null>(null);
 
-  // Fetch attributes (with terms) when the category changes.
+  // Only fetch attributes if initialAttributes is not provided.
   useEffect(() => {
+    // If initialAttributes exist, assume they’re fresh.
+    if (initialAttributes && initialAttributes.length > 0) {
+      setAttributes(initialAttributes);
+      const initialExpandedFilters = initialAttributes.slice(0, 3).reduce(
+        (acc: { [key: string]: boolean }, attr: FilterAttribute) => ({
+          ...acc,
+          [attr.slug]: true,
+        }),
+        { price: false },
+      );
+      setExpandedFilters(initialExpandedFilters);
+      return;
+    }
+
+    // Otherwise, fetch attributes from the API.
     const fetchAttributes = async () => {
+      // Avoid re-fetching if category hasn't changed.
       if (previousCategoryId.current === categoryId) return;
       setLoading(true);
       try {
@@ -65,7 +84,6 @@ const Filters = ({
             : fetchedAttributes;
         setAttributes(orderedAttributes);
         setPriceRange([0, 500]);
-        // Initialize expanded state for the first 3 attributes.
         const initialExpandedFilters = orderedAttributes.slice(0, 3).reduce(
           (acc: { [key: string]: boolean }, attr: FilterAttribute) => ({
             ...acc,
@@ -82,15 +100,17 @@ const Filters = ({
       }
     };
 
-    if (categoryId) fetchAttributes();
-  }, [categoryId, filterOrder]);
+    if (categoryId) {
+      fetchAttributes();
+    }
+  }, [categoryId, filterOrder, initialAttributes]);
 
   const handleFilterChange = async (
     attributeSlug: string,
     optionSlug: string,
     checked: boolean,
   ) => {
-    if (isFetchingProducts) return; // Block further interactions while fetching
+    if (isFetchingProducts) return;
 
     const updatedFilters = checked
       ? [...activeFilters, { name: attributeSlug, value: optionSlug }]
@@ -101,13 +121,23 @@ const Filters = ({
 
     onFilterChange(updatedFilters);
 
-    // Instead of clearing products when filters are empty,
-    // we re-fetch the archive (with an empty filters parameter)
-    const filtersParam =
-      updatedFilters.length > 0
-        ? encodeURIComponent(JSON.stringify(updatedFilters))
-        : '';
+    // If no filters remain, use the default products endpoint.
+    if (updatedFilters.length === 0) {
+      try {
+        const res = await fetch(
+          `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryId}&page=1&perPage=12`,
+        );
+        if (!res.ok) throw new Error('Error fetching default products');
+        const data = await res.json();
+        setProducts(data.products);
+        setTotalProducts(data.totalProducts);
+      } catch (error) {
+        console.error('Error fetching default products:', error);
+      }
+      return;
+    }
 
+    const filtersParam = encodeURIComponent(JSON.stringify(updatedFilters));
     setIsFetchingProducts(true);
     try {
       const res = await fetch(
@@ -125,8 +155,6 @@ const Filters = ({
   };
 
   const handlePriceChange = async (newRange: [number, number]) => {
-    if (isFetchingProducts) return; // Block interactions while fetching
-
     setPriceRange(newRange);
 
     const priceFilter = {
@@ -140,11 +168,7 @@ const Filters = ({
     ];
 
     onFilterChange(updatedFilters);
-
-    const filtersParam =
-      updatedFilters.length > 0
-        ? encodeURIComponent(JSON.stringify(updatedFilters))
-        : '';
+    const filtersParam = encodeURIComponent(JSON.stringify(updatedFilters));
 
     setIsFetchingProducts(true);
     try {
@@ -184,7 +208,7 @@ const Filters = ({
     return <Snackbar message={errorMessage} type="error" visible={true} />;
   }
 
-  if (loading || attributes.length === 0) {
+  if (attributes.length === 0) {
     return (
       <div className="filters border p-4">
         <SkeletonFilter />
