@@ -100,7 +100,7 @@ const nextConfig = {
       { source: '/produkt/:path*', destination: '/produkt/:path*' },
 
       // Proxy WordPress API calls: ensure /wp-json is served from hvyt.pl
-      { source: '/wp-json/:path*', destination: 'https://wp.hvyt.pl/wp-json/:path*' },
+      { source: '/wp-json/:path*', destination: 'https://hvyt.pl/wp-json/:path*' },
 
       // NEW: Catch requests to "/" that include a wc-api query parameter and proxy them to wp.hvyt.pl.
       {
@@ -112,13 +112,13 @@ const nextConfig = {
             value: '(.*)',
           },
         ],
-        destination: 'https://wp.hvyt.pl/',
+        destination: 'https://hvyt.pl/',
       },
 
       // Catch-all: Any route not matched above is proxied to WordPress.
       {
         source: '/:path((?!_next|api|static|wp-json|wp-admin|auth|moje-konto|orders|posts|blog|kategoria|kolekcje|category|contact|create-order|payment-webhooks|payment|reviews|shipping|waiting-list|woocommerce|checkout|dostawa|dziekujemy|hvyt-objects|kase|koszyk|logowanie|o-nas|polityka-prywatnosci|potwierdzenie-email|regulamin|ulubione|wspolpraca|wygodne-zwroty|zapomniane-haslo|zwroty-i-reklamacje|produkt).+)',
-        destination: 'https://wp.hvyt.pl/:path*',
+        destination: 'https://hvyt.pl/:path*',
       },
     ];
   },

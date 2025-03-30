@@ -6,6 +6,7 @@ interface PriceSliderProps {
   maxPrice: number;
   currentRange: [number, number];
   onPriceChange: (range: [number, number]) => void;
+  disabled?: boolean; // Add this optional prop
 }
 
 const PriceSlider: React.FC<PriceSliderProps> = ({
