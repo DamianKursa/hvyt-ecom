@@ -14,6 +14,7 @@ interface FilterModalProps {
   setProducts: React.Dispatch<React.SetStateAction<any[]>>; // Update products when filters change
   setTotalProducts: React.Dispatch<React.SetStateAction<number>>; // Update total products count
   filterOrder: string[]; // Add filterOrder prop
+  initialAttributes: any[];
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({

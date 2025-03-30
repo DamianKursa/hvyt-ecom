@@ -299,11 +299,17 @@ const CategoryPage = ({
           sorting={sortingOption}
           onSortingChange={handleSortingChange}
           onRemoveFilter={(filterToRemove) => {
+            // Remove the filter where both name and value match
             const updatedFilters = activeFilters.filter(
               (filter) =>
-                filter.name !== filterToRemove.name ||
-                filter.value !== filterToRemove.value,
+                !(
+                  filter.name === filterToRemove.name &&
+                  filter.value === filterToRemove.value
+                ),
             );
+            // Immediately update local state
+            setActiveFilters(updatedFilters);
+            // Then update URL and re-fetch products
             handleFilterChange(updatedFilters);
           }}
           isMobile={isMobile}
@@ -357,6 +363,7 @@ const CategoryPage = ({
         productsCount={filteredProductCount}
         initialProductCount={initialTotalProducts}
         filterOrder={filterOrder[slug || ''] || []}
+        initialAttributes={initialAttributes}
       />
 
       <div className="w-full">
