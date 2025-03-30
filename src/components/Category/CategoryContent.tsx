@@ -156,23 +156,6 @@ kształtów i pomóc odnaleźć prawdziwych wnętrzarskich przyjaciół.</p>
 <p>Zobacz również gałki meblowe w naszej ofercie.</p>`,
     },
   ],
-  galki: [
-    {
-      title: 'Gałki do mebli',
-      content: `
-        <p>Urządzasz mieszkanie i nie wiesz, jak nadać mu indywidualnego charakteru? A może znudziło Ci się już stare i szukasz elementów, które coś w nim zmienią? Mamy na to sposób! Gałki do mebli HVYT są tym, czego potrzebujesz. Nieoczywiste kształty, żywe kolory, różnorodność materiałów i rozmiarów - tacy właśnie jesteśmy. Odrobinę zakręceni, zupełnie jak nasze gałki meblowe.</p>`,
-    },
-    {
-      title: 'Gałki do mebli kuchennych',
-      content: `
-        <p>Kuchnia to zdecydowanie najlepsza przestrzeń do spotkań. Tych międzyludzkich, ale także kulinarnych. Zapachy unoszące się w powietrzu potrafią przenieść w odległe krainy, sprawiając, że choć na chwilę jesteśmy w stanie zapomnieć o zmartwieniach. Wspólne gotowanie jest dla niektórych ulubioną formą rozrywki, a gałki do mebli kuchennych cichymi obserwatorami tych poczynań. Dlaczego o tym piszemy? Bo nie jest to wcale takie oczywiste, że małe rzeczy mają w sobie wielką moc sprawczą.`,
-    },
-    {
-      title: 'Gałki do mebli dziecięcych',
-      content: `
-<p>Pokój dziecięcy jest miejscem absolutnie magicznym. To tutaj buduje się rodzinne więzi, rozwiązuje dziecięce problemy i śmieje do utraty tchu, szukając łaskotek. Meble w pokoju dziecięcym odgrywają rolę magazynów, które pomieszczą wszystko: ubrania, zabawki i książki. Gałki do mebli dziecięcych muszą więc posiadać dwie funkcje: być poręczne i bezpieczne dla małych użytkowników.</p>`,
-    },
-  ],
 };
 
 export type { Section };
