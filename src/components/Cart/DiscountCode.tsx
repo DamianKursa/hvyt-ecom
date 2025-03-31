@@ -19,7 +19,6 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     visible: boolean;
   }>({ message: '', type: 'success', visible: false });
   const [isLoading, setIsLoading] = useState(false);
-
   const handleApplyCode = async () => {
     if (!code.trim()) {
       setSnackbar({
@@ -37,37 +36,37 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       const response = await fetch('/api/discount', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: code.trim() }),
+        body: JSON.stringify({ code: code.trim(), cartTotal }),
       });
 
-      if (!response.ok) {
-        throw new Error('Błąd podczas weryfikacji kodu rabatowego');
-      }
+      const data = await response.json();
 
-      const { valid, discountValue, discountType } = await response.json();
-
-      if (valid) {
-        let discountApplied = 0;
-        if (discountType === 'percent') {
-          discountApplied = (cartTotal * discountValue) / 100;
-        } else if (discountType === 'fixed') {
-          discountApplied = discountValue;
-        }
-
-        applyCoupon({ code, discountValue: discountApplied, discountType });
-        setCartTotal(cartTotal - discountApplied);
+      if (!response.ok || !data.valid) {
         setSnackbar({
-          message: 'Kod rabatowy został dodany',
-          type: 'success',
-          visible: true,
-        });
-      } else {
-        setSnackbar({
-          message: 'Podany kod nie istnieje',
+          message: data.message || 'Niepoprawny kod rabatowy',
           type: 'error',
           visible: true,
         });
+        return;
       }
+
+      const { discountValue, discountType } = data;
+
+      let discountApplied = 0;
+      if (discountType === 'percent') {
+        discountApplied = (cartTotal * discountValue) / 100;
+      } else if (discountType === 'fixed') {
+        discountApplied = discountValue;
+      }
+
+      applyCoupon({ code, discountValue: discountApplied, discountType });
+      setCartTotal(cartTotal - discountApplied);
+
+      setSnackbar({
+        message: 'Kod rabatowy został dodany',
+        type: 'success',
+        visible: true,
+      });
     } catch (error) {
       console.error('Error validating discount code:', error);
       setSnackbar({
@@ -77,10 +76,9 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       });
     } finally {
       setIsLoading(false);
-      setTimeout(
-        () => setSnackbar((prev) => ({ ...prev, visible: false })),
-        3000,
-      );
+      setTimeout(() => {
+        setSnackbar((prev) => ({ ...prev, visible: false }));
+      }, 3000);
     }
   };
 
