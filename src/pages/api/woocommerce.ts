@@ -1,4 +1,3 @@
-// pages/api/woocommerce.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   fetchCategoryBySlug,
@@ -15,7 +14,7 @@ import {
 } from '../../utils/api/woocommerce';
 import { getCache, setCache } from '../../lib/cache';
 
-// Set cache TTL in seconds
+// Set cache TTL in seconds (1 hour)
 const CACHE_TTL = 3600;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -29,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { slug } = req.query;
         if (!slug || typeof slug !== 'string')
           return res.status(400).json({ error: 'Missing or invalid slug' });
-
+  
         const cacheKey = `fetchCategoryBySlug:${slug}`;
         let result = await getCache(cacheKey);
         if (!result) {
@@ -44,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { slug } = req.query;
         if (!slug || typeof slug !== 'string')
           return res.status(400).json({ error: 'Missing or invalid slug' });
-
+  
         const cacheKey = `fetchProductBySlug:${slug}`;
         let result = await getCache(cacheKey);
         if (!result) {
@@ -60,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const id = parseInt(mediaId as string, 10);
         if (isNaN(id))
           return res.status(400).json({ error: 'Invalid mediaId' });
-
+  
         const cacheKey = `fetchMediaById:${id}`;
         let result = await getCache(cacheKey);
         if (!result) {
@@ -72,7 +71,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       case 'fetchKolekcjePostsWithImages': {
         if (req.method !== 'GET')
           return res.status(405).json({ error: 'Method not allowed' });
-
+  
         const cacheKey = 'fetchKolekcjePostsWithImages';
         let result = await getCache(cacheKey);
         if (!result) {
@@ -84,7 +83,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       case 'fetchNowosciPosts': {
         if (req.method !== 'GET')
           return res.status(405).json({ error: 'Method not allowed' });
-
+  
         const cacheKey = 'fetchNowosciPosts';
         let result = await getCache(cacheKey);
         if (!result) {
@@ -100,7 +99,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const id = parseInt(categoryId as string, 10);
         if (isNaN(id))
           return res.status(400).json({ error: 'Invalid categoryId' });
-
+  
         const cacheKey = `fetchProductAttributesWithTerms:${id}`;
         let result = await getCache(cacheKey);
         if (!result) {
@@ -112,7 +111,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       case 'fetchLatestKolekcja': {
         if (req.method !== 'GET')
           return res.status(405).json({ error: 'Method not allowed' });
-
+  
         const cacheKey = 'fetchLatestKolekcja';
         let result = await getCache(cacheKey);
         if (!result) {
@@ -127,7 +126,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { kolekcja } = req.query;
         if (!kolekcja || typeof kolekcja !== 'string')
           return res.status(400).json({ error: 'Missing or invalid kolekcja' });
-
+  
         const cacheKey = `fetchProductsByAttribute:${kolekcja}`;
         let result = await getCache(cacheKey);
         if (!result) {
@@ -142,7 +141,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { productId } = req.query;
         if (!productId || typeof productId !== 'string')
           return res.status(400).json({ error: 'Missing or invalid productId' });
-
+  
         const cacheKey = `fetchCrossSellProducts:${productId}`;
         let result = await getCache(cacheKey);
         if (!result) {
@@ -158,7 +157,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!query || typeof query !== 'string')
           return res.status(400).json({ error: 'Missing or invalid query' });
         const perPageNum = perPage ? parseInt(perPage as string, 10) : 10;
-
+  
         const cacheKey = `searchProducts:${query}:${perPageNum}`;
         let result = await getCache(cacheKey);
         if (!result) {
@@ -170,7 +169,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       case 'fetchInstagramPosts': {
         if (req.method !== 'GET')
           return res.status(405).json({ error: 'Method not allowed' });
-
+  
         const cacheKey = 'fetchInstagramPosts';
         let result = await getCache(cacheKey);
         if (!result) {

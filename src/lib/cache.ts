@@ -1,21 +1,21 @@
-// lib/cache.ts
-import { kv } from '@vercel/kv';
+import Redis from 'ioredis';
 
-export async function getCache(key: string): Promise<any> {
+const redis = new Redis(process.env.REDIS_URL);
+
+export const getCache = async (key: string) => {
   try {
-    const data = await kv.get(key);
-    return data ? JSON.parse(data as string) : null;
+    const data = await redis.get(key);
+    return data ? JSON.parse(data) : null;
   } catch (error) {
     console.error('Error getting cache:', error);
     return null;
   }
-}
+};
 
-export async function setCache(key: string, data: any, ttl: number): Promise<void> {
+export const setCache = async (key: string, data: any, ttl: number) => {
   try {
-    // Use the "ex" option to set the TTL (in seconds)
-    await kv.set(key, JSON.stringify(data), { ex: ttl });
+    await redis.set(key, JSON.stringify(data), 'EX', ttl);
   } catch (error) {
     console.error('Error setting cache:', error);
   }
-}
+};
