@@ -157,9 +157,23 @@ const Checkout: React.FC = () => {
       return;
     }
 
-    // For guest checkout, only require billing first name, last name and email.
-    if (!user && (!billingData.firstName || !billingData.lastName || !email)) {
-      alert('Proszę podaj wszystkie wymagane pola: imię, nazwisko i email.');
+    const missingFields = [];
+
+    if (!billingData.firstName) missingFields.push('imię');
+    if (!billingData.lastName) missingFields.push('nazwisko');
+    if (!billingData.phone) missingFields.push('numer telefonu');
+    if (!email) missingFields.push('adres e-mail');
+    if (!billingData.street) missingFields.push('nazwa ulicy');
+    if (!billingData.buildingNumber) missingFields.push('numer budynku');
+    if (!billingData.city) missingFields.push('miasto');
+    if (!billingData.postalCode) missingFields.push('kod pocztowy');
+
+    if (missingFields.length > 0) {
+      alert(
+        `Proszę uzupełnić wymagane pola: ${missingFields
+          .map((field) => `\n• ${field}`)
+          .join('')}`,
+      );
       return;
     }
 
