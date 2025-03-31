@@ -1,6 +1,10 @@
 import Redis from 'ioredis';
 
-const redis = new Redis(process.env.REDIS_URL);
+if (!process.env.REDIS_URL) {
+  throw new Error("Missing REDIS_URL environment variable");
+}
+
+const redis = new Redis(process.env.REDIS_URL!); // The "!" tells TypeScript it's not undefined
 
 export const getCache = async (key: string) => {
   try {
