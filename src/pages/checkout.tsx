@@ -132,7 +132,16 @@ const Checkout: React.FC = () => {
       );
       return;
     }
+    if (shippingMethod === 'paczkomaty_inpost' && !selectedLocker) {
+      alert('Wybierz paczkomat przed złożeniem zamówienia.');
+      return;
+    }
 
+    // Validate selected point if GLS point is selected
+    if (shippingMethod === 'punkty_gls' && !selectedGlsPoint) {
+      alert('Wybierz punkt GLS przed złożeniem zamówienia.');
+      return;
+    }
     if (!cart || cart.products.length === 0) {
       alert('Koszyk jest pusty!');
       return;
