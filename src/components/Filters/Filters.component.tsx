@@ -24,7 +24,7 @@ interface FiltersProps {
   initialAttributes?: FilterAttribute[];
 }
 
-const Filters = ({
+const Filters: React.FC<FiltersProps> = ({
   categoryId,
   activeFilters,
   onFilterChange,
@@ -32,7 +32,7 @@ const Filters = ({
   setTotalProducts,
   filterOrder = [],
   initialAttributes = [],
-}: FiltersProps) => {
+}) => {
   const [attributes, setAttributes] =
     useState<FilterAttribute[]>(initialAttributes);
   const [loading, setLoading] = useState(initialAttributes.length === 0);
@@ -51,8 +51,18 @@ const Filters = ({
   useEffect(() => {
     // If initialAttributes exist, assume they’re fresh.
     if (initialAttributes && initialAttributes.length > 0) {
-      setAttributes(initialAttributes);
-      const initialExpandedFilters = initialAttributes.slice(0, 3).reduce(
+      const orderedAttributes =
+        filterOrder.length > 0
+          ? filterOrder
+              .map((order) =>
+                initialAttributes.find((attr) => attr.name === order),
+              )
+              .filter((attr): attr is FilterAttribute => !!attr)
+          : initialAttributes;
+
+      setAttributes(orderedAttributes);
+
+      const initialExpandedFilters = orderedAttributes.slice(0, 3).reduce(
         (acc: { [key: string]: boolean }, attr: FilterAttribute) => ({
           ...acc,
           [attr.slug]: true,
@@ -74,6 +84,7 @@ const Filters = ({
         );
         if (!res.ok) throw new Error('Failed to fetch attributes');
         const fetchedAttributes: FilterAttribute[] = await res.json();
+        // Order attributes using filterOrder if provided.
         const orderedAttributes =
           filterOrder.length > 0
             ? filterOrder
