@@ -125,6 +125,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-4">
         <input
           type="text"
+          required
           placeholder="Nazwa ulicy*"
           value={billingData.street}
           onChange={(e) =>
@@ -134,6 +135,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         />
         <input
           type="text"
+          required
           placeholder="Nr budynku*"
           value={billingData.buildingNumber}
           onChange={(e) =>
@@ -159,6 +161,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         <input
           type="text"
           placeholder="Miasto*"
+          required
           value={billingData.city}
           onChange={(e) =>
             setBillingData((prev) => ({ ...prev, city: e.target.value }))
@@ -168,6 +171,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         <input
           type="text"
           placeholder="Kod pocztowy*"
+          required
           value={billingData.postalCode}
           onChange={(e) =>
             setBillingData((prev) => ({ ...prev, postalCode: e.target.value }))
@@ -177,6 +181,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         <input
           type="text"
           placeholder="Kraj / Region*"
+          required
           value={billingData.country}
           onChange={(e) =>
             setBillingData((prev) => ({
@@ -204,6 +209,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             <input
               type="text"
               placeholder="Nazwa ulicy*"
+              required
               value={shippingData.street}
               onChange={(e) =>
                 setShippingData((prev) => ({ ...prev, street: e.target.value }))
@@ -213,6 +219,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             <input
               type="text"
               placeholder="Nr budynku*"
+              required
               value={shippingData.buildingNumber}
               onChange={(e) =>
                 setShippingData((prev) => ({
@@ -237,6 +244,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             <input
               type="text"
               placeholder="Miasto*"
+              required
               value={shippingData.city}
               onChange={(e) =>
                 setShippingData((prev) => ({ ...prev, city: e.target.value }))
@@ -246,6 +254,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             <input
               type="text"
               placeholder="Kod pocztowy*"
+              required
               value={shippingData.postalCode}
               onChange={(e) =>
                 setShippingData((prev) => ({
@@ -258,6 +267,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             <input
               type="text"
               placeholder="Kraj / Region*"
+              required
               value={shippingData.country}
               onChange={(e) =>
                 setShippingData((prev) => ({

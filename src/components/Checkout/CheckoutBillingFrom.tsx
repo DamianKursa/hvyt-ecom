@@ -173,6 +173,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
           <>
             <input
               type="text"
+              required
               value={formData.firstName}
               placeholder="Imię*"
               onChange={(e) => handleInputChange('firstName', e.target.value)}
@@ -180,6 +181,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             />
             <input
               type="text"
+              required
               value={formData.lastName}
               placeholder="Nazwisko*"
               onChange={(e) => handleInputChange('lastName', e.target.value)}
@@ -192,6 +194,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
               type="text"
               value={formData.company}
               placeholder="Nazwa firmy*"
+              required
               onChange={(e) => handleInputChange('company', e.target.value)}
               className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
@@ -199,6 +202,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
               type="text"
               value={formData.vatNumber}
               placeholder="NIP*"
+              required
               onChange={(e) => handleInputChange('vatNumber', e.target.value)}
               className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
@@ -207,6 +211,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
         <input
           type="text"
           value={formData.phone}
+          required
           placeholder="Numer telefonu*"
           onChange={(e) => handleInputChange('phone', e.target.value)}
           className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
@@ -215,6 +220,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
           type="email"
           value={email}
           placeholder="Adres e-mail*"
+          required
           onChange={(e) => setEmail(e.target.value)}
           className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
