@@ -1,3 +1,4 @@
+// pages/api/woocommerce.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   fetchCategoryBySlug,
@@ -11,8 +12,11 @@ import {
   fetchCrossSellProducts,
   searchProducts,
   fetchInstagramPosts,
-
 } from '../../utils/api/woocommerce';
+import { getCache, setCache } from '../../lib/cache';
+
+// Set cache TTL in seconds
+const CACHE_TTL = 3600;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { action } = req.query;
@@ -25,7 +29,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { slug } = req.query;
         if (!slug || typeof slug !== 'string')
           return res.status(400).json({ error: 'Missing or invalid slug' });
-        const result = await fetchCategoryBySlug(slug);
+
+        const cacheKey = `fetchCategoryBySlug:${slug}`;
+        let result = await getCache(cacheKey);
+        if (!result) {
+          result = await fetchCategoryBySlug(slug);
+          await setCache(cacheKey, result, CACHE_TTL);
+        }
         return res.status(200).json(result);
       }
       case 'fetchProductBySlug': {
@@ -34,7 +44,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { slug } = req.query;
         if (!slug || typeof slug !== 'string')
           return res.status(400).json({ error: 'Missing or invalid slug' });
-        const result = await fetchProductBySlug(slug);
+
+        const cacheKey = `fetchProductBySlug:${slug}`;
+        let result = await getCache(cacheKey);
+        if (!result) {
+          result = await fetchProductBySlug(slug);
+          await setCache(cacheKey, result, CACHE_TTL);
+        }
         return res.status(200).json(result);
       }
       case 'fetchMediaById': {
@@ -44,19 +60,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const id = parseInt(mediaId as string, 10);
         if (isNaN(id))
           return res.status(400).json({ error: 'Invalid mediaId' });
-        const result = await fetchMediaById(id);
+
+        const cacheKey = `fetchMediaById:${id}`;
+        let result = await getCache(cacheKey);
+        if (!result) {
+          result = await fetchMediaById(id);
+          await setCache(cacheKey, result, CACHE_TTL);
+        }
         return res.status(200).json({ source_url: result });
       }
       case 'fetchKolekcjePostsWithImages': {
         if (req.method !== 'GET')
           return res.status(405).json({ error: 'Method not allowed' });
-        const result = await fetchKolekcjePostsWithImages();
+
+        const cacheKey = 'fetchKolekcjePostsWithImages';
+        let result = await getCache(cacheKey);
+        if (!result) {
+          result = await fetchKolekcjePostsWithImages();
+          await setCache(cacheKey, result, CACHE_TTL);
+        }
         return res.status(200).json(result);
       }
       case 'fetchNowosciPosts': {
         if (req.method !== 'GET')
           return res.status(405).json({ error: 'Method not allowed' });
-        const result = await fetchNowosciPosts();
+
+        const cacheKey = 'fetchNowosciPosts';
+        let result = await getCache(cacheKey);
+        if (!result) {
+          result = await fetchNowosciPosts();
+          await setCache(cacheKey, result, CACHE_TTL);
+        }
         return res.status(200).json(result);
       }
       case 'fetchProductAttributesWithTerms': {
@@ -66,13 +100,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const id = parseInt(categoryId as string, 10);
         if (isNaN(id))
           return res.status(400).json({ error: 'Invalid categoryId' });
-        const result = await fetchProductAttributesWithTerms(id);
+
+        const cacheKey = `fetchProductAttributesWithTerms:${id}`;
+        let result = await getCache(cacheKey);
+        if (!result) {
+          result = await fetchProductAttributesWithTerms(id);
+          await setCache(cacheKey, result, CACHE_TTL);
+        }
         return res.status(200).json(result);
       }
       case 'fetchLatestKolekcja': {
         if (req.method !== 'GET')
           return res.status(405).json({ error: 'Method not allowed' });
-        const result = await fetchLatestKolekcja();
+
+        const cacheKey = 'fetchLatestKolekcja';
+        let result = await getCache(cacheKey);
+        if (!result) {
+          result = await fetchLatestKolekcja();
+          await setCache(cacheKey, result, CACHE_TTL);
+        }
         return res.status(200).json(result);
       }
       case 'fetchProductsByAttribute': {
@@ -81,7 +127,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { kolekcja } = req.query;
         if (!kolekcja || typeof kolekcja !== 'string')
           return res.status(400).json({ error: 'Missing or invalid kolekcja' });
-        const result = await fetchProductsByAttribute(kolekcja);
+
+        const cacheKey = `fetchProductsByAttribute:${kolekcja}`;
+        let result = await getCache(cacheKey);
+        if (!result) {
+          result = await fetchProductsByAttribute(kolekcja);
+          await setCache(cacheKey, result, CACHE_TTL);
+        }
         return res.status(200).json(result);
       }
       case 'fetchCrossSellProducts': {
@@ -90,7 +142,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const { productId } = req.query;
         if (!productId || typeof productId !== 'string')
           return res.status(400).json({ error: 'Missing or invalid productId' });
-        const result = await fetchCrossSellProducts(productId);
+
+        const cacheKey = `fetchCrossSellProducts:${productId}`;
+        let result = await getCache(cacheKey);
+        if (!result) {
+          result = await fetchCrossSellProducts(productId);
+          await setCache(cacheKey, result, CACHE_TTL);
+        }
         return res.status(200).json(result);
       }
       case 'searchProducts': {
@@ -100,13 +158,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (!query || typeof query !== 'string')
           return res.status(400).json({ error: 'Missing or invalid query' });
         const perPageNum = perPage ? parseInt(perPage as string, 10) : 10;
-        const result = await searchProducts(query, perPageNum);
+
+        const cacheKey = `searchProducts:${query}:${perPageNum}`;
+        let result = await getCache(cacheKey);
+        if (!result) {
+          result = await searchProducts(query, perPageNum);
+          await setCache(cacheKey, result, CACHE_TTL);
+        }
         return res.status(200).json(result);
       }
       case 'fetchInstagramPosts': {
         if (req.method !== 'GET')
           return res.status(405).json({ error: 'Method not allowed' });
-        const result = await fetchInstagramPosts();
+
+        const cacheKey = 'fetchInstagramPosts';
+        let result = await getCache(cacheKey);
+        if (!result) {
+          result = await fetchInstagramPosts();
+          await setCache(cacheKey, result, CACHE_TTL);
+        }
         return res.status(200).json(result);
       }
       default:
