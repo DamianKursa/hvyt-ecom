@@ -423,7 +423,7 @@ const ProductPage = () => {
             )}
             <ColorSwitcher
               options={
-                product?.attributes?.find((attr) => attr.name === 'Kolor')
+                product?.attributes?.find((attr) => attr.name === 'Kolor OK')
                   ?.options || []
               }
               selectedColor={selectedColor}

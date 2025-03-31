@@ -177,6 +177,18 @@ const CartItem: React.FC<CartItemProps> = ({
               className="w-3 h-3 ml-1"
             />
           </button>
+          {onRemoveItem && (
+            <button
+              className="text-red-500 hover:text-red-700 mt-6"
+              onClick={() => onRemoveItem(product)}
+            >
+              <img
+                src="/icons/trash.svg"
+                alt="Remove Icon"
+                className="w-4 h-4"
+              />
+            </button>
+          )}
         </div>
       </div>
 
