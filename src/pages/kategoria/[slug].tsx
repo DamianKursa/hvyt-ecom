@@ -2,6 +2,7 @@ import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
+import useSWR from 'swr';
 import Layout from '@/components/Layout/Layout.component';
 import Filters from '@/components/Filters/Filters.component';
 import ProductArchive from '@/components/Product/ProductArchive';
@@ -29,11 +30,39 @@ interface CategoryPageProps {
   initialAttributes: any[]; // New prop for attributes
 }
 
+// Define filterOrder for Filters and FilterModal
+const filterOrder: Record<string, string[]> = {
+  'uchwyty-meblowe': [
+    'Rodzaj',
+    'Kolor',
+    'Rozstaw',
+    'Materiał',
+    'Styl',
+    'Kolekcja',
+    'Przeznaczenie',
+  ],
+  klamki: ['Kształt rozety', 'Kolor', 'Materiał'],
+  wieszaki: ['Kolor', 'Materiał'],
+};
+
 const icons: Record<string, string> = {
   'uchwyty-meblowe': '/icons/uchwyty-kształty.svg',
   klamki: '/icons/klamki-kształty.svg',
   wieszaki: '/icons/wieszaki-kształty.svg',
 };
+
+const ignoredParams = new Set([
+  'slug',
+  'gad_source',
+  'gclid',
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'srsltid',
+  'gbraid',
+]);
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const CategoryPage = ({
   category,
@@ -47,7 +76,7 @@ const CategoryPage = ({
     ? router.query.slug[0]
     : router.query.slug;
 
-  // Use SEO data if available or fallback to default title
+  // SEO fallback data
   const seoTitle =
     seoData && seoData.yoastTitle
       ? seoData.yoastTitle
@@ -55,63 +84,27 @@ const CategoryPage = ({
   const seoDescription =
     seoData && seoData.yoastDescription ? seoData.yoastDescription : '';
 
-  const [products, setProducts] = useState(initialProducts);
+  // State for filtering, sorting, and pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const [isMobile, setIsMobile] = useState(false);
-  const [filtersVisible, setFiltersVisible] = useState(!isMobile);
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<
     { name: string; value: string }[]
   >([]);
   const [sortingOption, setSortingOption] = useState('Sortowanie');
-  const [filteredProductCount, setFilteredProductCount] =
-    useState(initialTotalProducts);
-  const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [filtersVisible, setFiltersVisible] = useState(true);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
-  const initialLoadRef = useRef(true); // Prevent resetting during the initial load
-  const lastFetchParams = useRef<string | null>(null);
-
-  const filterOrder: Record<string, string[]> = {
-    'uchwyty-meblowe': [
-      'Rodzaj',
-      'Kolor',
-      'Rozstaw',
-      'Materiał',
-      'Styl',
-      'Kolekcja',
-      'Przeznaczenie',
-    ],
-    klamki: ['Kształt rozety', 'Kolor', 'Materiał'],
-    wieszaki: ['Kolor', 'Materiał'],
-  };
-  const ignoredParams = new Set([
-    'slug',
-    'gad_source',
-    'gclid',
-    'utm_source',
-    'utm_medium',
-    'utm_campaign',
-    'srsltid',
-    'gbraid',
-  ]);
-
-  // Update filters from URL query parameters
+  // Update filters from URL query parameters on initial load
   useEffect(() => {
     const updateFiltersFromQuery = () => {
       const queryFilters: { name: string; value: string }[] = [];
-      const queryKeys = Object.keys(router.query);
       let sortFromQuery = 'Sortowanie';
-
-      queryKeys.forEach((key) => {
-        if (ignoredParams.has(key)) {
-          return; // Skip these
-        }
-        // If the key is 'sort', handle sorting
+      Object.keys(router.query).forEach((key) => {
+        if (ignoredParams.has(key)) return;
         if (key === 'sort') {
           sortFromQuery = router.query[key] as string;
           return;
         }
-
         const values = router.query[key];
         if (Array.isArray(values)) {
           values.forEach((value) => queryFilters.push({ name: key, value }));
@@ -119,12 +112,11 @@ const CategoryPage = ({
           queryFilters.push({ name: key, value: values });
         }
       });
-
+      setActiveFilters(queryFilters);
       if (sortFromQuery !== 'Sortowanie') {
         setSortingOption(sortFromQuery);
       }
-      setActiveFilters(queryFilters);
-      fetchProducts(queryFilters, sortFromQuery, 1);
+      setCurrentPage(1);
     };
 
     if (router.isReady) {
@@ -132,97 +124,84 @@ const CategoryPage = ({
     }
   }, [router.query, router.isReady]);
 
+  // Handle resizing to update mobile state
   useEffect(() => {
     const handleResize = () => {
-      const isCurrentlyMobile = window.innerWidth <= 768;
-      setIsMobile(isCurrentlyMobile);
-      setFiltersVisible(!isCurrentlyMobile);
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      setFiltersVisible(!mobile);
     };
-
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Prevent resetting on first load
-  useEffect(() => {
-    if (!initialLoadRef.current) {
-      setProducts(initialProducts);
-      setFilteredProductCount(initialTotalProducts);
-      setCurrentPage(1);
-      setActiveFilters([]);
-      setSortingOption('Sortowanie');
+  // Build dynamic SWR key based on filters, sorting, and page
+  const buildApiEndpoint = () => {
+    if (activeFilters.length > 0) {
+      return `/api/category?action=fetchProductsWithFilters&categoryId=${category.id}&filters=${encodeURIComponent(
+        JSON.stringify(activeFilters),
+      )}&page=${currentPage}&perPage=12`;
+    } else if (sortingOption !== 'Sortowanie') {
+      const sortingMap: Record<string, { orderby: string; order: string }> = {
+        Bestsellers: { orderby: 'popularity', order: 'asc' },
+        'Najnowsze produkty': { orderby: 'date', order: 'desc' },
+        'Najwyższa cena': { orderby: 'price', order: 'desc' },
+        'Najniższa cena': { orderby: 'price', order: 'asc' },
+      };
+      const sortingParams = sortingMap[sortingOption] || {
+        orderby: 'menu_order',
+        order: 'asc',
+      };
+      return `/api/category?action=fetchSortedProducts&categoryId=${category.id}&orderby=${sortingParams.orderby}&order=${sortingParams.order}&page=${currentPage}&perPage=12`;
     } else {
-      initialLoadRef.current = false;
-    }
-  }, [category.id]);
-
-  const fetchProducts = async (
-    filters: { name: string; value: string }[] = activeFilters,
-    sortOption: string = sortingOption,
-    page: number = currentPage,
-  ) => {
-    const fetchParams = JSON.stringify({ filters, sortOption, page });
-    if (fetchParams === lastFetchParams.current) return;
-    lastFetchParams.current = fetchParams;
-
-    setLoading(true);
-    try {
-      let res;
-      if (filters.length > 0) {
-        // Call API route for filtered products
-        res = await fetch(
-          `/api/category?action=fetchProductsWithFilters&categoryId=${category.id}&filters=${encodeURIComponent(
-            JSON.stringify(filters),
-          )}&page=${page}&perPage=12`,
-        );
-      } else if (sortOption !== 'Sortowanie') {
-        // Map sortOption to orderby and order parameters
-        const sortingMap: Record<string, { orderby: string; order: string }> = {
-          Bestsellers: { orderby: 'popularity', order: 'asc' },
-          'Najnowsze produkty': { orderby: 'date', order: 'desc' },
-          'Najwyższa cena': { orderby: 'price', order: 'desc' },
-          'Najniższa cena': { orderby: 'price', order: 'asc' },
-        };
-        const sortingParams = sortingMap[sortOption] || {
-          orderby: 'menu_order',
-          order: 'asc',
-        };
-
-        res = await fetch(
-          `/api/category?action=fetchSortedProducts&categoryId=${category.id}&orderby=${sortingParams.orderby}&order=${sortingParams.order}&page=${page}&perPage=12`,
-        );
-      } else {
-        res = await fetch(
-          `/api/category?action=fetchProductsByCategoryId&categoryId=${category.id}&page=${page}&perPage=12`,
-        );
-      }
-      if (!res.ok) throw new Error('Error fetching products');
-      const data = await res.json();
-      setProducts(data.products);
-      setFilteredProductCount(data.totalProducts);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
+      return `/api/category?action=fetchProductsByCategoryId&categoryId=${category.id}&page=${currentPage}&perPage=12`;
     }
   };
 
+  const swrKey = buildApiEndpoint();
+
+  // Only use fallbackData when on initial load (no filters, default sorting, page 1)
+  const fallback =
+    activeFilters.length === 0 &&
+    sortingOption === 'Sortowanie' &&
+    currentPage === 1
+      ? { products: initialProducts, totalProducts: initialTotalProducts }
+      : undefined;
+
+  // Use SWR for data fetching
+  const { data, error } = useSWR(swrKey, fetcher, {
+    fallbackData: fallback,
+    revalidateOnFocus: false,
+    errorRetryCount: Infinity,
+    errorRetryInterval: 30000,
+  });
+
+  // Extract products and count from SWR data
+  const products = data?.products || [];
+  const filteredProductCount = data?.totalProducts || 0;
+
+  // Handlers for filter and sorting changes
   const handleFilterChange = (
     selectedFilters: { name: string; value: string }[],
   ) => {
     setActiveFilters(selectedFilters);
     setCurrentPage(1);
     updateUrlWithFilters(selectedFilters);
-    fetchProducts(selectedFilters, sortingOption, 1);
+    // When state changes, the SWR key updates and triggers a refetch;
+    // fallbackData will be undefined so loading state appears.
   };
 
   const clearFilters = () => {
     setActiveFilters([]);
-    setFilteredProductCount(initialTotalProducts);
-    setProducts(initialProducts);
     setCurrentPage(1);
-    router.push({ pathname: router.pathname, query: { slug: slug || '' } });
+    router.push(
+      { pathname: router.pathname, query: { slug: slug || '' } },
+      undefined,
+      {
+        shallow: true,
+      },
+    );
   };
 
   const toggleFilterModal = () => {
@@ -263,6 +242,15 @@ const CategoryPage = ({
     });
   };
 
+  // Handle pagination changes (SWR key will update on currentPage change)
+  const onPageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  if (error) {
+    console.error('Error fetching products:', error);
+  }
+
   return (
     <Layout title={`Hvyt | ${category.name || 'Loading...'}`}>
       <Head>
@@ -274,7 +262,6 @@ const CategoryPage = ({
       </Head>
       <div className="container max-w-[1440px] mt-[115px] px-4 md:px-0 mx-auto">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
-
         <div className="flex items-center mb-8">
           <h1 className="text-[32px] mt-[24px] md:text-[40px] font-bold text-[#661F30] flex items-center gap-4">
             {category.name}
@@ -287,7 +274,6 @@ const CategoryPage = ({
             )}
           </h1>
         </div>
-
         <FiltersControls
           filtersVisible={filtersVisible}
           toggleFilters={
@@ -299,7 +285,6 @@ const CategoryPage = ({
           sorting={sortingOption}
           onSortingChange={handleSortingChange}
           onRemoveFilter={(filterToRemove) => {
-            // Remove the filter where both name and value match
             const updatedFilters = activeFilters.filter(
               (filter) =>
                 !(
@@ -307,14 +292,11 @@ const CategoryPage = ({
                   filter.value === filterToRemove.value
                 ),
             );
-            // Immediately update local state
             setActiveFilters(updatedFilters);
-            // Then update URL and re-fetch products
             handleFilterChange(updatedFilters);
           }}
           isMobile={isMobile}
         />
-
         <div className="flex">
           {!isMobile && filtersVisible && (
             <div className={`w-1/4 pr-8 ${filtersVisible ? '' : 'hidden'}`}>
@@ -322,27 +304,23 @@ const CategoryPage = ({
                 categoryId={category.id}
                 activeFilters={activeFilters}
                 onFilterChange={handleFilterChange}
-                setProducts={setProducts}
-                setTotalProducts={setFilteredProductCount}
+                setProducts={() => {}}
+                setTotalProducts={() => {}}
                 filterOrder={filterOrder[slug || ''] || []}
-                initialAttributes={initialAttributes} // Pass down the initial attributes!
+                initialAttributes={initialAttributes}
               />
             </div>
           )}
-
           <div
             className={`w-full ${filtersVisible && !isMobile ? 'lg:w-3/4' : ''}`}
           >
             <ProductArchive
               products={products}
               totalProducts={filteredProductCount}
-              loading={loading}
+              loading={!data && !error}
               perPage={12}
               currentPage={currentPage}
-              onPageChange={(page) => {
-                setCurrentPage(page);
-                fetchProducts(activeFilters, sortingOption, page);
-              }}
+              onPageChange={onPageChange}
             />
           </div>
         </div>
@@ -355,17 +333,16 @@ const CategoryPage = ({
         onFilterChange={handleFilterChange}
         onApplyFilters={() => {
           setIsFilterModalOpen(false);
-          fetchProducts(activeFilters, sortingOption, 1);
+          // SWR revalidates automatically on state change.
         }}
         onClearFilters={clearFilters}
-        setProducts={setProducts}
-        setTotalProducts={setFilteredProductCount}
+        setProducts={() => {}}
+        setTotalProducts={() => {}}
         productsCount={filteredProductCount}
         initialProductCount={initialTotalProducts}
         filterOrder={filterOrder[slug || ''] || []}
         initialAttributes={initialAttributes}
       />
-
       <div className="w-full">
         <CategoryDescription category={slug || ''} />
       </div>
@@ -375,18 +352,15 @@ const CategoryPage = ({
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const slug = context.params?.slug as string;
-  // Build an absolute URL using an environment variable (or fallback to localhost)
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   try {
-    // Call the aggregator endpoint to get category, products, and attributes at once.
     const aggregatorRes = await fetch(
       `${baseUrl}/api/category-aggregator?slug=${encodeURIComponent(slug)}&page=1&perPage=12`,
     );
     if (!aggregatorRes.ok) throw new Error('Error fetching aggregated data');
     const aggregatorData = await aggregatorRes.json();
 
-    // Load SEO data from a JSON file (unchanged)
     const fs = require('fs');
     const path = require('path');
     const seoFilePath = path.join(process.cwd(), 'data', 'seo-data.json');
@@ -408,18 +382,26 @@ export const getStaticProps: GetStaticProps = async (context) => {
         category: aggregatorData.category,
         initialProducts: aggregatorData.products,
         initialTotalProducts: aggregatorData.totalProducts,
-        initialAttributes: aggregatorData.attributes, // Pass attributes down
+        initialAttributes: aggregatorData.attributes,
         seoData,
       },
       revalidate: 60,
     };
   } catch (error) {
-    return { notFound: true };
+    return {
+      props: {
+        category: { id: 0, name: 'Unknown', slug },
+        initialProducts: [],
+        initialTotalProducts: 0,
+        initialAttributes: [],
+        seoData: null,
+      },
+      revalidate: 60,
+    };
   }
 };
+
 export const getStaticPaths: GetStaticPaths = async () => {
-  // You can hardcode the slugs if the list is known.
-  // If you have an API, fetch the list of categories here.
   const paths = [
     { params: { slug: 'uchwyty-meblowe' } },
     { params: { slug: 'klamki' } },
@@ -428,7 +410,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
   return {
     paths,
-    fallback: 'blocking', // Other options are 'false' or 'true'
+    fallback: 'blocking',
   };
 };
 
