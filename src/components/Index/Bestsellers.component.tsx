@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import useSWR from 'swr';
 import ProductPreview from '../Product/ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import SkeletonProduct from '@/components/Skeletons/SkeletonProduct';
@@ -16,47 +17,43 @@ interface BestsellersProps {
   description?: string;
 }
 
+const itemsPerPage = 3.8;
+const gutter = 24;
+
+// A simple fetcher that uses the native fetch API.
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
+  // The API URL for bestsellers.
+  const categoryId = 123; // Replace with your actual category ID
+  // Here we stringify an empty filters array (adjust as needed)
+  const filters = JSON.stringify([]);
+  const apiUrl = `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryId}&page=1&perPage=12&sortingOption=default&filters=${encodeURIComponent(filters)}`;
+
+  // Use SWR to fetch data
+  const { data, error } = useSWR(apiUrl, fetcher, {
+    refreshInterval: 3600000, // Revalidate every hour
+    dedupingInterval: 600000, // Avoid duplicate requests for 10 minutes
+  });
+
+  // While data is loading or on error, show loading state.
+  const loading = !data && !error;
+  const products: Product[] = data
+    ? (data.products || []).map((product: any) => ({
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+        price: product.price,
+        image: { src: product.images?.[0]?.src || '/fallback-image.jpg' },
+      }))
+    : [];
+
+  // Limit to maximum 12 products
+  const displayedProducts = products.slice(0, 12);
+  const totalItems = loading ? 4 : displayedProducts.length;
+
+  // Pagination state for desktop view
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 3.8;
-  const gutter = 24;
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchBestsellers = async () => {
-      setLoading(true);
-      try {
-        const categoryId = 123; // Replace with your actual category ID
-        // Here we use an empty filters array, but you can adjust as needed.
-        const filters = JSON.stringify([]);
-        const response = await fetch(
-          `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryId}&page=1&perPage=12&sortingOption=default&filters=${encodeURIComponent(filters)}`,
-        );
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
-        }
-        const data = await response.json();
-        const fetchedProducts = data.products || [];
-        const formattedProducts = fetchedProducts.map((product: any) => ({
-          id: product.id,
-          slug: product.slug,
-          name: product.name,
-          price: product.price,
-          image: { src: product.images?.[0]?.src || '/fallback-image.jpg' },
-        }));
-        setProducts(formattedProducts.slice(0, 12));
-      } catch (error) {
-        console.error('Error fetching Bestsellers:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBestsellers();
-  }, []);
-
-  const totalItems = loading ? 4 : products.length;
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < totalItems - itemsPerPage;
 
@@ -112,13 +109,11 @@ const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
         <div
           className="flex transition-transform duration-300"
           style={{
-            transform: `translateX(-${
-              (currentIndex % totalItems) * (100 / itemsPerPage)
-            }%)`,
+            transform: `translateX(-${(currentIndex % totalItems) * (100 / itemsPerPage)}%)`,
             gap: `${gutter}px`,
           }}
         >
-          {(loading ? Array.from({ length: 4 }) : products).map(
+          {(loading ? Array.from({ length: 4 }) : displayedProducts).map(
             (product, idx) =>
               loading ? (
                 <div
@@ -160,7 +155,7 @@ const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
           </div>
         ) : (
           <ResponsiveSlider
-            items={products}
+            items={displayedProducts}
             renderItem={(product: Product) => (
               <ProductPreview
                 product={{

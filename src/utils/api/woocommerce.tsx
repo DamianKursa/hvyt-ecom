@@ -132,7 +132,7 @@ export const fetchKolekcjePostsWithImages = async () => {
 
 export const fetchNowosciPosts = async (): Promise<NowosciPost[]> => {
   try {
-    const apiBase = process.env.NEXT_PUBLIC_WP_REST_API; // WordPress REST API base URL
+    const apiBase = process.env.NEXT_PUBLIC_WP_REST_API;
     const response = await axios.get(`${apiBase}/nowosci`, {
       params: {
         per_page: 4, // Limit to exactly 4 posts
