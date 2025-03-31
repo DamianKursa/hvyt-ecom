@@ -159,14 +159,14 @@ const Checkout: React.FC = () => {
 
     const missingFields = [];
 
-    if (!billingData.firstName) missingFields.push('imię');
-    if (!billingData.lastName) missingFields.push('nazwisko');
-    if (!billingData.phone) missingFields.push('numer telefonu');
-    if (!email) missingFields.push('adres e-mail');
-    if (!billingData.street) missingFields.push('nazwa ulicy');
-    if (!billingData.buildingNumber) missingFields.push('numer budynku');
-    if (!billingData.city) missingFields.push('miasto');
-    if (!billingData.postalCode) missingFields.push('kod pocztowy');
+    if (!billingData.firstName) missingFields.push('Imię');
+    if (!billingData.lastName) missingFields.push('Nazwisko');
+    if (!billingData.phone) missingFields.push('Numer telefonu');
+    if (!email) missingFields.push('Adres e-mail');
+    if (!billingData.street) missingFields.push('Nazwa ulicy');
+    if (!billingData.buildingNumber) missingFields.push('Numer budynku');
+    if (!billingData.city) missingFields.push('Miasto');
+    if (!billingData.postalCode) missingFields.push('Kod pocztowy');
 
     if (missingFields.length > 0) {
       alert(
