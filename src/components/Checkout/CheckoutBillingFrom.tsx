@@ -226,8 +226,6 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
         />
       </div>
 
-      {!user && <CreateAccount onSave={(data) => setPassword(data.password)} />}
-
       <div className="mt-4 flex items-center gap-2">
         <input
           type="checkbox"
