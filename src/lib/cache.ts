@@ -24,12 +24,22 @@ export async function getCache(key: string): Promise<any> {
 
 export async function setCache(key: string, data: any, ttl: number): Promise<void> {
   try {
+    if (
+      data === null ||
+      data === undefined ||
+      (typeof data === 'object' && 'error' in data)
+    ) {
+      console.warn(`[CACHE SKIP] Invalid or error response not cached. Key: ${key}`);
+      return;
+    }
+
     await redis.set(key, JSON.stringify(data), 'EX', ttl);
     console.log(`[CACHE SET] key: ${key} TTL: ${ttl}`);
   } catch (error) {
-    console.error('Error setting cache:', error);
+    console.error(`[CACHE ERROR] Failed to set cache for key ${key}:`, error);
   }
 }
+
 
 /**
  * Delete a specific key from the cache.
