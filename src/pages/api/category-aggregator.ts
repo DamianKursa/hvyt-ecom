@@ -53,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       attributes,
     };
 
-    await setCache(cacheKey, responseData, 60); // cache for 60 seconds
+    await setCache(cacheKey, responseData, 3600); 
 
     return res.status(200).json(responseData);
   } catch (error) {
