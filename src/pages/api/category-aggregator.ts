@@ -4,9 +4,9 @@ import {
   fetchProductsByCategoryId,
   fetchProductAttributesWithTerms,
 } from '../../utils/api/category';
+import { getCache, setCache } from '@/lib/cache';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Allow only GET requests
   if (req.method !== 'GET') {
     res.setHeader('Allow', ['GET']);
     return res.status(405).json({ error: `Method ${req.method} not allowed` });
@@ -18,12 +18,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Missing or invalid slug parameter' });
   }
 
+  const cacheKey = `category:slug=${slug}:page=${page}:perPage=${perPage}:sort=${sortingOption}:filters=${filters || 'none'}`;
   try {
-    // Fetch the category data by slug
+    const cached = await getCache(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const category = await fetchCategoryBySlug(slug);
     const categoryId = category.id;
 
-    // Parse filters if provided
     let parsedFilters: { name: string; value: string }[] = [];
     if (filters) {
       try {
@@ -33,7 +37,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     }
 
-    // Fetch products and attributes for the category
     const productsData = await fetchProductsByCategoryId(
       categoryId,
       parseInt(page as string, 10),
@@ -43,12 +46,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     );
     const attributes = await fetchProductAttributesWithTerms(categoryId);
 
-    return res.status(200).json({
+    const responseData = {
       category,
       products: productsData.products,
       totalProducts: productsData.totalProducts,
       attributes,
-    });
+    };
+
+    await setCache(cacheKey, responseData, 60); // cache for 60 seconds
+
+    return res.status(200).json(responseData);
   } catch (error) {
     console.error('Error in aggregator endpoint:', error);
     return res.status(500).json({ error: 'Internal server error' });

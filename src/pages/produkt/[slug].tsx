@@ -556,7 +556,12 @@ const ProductPage = () => {
               <button
                 onClick={handleAddToCart}
                 type="button"
-                className="w-4/5 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors bg-black text-white hover:bg-dark-pastel-red"
+                disabled={availableStock <= 0 || quantity > availableStock}
+                className={`w-4/5 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors ${
+                  availableStock <= 0 || quantity > availableStock
+                    ? 'bg-gray-400 text-white cursor-not-allowed'
+                    : 'bg-black text-white hover:bg-dark-pastel-red'
+                }`}
               >
                 Dodaj do koszyka
                 <Image

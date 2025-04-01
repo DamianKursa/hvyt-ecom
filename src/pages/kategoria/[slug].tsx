@@ -396,7 +396,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         initialAttributes: [],
         seoData: null,
       },
-      revalidate: 60,
+      revalidate: 300,
     };
   }
 };
