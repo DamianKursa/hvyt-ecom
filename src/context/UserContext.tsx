@@ -17,8 +17,7 @@ interface User {
 
 interface UserContextProps {
   user: User | null;
-  fetchUser: () => Promise<void>;
-  resetVerification: () => void;
+  fetchUser: () => void;
   logout: () => void;
   register: (
     username: string,
@@ -34,11 +33,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-  // Prevent multiple calls during mount
+  // Use a ref to ensure fetchUser is not called repeatedly
   const verifyCalled = useRef(false);
 
   const fetchUser = async () => {
-    // Prevent multiple calls if already verified
+    // If we've already attempted verification, skip further calls
     if (verifyCalled.current) return;
     verifyCalled.current = true;
 
@@ -79,18 +78,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // New function: reset the verification flag so fetchUser can run again
-  const resetVerification = () => {
-    verifyCalled.current = false;
-  };
-
   const logout = async () => {
     try {
       await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include',
       });
-      resetVerification(); // Allow future verification calls
       setUser(null);
       localStorage.removeItem('user');
       router.push('/logowanie');
@@ -127,20 +120,23 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // On mount: try to load from localStorage or fetch from API
+  // Updated useEffect: always check on mount whether a user exists in localStorage,
+  // and if not, and if there is a token in the cookie, attempt to fetch the user.
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
+    const hasToken = document.cookie.includes('token=');
+
     if (savedUser) {
       setUser(JSON.parse(savedUser));
-    } else {
+    } else if (hasToken) {
       fetchUser();
+    } else {
+      setUser(null);
     }
-  }, []);
+  }, []); // Empty dependency array so this runs only on mount
 
   return (
-    <UserContext.Provider
-      value={{ user, fetchUser, resetVerification, logout, register }}
-    >
+    <UserContext.Provider value={{ user, fetchUser, logout, register }}>
       {children}
     </UserContext.Provider>
   );
