@@ -1,3 +1,4 @@
+// pages/api/woocommerce.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   fetchCategoryBySlug,
@@ -12,10 +13,10 @@ import {
   searchProducts,
   fetchInstagramPosts,
 } from '../../utils/api/woocommerce';
+
 import { getCache, setCache } from '../../lib/cache';
 
-// Set cache TTL in seconds (1 hour)
-const CACHE_TTL = 3600;
+const CACHE_TTL = 300;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { action } = req.query;
@@ -23,166 +24,153 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     switch (action) {
       case 'fetchCategoryBySlug': {
-        if (req.method !== 'GET')
-          return res.status(405).json({ error: 'Method not allowed' });
         const { slug } = req.query;
-        if (!slug || typeof slug !== 'string')
-          return res.status(400).json({ error: 'Missing or invalid slug' });
-  
+        if (req.method !== 'GET' || !slug || typeof slug !== 'string') {
+          return res.status(400).json({ error: 'Invalid slug' });
+        }
         const cacheKey = `fetchCategoryBySlug:${slug}`;
-        let result = await getCache(cacheKey);
-        if (!result) {
-          result = await fetchCategoryBySlug(slug);
-          await setCache(cacheKey, result, CACHE_TTL);
-        }
+        const cached = await getCache(cacheKey);
+        if (cached) return res.status(200).json(cached);
+
+        const result = await fetchCategoryBySlug(slug);
+        await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }
+
       case 'fetchProductBySlug': {
-        if (req.method !== 'GET')
-          return res.status(405).json({ error: 'Method not allowed' });
         const { slug } = req.query;
-        if (!slug || typeof slug !== 'string')
-          return res.status(400).json({ error: 'Missing or invalid slug' });
-  
-        const cacheKey = `fetchProductBySlug:${slug}`;
-        let result = await getCache(cacheKey);
-        if (!result) {
-          result = await fetchProductBySlug(slug);
-          await setCache(cacheKey, result, CACHE_TTL);
+        if (req.method !== 'GET' || !slug || typeof slug !== 'string') {
+          return res.status(400).json({ error: 'Invalid slug' });
         }
+
+        // 👇 Skipping cache intentionally
+        const result = await fetchProductBySlug(slug);
         return res.status(200).json(result);
       }
+
       case 'fetchMediaById': {
-        if (req.method !== 'GET')
-          return res.status(405).json({ error: 'Method not allowed' });
         const { mediaId } = req.query;
         const id = parseInt(mediaId as string, 10);
-        if (isNaN(id))
+        if (req.method !== 'GET' || isNaN(id)) {
           return res.status(400).json({ error: 'Invalid mediaId' });
-  
-        const cacheKey = `fetchMediaById:${id}`;
-        let result = await getCache(cacheKey);
-        if (!result) {
-          result = await fetchMediaById(id);
-          await setCache(cacheKey, result, CACHE_TTL);
         }
+
+        const cacheKey = `fetchMediaById:${id}`;
+        const cached = await getCache(cacheKey);
+        if (cached) return res.status(200).json({ source_url: cached });
+
+        const result = await fetchMediaById(id);
+        await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json({ source_url: result });
       }
+
       case 'fetchKolekcjePostsWithImages': {
-        if (req.method !== 'GET')
-          return res.status(405).json({ error: 'Method not allowed' });
-  
         const cacheKey = 'fetchKolekcjePostsWithImages';
-        let result = await getCache(cacheKey);
-        if (!result) {
-          result = await fetchKolekcjePostsWithImages();
-          await setCache(cacheKey, result, CACHE_TTL);
-        }
+        const cached = await getCache(cacheKey);
+        if (cached) return res.status(200).json(cached);
+
+        const result = await fetchKolekcjePostsWithImages();
+        await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }
+
       case 'fetchNowosciPosts': {
-        if (req.method !== 'GET')
-          return res.status(405).json({ error: 'Method not allowed' });
-  
         const cacheKey = 'fetchNowosciPosts';
-        let result = await getCache(cacheKey);
-        if (!result) {
-          result = await fetchNowosciPosts();
-          await setCache(cacheKey, result, CACHE_TTL);
-        }
+        const cached = await getCache(cacheKey);
+        if (cached) return res.status(200).json(cached);
+
+        const result = await fetchNowosciPosts();
+        await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }
+
       case 'fetchProductAttributesWithTerms': {
-        if (req.method !== 'GET')
-          return res.status(405).json({ error: 'Method not allowed' });
         const { categoryId } = req.query;
         const id = parseInt(categoryId as string, 10);
-        if (isNaN(id))
+        if (req.method !== 'GET' || isNaN(id)) {
           return res.status(400).json({ error: 'Invalid categoryId' });
-  
+        }
+
         const cacheKey = `fetchProductAttributesWithTerms:${id}`;
-        let result = await getCache(cacheKey);
-        if (!result) {
-          result = await fetchProductAttributesWithTerms(id);
-          await setCache(cacheKey, result, CACHE_TTL);
-        }
+        const cached = await getCache(cacheKey);
+        if (cached) return res.status(200).json(cached);
+
+        const result = await fetchProductAttributesWithTerms(id);
+        await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }
+
       case 'fetchLatestKolekcja': {
-        if (req.method !== 'GET')
-          return res.status(405).json({ error: 'Method not allowed' });
-  
         const cacheKey = 'fetchLatestKolekcja';
-        let result = await getCache(cacheKey);
-        if (!result) {
-          result = await fetchLatestKolekcja();
-          await setCache(cacheKey, result, CACHE_TTL);
-        }
+        const cached = await getCache(cacheKey);
+        if (cached) return res.status(200).json(cached);
+
+        const result = await fetchLatestKolekcja();
+        await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }
+
       case 'fetchProductsByAttribute': {
-        if (req.method !== 'GET')
-          return res.status(405).json({ error: 'Method not allowed' });
         const { kolekcja } = req.query;
-        if (!kolekcja || typeof kolekcja !== 'string')
-          return res.status(400).json({ error: 'Missing or invalid kolekcja' });
-  
+        if (req.method !== 'GET' || typeof kolekcja !== 'string') {
+          return res.status(400).json({ error: 'Invalid kolekcja' });
+        }
+
         const cacheKey = `fetchProductsByAttribute:${kolekcja}`;
-        let result = await getCache(cacheKey);
-        if (!result) {
-          result = await fetchProductsByAttribute(kolekcja);
-          await setCache(cacheKey, result, CACHE_TTL);
-        }
+        const cached = await getCache(cacheKey);
+        if (cached) return res.status(200).json(cached);
+
+        const result = await fetchProductsByAttribute(kolekcja);
+        await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }
+
       case 'fetchCrossSellProducts': {
-        if (req.method !== 'GET')
-          return res.status(405).json({ error: 'Method not allowed' });
         const { productId } = req.query;
-        if (!productId || typeof productId !== 'string')
-          return res.status(400).json({ error: 'Missing or invalid productId' });
-  
+        if (req.method !== 'GET' || typeof productId !== 'string') {
+          return res.status(400).json({ error: 'Invalid productId' });
+        }
+
         const cacheKey = `fetchCrossSellProducts:${productId}`;
-        let result = await getCache(cacheKey);
-        if (!result) {
-          result = await fetchCrossSellProducts(productId);
-          await setCache(cacheKey, result, CACHE_TTL);
-        }
+        const cached = await getCache(cacheKey);
+        if (cached) return res.status(200).json(cached);
+
+        const result = await fetchCrossSellProducts(productId);
+        await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }
+
       case 'searchProducts': {
-        if (req.method !== 'GET')
-          return res.status(405).json({ error: 'Method not allowed' });
         const { query, perPage } = req.query;
-        if (!query || typeof query !== 'string')
-          return res.status(400).json({ error: 'Missing or invalid query' });
-        const perPageNum = perPage ? parseInt(perPage as string, 10) : 10;
-  
-        const cacheKey = `searchProducts:${query}:${perPageNum}`;
-        let result = await getCache(cacheKey);
-        if (!result) {
-          result = await searchProducts(query, perPageNum);
-          await setCache(cacheKey, result, CACHE_TTL);
-        }
+        const q = query as string;
+        const pp = perPage ? parseInt(perPage as string, 10) : 10;
+
+        if (!q) return res.status(400).json({ error: 'Invalid query' });
+
+        const cacheKey = `searchProducts:${q}:${pp}`;
+        const cached = await getCache(cacheKey);
+        if (cached) return res.status(200).json(cached);
+
+        const result = await searchProducts(q, pp);
+        await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }
+
       case 'fetchInstagramPosts': {
-        if (req.method !== 'GET')
-          return res.status(405).json({ error: 'Method not allowed' });
-  
         const cacheKey = 'fetchInstagramPosts';
-        let result = await getCache(cacheKey);
-        if (!result) {
-          result = await fetchInstagramPosts();
-          await setCache(cacheKey, result, CACHE_TTL);
-        }
+        const cached = await getCache(cacheKey);
+        if (cached) return res.status(200).json(cached);
+
+        const result = await fetchInstagramPosts();
+        await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }
+
       default:
         return res.status(400).json({ error: 'Invalid action parameter' });
     }
   } catch (error) {
-    console.error('Error in woocomerce API:', error);
+    console.error('WooCommerce API Error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
