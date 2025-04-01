@@ -30,3 +30,32 @@ export async function setCache(key: string, data: any, ttl: number): Promise<voi
     console.error('Error setting cache:', error);
   }
 }
+
+/**
+ * Delete a specific key from the cache.
+ * Returns the number of keys that were removed.
+ */
+export async function deleteCache(key: string): Promise<number> {
+  try {
+    const result = await redis.del(key);
+    console.log(`[CACHE DELETE] key: ${key}`);
+    return result;
+  } catch (error) {
+    console.error(`Error deleting cache key ${key}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Flush the entire Redis cache.
+ * Use with caution since this removes all keys.
+ */
+export async function flushCache(): Promise<void> {
+  try {
+    await redis.flushdb();
+    console.log('[CACHE FLUSH] All keys have been flushed.');
+  } catch (error) {
+    console.error('Error flushing cache:', error);
+    throw error;
+  }
+}
