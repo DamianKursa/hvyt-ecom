@@ -6,6 +6,7 @@ import {
   fetchProductsWithFilters,
   fetchSortedProducts,
 } from '../../utils/api/category';
+import { getCache, setCache } from '@/lib/cache';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Allow only GET requests
@@ -27,7 +28,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json(result);
 
     } else if (action === 'fetchProductsByCategoryId') {
-      // Expects: ?action=fetchProductsByCategoryId&categoryId=123&page=1&perPage=12&sortingOption=default&filters=[{"name":"color","value":"red"}]
+      // Expects: 
+      // ?action=fetchProductsByCategoryId&categoryId=123&page=1&perPage=12&sortingOption=default&filters=[{"name":"color","value":"red"}]
       const { categoryId, page, perPage, sortingOption, filters } = req.query;
       if (!categoryId) {
         return res.status(400).json({ error: 'categoryId parameter is required' });
@@ -43,6 +45,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(400).json({ error: 'Invalid filters parameter. Must be valid JSON.' });
         }
       }
+
+      // Build a cache key specific to this action and its parameters
+      const cacheKey = `fetchProductsByCategoryId:cat=${catId}:page=${pageNum}:perPage=${perPageNum}:sort=${sortingOption || 'default'}:filters=${filters || 'none'}`;
+      
+      // Check for a cached result
+      const cached = await getCache(cacheKey);
+      if (cached) {
+        return res.status(200).json(cached);
+      }
+      
+      // If no cache exists, fetch fresh data
       const result = await fetchProductsByCategoryId(
         catId,
         pageNum,
@@ -50,6 +63,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         parsedFilters,
         (sortingOption as string) || 'default'
       );
+      
+      // Cache the result for 3600 seconds (1 hour)
+      await setCache(cacheKey, result, 3600);
+      
       return res.status(200).json(result);
 
     } else if (action === 'fetchProductAttributesWithTerms') {
