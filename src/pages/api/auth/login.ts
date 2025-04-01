@@ -11,14 +11,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { username, password } = req.body;
 
   try {
-    const response = await axios.post(`${process.env.WORDPRESS_API_URL}/wp-json/jwt-auth/v1/token`, {
-      username,
-      password,
-    });
+    const response = await axios.post(
+      `${process.env.WORDPRESS_API_URL}/wp-json/jwt-auth/v1/token`,
+      { username, password }
+    );
 
     const { token, user_display_name } = response.data;
 
-    // Set the token as an HTTP-only cookie
+    // Set the token as an HTTP-only cookie with domain (if needed)
     res.setHeader(
       'Set-Cookie',
       serialize('token', token, {
@@ -27,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         sameSite: 'none',
         path: '/',
         maxAge: 60 * 60 * 24, // 1 day
+        domain: process.env.COOKIE_DOMAIN || '.hvyt.pl', // Ensure cookie is valid for both subdomains
       })
     );
 
