@@ -1,15 +1,16 @@
+// context/UserContext.tsx
 import React, {
   createContext,
   useContext,
   useState,
   useEffect,
   ReactNode,
+  useRef,
 } from 'react';
 import { useRouter } from 'next/router';
 
-// Updated User interface to include id (optional)
 interface User {
-  id?: number | null; // Optional id field
+  id?: number | null;
   name: string | null;
   email: string | null;
 }
@@ -32,9 +33,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+  // New: Use a ref to ensure verification is attempted only once
+  const verifyCalled = useRef(false);
 
   const fetchUser = async () => {
-    if (user !== null) return; // Avoid fetching again if user exists
+    // If a user already exists or we've attempted verification, do nothing
+    if (user !== null || verifyCalled.current) return;
+    verifyCalled.current = true;
 
     try {
       const validateResponse = await fetch('/api/auth/verify', {
@@ -55,15 +60,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
       if (profileResponse.ok) {
         const data = await profileResponse.json();
-        setUser({ id: data.id || null, name: data.name, email: data.email });
-        localStorage.setItem(
-          'user',
-          JSON.stringify({
-            id: data.id || null,
-            name: data.name,
-            email: data.email,
-          }),
-        );
+        const newUser = {
+          id: data.id || null,
+          name: data.name,
+          email: data.email,
+        };
+        setUser(newUser);
+        localStorage.setItem('user', JSON.stringify(newUser));
       } else {
         setUser(null);
         localStorage.removeItem('user');
@@ -76,10 +79,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
       setUser(null);
-      localStorage.removeItem('user'); // Clear persisted user data
-      router.push('/logowanie'); // Redirect to logowanie after logout
+      localStorage.removeItem('user');
+      router.push('/logowanie');
     } catch (error) {
       console.error('Failed to log out:', error);
     }
@@ -103,33 +109,27 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       }
 
       const data = await response.json();
-
-      // Automatically log in the user after registration
-      setUser({ id: data.id || null, name: username, email }); // Include id
-      localStorage.setItem(
-        'user',
-        JSON.stringify({ id: data.id || null, name: username, email }),
-      ); // Persist user data including id
-
+      const newUser = { id: data.id || null, name: username, email };
+      setUser(newUser);
+      localStorage.setItem('user', JSON.stringify(newUser));
       console.log('User registered and logged in.');
     } catch (error) {
       console.error('Error during registration:', error);
-      throw error; // Rethrow error for the caller to handle
+      throw error;
     }
   };
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     const hasToken = document.cookie.includes('token=');
-
-    if (user !== null) return; // User already loaded, skip fetching again
+    if (user !== null) return;
 
     if (savedUser && hasToken) {
       setUser(JSON.parse(savedUser));
     } else if (hasToken) {
       fetchUser();
     } else {
-      setUser(null); // no token, no saved user
+      setUser(null);
     }
   }, []);
 
