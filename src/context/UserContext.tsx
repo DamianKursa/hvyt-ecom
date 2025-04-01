@@ -17,7 +17,8 @@ interface User {
 
 interface UserContextProps {
   user: User | null;
-  fetchUser: () => void;
+  fetchUser: () => Promise<void>;
+  resetVerification: () => void;
   logout: () => void;
   register: (
     username: string,
@@ -33,11 +34,11 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-  // Use a ref to ensure fetchUser is not called repeatedly
+  // Prevent multiple calls during mount
   const verifyCalled = useRef(false);
 
   const fetchUser = async () => {
-    // Prevent multiple calls
+    // Prevent multiple calls if already verified
     if (verifyCalled.current) return;
     verifyCalled.current = true;
 
@@ -78,12 +79,18 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // New function: reset the verification flag so fetchUser can run again
+  const resetVerification = () => {
+    verifyCalled.current = false;
+  };
+
   const logout = async () => {
     try {
       await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include',
       });
+      resetVerification(); // Allow future verification calls
       setUser(null);
       localStorage.removeItem('user');
       router.push('/logowanie');
@@ -120,7 +127,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // Updated useEffect: Always attempt to fetch the user if not already saved in localStorage
+  // On mount: try to load from localStorage or fetch from API
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
@@ -128,10 +135,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     } else {
       fetchUser();
     }
-  }, []); // Runs only once on mount
+  }, []);
 
   return (
-    <UserContext.Provider value={{ user, fetchUser, logout, register }}>
+    <UserContext.Provider
+      value={{ user, fetchUser, resetVerification, logout, register }}
+    >
       {children}
     </UserContext.Provider>
   );
