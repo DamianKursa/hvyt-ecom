@@ -33,12 +33,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-  // New: Use a ref to ensure verification is attempted only once
+  // Use a ref to ensure fetchUser is not called repeatedly
   const verifyCalled = useRef(false);
 
   const fetchUser = async () => {
-    // If a user already exists or we've attempted verification, do nothing
-    if (user !== null || verifyCalled.current) return;
+    // If we've already attempted verification, skip further calls
+    if (verifyCalled.current) return;
     verifyCalled.current = true;
 
     try {
@@ -72,6 +72,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         localStorage.removeItem('user');
       }
     } catch (error) {
+      console.error('fetchUser error:', error);
       setUser(null);
       localStorage.removeItem('user');
     }
@@ -119,19 +120,20 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
+  // Updated useEffect: always check on mount whether a user exists in localStorage,
+  // and if not, and if there is a token in the cookie, attempt to fetch the user.
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     const hasToken = document.cookie.includes('token=');
-    if (user !== null) return;
 
-    if (savedUser && hasToken) {
+    if (savedUser) {
       setUser(JSON.parse(savedUser));
     } else if (hasToken) {
       fetchUser();
     } else {
       setUser(null);
     }
-  }, []);
+  }, []); // Empty dependency array so this runs only on mount
 
   return (
     <UserContext.Provider value={{ user, fetchUser, logout, register }}>
