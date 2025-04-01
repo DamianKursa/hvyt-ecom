@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         sameSite: 'none',
         path: '/',
         maxAge: 60 * 60 * 24, // 1 day
-        domain: process.env.COOKIE_DOMAIN || '.hvyt.pl', // Ensure cookie is valid for both subdomains
+        domain: process.env.COOKIE_DOMAIN || '.hvyt.pl', 
       })
     );
 

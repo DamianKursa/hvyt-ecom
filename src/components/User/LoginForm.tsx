@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useUserContext } from '@/context/UserContext';
 
 const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
   onForgotPassword,
@@ -10,6 +11,7 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { fetchUser } = useUserContext(); // Get the fetchUser function
 
   // Function to strip HTML tags from a string
   const stripHtmlTags = (html: string): string => {
@@ -26,9 +28,12 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
+        credentials: 'include',
       });
 
       if (response.ok) {
+        // After successful login, trigger fetching user data
+        await fetchUser();
         router.push('/moje-konto/moje-zamowienia');
       } else {
         const data = await response.json();
