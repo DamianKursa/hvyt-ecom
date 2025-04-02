@@ -7,6 +7,8 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [latestKolekcja, setLatestKolekcja] = useState<any>(null);
+  // Track if a search has been attempted (to conditionally show "no results" message)
+  const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
     // Disable scrolling when modal is open
@@ -33,19 +35,24 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
     fetchLatest();
   }, []);
 
-  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
-
-    if (value.length < 3) {
+  // This function is only triggered when the user clicks the "Szukaj" button
+  const handleSearchSubmit = async () => {
+    if (query.length < 3) {
       setResults([]);
       return;
     }
-
     setLoading(true);
+    setHasSearched(true);
+
+    // Normalize the query: lowercase and remove diacritics
+    const normalizedQuery = query
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
     try {
       const res = await fetch(
-        `/api/woocommerce?action=searchProducts&query=${encodeURIComponent(value)}`,
+        `/api/woocommerce?action=searchProducts&query=${encodeURIComponent(normalizedQuery)}`,
       );
       if (!res.ok) {
         throw new Error('Error fetching search results');
@@ -57,6 +64,11 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+    // Do NOT trigger search here.
   };
 
   return (
@@ -76,6 +88,16 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
           />
           <button onClick={onClose} className="text-gray-500 text-2xl ml-4">
             ×
+          </button>
+        </div>
+
+        {/* Search Button */}
+        <div className="flex justify-end mb-4">
+          <button
+            onClick={handleSearchSubmit}
+            className="px-4 py-2 bg-black text-white rounded-full hover:bg-neutral-dark transition-colors"
+          >
+            Szukaj
           </button>
         </div>
 
@@ -115,6 +137,8 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
               </div>
             </div>
           ) : (
+            // Only show "no results" if a search has been attempted and query length >= 3
+            hasSearched &&
             query.length >= 3 && (
               <div className="mt-6 text-center text-black text-regular">
                 <p>
