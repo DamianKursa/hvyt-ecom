@@ -1,5 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
+import { getCache, setCache } from '../../lib/cache';
+
+const CACHE_TTL = 3600; // Cache reviews for 5 minutes
 
 const WooCommerceAPI = axios.create({
   baseURL: process.env.REST_API, // WooCommerce REST API base URL
@@ -20,6 +23,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'Product ID is required' });
       }
 
+      const cacheKey = `reviews:product:${productId}`;
+      const cachedReviews = await getCache(cacheKey);
+      if (cachedReviews) {
+        return res.status(200).json(cachedReviews);
+      }
+
       const response = await WooCommerceAPI.get('/products/reviews', {
         params: {
           product: productId, // Filter reviews by product ID
@@ -27,7 +36,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       });
 
-      res.status(200).json(response.data);
+      // Cache the reviews for 5 minutes
+      await setCache(cacheKey, response.data, CACHE_TTL);
+
+      return res.status(200).json(response.data);
     } else if (method === 'POST') {
       const { productId, name, email, content, rating } = req.body;
 
@@ -43,13 +55,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         rating,
       });
 
-      res.status(201).json(response.data);
+      return res.status(201).json(response.data);
     } else {
       res.setHeader('Allow', ['GET', 'POST']);
-      res.status(405).json({ error: `Method ${method} Not Allowed` });
+      return res.status(405).json({ error: `Method ${method} Not Allowed` });
     }
   } catch (error) {
     console.error('Error in /api/reviews:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 }
