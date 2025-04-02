@@ -1,5 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
+import { getCache, setCache } from '../../lib/cache'; // Adjust path as necessary
+
+const CACHE_TTL = 86400; // 24 hours in seconds
 
 // Create the WooCommerce REST API client
 const WooCommerceAPI = axios.create({
@@ -13,8 +16,15 @@ const WooCommerceAPI = axios.create({
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
     try {
+      const cacheKey = 'payment_methods';
+      // Check if cached payment methods exist
+      let cachedPaymentMethods = await getCache(cacheKey);
+      if (cachedPaymentMethods) {
+        return res.status(200).json(cachedPaymentMethods);
+      }
+      
+      // Fetch payment methods from WooCommerce
       const paymentResponse = await WooCommerceAPI.get('/payment_gateways');
-
       const paymentMethods = paymentResponse.data;
 
       if (!paymentMethods || paymentMethods.length === 0) {
@@ -22,9 +32,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       // Filter enabled payment methods
-      const enabledMethods = paymentMethods.filter(
-        (method: any) => method.enabled
-      );
+      const enabledMethods = paymentMethods.filter((method: any) => method.enabled);
+
+      // Cache the enabled methods for 24 hours
+      await setCache(cacheKey, enabledMethods, CACHE_TTL);
 
       return res.status(200).json(enabledMethods);
     } catch (error: any) {
