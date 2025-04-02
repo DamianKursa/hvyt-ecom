@@ -47,17 +47,12 @@ const RegisterForm: React.FC = () => {
           router.push(`/aktywacja-konta?email=${formData.email}`);
         }, 1500);
       } else {
-        // Try to parse the error response
         const errorData = await response.json();
-        if (errorData?.code === 'user_exists') {
-          setError(
-            'Użytkownik z tym adresem email już istnieje. Spróbuj się zalogować.',
-          );
-        } else {
-          setError(
-            'Wystąpił błąd podczas rejestracji, spróbuj ponownie później.',
-          );
-        }
+        // Extract the exact error message from the response
+        const exactMessage =
+          errorData?.message ||
+          'Wystąpił błąd podczas rejestracji, spróbuj ponownie później.';
+        setError(exactMessage);
       }
     } catch (err) {
       setError('Wystąpił błąd podczas rejestracji, spróbuj ponownie później.');
