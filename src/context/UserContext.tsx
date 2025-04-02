@@ -24,6 +24,7 @@ interface UserContextProps {
     email: string,
     password: string,
   ) => Promise<void>;
+  setUser: (user: User | null) => void; // Added setter for user
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -33,11 +34,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-  // Use a ref to ensure fetchUser is not called repeatedly
+  // Use a ref to ensure fetchUser is not called repeatedly on mount
   const verifyCalled = useRef(false);
 
   const fetchUser = async () => {
-    // If we've already attempted verification, skip further calls
     if (verifyCalled.current) return;
     verifyCalled.current = true;
 
@@ -60,7 +60,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
       if (profileResponse.ok) {
         const data = await profileResponse.json();
-        const newUser = {
+        const newUser: User = {
           id: data.id || null,
           name: data.name,
           email: data.email,
@@ -110,7 +110,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       }
 
       const data = await response.json();
-      const newUser = { id: data.id || null, name: username, email };
+      const newUser: User = { id: data.id || null, name: username, email };
       setUser(newUser);
       localStorage.setItem('user', JSON.stringify(newUser));
       console.log('User registered and logged in.');
@@ -120,8 +120,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // Updated useEffect: always check on mount whether a user exists in localStorage,
-  // and if not, and if there is a token in the cookie, attempt to fetch the user.
+  // On mount, check for a saved user or a token to attempt fetching the user
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     const hasToken = document.cookie.includes('token=');
@@ -133,10 +132,12 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     } else {
       setUser(null);
     }
-  }, []); // Empty dependency array so this runs only on mount
+  }, []); // Empty dependency array to run only on mount
 
   return (
-    <UserContext.Provider value={{ user, fetchUser, logout, register }}>
+    <UserContext.Provider
+      value={{ user, fetchUser, logout, register, setUser }}
+    >
       {children}
     </UserContext.Provider>
   );

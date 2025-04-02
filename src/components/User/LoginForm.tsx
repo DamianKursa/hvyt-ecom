@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import { useUserContext } from '@/context/UserContext';
 
 const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
   onForgotPassword,
@@ -10,6 +11,9 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+
+  // Import setUser from user context to update the logged-in user
+  const { setUser } = useUserContext();
 
   // Function to strip HTML tags from a string
   const stripHtmlTags = (html: string): string => {
@@ -29,10 +33,14 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
       });
 
       if (response.ok) {
+        // Assuming your API returns user data upon a successful login:
+        const userData = await response.json();
+        // Update the user context immediately
+        setUser(userData);
+        // Navigate to the account page
         router.push('/moje-konto/moje-zamowienia');
       } else {
         const data = await response.json();
-        // Strip HTML tags from the error message
         const cleanedMessage =
           data.message && typeof data.message === 'string'
             ? stripHtmlTags(data.message)
