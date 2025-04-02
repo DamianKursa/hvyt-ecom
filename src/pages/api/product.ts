@@ -19,10 +19,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     // Fetch full product data from WooCommerce
     const productData = await fetchProductBySlug(slug);
-
-    // Separate dynamic fields (e.g. stock data) from static fields
-    const { stock_quantity, stock_status, ...staticData } = productData;
-    const dynamicData = { stock_quantity, stock_status };
+    if (!productData) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    
+    // Remove dynamic fields from static data.
+    // Here, we treat both top-level stock fields and the variations array as dynamic.
+    const { stock_quantity, stock_status, baselinker_variations, ...staticData } = productData;
+    const dynamicData = { 
+      stock_quantity, 
+      stock_status, 
+      baselinker_variations // always update variation data
+    };
 
     // Attempt to retrieve cached static data
     const cacheKey = `staticProductData:${slug}`;
