@@ -84,8 +84,9 @@ const ProductPage = () => {
       try {
         dispatch({ type: 'SET_LOADING', payload: true });
         const res = await fetch(
-          `/api/woocommerce?action=fetchProductBySlug&slug=${encodeURIComponent(slug)}`,
+          `/api/product?slug=${encodeURIComponent(slug)}`,
         );
+
         if (!res.ok) {
           throw new Error('No product found');
         }
