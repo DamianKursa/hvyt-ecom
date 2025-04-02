@@ -6,7 +6,7 @@ interface PriceSliderProps {
   maxPrice: number;
   currentRange: [number, number];
   onPriceChange: (range: [number, number]) => void;
-  disabled?: boolean; // Add this optional prop
+  disabled?: boolean; // Optional prop if you need to disable the slider or button externally
 }
 
 const PriceSlider: React.FC<PriceSliderProps> = ({
@@ -14,11 +14,12 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   maxPrice,
   currentRange,
   onPriceChange,
+  disabled = false,
 }) => {
   const [range, setRange] = useState<[number, number]>(currentRange);
 
   useEffect(() => {
-    // Ensure range is updated if currentRange prop changes
+    // Update local state if currentRange prop changes
     setRange(currentRange);
   }, [currentRange]);
 
@@ -30,10 +31,15 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
     const updatedRange = [...range] as [number, number];
     updatedRange[index] = numericValue;
     setRange(updatedRange);
-    onPriceChange(updatedRange);
   };
 
-  const handleAfterChange = () => {
+  const handleSliderChange = (values: number | number[]) => {
+    // ReactSlider passes values as number[]
+    setRange(values as [number, number]);
+  };
+
+  // New function to call onPriceChange only when the user clicks "Apply"
+  const handleApplyPriceFilter = () => {
     onPriceChange(range);
   };
 
@@ -44,7 +50,6 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
         className="horizontal-slider"
         thumbClassName="slider-thumb"
         renderTrack={(props, state) => {
-          // Determine track color based on its index
           const backgroundColor =
             state.index === 0 || state.index === 2 ? '#e0e0e0' : '#661f30';
           return (
@@ -62,8 +67,8 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
         max={maxPrice}
         step={1}
         value={range}
-        onChange={(values) => setRange(values as [number, number])}
-        onAfterChange={handleAfterChange}
+        onChange={handleSliderChange}
+        // We remove onAfterChange so that onPriceChange isn't called on every slider change
       />
 
       {/* Input Fields for Prices */}
@@ -76,6 +81,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
             value={range[0]}
             onChange={(e) => handleInputChange(0, e.target.value)}
             className="border border-gray-300 rounded-full px-8 py-2 w-full text-center bg-transparent"
+            disabled={disabled}
           />
           <span className="absolute right-3 text-gray-500">zł</span>
         </div>
@@ -87,9 +93,22 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
             value={range[1]}
             onChange={(e) => handleInputChange(1, e.target.value)}
             className="border border-gray-300 rounded-full px-8 py-2 w-full text-center bg-transparent"
+            disabled={disabled}
           />
           <span className="absolute right-3 text-gray-500">zł</span>
         </div>
+      </div>
+
+      {/* Apply Button */}
+      <div className="mt-4 flex justify-end">
+        <button
+          type="button"
+          onClick={handleApplyPriceFilter}
+          disabled={disabled}
+          className="px-4 py-2 bg-black text-white rounded-full hover:bg-neutral-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Zastosuj
+        </button>
       </div>
     </div>
   );
