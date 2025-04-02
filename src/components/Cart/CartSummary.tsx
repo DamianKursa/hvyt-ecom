@@ -7,6 +7,7 @@ interface CartSummaryProps {
   shippingPrice?: number;
   onCheckout: () => Promise<void> | void;
   isCheckoutPage?: boolean;
+  disabled?: boolean; // Add this line
 }
 
 const CartSummary: React.FC<CartSummaryProps> = ({
@@ -17,7 +18,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 }) => {
   const [totalPrice, setTotalPrice] = useState(totalProductsPrice);
   const [loading, setLoading] = useState(false);
-  // Local loading state to disable the button during submission
+  // Local loading state to disable the button during submission or for timeout
   const [localLoading, setLocalLoading] = useState(false);
   const router = useRouter();
 
@@ -39,13 +40,19 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
   const handleButtonClick = async () => {
     if (isCheckoutPage) {
+      // Prevent multiple clicks if already processing
+      if (localLoading) return;
+      // Disable the button immediately
       setLocalLoading(true);
       try {
         await onCheckout();
       } catch (error) {
         console.error('Error during checkout:', error);
       } finally {
-        setLocalLoading(false);
+        // Keep the button disabled for 10 seconds
+        setTimeout(() => {
+          setLocalLoading(false);
+        }, 10000);
       }
     } else {
       router.push('/checkout');
@@ -107,7 +114,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       <button
         onClick={handleButtonClick}
         disabled={localLoading}
-        className={`w-full py-4 bg-black text-white text-lg font-light rounded-full hover:bg-neutral-dark transition ${
+        className={`w-full py-4 bg-black text-white text-lg font-light rounded-full hover:bg-neutral-dark transition-colors ${
           localLoading ? 'opacity-50 cursor-not-allowed' : ''
         }`}
       >

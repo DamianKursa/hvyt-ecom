@@ -34,7 +34,7 @@ const Checkout: React.FC = () => {
     useState<boolean>(false);
 
   const [isTermsChecked, setIsTermsChecked] = useState<boolean>(false);
-
+  const [orderDisabled, setOrderDisabled] = useState(false);
   const [selectedGlsPoint, setSelectedGlsPoint] = useState<any>(null);
 
   const [billingData, setBillingData] = useState({
@@ -126,6 +126,9 @@ const Checkout: React.FC = () => {
 
   // Handle order submission
   const handleOrderSubmit = async () => {
+    setOrderDisabled(true);
+    setTimeout(() => setOrderDisabled(false), 10000);
+
     if (!isTermsChecked) {
       alert(
         '*Potwierdzam, że zapoznałam/em się z treścią Regulaminu i Polityki Prywatności oraz akceptuję ich postanowienia.',
@@ -485,6 +488,7 @@ const Checkout: React.FC = () => {
                 totalProductsPrice={cart?.totalProductsPrice || 0}
                 onCheckout={handleOrderSubmit}
                 isCheckoutPage={true}
+                disabled={orderDisabled}
               />
             </div>
           </div>
