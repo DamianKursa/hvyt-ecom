@@ -41,10 +41,13 @@ const Dziekujemy = () => {
                   name: item.name,
                   quantity: item.quantity,
                   price: item.price,
-                  total: (parseFloat(item.price) * item.quantity).toFixed(2),
+                  total: item.total
+                    ? item.total
+                    : (parseFloat(item.price) * item.quantity).toFixed(2),
                   image: item.image || '/placeholder.jpg',
                 }))
               : [],
+
           shipping: {
             ...fetchedOrder.shipping,
             country: fetchedOrder.shipping?.country || 'PL',
