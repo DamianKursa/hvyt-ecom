@@ -25,9 +25,9 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   useEffect(() => {
     setLoading(true);
     const timeout = setTimeout(() => {
-      const updatedTotal = isCheckoutPage
-        ? totalProductsPrice + shippingPrice
-        : totalProductsPrice;
+      const updatedTotal = totalProductsPrice; // Only products total (without shipping)
+      setTotalPrice(updatedTotal);
+
       setTotalPrice(updatedTotal);
       setLoading(false);
     }, 500);
@@ -103,7 +103,11 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           {loading ? (
             <div className="loader-pulse w-20 h-8 rounded"></div>
           ) : (
-            <p className="text-end">{formatPrice(totalPrice)}</p>
+            <p className="text-end">
+              {formatPrice(
+                isCheckoutPage ? totalPrice + shippingPrice : totalPrice,
+              )}
+            </p>
           )}
           <span className="text-sm text-black font-light">
             <p>kwota zawiera 23% VAT</p>
