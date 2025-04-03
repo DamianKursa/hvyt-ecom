@@ -54,11 +54,13 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
       let discountApplied = 0;
       if (discountType === 'percent') {
+        // Calculate discount on the total order value
         discountApplied = (cartTotal * discountValue) / 100;
       } else if (discountType === 'fixed') {
         discountApplied = discountValue;
       }
 
+      // Apply the coupon and update the total for the entire order
       applyCoupon({ code, discountValue: discountApplied, discountType });
       setCartTotal(cartTotal - discountApplied);
 

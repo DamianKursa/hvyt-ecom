@@ -329,7 +329,6 @@ const Checkout: React.FC = () => {
             : [],
         };
       }),
-
       customer_note: shippingData.additionalInfo || '',
       customer_id: user?.id || undefined,
     };

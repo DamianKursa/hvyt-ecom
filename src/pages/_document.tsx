@@ -1,3 +1,4 @@
+// pages/_document.js
 import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
@@ -18,7 +19,7 @@ export default function Document() {
         <meta name="author" content="HVYT" />
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://hvyt.pl" />
-        {/* Open Graph Meta Tags for Social Media */}
+        {/* Open Graph Meta Tags */}
         <meta
           property="og:title"
           content="HVYT – Nowoczesne Gałki i Uchwyty Meblowe"
@@ -32,7 +33,7 @@ export default function Document() {
         <meta property="og:image" content="https://hvyt.pl/og-image.jpg" />
         {/* Favicon */}
         <link rel="icon" href="/favicon.png" />
-        {/* Fonts */}
+        {/* Fonts & Additional Resources */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -43,7 +44,6 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
-        {/* Additional Resources */}
         <link rel="stylesheet" href="https://hvyt.pl/styles.css" />
         {/* Facebook Domain Verification */}
         <meta
@@ -55,22 +55,50 @@ export default function Document() {
           content="a6786718d22d0c370bdbd44d3a3f44ee"
         />
 
-        {/* Global site tag (gtag.js) - Google Analytics */}
+        {/* --- Google Consent Mode v2 Default Settings --- */}
         <script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=UA-191037585-1"
-        ></script>
-        <script
+          data-cookieconsent="ignore"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'UA-191037585-1');
+              function gtag(){ dataLayer.push(arguments); }
+              // Set default consent state to "denied" for non‑essential storage
+              gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied',
+                'ad_personalization': 'denied',
+                'ad_user_data': 'denied',
+                'personalization_storage': 'denied',
+                'functionality_storage': 'denied',
+                'security_storage': 'granted',
+                'wait_for_update': 500
+              });
+              // Optional: Redact ads data and disable URL passthrough
+              gtag('set', 'ads_data_redaction', true);
+              gtag('set', 'url_passthrough', false);
             `,
           }}
         />
-        {/* Cookiebot Script */}
+
+        {/* --- Google Tag Manager (GTM) Script --- */}
+        <script
+          data-cookieconsent="ignore"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0],
+                    j=d.createElement(s), dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true;
+                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','GTM-PJNDR4N');
+            `,
+          }}
+        />
+
+        {/* --- Cookiebot Script (CMP) --- */}
         <script
           id="Cookiebot"
           src="https://consent.cookiebot.com/uc.js"
@@ -80,7 +108,7 @@ export default function Document() {
         ></script>
       </Head>
       <body className="bg-beige-light">
-        {/* Google Tag Manager (noscript) */}
+        {/* --- Google Tag Manager (noscript) fallback --- */}
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-PJNDR4N"
@@ -91,7 +119,7 @@ export default function Document() {
         </noscript>
         <Main />
         <NextScript />
-        {/* Allekurier Banner Script */}
+        {/* --- Allekurier Banner Script --- */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
