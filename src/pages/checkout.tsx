@@ -303,6 +303,7 @@ const Checkout: React.FC = () => {
             },
           ]
         : [],
+
       shipping: shippingAddress,
       shipping_lines: [
         {
@@ -312,19 +313,23 @@ const Checkout: React.FC = () => {
           meta_data: shippingMetaData,
         },
       ],
-      line_items: cart.products.map((product) => ({
-        product_id: product.productId,
-        variation_id: product.variationId || undefined,
-        quantity: product.qty,
-        subtotal: product.price.toFixed(2),
-        total: product.totalPrice.toFixed(2),
-        meta_data: product.attributes
-          ? Object.entries(product.attributes).map(([key, value]) => ({
-              key,
-              value,
-            }))
-          : [],
-      })),
+      line_items: cart.products.map((product) => {
+        const lineTotal = (product.price * product.qty).toFixed(2); // Full line total
+        return {
+          product_id: product.productId,
+          variation_id: product.variationId || undefined,
+          quantity: product.qty,
+          subtotal: lineTotal, // Set subtotal as full line total
+          total: lineTotal, // Set total as full line total
+          meta_data: product.attributes
+            ? Object.entries(product.attributes).map(([key, value]) => ({
+                key,
+                value,
+              }))
+            : [],
+        };
+      }),
+
       customer_note: shippingData.additionalInfo || '',
       customer_id: user?.id || undefined,
     };
