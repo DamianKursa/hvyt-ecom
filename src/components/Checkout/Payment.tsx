@@ -40,7 +40,7 @@ const Payment: React.FC<PaymentProps> = ({
           throw new Error('Nie udało się pobrać metod płatności');
         }
         const data = await response.json();
-        console.log('Fetched payment methods:', data);
+
         setPaymentMethods(data);
       } catch (err) {
         console.error('Błąd podczas pobierania metod płatności:', err);
@@ -57,14 +57,6 @@ const Payment: React.FC<PaymentProps> = ({
 
     fetchPaymentMethods();
   }, []);
-
-  // Log payment method IDs when they update
-  useEffect(() => {
-    console.log(
-      'Current payment method IDs:',
-      paymentMethods.map((m) => m.id),
-    );
-  }, [paymentMethods]);
 
   // Filter payment methods based on the selected shipping method
   const getFilteredPaymentMethods = () => {
