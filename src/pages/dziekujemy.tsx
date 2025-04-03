@@ -36,16 +36,44 @@ const Dziekujemy = () => {
           line_items: Array.isArray(fetchedOrder.line_items)
             ? fetchedOrder.line_items
             : Array.isArray(fetchedOrder.items)
-              ? fetchedOrder.items.map((item: any) => ({
-                  product_id: item.product_id,
-                  name: item.name,
-                  quantity: item.quantity,
-                  price: item.price,
-                  total: item.total
-                    ? item.total
-                    : (parseFloat(item.price) * item.quantity).toFixed(2),
-                  image: item.image || '/placeholder.jpg',
-                }))
+              ? fetchedOrder.items.map((item: any) => {
+                  const qty = item.quantity || 1;
+                  // Original unit price from the order (assumed to be the non-discounted product price)
+                  const originalUnitPrice = item.price;
+                  // Calculate full line total (without discount)
+                  const originalLineTotal = parseFloat(originalUnitPrice) * qty;
+                  // Get the discounted line total from the order, or use the original if not present
+                  const discountedLineTotal = item.total
+                    ? parseFloat(item.total)
+                    : originalLineTotal;
+                  // Calculate discount amount for this line
+                  const discountAmount =
+                    originalLineTotal - discountedLineTotal;
+
+                  // Console log for debugging purposes
+                  console.log('Mapping line item:', {
+                    product_id: item.product_id,
+                    name: item.name,
+                    quantity: qty,
+                    originalUnitPrice,
+                    originalLineTotal,
+                    discountedLineTotal,
+                    discountAmount,
+                  });
+
+                  return {
+                    product_id: item.product_id,
+                    name: item.name,
+                    quantity: qty,
+                    // Show the original product price (per unit) without discount
+                    price: originalUnitPrice,
+                    // Add a discount field for display purposes
+                    discount: discountAmount.toFixed(2),
+                    // Final line total after discount is applied
+                    total: discountedLineTotal.toFixed(2),
+                    image: item.image || '/placeholder.jpg',
+                  };
+                })
               : [],
 
           shipping: {
