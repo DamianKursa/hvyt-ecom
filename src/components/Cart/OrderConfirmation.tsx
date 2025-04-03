@@ -180,7 +180,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                   <div className="flex justify-between">
                     <span className="text-gray-700">Cena</span>
                     <span className="text-gray-900 font-bold">
-                      {item.price} zł
+                      {(parseFloat(item.price) / item.quantity).toFixed(2)} zł
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -192,7 +192,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                   <div className="flex justify-between">
                     <span className="text-gray-700">Suma</span>
                     <span className="text-gray-900 font-bold">
-                      {(parseFloat(item.price) * item.quantity).toFixed(2)} zł
+                      {item.price} zł
                     </span>
                   </div>
                 </div>
