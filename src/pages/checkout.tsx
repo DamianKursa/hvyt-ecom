@@ -64,22 +64,19 @@ const Checkout: React.FC = () => {
   const [isShippingDifferent, setIsShippingDifferent] = useState(false);
 
   const { user } = useUserContext();
-  const { cart } = useContext(CartContext);
+  const { cart, clearCart } = useContext(CartContext);
 
-  // Map country name to country code
   const mapCountry = (country: string): string => {
     const countryMapping: Record<string, string> = { Polska: 'PL' };
     return countryMapping[country] || country;
   };
 
-  // Redirect to cart if cart is empty
   useEffect(() => {
     if (!cart || cart.products.length === 0) {
       router.push('/koszyk');
     }
   }, [cart, router]);
 
-  // Fetch shipping methods
   useEffect(() => {
     const fetchShippingMethods = async () => {
       try {
@@ -101,7 +98,6 @@ const Checkout: React.FC = () => {
     fetchShippingMethods();
   }, []);
 
-  // Update shipping title dynamically when shipping method changes
   useEffect(() => {
     const fetchShippingTitle = async () => {
       try {
@@ -124,7 +120,6 @@ const Checkout: React.FC = () => {
     if (shippingMethod) fetchShippingTitle();
   }, [shippingMethod]);
 
-  // Handle order submission
   const handleOrderSubmit = async () => {
     setOrderDisabled(true);
     setTimeout(() => setOrderDisabled(false), 10000);
@@ -140,7 +135,6 @@ const Checkout: React.FC = () => {
       return;
     }
 
-    // Validate selected point if GLS point is selected
     if (shippingMethod === 'punkty_gls' && !selectedGlsPoint) {
       alert('Wybierz punkt GLS przed złożeniem zamówienia.');
       return;
@@ -190,7 +184,6 @@ const Checkout: React.FC = () => {
           password,
         });
         console.log('Account created:', registerResponse.data);
-        // Optionally, update your user context with the new user info here.
       } catch (err) {
         console.error('Error creating account:', err);
         alert('Błąd przy tworzeniu konta. Spróbuj ponownie.');
@@ -201,7 +194,6 @@ const Checkout: React.FC = () => {
     const mappedBillingCountry = mapCountry(billingData.country);
     const mappedShippingCountry = mapCountry(shippingData.country);
 
-    // Choose shipping address based on "Dostawa pod inny adres"
     const shippingAddress = isShippingDifferent
       ? {
           first_name: billingData.firstName,
@@ -314,13 +306,13 @@ const Checkout: React.FC = () => {
         },
       ],
       line_items: cart.products.map((product) => {
-        const lineTotal = (product.price * product.qty).toFixed(2); // Full line total
+        const lineTotal = (product.price * product.qty).toFixed(2);
         return {
           product_id: product.productId,
           variation_id: product.variationId || undefined,
           quantity: product.qty,
-          subtotal: lineTotal, // Set subtotal as full line total
-          total: lineTotal, // Set total as full line total
+          subtotal: lineTotal,
+          total: lineTotal,
           meta_data: product.attributes
             ? Object.entries(product.attributes).map(([key, value]) => ({
                 key,
@@ -339,12 +331,11 @@ const Checkout: React.FC = () => {
       });
       const createdOrder = response.data;
 
-      // Save order info locally (if needed)
       localStorage.setItem('recentOrderId', createdOrder.id.toString());
       localStorage.setItem('recentOrderKey', createdOrder.order_key);
 
-      // If the payment method is one of our online gateways (including PayNow),
-      // then check for the payment_url and redirect the customer.
+      clearCart();
+
       if (
         (paymentMethod === 'przelewy24' ||
           paymentMethod === 'p24-online-payments' ||
