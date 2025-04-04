@@ -24,7 +24,7 @@ const Payment: React.FC<PaymentProps> = ({
   // Shipping method mapping (adjust if needed)
   const shippingMethodMapping: Record<string, string> = {
     '1': 'kurier_gls',
-    '3': 'kurier_gls_pobranie', // Match this to the value for Kurier GLS Pobranie
+    '3': 'kurier_gls_pobranie',
     '13': 'paczkomaty_inpost',
     kurier_gls_pobranie: 'kurier_gls_pobranie', // For safety
   };
@@ -40,7 +40,6 @@ const Payment: React.FC<PaymentProps> = ({
           throw new Error('Nie udało się pobrać metod płatności');
         }
         const data = await response.json();
-
         setPaymentMethods(data);
       } catch (err) {
         console.error('Błąd podczas pobierania metod płatności:', err);
@@ -60,39 +59,32 @@ const Payment: React.FC<PaymentProps> = ({
 
   // Filter payment methods based on the selected shipping method
   const getFilteredPaymentMethods = () => {
-    const mappedShippingMethod = shippingMethodMapping[shippingMethod];
+    const mappedShippingMethod =
+      shippingMethodMapping[shippingMethod] || shippingMethod;
 
-    // If shipping method requires COD only:
+    // For "Kurier GLS Pobranie" return only the COD option
     if (mappedShippingMethod === 'kurier_gls_pobranie') {
       return paymentMethods.filter((method) => method.id === 'cod');
     }
 
-    // Accept legacy Przelewy24, new Przelewy24, and PayNow (with correct ID "pay_by_paynow_pl_pbl")
-    const accepted = [
-      'przelewy24',
-      'p24-online-payments',
-      'pay_by_paynow_pl_pbl',
-    ];
-    return paymentMethods.filter((method) => accepted.includes(method.id));
+    // Otherwise, return only the PayNow method
+    return paymentMethods.filter(
+      (method) => method.id === 'pay_by_paynow_pl_pbl',
+    );
   };
 
   const availableMethods = getFilteredPaymentMethods();
 
-  // Automatically adjust the selected payment method based on shipping method
+  // Set the default payment method based on the mapped shipping method
   useEffect(() => {
-    if (shippingMethod === 'paczkomaty_inpost') {
-      setPaymentMethod('p24-online-payments');
-    } else if (shippingMethod === 'kurier_gls_pobranie') {
+    const mappedShippingMethod =
+      shippingMethodMapping[shippingMethod] || shippingMethod;
+    if (mappedShippingMethod === 'kurier_gls_pobranie') {
       setPaymentMethod('cod');
     } else {
-      // Prefer PayNow if available, else fallback to p24-online-payments
-      if (paymentMethods.find((m) => m.id === 'pay_by_paynow_pl_pbl')) {
-        setPaymentMethod('pay_by_paynow_pl_pbl');
-      } else {
-        setPaymentMethod('p24-online-payments');
-      }
+      setPaymentMethod('pay_by_paynow_pl_pbl');
     }
-  }, [shippingMethod, paymentMethods, setPaymentMethod]);
+  }, [shippingMethod, setPaymentMethod]);
 
   if (loading) {
     return <p>Ładowanie metod płatności...</p>;
