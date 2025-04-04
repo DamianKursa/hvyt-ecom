@@ -49,10 +49,6 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                     <p className="font-bold">{item.name}</p>
                   </div>
                 </td>
-                <td className="py-4 px-6 text-left font-bold">
-                  {item.price} zł
-                </td>
-
                 <td className="py-4 px-6 text-right font-bold">
                   {(parseFloat(item.price) / item.quantity).toFixed(2)} zł
                 </td>

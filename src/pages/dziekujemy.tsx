@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Link from 'next/link';
@@ -6,12 +6,21 @@ import Layout from '@/components/Layout/Layout.component';
 import CartProgress from '@/components/Cart/CartProgress';
 import OrderConfirmation from '@/components/Cart/OrderConfirmation';
 import { Order } from '@/utils/functions/interfaces';
+import { CartContext } from '@/stores/CartProvider';
 
 const Dziekujemy = () => {
   const router = useRouter();
   const { orderId, orderKey } = router.query;
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Import clearCart from your CartContext
+  const { clearCart } = useContext(CartContext);
+
+  // Clear the cart when the component mounts
+  useEffect(() => {
+    clearCart();
+  }, [clearCart]);
 
   useEffect(() => {
     let currentOrderId = orderId || localStorage.getItem('recentOrderId');
@@ -30,7 +39,6 @@ const Dziekujemy = () => {
         );
         const fetchedOrder = response.data;
 
-        // Ensure order has correct structure, even if API changes.
         const formattedOrder: Order = {
           ...fetchedOrder,
           line_items: Array.isArray(fetchedOrder.line_items)
@@ -38,44 +46,24 @@ const Dziekujemy = () => {
             : Array.isArray(fetchedOrder.items)
               ? fetchedOrder.items.map((item: any) => {
                   const qty = item.quantity || 1;
-                  // Original unit price from the order (assumed to be the non-discounted product price)
                   const originalUnitPrice = item.price;
-                  // Calculate full line total (without discount)
                   const originalLineTotal = parseFloat(originalUnitPrice) * qty;
-                  // Get the discounted line total from the order, or use the original if not present
                   const discountedLineTotal = item.total
                     ? parseFloat(item.total)
                     : originalLineTotal;
-                  // Calculate discount amount for this line
                   const discountAmount =
                     originalLineTotal - discountedLineTotal;
-
-                  // Console log for debugging purposes
-                  console.log('Mapping line item:', {
-                    product_id: item.product_id,
-                    name: item.name,
-                    quantity: qty,
-                    originalUnitPrice,
-                    originalLineTotal,
-                    discountedLineTotal,
-                    discountAmount,
-                  });
-
                   return {
                     product_id: item.product_id,
                     name: item.name,
                     quantity: qty,
-                    // Show the original product price (per unit) without discount
                     price: originalUnitPrice,
-                    // Add a discount field for display purposes
                     discount: discountAmount.toFixed(2),
-                    // Final line total after discount is applied
                     total: discountedLineTotal.toFixed(2),
                     image: item.image || '/placeholder.jpg',
                   };
                 })
               : [],
-
           shipping: {
             ...fetchedOrder.shipping,
             country: fetchedOrder.shipping?.country || 'PL',
@@ -85,7 +73,7 @@ const Dziekujemy = () => {
 
         setOrder(formattedOrder);
       } catch (err) {
-        console.error('❌ Error fetching order:', err);
+        console.error('Error fetching order:', err);
         setError('Nie udało się załadować zamówienia.');
       }
     };
@@ -95,13 +83,10 @@ const Dziekujemy = () => {
 
   return (
     <Layout title="Dziękujemy za zakupy!">
-      {/* Cart Progress - Mark current step */}
       <div className="mt-[55px] md:mt-0 container mx-auto px-4 mb-16 md:px-0">
         <CartProgress />
       </div>
-      {/* Desktop Version */}
       <div className="mx-4 xl:mx-0 hidden md:grid grid-cols-10 min-h-[750px] rounded-[24px] overflow-hidden mb-10">
-        {/* Left Column - 40% (Text & Background) */}
         <div className="col-span-4 bg-[#F0E0CF] flex flex-col justify-center pl-[40px]">
           <h1 className="text-[48px] font-bold text-black leading-tight">
             Dziękujemy za
@@ -112,21 +97,16 @@ const Dziekujemy = () => {
             zamówienia <span className="font-bold">#{order?.id}</span>.
           </p>
         </div>
-        {/* Right Column - 60% (Image Background & Overlay Box) */}
         <div
           className="col-span-6 relative bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: "url('/images/dziekujemy-hero.png')",
           }}
         >
-          {/* Overlay Box positioned at bottom left as before */}
           <div className="absolute bottom-0 left-0 bg-[#F0E0CF] w-[250px] h-[250px]" />
         </div>
       </div>
-
-      {/* Mobile Version */}
       <div className=" block md:hidden mb-10 mx-4 rounded-[24px] overflow-hidden">
-        {/* Text Section */}
         <div className="bg-[#F0E0CF] p-4">
           <h1 className="text-[36px] mt-4 font-bold text-black leading-tight">
             Dziękujemy za
@@ -137,7 +117,6 @@ const Dziekujemy = () => {
             zamówienia <span className="font-bold">#{order?.id}</span>.
           </p>
         </div>
-        {/* Image Section with fixed height and overlay */}
         <div className="relative" style={{ height: '250px' }}>
           <img
             src="/images/dziekujemy-hero.png"
@@ -150,11 +129,8 @@ const Dziekujemy = () => {
           />
         </div>
       </div>
-
-      {/* Order Confirmation Section */}
       <div className="container mx-auto px-4 md:px-0 py-10">
         {order && <OrderConfirmation order={order} />}
-        {/* "Wróć na stronę główną" Button */}
         <div className="text-center mt-10">
           <Link
             href="/"

@@ -64,7 +64,7 @@ const Checkout: React.FC = () => {
   const [isShippingDifferent, setIsShippingDifferent] = useState(false);
 
   const { user } = useUserContext();
-  const { cart, clearCart } = useContext(CartContext);
+  const { cart } = useContext(CartContext);
 
   const mapCountry = (country: string): string => {
     const countryMapping: Record<string, string> = { Polska: 'PL' };
@@ -333,8 +333,6 @@ const Checkout: React.FC = () => {
 
       localStorage.setItem('recentOrderId', createdOrder.id.toString());
       localStorage.setItem('recentOrderKey', createdOrder.order_key);
-
-      clearCart();
 
       if (
         (paymentMethod === 'przelewy24' ||
