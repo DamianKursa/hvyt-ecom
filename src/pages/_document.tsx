@@ -1,4 +1,3 @@
-// pages/_document.js
 import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
@@ -18,7 +17,7 @@ export default function Document() {
         />
         <meta name="author" content="HVYT" />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://hvyt.pl" />
+
         {/* Open Graph Meta Tags */}
         <meta
           property="og:title"
@@ -55,31 +54,6 @@ export default function Document() {
           content="a6786718d22d0c370bdbd44d3a3f44ee"
         />
 
-        {/* --- Google Consent Mode v2 Default Settings --- */}
-        <script
-          data-cookieconsent="ignore"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){ dataLayer.push(arguments); }
-              // Set default consent state to "denied" for non‑essential storage
-              gtag('consent', 'default', {
-                'ad_storage': 'denied',
-                'analytics_storage': 'denied',
-                'ad_personalization': 'denied',
-                'ad_user_data': 'denied',
-                'personalization_storage': 'denied',
-                'functionality_storage': 'denied',
-                'security_storage': 'granted',
-                'wait_for_update': 500
-              });
-              // Optional: Redact ads data and disable URL passthrough
-              gtag('set', 'ads_data_redaction', true);
-              gtag('set', 'url_passthrough', false);
-            `,
-          }}
-        />
-
         {/* --- Google Tag Manager (GTM) Script --- */}
         <script
           data-cookieconsent="ignore"
@@ -98,14 +72,10 @@ export default function Document() {
           }}
         />
 
-        {/* --- Cookiebot Script (CMP) --- */}
-        <script
-          id="Cookiebot"
-          src="https://consent.cookiebot.com/uc.js"
-          data-cbid="feef7cd9-8bc1-4184-80c9-90153c1244ea"
-          type="text/javascript"
-          async
-        ></script>
+        {/* 
+          Removed Cookiebot script from here.
+          Load Cookiebot in _app.tsx with Next/Script using strategy="afterInteractive"
+        */}
       </Head>
       <body className="bg-beige-light">
         {/* --- Google Tag Manager (noscript) fallback --- */}

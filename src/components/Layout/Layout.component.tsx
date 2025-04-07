@@ -1,25 +1,24 @@
-// Layout.tsx
+// components/Layout/Layout.component.tsx
 import React, { ReactNode, useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { SpeedInsights } from '@vercel/speed-insights/next'; // Import SpeedInsights
+import Head from 'next/head';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
-// Components
 import Header from '@/components/Header/Header.component';
 import Footer from '@/components/Footer/Footer.component';
 
-// State
 import { CartContext } from '@/stores/CartProvider';
 
 interface ILayoutProps {
   children?: ReactNode;
   title: string;
+  description?: string;
 }
 
-const Layout: React.FC<ILayoutProps> = ({ children, title }) => {
+const Layout: React.FC<ILayoutProps> = ({ children, title, description }) => {
   const { cart, addCartItem } = useContext(CartContext);
   const router = useRouter();
 
-  // Define routes for full-width or modified layout
   const noMarginPages = ['/', '/o-nas', '/hvyt-objects', '/blog', '/kolekcje'];
   const fullWidthCategories = [
     'uchwyty-meblowe',
@@ -32,14 +31,11 @@ const Layout: React.FC<ILayoutProps> = ({ children, title }) => {
     noMarginPages.includes(router.pathname) ||
     fullWidthCategories.some((slug) => router.asPath.includes(`/${slug}`));
 
-  // Load cart from localStorage and sync with context if needed
   useEffect(() => {
     if (!cart) {
       const storedCart = localStorage.getItem('woocommerce-cart');
       if (storedCart) {
         const parsedCart = JSON.parse(storedCart);
-
-        // Check if parsedCart.products is an array and add items to the cart
         if (Array.isArray(parsedCart.products)) {
           parsedCart.products.forEach((product: any) => {
             addCartItem(product);
@@ -51,6 +47,12 @@ const Layout: React.FC<ILayoutProps> = ({ children, title }) => {
 
   return (
     <>
+      <Head>
+        <title>{title}</title>
+        {description && <meta name="description" content={description} />}
+        <link rel="canonical" href={`https://hvyt.pl${router.asPath}`} />
+      </Head>
+
       <Header title={title} />
 
       <main
@@ -65,8 +67,6 @@ const Layout: React.FC<ILayoutProps> = ({ children, title }) => {
       </main>
 
       <Footer />
-
-      {/* Add SpeedInsights */}
       <SpeedInsights />
     </>
   );

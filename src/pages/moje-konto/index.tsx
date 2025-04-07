@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Layout from '@/components/Layout/Layout.component';
 import Link from 'next/link';
 import Image from 'next/image';
-import LoadingModal from '@/components/UI/LoadingModal'; // Import the LoadingModal component
+import LoadingModal from '@/components/UI/LoadingModal';
 
 const endpoints = [
   {
@@ -39,12 +39,12 @@ const endpoints = [
 ];
 
 interface MojeKontoProps {
-  children?: React.ReactNode; // Allow children to be passed into the component
+  children?: React.ReactNode;
 }
 
 const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null); // Replace `any` with proper typing if needed
+  const [user, setUser] = useState<any>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -78,11 +78,11 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
         title="Logowanie"
         description="Za chwilę przekierujemy Cię do Twojego konta"
       />
-    ); // Display the LoadingModal while loading
+    );
   }
 
   if (!user) {
-    return null; // If user data isn't available, return null
+    return null;
   }
 
   return (
