@@ -1,4 +1,6 @@
+// pages/_document.js
 import { Html, Head, Main, NextScript } from 'next/document';
+import Script from 'next/script';
 
 export default function Document() {
   return (
@@ -54,6 +56,28 @@ export default function Document() {
           content="a6786718d22d0c370bdbd44d3a3f44ee"
         />
 
+        {/* --- Google Consent Mode v2 Default Settings --- */}
+        <Script id="ga-consent" strategy="beforeInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){ dataLayer.push(arguments); }
+            // Set default consent state to "denied" for non‑essential storage
+            gtag('consent', 'default', {
+              'ad_storage': 'denied',
+              'analytics_storage': 'denied',
+              'ad_personalization': 'denied',
+              'ad_user_data': 'denied',
+              'personalization_storage': 'denied',
+              'functionality_storage': 'denied',
+              'security_storage': 'granted',
+              'wait_for_update': 500
+            });
+            // Optional: Redact ads data and disable URL passthrough
+            gtag('set', 'ads_data_redaction', true);
+            gtag('set', 'url_passthrough', false);
+          `}
+        </Script>
+
         {/* --- Google Tag Manager (GTM) Script --- */}
         <script
           data-cookieconsent="ignore"
@@ -71,11 +95,6 @@ export default function Document() {
             `,
           }}
         />
-
-        {/* 
-          Removed Cookiebot script from here.
-          Load Cookiebot in _app.tsx with Next/Script using strategy="afterInteractive"
-        */}
       </Head>
       <body className="bg-beige-light">
         {/* --- Google Tag Manager (noscript) fallback --- */}

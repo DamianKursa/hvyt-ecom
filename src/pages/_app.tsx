@@ -52,28 +52,24 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }, [router.query, router]);
 
+  // Push pageview event on each route change
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (typeof window !== 'undefined' && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          event: 'pageview',
+          page: url,
+        });
+      }
+    };
+    router.events.on('routeChangeComplete', handleRouteChange);
+    return () => {
+      router.events.off('routeChangeComplete', handleRouteChange);
+    };
+  }, [router.events]);
+
   return (
     <>
-      {/* Google Analytics / Consent Mode initialization script */}
-      <Script id="ga-consent" strategy="beforeInteractive">
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){ dataLayer.push(arguments); }
-          gtag('consent', 'default', {
-            'ad_storage': 'denied',
-            'analytics_storage': 'denied',
-            'ad_personalization': 'denied',
-            'ad_user_data': 'denied',
-            'personalization_storage': 'denied',
-            'functionality_storage': 'denied',
-            'security_storage': 'granted',
-            'wait_for_update': 500
-          });
-          gtag('set', 'ads_data_redaction', true);
-          gtag('set', 'url_passthrough', false);
-        `}
-      </Script>
-
       {/* Load Cookiebot script only in production */}
       {process.env.NODE_ENV === 'production' && (
         <Script
