@@ -15,6 +15,7 @@ import type { AppProps } from 'next/app';
 import '@/styles/globals.css';
 import 'nprogress/nprogress.css';
 
+// Konfiguracja NProgress przy zmianie tras
 Router.events.on('routeChangeStart', () => NProgress.start());
 Router.events.on('routeChangeComplete', () => NProgress.done());
 Router.events.on('routeChangeError', () => NProgress.done());
@@ -23,6 +24,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const [showOverlay, setShowOverlay] = useState(false);
 
+  // Obsługa przekierowania na podstawie parametrów w URL (np. dla zamówień)
   useEffect(() => {
     if (router.query['wc-api']) {
       setShowOverlay(true);
@@ -52,7 +54,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     }
   }, [router.query, router]);
 
-  // Push pageview event on each route change
+  // Przesyłanie zdarzenia pageview do dataLayer po zmianie trasy
   useEffect(() => {
     const handleRouteChange = (url: string) => {
       if (typeof window !== 'undefined' && (window as any).dataLayer) {
@@ -70,7 +72,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      {/* Load Cookiebot script only in production */}
+      {/* Ładowanie Cookiebot tylko w środowisku produkcyjnym */}
       {process.env.NODE_ENV === 'production' && (
         <Script
           id="Cookiebot"

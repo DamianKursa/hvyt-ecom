@@ -1,8 +1,7 @@
-// pages/_document.js
 import { Html, Head, Main, NextScript } from 'next/document';
 import Script from 'next/script';
 
-export default function Document() {
+export default function Document(): JSX.Element {
   return (
     <Html lang="pl-PL">
       <Head>
@@ -32,8 +31,10 @@ export default function Document() {
         <meta property="og:url" content="https://hvyt.pl" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://hvyt.pl/og-image.jpg" />
+
         {/* Favicon */}
         <link rel="icon" href="/favicon.png" />
+
         {/* Fonts & Additional Resources */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -46,6 +47,7 @@ export default function Document() {
           rel="stylesheet"
         />
         <link rel="stylesheet" href="https://hvyt.pl/styles.css" />
+
         {/* Facebook Domain Verification */}
         <meta
           name="facebook-domain-verification"
@@ -61,7 +63,7 @@ export default function Document() {
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){ dataLayer.push(arguments); }
-            // Set default consent state to "denied" for non‑essential storage
+            // Ustaw domyślny stan zgody (np. 'denied' dla nie‑istotnych danych)
             gtag('consent', 'default', {
               'ad_storage': 'denied',
               'analytics_storage': 'denied',
@@ -72,29 +74,26 @@ export default function Document() {
               'security_storage': 'granted',
               'wait_for_update': 500
             });
-            // Optional: Redact ads data and disable URL passthrough
+            // Opcjonalnie: redaguj dane reklamowe i wyłącz URL passthrough
             gtag('set', 'ads_data_redaction', true);
             gtag('set', 'url_passthrough', false);
           `}
         </Script>
 
         {/* --- Google Tag Manager (GTM) Script --- */}
-        <script
-          data-cookieconsent="ignore"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(w,d,s,l,i){
-                w[l]=w[l]||[];
-                w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
-                var f=d.getElementsByTagName(s)[0],
-                    j=d.createElement(s), dl=l!='dataLayer'?'&l='+l:'';
-                j.async=true;
-                j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-                f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','GTM-PJNDR4N');
-            `,
-          }}
-        />
+        <Script id="gtm-script" strategy="afterInteractive">
+          {`
+            (function(w,d,s,l,i){
+              w[l]=w[l]||[];
+              w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
+              var f=d.getElementsByTagName(s)[0],
+                  j=d.createElement(s), dl=l!='dataLayer'?'&l='+l:'';
+              j.async=true;
+              j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+              f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-PJNDR4N');
+          `}
+        </Script>
       </Head>
       <body className="bg-beige-light">
         {/* --- Google Tag Manager (noscript) fallback --- */}
@@ -109,19 +108,17 @@ export default function Document() {
         <Main />
         <NextScript />
         {/* --- Allekurier Banner Script --- */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function (i) {
-                var j = document.createElement("script");
-                j.src = "https://cdn.allekurier.pl/mail-box/banner.js?hid=" + i;
-                j.async = true;
-                j.referrerPolicy = "no-referrer-when-downgrade";
-                document.body.appendChild(j);
-              })("59c63e5c-3a7e-4b8e-8165-999687ba3bc4");
-            `,
-          }}
-        />
+        <Script id="allekurier-banner" strategy="afterInteractive">
+          {`
+            (function (i) {
+              var j = document.createElement("script");
+              j.src = "https://cdn.allekurier.pl/mail-box/banner.js?hid=" + i;
+              j.async = true;
+              j.referrerPolicy = "no-referrer-when-downgrade";
+              document.body.appendChild(j);
+            })("59c63e5c-3a7e-4b8e-8165-999687ba3bc4");
+          `}
+        </Script>
       </body>
     </Html>
   );
