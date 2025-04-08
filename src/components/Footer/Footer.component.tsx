@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useForm, FormProvider } from 'react-hook-form';
 import { InputField } from '../Input/InputField.component';
 import SocialIcons from '../UI/SocialIcons';
-import { normalizeString } from '@/utils/functions/functions'; // Import normalizeString
+import { normalizeString } from '@/utils/functions/functions';
 
 const Footer = () => {
   const router = useRouter();
@@ -26,7 +26,6 @@ const Footer = () => {
     console.log('Newsletter form data:', data);
   };
 
-  // Mapping for category links
   const categoryLinks: { [key: string]: string } = {
     Uchwyty: 'uchwyty-meblowe',
     Klamki: 'klamki',
@@ -41,9 +40,7 @@ const Footer = () => {
       } py-16 text-sm text-neutral-darkest`}
     >
       <div className="max-w-[1440px] container px-[16px] md:mx-auto">
-        {/* First Row - Grid with 50/50 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 border-b border-beige-dark pb-8 mb-8">
-          {/* Left Column */}
           <div className="grid grid-cols-2 lg:grid-cols-1 space-y-0 md:space-y-4">
             {/* Logo */}
             <img
@@ -51,11 +48,8 @@ const Footer = () => {
               alt="HVYT Logo"
               className="h-[20px] md:h-10"
             />
-
-            {/* Social Media Icons */}
             <SocialIcons />
           </div>
-
           {/* Service Information */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[

@@ -7,27 +7,27 @@ const Sidebar = ({ section }: { section: string }) => {
     {
       label: 'Moje dane',
       href: '/moje-konto/moje-dane',
-      icon: '/icons/user.svg', // Update the path as necessary
+      icon: '/icons/user.svg',
     },
     {
       label: 'Moje zamówienia',
       href: '/moje-konto/moje-zamowienia',
-      icon: '/icons/cart.svg', // Update the path as necessary
+      icon: '/icons/cart.svg',
     },
     {
       label: 'Kupione produkty',
       href: '/moje-konto/kupione-produkty',
-      icon: '/icons/kupione.svg', // Update the path as necessary
+      icon: '/icons/kupione.svg',
     },
     {
       label: 'Dane do faktury',
       href: '/moje-konto/dane-do-faktury',
-      icon: '/icons/do-faktury.svg', // Update the path as necessary
+      icon: '/icons/do-faktury.svg',
     },
     {
       label: 'Wyloguj',
       href: '/logowanie',
-      icon: '/icons/logout-01.svg', // Update the path as necessary
+      icon: '/icons/logout-01.svg',
     },
   ];
 

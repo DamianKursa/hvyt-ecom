@@ -29,28 +29,28 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
         icon.src = '/icons/download-single.svg';
         icon.alt = 'Download';
         icon.classList.add('w-5', 'h-5', 'ml-2', 'inline-block');
-        icon.setAttribute('data-icon', 'true'); // Add distinguishing attribute
+        icon.setAttribute('data-icon', 'true');
         link.appendChild(icon);
       });
 
       // Process and validate images (exclude icons)
-      let validImageIndex = 0; // Track index of valid images in `imageSources`
+      let validImageIndex = 0;
       doc.querySelectorAll('img').forEach((img) => {
-        if (img.hasAttribute('data-icon')) return; // Skip icons
+        if (img.hasAttribute('data-icon')) return;
 
         const imageSrc = img.getAttribute('src');
         if (imageSrc && imageSrc.trim() !== '') {
           imageSources.push(imageSrc.trim());
           img.classList.add('product-image', 'cursor-pointer', 'mt-6');
           img.setAttribute('data-src', imageSrc.trim());
-          img.setAttribute('data-index', validImageIndex.toString()); // Use validImageIndex
-          validImageIndex++; // Increment only for valid images
+          img.setAttribute('data-index', validImageIndex.toString());
+          validImageIndex++;
         } else {
           console.warn('Image with missing src detected, skipping:', img);
           img.remove();
         }
       });
-      setModalImages(imageSources); // Update modal images
+      setModalImages(imageSources);
       return doc.body.innerHTML;
     };
 

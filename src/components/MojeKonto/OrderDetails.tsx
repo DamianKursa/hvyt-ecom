@@ -6,12 +6,10 @@ interface OrderDetailsProps {
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
-  // Function to calculate subtotal if not provided
   const calculatedSubtotal = order.line_items
     .reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0)
     .toFixed(2);
 
-  // Calculate tax (e.g., PL VAT 23%) if not provided
   const calculatedTax = (
     (parseFloat(order.subtotal || calculatedSubtotal) * 23) /
     100

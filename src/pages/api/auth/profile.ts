@@ -21,7 +21,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    // Destructure id along with name, username, email
     const { id, name, username, email } = response.data;
     res.status(200).json({ id, name, username, email });
   } catch (error: any) {

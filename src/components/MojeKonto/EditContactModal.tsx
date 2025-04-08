@@ -47,11 +47,11 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
   return (
     <div
       className="fixed inset-0  flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(54, 49, 50, 0.4)' }} // Overlay color
+      style={{ backgroundColor: 'rgba(54, 49, 50, 0.4)' }}
     >
       <div
         className="mx-4 md:mx-0 bg-beige-light rounded-[25px] w-full max-w-[800px] relative"
-        style={{ padding: '40px 32px', maxWidth: '650px' }} // Modal padding
+        style={{ padding: '40px 32px', maxWidth: '650px' }}
       >
         {/* Title and Close Button */}
         <div className="flex justify-between items-center mb-6">
@@ -60,8 +60,8 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
             <img
               src="/icons/close-button.svg"
               alt="Close"
-              className="w-3 h-3" // 12px x 12px
-              style={{ filter: 'invert(0)' }} // Black color
+              className="w-3 h-3"
+              style={{ filter: 'invert(0)' }}
             />
           </button>
         </div>

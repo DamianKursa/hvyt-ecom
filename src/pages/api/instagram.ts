@@ -19,8 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const data = await response.json();
-
-    // ✅ Only return the latest 4 posts
+    
     const limitedPosts = Array.isArray(data.data) ? data.data.slice(0, 4) : [];
 
     res.status(200).json({ data: limitedPosts });

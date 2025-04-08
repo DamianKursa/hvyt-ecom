@@ -9,7 +9,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void }> = ({
     name: '',
     email: '',
     content: '',
-    rating: 5, // Default to 5 stars
+    rating: 5,
     consent: false,
   });
 

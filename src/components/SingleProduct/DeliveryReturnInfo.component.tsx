@@ -2,9 +2,9 @@ import React from 'react';
 import Image from 'next/image';
 
 interface DeliveryReturnInfoProps {
-  onScrollToSection?: () => void; // Callback for special interaction
-  stock?: number | null; // Stock quantity (number or null)
-  stockStatus?: string; // e.g. "instock"
+  onScrollToSection?: () => void;
+  stock?: number | null;
+  stockStatus?: string;
 }
 
 const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({

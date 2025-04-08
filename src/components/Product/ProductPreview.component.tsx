@@ -3,12 +3,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useWishlist } from '@/context/WhishlistContext';
 
-// Extend the Product interface to include attributes (if available)
 interface Product {
   name: string;
   price: string;
   slug: string;
-  categorySlug?: string; // Optional category field
+  categorySlug?: string;
   images: { src: string }[];
   variations?: {
     nodes: {
@@ -22,8 +21,8 @@ interface ProductPreviewProps {
   product: Product;
   containerClass?: string;
   imageClass?: string;
-  isSmall?: boolean; // Supports smaller dimensions
-  alwaysShowIcons?: boolean; // If true, the icons overlay is always visible
+  isSmall?: boolean;
+  alwaysShowIcons?: boolean;
 }
 
 /**
@@ -32,7 +31,6 @@ interface ProductPreviewProps {
 const getProductTypeIcon = (product: Product): string | null => {
   const slugLower = product.slug.toLowerCase();
 
-  // Convert object-based attributes into an array
   const attributes = Array.isArray(product.attributes)
     ? product.attributes
     : Object.entries(product.attributes || {}).map(([key, value]) => ({
@@ -41,7 +39,6 @@ const getProductTypeIcon = (product: Product): string | null => {
         option: (value as { option?: string })?.option || '',
       }));
 
-  // Category-based icons
   if (slugLower.includes('klamka')) return '/icons/kolekcja/klamka.svg';
   if (slugLower.includes('wieszak')) return '/icons/kolekcja/wieszak.svg';
 
@@ -54,7 +51,6 @@ const getProductTypeIcon = (product: Product): string | null => {
     rodzajAttr?.option?.toLowerCase() ||
     '';
 
-  // Map rodzaj values to icons
   if (value.includes('relingi')) return '/icons/kolekcja/uchwyt.svg';
   if (value.includes('krawędziowe')) return '/icons/kolekcja/krawędziowy.svg';
   if (value.includes('gałki')) return '/icons/kolekcja/gałka.svg';
@@ -62,25 +58,20 @@ const getProductTypeIcon = (product: Product): string | null => {
   if (value.includes('podluzne')) return '/icons/kolekcja/uchwyt.svg';
   if (value.includes('muszlowe')) return '/icons/kolekcja/krawędziowy.svg';
 
-  // Default fallback
   return slugLower.includes('uchwyt') ? '/icons/kolekcja/uchwyt.svg' : null;
 };
 
-/**
- * Determines a color swatch (hex code) based on the "Kolor OK" attribute.
- */
 const getProductColorSwatch = (product: Product): string | null => {
-  // Convert object-based attributes into an array
   const attributes = Array.isArray(product.attributes)
     ? product.attributes
     : Object.entries(product.attributes || {}).map(([key, value]) => ({
-        name: key.replace(/^pa_/, '').replace(/-/g, ' '), // Normalize attribute names
+        name: key.replace(/^pa_/, '').replace(/-/g, ' '),
         options: (value as { options?: string[] })?.options || [],
         option: (value as { option?: string })?.option || '',
       }));
 
   const colorAttr = attributes.find(
-    (attr) => attr.name.toLowerCase() === 'kolor ok',
+    (attr) => attr.name.toLowerCase() === 'kolor',
   );
   const value: string =
     colorAttr?.options?.[0]?.toLowerCase() ||

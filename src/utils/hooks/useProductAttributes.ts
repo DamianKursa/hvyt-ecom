@@ -15,7 +15,7 @@ const useProductAttributes = (product: Product | null) => {
       [attributeName]: value,
     }));
 
-    // Match the variation based on selected attributes
+
     const matchedVariation = product?.baselinker_variations?.find((variation) =>
       variation.attributes.every(
         (attr) =>

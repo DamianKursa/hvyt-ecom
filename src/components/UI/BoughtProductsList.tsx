@@ -34,7 +34,6 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
     };
 
     addCartItem(cartItem);
-    console.log('🛒 Added to Cart:', cartItem);
 
     setSnackbarMessage(`Dodano "${product.name}" do koszyka.`);
     setTimeout(() => setSnackbarMessage(null), 3000);

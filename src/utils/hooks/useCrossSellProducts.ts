@@ -36,7 +36,7 @@ const useCrossSellProducts = (productId: string | null) => {
           price: product.price,
           images: [{ src: product.images?.[0]?.src || '/fallback-image.jpg' }],
         }));
-        setProducts(formattedProducts.slice(0, 12)); // Limit to 12 products
+        setProducts(formattedProducts.slice(0, 12)); 
       } catch (error) {
         console.error('Error in useCrossSellProducts:', error);
       } finally {

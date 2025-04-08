@@ -9,9 +9,9 @@ interface BillingData {
   companyName?: string;
   nip?: string;
   street: string;
-  billing_address_2?: string; // Combined building/apartment number
-  buildingNumber?: string; // Optional field
-  apartmentNumber?: string; // Optional field
+  billing_address_2?: string;
+  buildingNumber?: string;
+  apartmentNumber?: string;
   city: string;
   postalCode: string;
 }
@@ -61,8 +61,6 @@ const BillingAddresses: React.FC = () => {
         address: formattedAddress,
       };
 
-      console.log('Payload sent to server:', JSON.stringify(payload, null, 2)); // Log payload
-
       const response = await fetch('/api/moje-konto/billing-addresses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -70,7 +68,6 @@ const BillingAddresses: React.FC = () => {
       });
 
       const responseData = await response.json();
-      console.log('Server response:', responseData); // Log server response
 
       if (!response.ok) {
         console.error('Error response from server:', responseData);
@@ -79,8 +76,8 @@ const BillingAddresses: React.FC = () => {
         );
       }
 
-      await fetchBillingData(); // Refresh data after saving
-      setModalData(null); // Close the modal
+      await fetchBillingData();
+      setModalData(null);
     } catch (err) {
       console.error('Error saving billing address:', err);
       alert('Nie udało się zapisać danych do faktury. Spróbuj ponownie.');

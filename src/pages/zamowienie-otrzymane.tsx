@@ -39,7 +39,6 @@ const ZamowienieOtrzymane = () => {
             <br /> zakupy w naszym sklepie!
           </h1>
           <p className="text-[18px] pb-8 mt-4 font-light text-black">
-            Dziękujemy za zamówienie! <br />
             Aktualnie przetwarzamy Twoją płatność.
           </p>
         </div>

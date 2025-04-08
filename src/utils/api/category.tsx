@@ -1,32 +1,29 @@
 import axios from 'axios';
 
-// Setup the WooCommerce API instance with the necessary credentials.
 const WooCommerceAPI = axios.create({
-  baseURL: process.env.REST_API, // WooCommerce REST API base URL
+  baseURL: process.env.REST_API,
   auth: {
-    username: process.env.WC_CONSUMER_KEY || '', // Consumer Key
-    password: process.env.WC_CONSUMER_SECRET || '', // Consumer Secret
+    username: process.env.WC_CONSUMER_KEY || '',
+    password: process.env.WC_CONSUMER_SECRET || '',
   },
 });
 
 const CustomAPI = axios.create({
-  baseURL: 'https://wp.hvyt.pl/wp-json/custom/v1', // Custom API base URL
+  baseURL: 'https://wp.hvyt.pl/wp-json/custom/v1',
 });
 
-// Define the type for attributes
 interface Attribute {
   id: number;
   name: string;
   slug: string;
 }
 
-// Fetch category data by slug
 export const fetchCategoryBySlug = async (slug: string) => {
   try {
     const response = await WooCommerceAPI.get('/products/categories', {
       params: {
         slug,
-        per_page: 50, // Adjust as necessary
+        per_page: 50,
       },
     });
     if (response.data.length === 0) {
@@ -39,7 +36,6 @@ export const fetchCategoryBySlug = async (slug: string) => {
   }
 };
 
-// Fetch products by category ID
 export const fetchProductsByCategoryId = async (
   categoryId: number,
   page = 1,
@@ -48,24 +44,21 @@ export const fetchProductsByCategoryId = async (
   sortingOption: string = 'default',
 ) => {
   try {
-    // Initialize API request parameters and include published status
     const params: Record<string, any> = {
       category: categoryId,
       page,
       per_page: perPage,
-      status: 'publish', // Only published products will be returned
+      status: 'publish',
       _fields: 'id,name,price,slug,images',
     };
 
-    // Add filters to the request
     filters.forEach((filter) => {
       if (filter.name && filter.value) {
-        // Use WooCommerce attribute query format
         const attributeKey = `attribute_${filter.name}`;
         if (!params[attributeKey]) {
           params[attributeKey] = filter.value;
         } else {
-          params[attributeKey] += `,${filter.value}`; // Handle multiple values for the same filter
+          params[attributeKey] += `,${filter.value}`;
         }
       }
     });
@@ -87,7 +80,6 @@ export const fetchProductsByCategoryId = async (
       params.order = sortingParams.order;
     }
 
-    // Fetch products from WooCommerce API
     const response = await WooCommerceAPI.get('/products', { params });
 
     return {
@@ -112,7 +104,7 @@ export const fetchProductAttributesWithTerms = async (categoryId: number) => {
     return response.data.map((attribute: any) => ({
       id: attribute.id,
       name: attribute.name,
-      slug: `pa_${attribute.slug}`, // Ensure slug matches taxonomy in backend
+      slug: `pa_${attribute.slug}`,
       options: attribute.options.map((option: any) => ({
         id: option.id,
         name: option.name,
@@ -145,12 +137,10 @@ export const fetchProductsWithFilters = async (
 
   filters.forEach((filter) => {
     if (filter.name === 'price') {
-      // Add price filter to params
       const [minPrice, maxPrice] = filter.value.split('-').map(Number);
       params.min_price = minPrice;
       params.max_price = maxPrice;
     } else {
-      // Add attribute filter to params
       params.attributes = params.attributes || [];
       params.attributes.push({
         key: filter.name,
@@ -196,11 +186,9 @@ export const fetchSortedProducts = async (
         id: product.id,
         name: product.name,
         price: product.price,
-        slug: product.permalink.split('/').filter(Boolean).pop(), // Extract slug from permalink
-        images: [
-          { src: product.image }, // Wrap image in an array
-        ],
-        variations: [], // Add variations if available in API
+        slug: product.permalink.split('/').filter(Boolean).pop(),
+        images: [{ src: product.image }],
+        variations: [],
       })),
       totalProducts: response.data.total || 0,
     };

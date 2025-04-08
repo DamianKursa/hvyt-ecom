@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 import { parse } from 'cookie';
-import { Product } from '@/utils/functions/interfaces'; // Use your defined Product interface
+import { Product } from '@/utils/functions/interfaces';
 
 interface OrderItem {
   product_id: string;
@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       apiEndpoint = 'orders';
       break;
     case 'moje-dane':
-      apiEndpoint = 'custom-api/v1/user-data'; // Endpoint for user data
+      apiEndpoint = 'custom-api/v1/user-data'; 
       break;
     case 'moje-adresy':
     case 'dane-do-faktury':
@@ -45,7 +45,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Validate the token with the WordPress API
     const validateResponse = await axios.post(
       `${process.env.WORDPRESS_API_URL}/wp-json/jwt-auth/v1/token/validate`,
       null,
@@ -58,7 +57,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ error: 'Invalid token' });
     }
 
-    // Decode the token to extract the user ID
     const decodedToken = JSON.parse(
       Buffer.from(token.split('.')[1], 'base64').toString('utf-8')
     ) as { data: { user: { id: number } } };
@@ -78,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           const userData = response.data;
           return res.status(200).json({
-            id: userData.id || customerId, // Fallback to decoded ID
+            id: userData.id || customerId,
             firstName: userData.firstName,
             lastName: userData.lastName,
             email: userData.email,

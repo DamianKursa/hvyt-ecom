@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.message || 'Error creating user';
-      console.error('WordPress Error:', error.response?.data); // Log full error response
+      console.error('WordPress Error:', error.response?.data); 
       res.status(error.response?.status || 500).json({ message: errorMessage });
     } else {
       console.error('Unexpected Error:', error);

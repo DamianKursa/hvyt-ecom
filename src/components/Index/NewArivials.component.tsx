@@ -9,10 +9,10 @@ import useSWR from 'swr';
 
 interface NowosciItem {
   id: number;
-  src: string; // Desktop image URL
-  mobileSrc: string; // Mobile image URL from new_arrivals_mobile
-  alt: string; // Alt text (using title)
-  title?: string; // Optional title
+  src: string;
+  mobileSrc: string;
+  alt: string;
+  title?: string;
 }
 
 const HERO_HEIGHT = 800;
@@ -57,7 +57,6 @@ interface NewArrivalsSectionProps {
   useInViewTrigger?: boolean;
 }
 
-// Define a simple fetcher function
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
@@ -70,13 +69,13 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
   });
   const combinedRef = mergeRefs(sectionRef, inViewRef);
 
-  // Use SWR to fetch nowości posts
+  //SWR to fetch nowości posts
   const { data: posts, error } = useSWR(
     '/api/woocommerce?action=fetchNowosciPosts',
     fetcher,
     {
-      refreshInterval: 3600000, // Revalidate every hour
-      dedupingInterval: 600000, // Avoid duplicate requests for 10 minutes
+      refreshInterval: 3600000,
+      dedupingInterval: 600000,
     },
   );
 
@@ -84,21 +83,18 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
   if (error) return <div>Error loading nowości posts</div>;
   if (!posts) return <SkeletonNowosci />;
 
-  // Map posts into NowosciItem objects
   const nowosciItems: NowosciItem[] = posts.map((post: any) => ({
     id: post.id,
-    src: post.imageUrl, // Desktop image from featured image
+    src: post.imageUrl,
     mobileSrc: post.acf?.new_arrivals_mobile || post.imageUrl,
     alt: post.title.rendered,
     title: post.title.rendered,
   }));
 
-  // Fallback if insufficient data
   if (nowosciItems.length < 4) {
     return <p>Insufficient nowości data available.</p>;
   }
 
-  // Use inView trigger if enabled, otherwise scroll-based logic (omitted for brevity)
   const animationTrigger = useInViewTrigger ? inView : false;
 
   return (

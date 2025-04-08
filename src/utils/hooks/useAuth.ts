@@ -9,7 +9,7 @@ const useAuth = () => {
     const token = document.cookie.includes('token=');
 
     if (!token) {
-      router.push('/login'); // Redirect to login if no token
+      router.push('/login'); 
     } else {
       setIsAuthenticated(true);
     }

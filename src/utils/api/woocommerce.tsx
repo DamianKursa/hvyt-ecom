@@ -1,16 +1,15 @@
 import axios from 'axios';
-import { Kolekcja } from '../functions/interfaces'; // Adjust the import path
+import { Kolekcja } from '../functions/interfaces';
 import { NowosciPost } from '../functions/interfaces';
-// Setup the WooCommerce API instance with the necessary credentials.
+
 const WooCommerceAPI = axios.create({
-  baseURL: process.env.REST_API, // WooCommerce REST API base URL
+  baseURL: process.env.REST_API,
   auth: {
-    username: process.env.WC_CONSUMER_KEY || '', // Consumer Key
-    password: process.env.WC_CONSUMER_SECRET || '', // Consumer Secret
+    username: process.env.WC_CONSUMER_KEY || '',
+    password: process.env.WC_CONSUMER_SECRET || '',
   },
 });
 
-// Define the type for attributes
 interface Attribute {
   id: number;
   name: string;
@@ -20,13 +19,12 @@ interface MediaItem {
   source_url: string;
 }
 
-// Fetch category data by slug
 export const fetchCategoryBySlug = async (slug: string) => {
   try {
     const response = await WooCommerceAPI.get('/products/categories', {
       params: {
         slug,
-        per_page: 50, // Adjust as necessary
+        per_page: 50,
       },
     });
     if (response.data.length === 0) {
@@ -48,7 +46,7 @@ export const fetchProductBySlug = async (slug: string) => {
       },
     });
 
-    return response.data[0]; // Return the first product matching the slug
+    return response.data[0];
   } catch (error) {
     console.error('Error fetching product by slug:', error);
     throw error;
@@ -61,7 +59,7 @@ export const fetchMediaById = async (mediaId: number) => {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_WP_REST_API}/media/${mediaId}`,
     );
-    return response.data.source_url; // Return the image URL
+    return response.data.source_url;
   } catch (error) {
     console.error('Error fetching media:', error);
     return null;
@@ -135,21 +133,21 @@ export const fetchNowosciPosts = async (): Promise<NowosciPost[]> => {
     const apiBase = process.env.NEXT_PUBLIC_WP_REST_API;
     const response = await axios.get(`${apiBase}/nowosci`, {
       params: {
-        per_page: 4, // Limit to exactly 4 posts
-        _embed: true, // Include featured image data
+        per_page: 4,
+        _embed: true,
       },
     });
 
     const posts = response.data.map((post: any) => {
       const featuredImage =
         post._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
-        '/placeholder.jpg'; // Default fallback image
+        '/placeholder.jpg';
 
       return {
         id: post.id,
         title: post.title.rendered,
         featured_media: post.featured_media,
-        imageUrl: featuredImage, // Map the featured image URL
+        imageUrl: featuredImage,
       };
     });
 
@@ -192,10 +190,10 @@ export const fetchProductAttributesWithTerms = async (categoryId: number) => {
 export const fetchLatestKolekcja = async () => {
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`, // Adjust this endpoint if necessary
+      `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`,
       {
         params: {
-          per_page: 1, // Get only the latest post
+          per_page: 1,
           orderby: 'date',
           order: 'desc',
         },
@@ -204,14 +202,13 @@ export const fetchLatestKolekcja = async () => {
 
     const latestKolekcja = response.data[0];
 
-    // Check if a featured image is available and fetch it if so
     if (latestKolekcja && latestKolekcja.featured_media) {
       const mediaResponse = await axios.get(
         `${process.env.NEXT_PUBLIC_WP_REST_API}/media/${latestKolekcja.featured_media}`,
       );
       latestKolekcja.imageUrl = mediaResponse.data.source_url;
     } else {
-      latestKolekcja.imageUrl = '/placeholder.jpg'; // Fallback image
+      latestKolekcja.imageUrl = '/placeholder.jpg';
     }
 
     return latestKolekcja;
@@ -226,9 +223,9 @@ export const fetchProductsByAttribute = async (kolekcja: string) => {
   try {
     const response = await WooCommerceAPI.get('/products', {
       params: {
-        attribute: 'kolekcja', // Assuming 'kolekcja' is the correct attribute slug
+        attribute: 'kolekcja',
         attribute_term: kolekcja,
-        per_page: 50, // Adjust as necessary
+        per_page: 50,
       },
     });
     return response.data;
@@ -238,25 +235,19 @@ export const fetchProductsByAttribute = async (kolekcja: string) => {
   }
 };
 
-// Fetch cross-sell products
-
 export const fetchCrossSellProducts = async (productId: string) => {
   try {
-    // Fetch the main product to get cross-sell IDs
     const productResponse = await WooCommerceAPI.get(`/products/${productId}`);
     const productData = productResponse.data;
-
-    // Limit cross-sell IDs to maximum of 6 products
     const crossSellIds = (productData.cross_sell_ids || []).slice(0, 6);
 
     if (crossSellIds.length === 0) {
       return { products: [] };
     }
 
-    // Fetch cross-sell products in a single batch API request
     const response = await WooCommerceAPI.get('/products', {
       params: { include: crossSellIds.join(','), per_page: 6 },
-      timeout: 5000, // 5 seconds timeout per batch request
+      timeout: 5000,
     });
 
     return { products: response.data };
@@ -266,7 +257,6 @@ export const fetchCrossSellProducts = async (productId: string) => {
   }
 };
 
-// Search products
 export const searchProducts = async (query: string, perPage = 10) => {
   try {
     const response = await WooCommerceAPI.get('/products', {
@@ -284,7 +274,6 @@ export const searchProducts = async (query: string, perPage = 10) => {
   }
 };
 
-// Fetch Instagram posts
 export const fetchInstagramPosts = async () => {
   const token = process.env.INSTAGRAM_ACCESS_TOKEN;
 
@@ -303,10 +292,9 @@ export const fetchInstagramPosts = async () => {
   }
 
   const data = await response.json();
-  return data.data; // Return the array of Instagram posts
+  return data.data;
 };
 
-// Fetch reviews for a specific product
 export const fetchProductReviews = async (productId: number) => {
   try {
     const response = await fetch(`/api/reviews?productId=${productId}`);
@@ -320,7 +308,6 @@ export const fetchProductReviews = async (productId: number) => {
   }
 };
 
-// Submit a review for a specific product
 export const submitProductReview = async (
   productId: number,
   name: string,
@@ -366,10 +353,10 @@ export const validateDiscountCode = async (
     return {
       valid: data.valid,
       discountValue: data.discountValue || 0,
-      discountType: data.discountType, // Include discountType from the response
+      discountType: data.discountType,
     };
   } catch (error) {
     console.error('Error validating discount code:', error);
-    return { valid: false, discountValue: 0 }; // Return default values in case of error
+    return { valid: false, discountValue: 0 };
   }
 };

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import AddressModal from './AddressModal'; // Import AddressModal
-import LoadingModal from '@/components/UI/LoadingModal'; // Import LoadingModal
+import AddressModal from './AddressModal';
+import LoadingModal from '@/components/UI/LoadingModal';
 
 const MyAddresses: React.FC = () => {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [modalData, setModalData] = useState<any | null>(null);
-  const [modalType, setModalType] = useState<'add' | 'edit'>('add'); // Track modal type
+  const [modalType, setModalType] = useState<'add' | 'edit'>('add');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);

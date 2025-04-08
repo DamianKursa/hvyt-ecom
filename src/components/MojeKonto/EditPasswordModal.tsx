@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 interface EditPasswordModalProps {
   onClose: () => void;
-  onUpdateSuccess: (message: string) => void; // Callback to display success message
+  onUpdateSuccess: (message: string) => void;
 }
 
 const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
@@ -58,8 +58,8 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
         throw new Error(errorData.message || 'Nie udało się zmienić hasła.');
       }
 
-      onUpdateSuccess('Twoje hasło zostało zmienione.'); // Pass success message
-      onClose(); // Close modal
+      onUpdateSuccess('Twoje hasło zostało zmienione.');
+      onClose();
     } catch (error: any) {
       console.error('Błąd przy zmianie hasła:', error.message);
       alert('Wystąpił błąd przy zmianie hasła.');

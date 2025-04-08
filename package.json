@@ -1,6 +1,6 @@
 {
-  "name": "nextjs-woocommerce",
-  "version": "1.2.0",
+  "name": "Hvyt",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -19,7 +19,7 @@
     "javascript",
     "framer"
   ],
-  "author": "w3bdesign",
+  "author": "hvyt",
   "license": "ISC",
   "dependencies": {
     "@apollo/client": "^3.11.4",

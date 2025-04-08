@@ -11,11 +11,8 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-
-  // Import setUser from user context to update the logged-in user
   const { setUser } = useUserContext();
 
-  // Function to strip HTML tags from a string
   const stripHtmlTags = (html: string): string => {
     return html.replace(/<[^>]*>?/gm, '');
   };
@@ -33,11 +30,8 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
       });
 
       if (response.ok) {
-        // Assuming your API returns user data upon a successful login:
         const userData = await response.json();
-        // Update the user context immediately
         setUser(userData);
-        // Navigate to the account page
         router.push('/moje-konto/moje-zamowienia');
       } else {
         const data = await response.json();
@@ -79,7 +73,6 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
           Adres email<span className="text-red-500">*</span>
         </span>
       </div>
-
       {/* Password Input */}
       <div className="relative">
         <input
@@ -109,7 +102,6 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
           onClick={() => setShowPassword(!showPassword)}
         />
       </div>
-
       {/* Forgot Password Link */}
       <p
         className="text-sm underline font-light text-black mt-2 cursor-pointer"
@@ -117,14 +109,12 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
       >
         Nie pamiętam hasła
       </p>
-
       {/* Error Message */}
       {error && (
         <div className="mt-4 px-4 py-2 rounded-lg flex items-center bg-red-500 text-white">
           <span>{error}</span>
         </div>
       )}
-
       {/* Submit Button */}
       <button
         type="submit"

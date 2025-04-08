@@ -4,7 +4,7 @@ interface ProductVariationEditProps {
   variationName: string;
   currentValue: string;
   variationOptions: { option: string; price: number }[];
-  onSave: (attrName: string, newValue: string) => void; // ✅ Fix: Accepts both attrName and newValue
+  onSave: (attrName: string, newValue: string) => void;
 }
 
 const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
@@ -27,7 +27,7 @@ const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
       );
 
       setOptions(variationOptions || []);
-      setNewValue(currentValue); // ✅ Ensure previously selected variation is pre-filled
+      setNewValue(currentValue);
     }
   }, [isModalOpen, variationOptions, currentValue]);
 
@@ -40,10 +40,7 @@ const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
       console.warn(`⚠️ No variation selected for ${variationName}`);
       return;
     }
-
-    console.log(`✅ Saving Variation: ${variationName} -> ${newValue}`);
-
-    onSave(variationName, newValue); // ✅ DO NOT prepend "Atrybut produktu: " here
+    onSave(variationName, newValue);
 
     setModalOpen(false);
   };

@@ -9,7 +9,7 @@ const PasswordChangeConfirmation: React.FC<{ onBackToLogin: () => void }> = ({
       <div
         className="p-10 w-full md:w-1/2 flex flex-col"
         style={{
-          backgroundImage: `url('/images/image-logowanie.png')`, // Update the image path if necessary
+          backgroundImage: `url('/images/image-logowanie.png')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}

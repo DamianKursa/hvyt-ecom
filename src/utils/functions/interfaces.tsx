@@ -27,7 +27,7 @@ export interface LineItem {
   price: string;
   total: string;
   image?: string | { src: string };
-  regular_price?: string; // Optional regular price property
+  regular_price?: string;
 }
 
 export interface Address {
@@ -53,15 +53,13 @@ export interface Order {
   tax?: string;
   phone?: string;
   email?: string;
-  // Add the new optional property:
   payment_method?: string;
-  shipping: Address; // Correctly typing shipping as an Address object
+  shipping: Address;
   line_items: LineItem[];
   billing: {
     first_name: string;
     last_name: string;
     email: string;
-    // You can also add any other new optional properties here:
     company?: string;
     address_1?: string;
     city?: string;
@@ -101,12 +99,12 @@ export interface Product {
   salePrice?: string;
   regularPrice?: string;
   description: string;
-  image: string; // Main image
+  image: string;
   images?: {
     src: string;
-  }[]; // Array of images
+  }[];
   attributes: ProductAttribute[];
-  variations?: Variation[]; // Array of product variations
+  variations?: Variation[];
   meta_data?: {
     key: string;
     value: string;
@@ -170,7 +168,7 @@ export interface NowosciPost {
   id: number;
   title: { rendered: string };
   featured_media: number;
-  imageUrl: string; // Featured image URL
+  imageUrl: string;
 }
 
 export interface PostArchive {
@@ -182,5 +180,5 @@ export interface PostArchive {
   _embedded?: {
     'wp:featuredmedia'?: { source_url: string }[];
   };
-  featuredImage?: string; // Add transformed `featuredImage` property
+  featuredImage?: string;
 }

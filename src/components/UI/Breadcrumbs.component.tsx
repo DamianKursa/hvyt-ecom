@@ -22,27 +22,19 @@ const Breadcrumbs: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // If breadcrumbs should not be shown, don't render anything
   if (!showBreadcrumbs) {
     return null;
   }
 
-  // Remove query string by splitting on "?" and taking the first part
   const cleanPath = asPath.split('?')[0];
 
   // Split the clean path into segments and filter out empty values
   const pathSegments = cleanPath.split('/').filter((segment) => segment);
-
-  // Generate the breadcrumb items from the clean path
   const breadcrumbItems = pathSegments.map((segment, index) => {
-    // Reconstruct the href for each breadcrumb step
     const href = '/' + pathSegments.slice(0, index + 1).join('/');
-
-    // Capitalize the first letter of each breadcrumb title
     const title = segment
       .replace(/-/g, ' ')
       .replace(/^\w/, (c) => c.toUpperCase());
-
     return { href, title };
   });
 
@@ -68,8 +60,6 @@ const Breadcrumbs: React.FC = () => {
               {item.title}
             </span>
           )}
-
-          {/* Only show the custom SVG divider if it's not the last item */}
           {index < breadcrumbItems.length - 1 && (
             <span className="mx-2">
               <Image

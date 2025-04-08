@@ -20,9 +20,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       process.env.BISN_ENDPOINT ||
       'https://hvyt.pl/wp-json/wc-instocknotifier/v3/create_subscriber';
 
-    // Build the payload with required fields.
     const data = {
-      subscriber_name: email, // using email as fallback for the name field
+      subscriber_name: email, 
       email,
       product_id,
       variation_id: "",

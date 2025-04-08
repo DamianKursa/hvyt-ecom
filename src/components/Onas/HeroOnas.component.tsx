@@ -23,7 +23,6 @@ const HeroOnas = () => {
       }}
     >
       <div className="container mx-auto max-w-grid-desktop h-full flex justify-between items-center">
-        {/* Static Background Boxes - hidden on mobile */}
         <div className="hidden md:grid grid-cols-3 grid-rows-4 gap-0 justify-end items-center overflow-hidden absolute right-0 top-0">
           {Array.from({ length: 12 }).map((_, idx) => {
             const boxConfig = staticBoxes.find((box) => box.index === idx);

@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 interface CustomDropdownProps {
-  options: string[]; // Array of dropdown options
-  selectedValue: string | null; // Currently selected value
-  placeholder?: string; // Placeholder text when no value is selected
-  onChange: (value: string) => void; // Callback when an option is selected
-  isProductPage?: boolean; // Indicates if the dropdown is on a product page
-  isCartPage?: boolean; // ✅ NEW: Indicates if it's on the cart page
+  options: string[];
+  selectedValue: string | null;
+  placeholder?: string;
+  onChange: (value: string) => void;
+  isProductPage?: boolean;
+  isCartPage?: boolean;
 }
 
 const CustomDropdown: React.FC<CustomDropdownProps> = ({
@@ -15,7 +15,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   placeholder = 'Wybierz',
   onChange,
   isProductPage = false,
-  isCartPage = false, // ✅ NEW PROP
+  isCartPage = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -35,8 +35,6 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
       setIsOpen(false);
     }
   };
-
-  // Attach event listener for outside clicks
   useEffect(() => {
     document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);

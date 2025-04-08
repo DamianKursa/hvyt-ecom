@@ -1,14 +1,14 @@
 import React from 'react';
 
 interface IconRendererProps {
-  icons: (string | null | undefined)[]; // Allow null or undefined to skip missing icons
-  iconPath: string; // Base path for the icons (e.g., "/icons/")
-  iconHeight?: number; // Height for icons (default: 24px)
-  gap?: number; // Gap between icons (default: 5px)
-  containerClassName?: string; // Optional class for the container
-  iconClassName?: string; // Optional class for individual icons
-  top?: number; // Top offset for positioning
-  left?: number; // Left offset for positioning
+  icons: (string | null | undefined)[];
+  iconPath: string;
+  iconHeight?: number;
+  gap?: number;
+  containerClassName?: string;
+  iconClassName?: string;
+  top?: number;
+  left?: number;
 }
 
 const IconRenderer: React.FC<IconRendererProps> = ({
@@ -21,7 +21,6 @@ const IconRenderer: React.FC<IconRendererProps> = ({
   top = 20,
   left = 30,
 }) => {
-  // Filter out missing or invalid icons
   const filteredIcons = icons.filter((icon) => !!icon);
 
   return (
@@ -32,7 +31,7 @@ const IconRenderer: React.FC<IconRendererProps> = ({
         position: 'absolute',
         top: `${top}px`,
         left: `${left}px`,
-        zIndex: 10, // Ensure it appears above the background
+        zIndex: 10,
       }}
     >
       {filteredIcons.map((iconName, index) => (
@@ -42,10 +41,10 @@ const IconRenderer: React.FC<IconRendererProps> = ({
           alt={`Icon ${iconName}`}
           className={iconClassName}
           style={{
-            height: `${iconHeight}px`, // Set fixed height for icons
-            width: 'auto', // Maintain aspect ratio
-            objectFit: 'contain', // Prevent distortion of SVGs
-            display: 'inline-block', // Ensure proper rendering
+            height: `${iconHeight}px`,
+            width: 'auto',
+            objectFit: 'contain',
+            display: 'inline-block',
           }}
         />
       ))}

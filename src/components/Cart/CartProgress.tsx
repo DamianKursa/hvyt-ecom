@@ -42,7 +42,7 @@ const CartProgress: React.FC = () => {
       <div className="flex items-center w-full rounded-full border border-[#E0D6CD] bg-[#F8F5F1]">
         {steps.map((step, index) => {
           const isActive = router.pathname === step.path;
-          // On mobile, if on checkout page, make the checkout step larger; otherwise equal flex.
+
           const mobileFlexClass = isCheckoutPage
             ? step.path === '/checkout'
               ? 'flex-[2]'

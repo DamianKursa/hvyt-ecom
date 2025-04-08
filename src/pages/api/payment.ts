@@ -1,15 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
-import { getCache, setCache } from '../../lib/cache'; // Adjust path as necessary
+import { getCache, setCache } from '../../lib/cache'; 
 
-const CACHE_TTL = 86400; // 24 hours in seconds
+const CACHE_TTL = 86400; 
 
-// Create the WooCommerce REST API client
 const WooCommerceAPI = axios.create({
-  baseURL: process.env.REST_API, // WooCommerce REST API base URL
+  baseURL: process.env.REST_API, 
   auth: {
-    username: process.env.WC_CONSUMER_KEY || '', // Consumer Key from WooCommerce
-    password: process.env.WC_CONSUMER_SECRET || '', // Consumer Secret from WooCommerce
+    username: process.env.WC_CONSUMER_KEY || '', 
+    password: process.env.WC_CONSUMER_SECRET || '', 
   },
 });
 
@@ -17,13 +16,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     try {
       const cacheKey = 'payment_methods';
-      // Check if cached payment methods exist
+
       let cachedPaymentMethods = await getCache(cacheKey);
       if (cachedPaymentMethods) {
         return res.status(200).json(cachedPaymentMethods);
       }
       
-      // Fetch payment methods from WooCommerce
       const paymentResponse = await WooCommerceAPI.get('/payment_gateways');
       const paymentMethods = paymentResponse.data;
 
@@ -31,10 +29,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ error: 'No payment methods available' });
       }
 
-      // Filter enabled payment methods
+
       const enabledMethods = paymentMethods.filter((method: any) => method.enabled);
 
-      // Cache the enabled methods for 24 hours
       await setCache(cacheKey, enabledMethods, CACHE_TTL);
 
       return res.status(200).json(enabledMethods);

@@ -1,4 +1,4 @@
-// pages/api/proxy-wc-webhook.ts
+
 import type { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 
@@ -18,14 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
     );
 
-    // If the WP endpoint returns order details, you can then trigger further actions,
-    // e.g., update the order status by calling another WP endpoint if needed.
-    // For this example, we assume the WP endpoint already updates the order status.
-    // Finally, you can redirect the user (or return a JSON response) with the order info.
-
-    // Example: redirect to your thank-you page with order details:
     const { order_id, order_key } = wpResponse.data;
-    // Here, you might decide to send a redirect response:
     res.status(200).json({
       redirectUrl: `/dziekujemy?order_id=${order_id}&key=${order_key}`
     });

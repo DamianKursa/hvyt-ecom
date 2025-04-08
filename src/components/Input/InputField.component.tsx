@@ -26,11 +26,10 @@ export const InputField = ({
     focus:outline-none focus:border-dark-pastel-red
   `;
 
-  // Error state handling: Changes the border color to red if there's an error.
   const stateClassNames =
     errors && errors[inputName]
-      ? 'border-bright-pastel-red' // Error state
-      : 'border-neutral-light'; // Default state
+      ? 'border-bright-pastel-red'
+      : 'border-neutral-light';
 
   const inputClassNames = `${baseInputClassNames} ${stateClassNames}`;
 
@@ -39,7 +38,7 @@ export const InputField = ({
       {/* Input field */}
       <input
         id={inputName}
-        placeholder={inputLabel} // Placeholder text
+        placeholder={inputLabel}
         type={type}
         className={inputClassNames}
         {...register(inputName, { ...customValidation })}

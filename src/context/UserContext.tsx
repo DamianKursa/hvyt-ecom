@@ -24,7 +24,7 @@ interface UserContextProps {
     email: string,
     password: string,
   ) => Promise<void>;
-  setUser: (user: User | null) => void; // Added setter for user
+  setUser: (user: User | null) => void;
 }
 
 const UserContext = createContext<UserContextProps | undefined>(undefined);
@@ -34,7 +34,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-  // Use a ref to ensure fetchUser is not called repeatedly on mount
+
   const verifyCalled = useRef(false);
 
   const fetchUser = async () => {

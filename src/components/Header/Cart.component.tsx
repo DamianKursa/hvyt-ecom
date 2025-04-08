@@ -7,10 +7,6 @@ interface ICartProps {
   stickyNav?: boolean;
 }
 
-/**
- * Displays the shopping cart contents.
- * Displays amount of items in cart.
- */
 const Cart = ({ stickyNav }: ICartProps) => {
   const { cart } = useContext(CartContext);
   const [productCount, setProductCount] = useState<number | null | undefined>();

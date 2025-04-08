@@ -18,7 +18,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { token, user_display_name } = response.data;
 
-    // Set the token as an HTTP-only cookie with domain (if needed)
     res.setHeader(
       'Set-Cookie',
       serialize('token', token, {
@@ -26,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'none',
         path: '/',
-        maxAge: 60 * 60 * 24, // 1 day
+        maxAge: 60 * 60 * 24, 
         domain: process.env.COOKIE_DOMAIN || '.hvyt.pl', 
       })
     );

@@ -13,7 +13,6 @@ const Instagram = () => {
         if (!response.ok) throw new Error('Failed to fetch Instagram posts');
         const data = await response.json();
         console.log('Instagram API response:', data);
-        // Only slice if data.data is defined
         setPosts(data.data ? data.data.slice(0, 4) : []);
         setLoading(false);
       } catch (error) {

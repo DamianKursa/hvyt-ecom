@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 const PotwierdzeniePage: React.FC = () => {
   const router = useRouter();
-  const { email } = router.query; // If needed, you can use this email
+  const { email } = router.query;
 
   return (
     <Layout title="Potwierdzenie aktywacji email">

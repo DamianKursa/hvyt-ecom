@@ -7,11 +7,8 @@ const ZwrotyReklamacjePage = () => {
   return (
     <Layout title="Zwroty i Reklamacje">
       <section className="w-full">
-        {/* Main container with responsive padding and top margin */}
         <div className="container mx-auto max-w-[1440px] px-4 md:px-0 mt-16 md:mt-4">
-          {/* Zwroty Section */}
           <div className="flex flex-col md:flex-row gap-10 font-light text-[18px] items-start mb-12">
-            {/* Text Column */}
             <div className="flex-1 md:flex-[3]">
               <h1 className="font-size-h1 font-bold text-black mb-6">Zwroty</h1>
               <p className="font-size-text-medium">
@@ -125,9 +122,7 @@ const ZwrotyReklamacjePage = () => {
             </div>
 
             {/* Image Column for Reklamacje (optional, if needed) */}
-            <div className="flex-1 md:flex-[2]">
-              {/* Optionally add an image here if your design requires it */}
-            </div>
+            <div className="flex-1 md:flex-[2]"></div>
           </div>
         </div>
       </section>

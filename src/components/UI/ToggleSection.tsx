@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 interface ToggleSectionProps {
   title: string;
-  content: string; // HTML content
+  content: string;
 }
 
 const ToggleSection: React.FC<ToggleSectionProps> = ({ title, content }) => {

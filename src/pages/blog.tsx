@@ -4,7 +4,6 @@ import { getPostsArchive } from '@/utils/api/getPosts';
 import Layout from '@/components/Layout/Layout.component';
 import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
 
-// Helper function to trim text to a specified number of words
 const trimToWords = (text: string, wordLimit: number): string => {
   const words = text.split(' ');
   return words.length > wordLimit
@@ -12,7 +11,6 @@ const trimToWords = (text: string, wordLimit: number): string => {
     : text;
 };
 
-// Helper function to format date to "DD.MM.YYYY"
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
   return date.toLocaleDateString('pl-PL', {
@@ -25,15 +23,15 @@ const formatDate = (dateString: string): string => {
 const BlogArchive = () => {
   const [posts, setPosts] = useState<PostArchive[]>([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1); // Current page
-  const [totalPages, setTotalPages] = useState(1); // Total number of pages
-  const [loadingMore, setLoadingMore] = useState(false); // Loading state for "Load More"
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        const data = await getPostsArchive(1); // Initial fetch for the first page
+        const data = await getPostsArchive(1);
         setPosts(
           data.posts.map((post: any) => ({
             ...post,
@@ -42,7 +40,7 @@ const BlogArchive = () => {
               '/placeholder.jpg',
           })),
         );
-        setTotalPages(data.totalPages); // Update total pages
+        setTotalPages(data.totalPages);
       } catch (error) {
         console.error('Error fetching posts:', error);
       } finally {
@@ -53,10 +51,10 @@ const BlogArchive = () => {
   }, []);
 
   const loadMorePosts = async () => {
-    if (page >= totalPages) return; // No more pages to load
+    if (page >= totalPages) return;
     setLoadingMore(true);
     try {
-      const data = await getPostsArchive(page + 1); // Fetch the next page
+      const data = await getPostsArchive(page + 1);
       setPosts((prevPosts) => [
         ...prevPosts,
         ...data.posts.map((post: any) => ({
@@ -66,7 +64,7 @@ const BlogArchive = () => {
             '/placeholder.jpg',
         })),
       ]);
-      setPage((prevPage) => prevPage + 1); // Increment the page number
+      setPage((prevPage) => prevPage + 1);
     } catch (error) {
       console.error('Error loading more posts:', error);
     } finally {

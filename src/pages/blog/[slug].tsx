@@ -3,7 +3,6 @@ import { getSinglePost } from '@/utils/api/getPosts';
 import Layout from '@/components/Layout/Layout.component';
 import Image from 'next/image';
 
-// Define the BlogPost interface
 interface BlogPost {
   id: number;
   title: { rendered: string };
@@ -19,7 +18,6 @@ interface BlogPost {
   tags: { name: string }[];
 }
 
-// Define props for the page component
 interface BlogPostPageProps {
   post: BlogPost | null;
 }
@@ -134,7 +132,6 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
 
 export default BlogPostPage;
 
-// Use the `getSinglePost` function in the API call
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const { slug } = params || {};
 

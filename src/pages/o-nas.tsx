@@ -3,14 +3,12 @@ import Slider from '../components/Slider/Slider.component';
 import NaszeKolekcje from '../components/Index/NaszeKolekcje';
 import NewArrivalsSection from '../components/Index/NewArivials.component';
 
-import Layout from '@/components/Layout/Layout.component'; // Use Layout to include the header and other layout-related aspects
+import Layout from '@/components/Layout/Layout.component';
 import HeroOnas from '@/components/Onas/HeroOnas.component';
 
 const OnasPage = () => {
   return (
     <Layout title="Hvyt | O nas">
-      {' '}
-      {/* Using Layout to maintain consistency */}
       <HeroOnas />
       {/* Slider Section */}
       <section className="py-16 w-full">

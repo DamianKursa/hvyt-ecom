@@ -5,7 +5,7 @@ import Image from 'next/image';
 interface ExpandableSectionProps {
   title: string;
   content: string;
-  isWymiary?: boolean; // Optional prop for special handling of "Wymiary"
+  isWymiary?: boolean;
 }
 
 const ExpandableSection: React.FC<ExpandableSectionProps> = ({
@@ -23,15 +23,14 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
     return doc.body.textContent || '';
   };
 
-  // Function to format "Wymiary" content into a two-column layout
   const renderWymiaryContent = () => {
-    const strippedContent = stripHTMLTags(content); // Strip HTML tags
-    const lines = strippedContent.split('\n'); // Split content into lines
+    const strippedContent = stripHTMLTags(content);
+    const lines = strippedContent.split('\n');
     return (
       <div className="grid grid-cols-[100px_1fr] md:grid-cols-[300px_1fr] gap-x-2 gap-y-4">
         {lines.map((line, index) => {
-          const [label, value] = line.split(':'); // Split label and value
-          if (!label || !value) return null; // Skip invalid lines
+          const [label, value] = line.split(':');
+          if (!label || !value) return null;
           return (
             <React.Fragment key={index}>
               <div className="font-light text-black">{label.trim()}:</div>

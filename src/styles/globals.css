@@ -23,8 +23,6 @@
   --color-beige-dark: #DAD3C8;
 
   --font-family-primary: 'Neue Haas Grotesk Display', sans-serif;
-
-  /* Desktop Font Sizes */
   --font-size-h1: 56px;
   --font-size-h2: 48px;
   --font-size-h3: 32px;
@@ -34,8 +32,6 @@
   --font-size-text-regular: 16px;
   --font-size-text-small: 14px;
   --font-size-text-extra-small: 12px;
-
-  /* Mobile Font Sizes */
   --font-size-h1-mobile: 40px;
   --font-size-h2-mobile: 32px;
   --font-size-h3-mobile: 24px;
@@ -44,27 +40,19 @@
   --font-size-text-medium-mobile: 16px;
   --font-size-text-regular-mobile: 14px;
   --font-size-text-small-mobile: 12px;
-
-  /* Line Heights */
   --line-height-base: 1.5;
   --line-height-tight: 120%;
   --line-height-loose: 150%;
-
-  /* Grid Margins and Gutters */
   --grid-margin-desktop: 40px;
   --grid-gutter-desktop: 24px;
   --grid-margin-mobile: 16px;
   --grid-gutter-mobile: 20px;
 }
-
-/* Ensure global font family and line height */
 body {
   font-family: var(--font-family-primary);
   line-height: var(--line-height-base);
   color: var(--color-neutral-darkest);
 }
-
-/* Override Tailwind's heading styles */
 h1, h2, h3, h4 {
   font-family: var(--font-family-primary);
   font-weight: 700;
@@ -75,14 +63,13 @@ h2 { font-size: var(--font-size-h2); line-height: var(--line-height-tight); }
 h3 { font-size: var(--font-size-h3); line-height: var(--line-height-loose); font-weight: 600; }
 h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font-weight: 600; }
 
-/* Text styles for various classes */
+
 .text-large { font-size: var(--font-size-text-large); line-height: var(--line-height-loose); }
 .text-medium { font-size: var(--font-size-text-medium); line-height: var(--line-height-loose); }
 .text-regular { font-size: var(--font-size-text-regular); line-height: var(--line-height-loose); }
 .text-small { font-size: var(--font-size-text-small); line-height: var(--line-height-loose); }
 .text-extra-small { font-size: var(--font-size-text-extra-small); line-height: var(--line-height-loose); }
 
-/* Mobile Responsive Font Sizes */
 @media (max-width: 768px) {
   h1 { font-size: var(--font-size-h1-mobile); }
   h2 { font-size: var(--font-size-h2-mobile); }
@@ -94,12 +81,11 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
   .text-small { font-size: var(--font-size-text-small-mobile); }
 }
 
-/* Additional utility class for background color */
 .bg-beige {
   background-color: var(--color-beige);
 }
 
-/* Custom Modal Styles */
+
 .modal {
   display: flex;
   justify-content: center;
@@ -118,7 +104,6 @@ h4 { font-size: var(--font-size-h4); line-height: var(--line-height-loose); font
   max-height: 90%;
   border-radius: 8px;
 }
-/* Apply styling to retain WordPress formatting */
 .formatted-content {
   font-size: 18px;
   color: #0E0B0C;
@@ -145,11 +130,6 @@ text-decoration: underline;
   font-size: 18px;
   font-weight: 600;
 }
-
-.formatted-content ul, .formatted-content ol {
-
-}
-
 .formatted-content ul li, .formatted-content ol li {
   margin-bottom: 0.5em;
 }
@@ -176,7 +156,6 @@ text-decoration: underline;
   position: relative;
 }
 
-/* Add to your CSS/Styles */
 .input-container {
   position: relative;
 }
@@ -212,14 +191,14 @@ text-decoration: underline;
 .icons-container {
   display: flex;
   align-items: center;
-  gap: 16px; /* Adjust the gap between icons */
+  gap: 16px; 
 }
 
 .icon-image {
-  height: 34px; /* Set a fixed height for all icons */
-  width: auto; /* Maintain the aspect ratio */
-  object-fit: contain; /* Ensure the SVGs scale properly */
-  display: block; /* Prevent inline spacing issues */
+  height: 34px; 
+  width: auto;
+  object-fit: contain; 
+  display: block; 
 }
 .my-icons-container {
   justify-content: center;
@@ -228,18 +207,18 @@ text-decoration: underline;
 .my-icon {
   border: 1px solid #ddd;
   border-radius: 8px;
-  image-rendering: crisp-edges; /* For sharper edges */
+  image-rendering: crisp-edges; 
   image-rendering: pixelated; 
 }
 .icons-container {
   display: flex;
   align-items: center;
-  gap: 4px; /* Space between icons */
+  gap: 4px; 
   justify-content: center;
 }
 
 .icon-image {
-  image-rendering: crisp-edges; /* For sharp SVG edges */
+  image-rendering: crisp-edges;
 }
 
 
@@ -276,16 +255,16 @@ text-decoration: underline;
 }
 
 .inactive-track {
-  background: #e0e0e0; /* Inactive track color */
+  background: #e0e0e0; 
 }
 
 .active-track {
-  background: #661f30; /* Active track color */
+  background: #661f30; 
 }
 
 input {
   font-size: 16px;
-  background-color: transparent; /* Transparent background */
+  background-color: transparent;
   outline: none;
   color: black;
 }

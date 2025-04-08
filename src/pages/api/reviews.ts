@@ -2,13 +2,13 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 import { getCache, setCache } from '../../lib/cache';
 
-const CACHE_TTL = 3600; // Cache reviews for 5 minutes
+const CACHE_TTL = 3600; 
 
 const WooCommerceAPI = axios.create({
-  baseURL: process.env.REST_API, // WooCommerce REST API base URL
+  baseURL: process.env.REST_API, 
   auth: {
-    username: process.env.WC_CONSUMER_KEY || '', // Consumer Key
-    password: process.env.WC_CONSUMER_SECRET || '', // Consumer Secret
+    username: process.env.WC_CONSUMER_KEY || '', 
+    password: process.env.WC_CONSUMER_SECRET || '', 
   },
 });
 
@@ -31,12 +31,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const response = await WooCommerceAPI.get('/products/reviews', {
         params: {
-          product: productId, // Filter reviews by product ID
+          product: productId,
           per_page: 50,
         },
       });
 
-      // Cache the reviews for 5 minutes
       await setCache(cacheKey, response.data, CACHE_TTL);
 
       return res.status(200).json(response.data);

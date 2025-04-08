@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 interface MobileMenuProps {
   menuOpen: boolean;
   toggleMenu: () => void;
-  isLoggedIn: boolean; // Pass logged-in status as a prop
+  isLoggedIn: boolean;
 }
 
 const MobileMenu: React.FC<MobileMenuProps> = ({
@@ -20,11 +20,9 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   // Handle click on "Moje konto"
   const handleAccountClick = (e: React.MouseEvent) => {
     if (isLoggedIn) {
-      // Prevent default link behavior if logged in to toggle dropdown instead
       e.preventDefault();
       setAccountDropdownOpen(!accountDropdownOpen);
     } else {
-      // If not logged in, let the Link work normally (navigates to /logowanie)
       toggleMenu();
     }
   };

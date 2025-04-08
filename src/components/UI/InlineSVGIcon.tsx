@@ -10,7 +10,7 @@ const InlineSVGIcon: React.FC<{ svgContent: string; size?: number }> = ({
       width: `${size}px`,
       height: `${size}px`,
       display: 'inline-block',
-      backgroundColor: 'transparent', // Force background transparency
+      backgroundColor: 'transparent',
     }}
   />
 );

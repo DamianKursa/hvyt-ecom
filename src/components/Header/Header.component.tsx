@@ -50,18 +50,18 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
 
   const handleMouseEnter = useCallback(() => {
     if (user) {
-      clearTimeout(dropdownTimeout); // Clear any existing timeout
+      clearTimeout(dropdownTimeout);
       dropdownTimeout = setTimeout(() => {
         setDropdownOpen(true);
-      }, 200); // Add 200ms delay before opening
+      }, 200);
     }
   }, [user]);
 
   const handleMouseLeave = useCallback(() => {
-    clearTimeout(dropdownTimeout); // Clear any existing timeout
+    clearTimeout(dropdownTimeout);
     dropdownTimeout = setTimeout(() => {
       setDropdownOpen(false);
-    }, 200); // Add 200ms delay before closing
+    }, 200);
   }, []);
 
   const getActiveClass = (path: string) =>

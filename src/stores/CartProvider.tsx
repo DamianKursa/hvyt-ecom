@@ -18,7 +18,7 @@ export interface Product {
     price: number;
     attributes: { name: string; option: string }[];
   }[];
-  availableStock?: number; // NEW: holds the maximum stock available
+  availableStock?: number;
 }
 
 export interface Coupon {
@@ -70,7 +70,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     totalProductsPrice: 0,
   });
 
-  // Load cart from localStorage
   useEffect(() => {
     const storedCart = localStorage.getItem('woocommerce-cart');
     if (storedCart) {

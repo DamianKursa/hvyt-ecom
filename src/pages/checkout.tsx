@@ -12,6 +12,7 @@ import Shipping from '@/components/Checkout/Shipping';
 import Payment from '@/components/Checkout/Payment';
 import { CartContext } from '@/stores/CartProvider';
 import { useUserContext } from '@/context/UserContext';
+import { pushGTMEvent } from '@/utils/gtm';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -119,6 +120,20 @@ const Checkout: React.FC = () => {
 
     if (shippingMethod) fetchShippingTitle();
   }, [shippingMethod]);
+
+  useEffect(() => {
+    if (cart && cart.products && cart.products.length > 0) {
+      pushGTMEvent('begin_checkout', {
+        items: cart.products.map((product) => ({
+          item_id: product.productId,
+          item_name: product.name,
+          price: product.price,
+          quantity: product.qty,
+        })),
+        value: cart.totalProductsPrice,
+      });
+    }
+  }, [cart]);
 
   const handleOrderSubmit = async () => {
     setOrderDisabled(true);
@@ -325,11 +340,37 @@ const Checkout: React.FC = () => {
       customer_id: user?.id || undefined,
     };
 
+    pushGTMEvent('add_shipping_info', {
+      shipping_method: shippingMethod,
+      shipping_cost: shippingPrice,
+      shipping_address: {
+        city: shippingAddress.city,
+        country: shippingAddress.country,
+        postcode: shippingAddress.postcode,
+      },
+    });
+    pushGTMEvent('add_payment_info', {
+      payment_method: paymentMethod,
+      // Optionally, include additional details such as payment type or billing info
+    });
+
     try {
       const response = await axios.post('/api/create-order', orderData, {
         headers: { 'Content-Type': 'application/json' },
       });
       const createdOrder = response.data;
+
+      pushGTMEvent('purchase', {
+        transaction_id: createdOrder.id,
+        value: cart.totalProductsPrice,
+        currency: 'PLN', // Adjust as needed
+        items: cart.products.map((product) => ({
+          item_id: product.productId,
+          item_name: product.name,
+          price: product.price,
+          quantity: product.qty,
+        })),
+      });
 
       localStorage.setItem('recentOrderId', createdOrder.id.toString());
       localStorage.setItem('recentOrderKey', createdOrder.order_key);

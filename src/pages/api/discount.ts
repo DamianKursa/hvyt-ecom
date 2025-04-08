@@ -23,7 +23,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Fetch the coupon from WooCommerce
     const response = await WooCommerceAPI.get('/coupons', {
       params: { code },
     });
@@ -37,7 +36,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const coupon = response.data[0];
 
-    // Check if coupon is expired
     const now = new Date();
     if (coupon.date_expires && new Date(coupon.date_expires) < now) {
       return res.status(400).json({
@@ -46,15 +44,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    // Check usage limits
     if (coupon.usage_limit && coupon.usage_count >= coupon.usage_limit) {
       return res.status(400).json({
         valid: false,
         message: 'Limit użycia tego kodu został osiągnięty.',
       });
     }
-
-    // Check minimum amount (if `cartTotal` is provided from frontend)
     if (
       coupon.minimum_amount &&
       cartTotal &&
@@ -66,7 +61,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    // Determine discount type and amount
     const isPercentage = coupon.discount_type === 'percent';
     const discountValue = parseFloat(coupon.amount || '0');
 

@@ -2,15 +2,13 @@
 import React from 'react';
 
 interface GridColumnProps {
-  span: number; // How many columns the item should span (out of 12)
+  span: number;
   children: React.ReactNode;
 }
 
 const GridColumn: React.FC<GridColumnProps> = ({ span, children }) => {
   return (
-    <div className={`w-${span}/12 px-grid-desktop-gutter`}>
-      {children}
-    </div>
+    <div className={`w-${span}/12 px-grid-desktop-gutter`}>{children}</div>
   );
 };
 

@@ -68,7 +68,6 @@ const CollectionPage = () => {
           stripHTML(currentKolekcja?.content.rendered || 'Opis kolekcji.'),
         );
 
-        // Directly use image URL from optimized data (no additional fetch)
         setFeaturedImage(currentKolekcja?.imageUrl || '/placeholder.jpg');
 
         setLoading(false);
@@ -81,7 +80,6 @@ const CollectionPage = () => {
     fetchData();
   }, [slugString]);
 
-  // Determine the current Kolekcja for display
   const currentKolekcja = kolekcjeData?.find(
     (kolekcja: Kolekcja) => kolekcja.slug === slugString,
   );

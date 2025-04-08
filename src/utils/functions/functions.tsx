@@ -4,8 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ChangeEvent } from 'react';
 
-/* Interface for products*/
-
 export interface IImage {
   __typename: string;
   id: string;
@@ -250,5 +248,5 @@ export const normalizeString = (text: string): string => {
   return text
     .toLowerCase()
     .replace(/[ąćęłńóśźż]/g, (char) => polishMap[char] || char)
-    .replace(/\s+/g, '-'); // Replace spaces with hyphens
+    .replace(/\s+/g, '-');
 };

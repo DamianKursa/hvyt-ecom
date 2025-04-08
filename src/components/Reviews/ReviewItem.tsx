@@ -38,7 +38,7 @@ const ReviewItem = ({ review }: { review: Review }) => {
       {/* Reviewer Info */}
       <div className="flex items-center gap-3 mt-4">
         <Image
-          src="/images/dummy-user.jpg" // Placeholder user image
+          src="/images/dummy-user.jpg"
           alt={review.reviewer || 'Reviewer'}
           width={40}
           height={40}

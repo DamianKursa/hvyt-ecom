@@ -43,7 +43,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(400).json({ error: 'Invalid slug' });
         }
 
-        // 👇 Skipping cache intentionally
         const result = await fetchProductBySlug(slug);
         return res.status(200).json(result);
       }

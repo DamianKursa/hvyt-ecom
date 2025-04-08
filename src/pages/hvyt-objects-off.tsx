@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component';
-// Collaboration data (dummy)
+
 const collaborations = [
   {
     title: 'Współpraca XXX',

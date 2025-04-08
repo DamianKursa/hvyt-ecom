@@ -7,7 +7,6 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [latestKolekcja, setLatestKolekcja] = useState<any>(null);
-  // Track if a search has been attempted (to conditionally show "no results" message)
   const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
@@ -35,7 +34,6 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
     fetchLatest();
   }, []);
 
-  // This function is only triggered when the user clicks the "Szukaj" button
   const handleSearchSubmit = async () => {
     if (query.length < 3) {
       setResults([]);
@@ -44,7 +42,6 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
     setLoading(true);
     setHasSearched(true);
 
-    // Normalize the query: lowercase and remove diacritics
     const normalizedQuery = query
       .toLowerCase()
       .normalize('NFD')

@@ -10,7 +10,6 @@ export default async function handler(
 
   const { name, email, message } = req.body;
 
-  // Get the WordPress API URL from your environment variables
   const wordpressApiUrl = process.env.WORDPRESS_API_URL;
   if (!wordpressApiUrl) {
     return res.status(500).json({ error: 'WORDPRESS_API_URL is not defined' });

@@ -11,19 +11,16 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onSave }) => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
-    onSave({ password: value }); // Trigger account save logic automatically
+    onSave({ password: value });
   };
 
   return (
     <div className="rounded-[16px] bg-[#E1DFE080] my-6 p-[12px]">
       <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-8">
-        {/* Left Column */}
         <div>
           <h3 className="text-[20px] font-semibold mb-2">Stwórz konto</h3>
           <p className="text-[18px]">I zaoszczędź przy kolejnym zamówieniu</p>
         </div>
-
-        {/* Right Column */}
         <div className="text-center">
           <div className="relative">
             <input
@@ -35,7 +32,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onSave }) => {
               required
             />
             <img
-              src="/icons/show-pass.svg" // Replace with actual path
+              src="/icons/show-pass.svg"
               alt="Show Password"
               className="absolute right-2 top-3 w-5 h-5 cursor-pointer"
               onClick={() => setShowPassword(!showPassword)}

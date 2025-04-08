@@ -10,7 +10,7 @@ interface BoxConfig {
 interface AnimationStep {
   step: number;
   animatedBoxes: BoxConfig[];
-  overlayRotation?: number; // Added property for overlay rotation
+  overlayRotation?: number;
 }
 
 interface HeroProps {
@@ -83,7 +83,7 @@ const Hero: React.FC<HeroProps> = ({
               }
             }
           });
-        }, step * 500); // Delay animations based on step number
+        }, step * 500);
       });
     } else {
       // On mobile, set overlay rotation to 90deg.

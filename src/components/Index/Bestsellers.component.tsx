@@ -20,23 +20,19 @@ interface BestsellersProps {
 const itemsPerPage = 3.8;
 const gutter = 24;
 
-// A simple fetcher that uses the native fetch API.
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
-  // The API URL for bestsellers.
-  const categoryId = 123; // Replace with your actual category ID
-  // Here we stringify an empty filters array (adjust as needed)
+  const categoryId = 123;
   const filters = JSON.stringify([]);
   const apiUrl = `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryId}&page=1&perPage=12&sortingOption=default&filters=${encodeURIComponent(filters)}`;
 
-  // Use SWR to fetch data
+  // SWR to fetch data
   const { data, error } = useSWR(apiUrl, fetcher, {
-    refreshInterval: 3600000, // Revalidate every hour
-    dedupingInterval: 600000, // Avoid duplicate requests for 10 minutes
+    refreshInterval: 3600000,
+    dedupingInterval: 600000,
   });
 
-  // While data is loading or on error, show loading state.
   const loading = !data && !error;
   const products: Product[] = data
     ? (data.products || []).map((product: any) => ({

@@ -11,14 +11,14 @@ const Kontakt = () => {
   const [isTermsChecked, setIsTermsChecked] = useState(false);
   const [termsError, setTermsError] = useState('');
   const [submitMessage, setSubmitMessage] = useState('');
-  const [submitMessageType, setSubmitMessageType] = useState(''); // "success" or "error"
+  const [submitMessageType, setSubmitMessageType] = useState('');
 
   const onSubmit = async (data: any) => {
     console.log('onSubmit triggered, isTermsChecked:', isTermsChecked);
-    // Check if terms are accepted
+
     if (!isTermsChecked) {
       setTermsError('Musisz zaakceptować Regulamin oraz Politykę Prywatności');
-      setSubmitMessage(''); // Clear any previous submission message
+      setSubmitMessage('');
       return;
     } else {
       setTermsError('');

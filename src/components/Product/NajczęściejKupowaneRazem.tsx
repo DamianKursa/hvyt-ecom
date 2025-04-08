@@ -5,7 +5,7 @@ import SkeletonProduct from '@/components/Skeletons/SkeletonProduct';
 import { RecommendedProduct } from '@/utils/hooks/useCrossSellProducts';
 
 interface NajczesciejKupowaneProps {
-  productId: string; // still available if needed for tracking purposes
+  productId: string;
   crossSellProducts: RecommendedProduct[];
   crossSellLoading: boolean;
 }
@@ -15,17 +15,16 @@ const NajczesciejKupowane: React.FC<NajczesciejKupowaneProps> = ({
   crossSellProducts,
   crossSellLoading,
 }) => {
-  // Use the passed props instead of calling the hook internally.
   const products = crossSellProducts;
   const loading = crossSellLoading;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemWidth = 350; // Fixed width for each item
-  const gutter = 24; // Gap between items
+  const itemWidth = 350;
+  const gutter = 24;
 
   const displayedProducts = loading
     ? Array.from({ length: 4 }) // Show 4 skeletons during loading
-    : products || []; // Show products after data is loaded
+    : products || [];
 
   const totalItems = displayedProducts.length;
   const canGoPrev = currentIndex > 0;

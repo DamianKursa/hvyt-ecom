@@ -1,10 +1,10 @@
 import React from 'react';
 
 interface ColorSwitcherProps {
-  options: string[]; // Array of available colors
-  selectedColor: string | null; // Currently selected color
-  onColorChange: (color: string) => void; // Callback for handling color change
-  colorMap: { [key: string]: string }; // Map of color names to their corresponding hex codes
+  options: string[];
+  selectedColor: string | null;
+  onColorChange: (color: string) => void;
+  colorMap: { [key: string]: string };
 }
 
 const ColorSwitcher: React.FC<ColorSwitcherProps> = ({

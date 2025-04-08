@@ -2,12 +2,12 @@ import React from 'react';
 import CustomDropdown from '@/components/UI/CustomDropdown.component';
 
 interface AttributeSwitcherProps {
-  attributeName: string; // Attribute name, e.g., "Rozstaw"
-  options: string[]; // Available options
-  selectedValue: string | null; // Currently selected value
-  onAttributeChange: (attributeName: string, value: string) => void; // Callback for attribute changes
-  pricesMap?: { [key: string]: string }; // Optional map of prices
-  isCartPage?: boolean; // ✅ NEW PROP to detect cart page
+  attributeName: string;
+  options: string[];
+  selectedValue: string | null;
+  onAttributeChange: (attributeName: string, value: string) => void;
+  pricesMap?: { [key: string]: string };
+  isCartPage?: boolean;
 }
 
 const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
@@ -16,7 +16,7 @@ const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
   selectedValue,
   onAttributeChange,
   pricesMap = {},
-  isCartPage = false, // ✅ Default to false
+  isCartPage = false,
 }) => {
   const cleanedAttributeName = attributeName.replace(/^Atrybut produktu: /, '');
 
@@ -31,14 +31,11 @@ const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
       <CustomDropdown
         options={displayOptions}
         selectedValue={selectedValue}
-        isProductPage={!isCartPage} // ✅ Prevents conflict with `isCartPage`
-        isCartPage={isCartPage} // ✅ Pass isCartPage
+        isProductPage={!isCartPage}
+        isCartPage={isCartPage}
         placeholder={selectedValue || cleanedAttributeName}
         onChange={(value) =>
-          onAttributeChange(
-            attributeName,
-            value.split(' | ')[0], // Extract the selected option only
-          )
+          onAttributeChange(attributeName, value.split(' | ')[0])
         }
       />
     </div>

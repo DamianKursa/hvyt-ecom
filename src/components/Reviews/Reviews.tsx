@@ -17,7 +17,7 @@ const Reviews = ({ productId }: { productId: number }) => {
   const [submitted, setSubmitted] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const itemsPerPage = 2; // Number of reviews visible at a time
+  const itemsPerPage = 2;
 
   const loadReviews = async () => {
     try {

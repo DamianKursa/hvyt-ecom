@@ -1,9 +1,9 @@
 import React from 'react';
 
 interface LoadingModalProps {
-  title: string; // Title to display in the modal
-  description?: string; // Optional description to display below the title
-  showOverlay?: boolean; // Determines whether the overlay should be visible
+  title: string;
+  description?: string;
+  showOverlay?: boolean;
 }
 
 const LoadingModal: React.FC<LoadingModalProps> = ({

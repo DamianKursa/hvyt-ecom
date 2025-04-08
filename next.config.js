@@ -4,7 +4,6 @@ const nextConfig = {
   images: {
     unoptimized: true,
     remotePatterns: [
-      // Existing domains
       {
         protocol: 'https',
         hostname: 'swewoocommerce.dfweb.no',
@@ -96,13 +95,8 @@ const nextConfig = {
       { source: '/wygodne-zwroty/:path*', destination: '/wygodne-zwroty/:path*' },
       { source: '/zapomniane-haslo/:path*', destination: '/zapomniane-haslo/:path*' },
       { source: '/zwroty-i-reklamacje/:path*', destination: '/zwroty-i-reklamacje/:path*' },
-      // New explicit route for /produkt
       { source: '/produkt/:path*', destination: '/produkt/:path*' },
-
-      // Proxy WordPress API calls: ensure /wp-json is served from hvyt.pl
       { source: '/wp-json/:path*', destination: 'https://wp.hvyt.pl/wp-json/:path*' },
-
-      // NEW: Catch requests to "/" that include a wc-api query parameter and proxy them to wp.hvyt.pl.
       {
         source: '/',
         has: [

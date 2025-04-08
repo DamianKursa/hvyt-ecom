@@ -99,7 +99,29 @@ const ProductPage = () => {
           });
           return;
         }
+
+        // Save fetched product to your state
         dispatch({ type: 'SET_PRODUCT', payload: productData });
+
+        // Once the product data is fetched, push the "view_item" event to the dataLayer.
+        // We use a type cast (window as any) to bypass TypeScript's strict typing.
+        if (typeof window !== 'undefined' && (window as any).dataLayer) {
+          (window as any).dataLayer.push({
+            event: 'view_item',
+            ecommerce: {
+              items: [
+                {
+                  item_id: productData.id,
+                  item_name: productData.name,
+                  price: productData.price
+                    ? parseFloat(productData.price).toFixed(2)
+                    : '0.00',
+                  // You can add additional properties here, e.g., category, variant, etc.
+                },
+              ],
+            },
+          });
+        }
       } catch (error) {
         dispatch({ type: 'SET_ERROR', payload: 'Error loading product data' });
         dispatch({
@@ -112,7 +134,6 @@ const ProductPage = () => {
     fetchData();
   }, [slug, dispatch]);
 
-  // Reset quantity to 1 when a new product loads
   useEffect(() => {
     if (product) {
       dispatch({ type: 'SET_QUANTITY', payload: 1 });
@@ -255,6 +276,7 @@ const ProductPage = () => {
       availableStock,
       selectedVariation,
     });
+
     if (!product) return;
 
     if (quantity > availableStock) {
@@ -309,9 +331,30 @@ const ProductPage = () => {
       availableStock,
     };
 
+    // Add item to cart
     addCartItem(cartItem);
+
+    // GA4 conversion tracking: Push add_to_cart event into the dataLayer
+    (window as any).window.dataLayer?.push({
+      event: 'add_to_cart',
+      ecommerce: {
+        currency: 'PLN',
+        value: parseFloat((quantity * price).toFixed(2)),
+        items: [
+          {
+            item_id: product.id,
+            item_name: product.name,
+            price: parseFloat(price.toFixed(2)),
+            quantity: quantity,
+            // You can include additional properties like category, brand, etc.
+          },
+        ],
+      },
+    });
+
     dispatch({ type: 'TOGGLE_MODAL', payload: true });
   };
+
   const onNotifySubmit = async (data: NotifyFormData) => {
     try {
       const res = await fetch('/api/waiting-list', {

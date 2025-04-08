@@ -1,8 +1,6 @@
 // pages/index.tsx
 import React from 'react';
 import type { NextPage } from 'next';
-
-// Components
 import Hero from '@/components/Index/Hero.component';
 import Layout from '@/components/Layout/Layout.component';
 import NewArrivals from '@/components/Index/NewArivials.component';
@@ -13,7 +11,6 @@ import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
 import Instagram from '@/components/Index/Instagram';
 
 const Index: NextPage = () => {
-  // Check maintenance mode via environment variable (set in .env.local)
   const maintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true';
 
   if (maintenanceMode) {
@@ -41,7 +38,7 @@ const Index: NextPage = () => {
           naszej strony internetowej. Dziękujemy za cierpliwość i już wkrótce
           zapraszamy na naszą nową stronę!
         </p>
-        <p>W sprawie zamowień lub innych pytań prosimy o kontakt</p>{' '}
+        <p>W sprawie zamowień lub innych pytań prosimy o kontakt</p>
         <a href="mailto:hello@hvyt.pl">
           <h3>hello@hvyt.pl</h3>
         </a>
@@ -50,7 +47,10 @@ const Index: NextPage = () => {
   }
 
   return (
-    <Layout title="Hvyt | Strona główna">
+    <Layout
+      title="Nowoczesne gałki i uchwyty do mebli, klamki i wieszaki | HVYT"
+      description="W naszej ofercie znajduje się szeroki wybór gałek i uchwytów meblowych, klamek do drzwi oraz wieszaków ściennych."
+    >
       <Hero
         secondButtonText="Zobacz gałki"
         secondButtonLink="/kategoria/uchwyty-meblowe?pa_rodzaj=galki&pa_rodzaj=t-bary"

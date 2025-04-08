@@ -6,8 +6,8 @@ import OrderTable from '@/components/MojeKonto/OrderTable';
 import OrderDetails from '@/components/MojeKonto/OrderDetails';
 import BoughtProductsList from '@/components/UI/BoughtProductsList';
 import MojeDane from '@/components/MojeKonto/MojeDane';
-import MyAddresses from '@/components/MojeKonto/MyAdresses'; // Import MyAddresses
-import BillingAddresses from '@/components/MojeKonto/BillingAddresses'; // Import BillingAddresses
+import MyAddresses from '@/components/MojeKonto/MyAdresses';
+import BillingAddresses from '@/components/MojeKonto/BillingAddresses';
 import { Order, Product } from '@/utils/functions/interfaces';
 
 const SectionPage: React.FC = () => {

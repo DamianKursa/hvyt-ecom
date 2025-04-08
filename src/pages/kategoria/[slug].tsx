@@ -27,10 +27,9 @@ interface CategoryPageProps {
   initialProducts: any[];
   initialTotalProducts: number;
   seoData: SEOData | null;
-  initialAttributes: any[]; // New prop for attributes
+  initialAttributes: any[];
 }
 
-// Define filterOrder for Filters and FilterModal
 const filterOrder: Record<string, string[]> = {
   'uchwyty-meblowe': [
     'Rodzaj',
@@ -76,7 +75,6 @@ const CategoryPage = ({
     ? router.query.slug[0]
     : router.query.slug;
 
-  // SEO fallback data
   const seoTitle =
     seoData && seoData.yoastTitle
       ? seoData.yoastTitle
@@ -84,7 +82,6 @@ const CategoryPage = ({
   const seoDescription =
     seoData && seoData.yoastDescription ? seoData.yoastDescription : '';
 
-  // State for filtering, sorting, and pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [activeFilters, setActiveFilters] = useState<
     { name: string; value: string }[]
@@ -161,7 +158,6 @@ const CategoryPage = ({
 
   const swrKey = buildApiEndpoint();
 
-  // Only use fallbackData when on initial load (no filters, default sorting, page 1)
   const fallback =
     activeFilters.length === 0 &&
     sortingOption === 'Sortowanie' &&
@@ -169,27 +165,21 @@ const CategoryPage = ({
       ? { products: initialProducts, totalProducts: initialTotalProducts }
       : undefined;
 
-  // Use SWR for data fetching
   const { data, error } = useSWR(swrKey, fetcher, {
     fallbackData: fallback,
     revalidateOnFocus: false,
     errorRetryCount: Infinity,
     errorRetryInterval: 30000,
   });
-
-  // Extract products and count from SWR data
   const products = data?.products || [];
   const filteredProductCount = data?.totalProducts || 0;
 
-  // Handlers for filter and sorting changes
   const handleFilterChange = (
     selectedFilters: { name: string; value: string }[],
   ) => {
     setActiveFilters(selectedFilters);
     setCurrentPage(1);
     updateUrlWithFilters(selectedFilters);
-    // When state changes, the SWR key updates and triggers a refetch;
-    // fallbackData will be undefined so loading state appears.
   };
 
   const clearFilters = () => {
@@ -242,7 +232,6 @@ const CategoryPage = ({
     });
   };
 
-  // Handle pagination changes (SWR key will update on currentPage change)
   const onPageChange = (page: number) => {
     setCurrentPage(page);
   };

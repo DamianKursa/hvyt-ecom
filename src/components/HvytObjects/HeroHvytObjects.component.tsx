@@ -6,7 +6,7 @@ const HeroHvytObjects = () => {
       id="hero"
       className="relative flex items-center w-full min-h-[795px] mx-auto bg-right bg-cover overflow-hidden"
       style={{
-        backgroundImage: 'url("/images/hvyt-objects-hero-bg.png")', // Update with the appropriate background image
+        backgroundImage: 'url("/images/hvyt-objects-hero-bg.png")',
         backgroundSize: 'cover',
       }}
     >
@@ -18,8 +18,11 @@ const HeroHvytObjects = () => {
               Hvyt Objects
             </h1>
             <p className="text-lg leading-relaxed text-neutral-darkest mb-6">
-              Tutaj tekst opisujący co użytkownik tu może znaleźć, o co chodzi na tej podstronie.<br />
-              Tutaj tekst opisujący co użytkownik tu może znaleźć, o co chodzi na tej podstronie.
+              Tutaj tekst opisujący co użytkownik tu może znaleźć, o co chodzi
+              na tej podstronie.
+              <br />
+              Tutaj tekst opisujący co użytkownik tu może znaleźć, o co chodzi
+              na tej podstronie.
             </p>
 
             <div className="flex space-x-4">
@@ -36,9 +39,9 @@ const HeroHvytObjects = () => {
         {/* Right Side: Static Image */}
         <div className="relative z-10 flex justify-end w-1/2 h-full">
           <Image
-            src="/images/hvyt-objects-hero-image.png" // Update with the appropriate image
+            src="/images/hvyt-objects-hero-image.png"
             alt="Hvyt Objects Hero Image"
-            width={600}  // Adjust width and height as needed
+            width={600}
             height={600}
             className="object-cover rounded-lg"
           />

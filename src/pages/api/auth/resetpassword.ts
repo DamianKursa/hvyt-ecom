@@ -6,7 +6,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   try {
     if (method === 'POST') {
-      // Handle sending reset password link
+
       const { email } = req.body;
 
       if (!email) {
@@ -26,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     if (method === 'PUT') {
-      // Handle reset password confirmation
+
       const { key, login, password } = req.body;
 
       if (!key || !login || !password) {

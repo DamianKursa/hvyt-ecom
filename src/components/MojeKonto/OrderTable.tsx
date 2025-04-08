@@ -5,10 +5,9 @@ import Image from 'next/image';
 
 interface OrderTableProps {
   content: Order[];
-  onViewDetails?: (order: Order) => void; // Callback for inline details rendering
+  onViewDetails?: (order: Order) => void;
 }
 
-// Function to map order statuses
 const getOrderStatusLabel = (status: string) => {
   switch (status) {
     case 'pending':
@@ -36,7 +35,6 @@ const getOrderStatusLabel = (status: string) => {
   }
 };
 
-// Function to map payment statuses
 const getPaymentStatusLabel = (paymentStatus: string) => {
   switch (paymentStatus) {
     case 'paid':

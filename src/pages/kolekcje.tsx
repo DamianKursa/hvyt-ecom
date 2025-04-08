@@ -77,8 +77,6 @@ const KolekcjePage = () => {
               </p>
             </div>
           </div>
-
-          {/* Dynamic Content or Skeleton */}
           {loading ? (
             <SkeletonKolekcjePage />
           ) : (

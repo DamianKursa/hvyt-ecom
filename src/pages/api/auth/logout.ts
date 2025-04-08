@@ -8,7 +8,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    // Clear the token by setting an expired cookie
     res.setHeader(
       'Set-Cookie',
       serialize('token', '', {
@@ -16,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
         path: '/',
-        expires: new Date(0), // Expire immediately
+        expires: new Date(0),
       })
     );
 

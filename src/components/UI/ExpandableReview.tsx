@@ -18,7 +18,7 @@ const ExpandableReview: React.FC<ExpandableReviewProps> = ({ content }) => {
       const lineHeight = parseFloat(
         getComputedStyle(contentRef.current).lineHeight,
       );
-      const maxHeight = lineHeight * 4; // 4 lines height
+      const maxHeight = lineHeight * 4;
       if (contentRef.current.scrollHeight > maxHeight) {
         setIsTruncated(true);
       }

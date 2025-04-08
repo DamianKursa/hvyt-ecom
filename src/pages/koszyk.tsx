@@ -6,6 +6,7 @@ import CartItems from '@/components/Cart/CartItems';
 import CartSummary from '@/components/Cart/CartSummary';
 import Link from 'next/link';
 import Bestsellers from '@/components/Index/Bestsellers.component';
+import { pushGTMEvent } from '@/utils/gtm';
 
 const Koszyk: React.FC = () => {
   const { cart, updateCartItem, removeCartItem } = useContext(CartContext);
@@ -15,11 +16,22 @@ const Koszyk: React.FC = () => {
     setMounted(true);
   }, []);
 
-  // Prevent rendering on the server/hydration mismatch
+  useEffect(() => {
+    if (cart && cart.products && cart.products.length > 0) {
+      pushGTMEvent('view_cart', {
+        items: cart.products.map((product: Product) => ({
+          item_id: product.productId,
+          item_name: product.name,
+          price: product.price,
+          quantity: product.qty,
+        })),
+      });
+    }
+  }, [cart]);
+
   if (!mounted) return <div>Loading...</div>;
 
   const handleIncreaseQuantity = (product: Product) => {
-    // Check availableStock before increasing quantity
     if (product.availableStock && product.qty >= product.availableStock) {
       console.log(`Reached maximum stock for ${product.name}`);
       return;
@@ -35,11 +47,20 @@ const Koszyk: React.FC = () => {
 
   const handleRemoveItem = (product: Product) => {
     removeCartItem(product.cartKey);
+    pushGTMEvent('remove_from_cart', {
+      items: [
+        {
+          item_id: product.productId,
+          item_name: product.name,
+          price: product.price,
+          quantity: product.qty,
+        },
+      ],
+    });
   };
 
   const handleCheckout = () => {
     console.log('Proceeding to checkout...');
-    // Add your checkout logic here
   };
 
   const isCartEmpty = !cart || cart.totalProductsPrice === 0;

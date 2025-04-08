@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import Layout from '@/components/Layout/Layout.component';
 import LoginForm from '@/components/User/LoginForm';
 import RegisterForm from '@/components/User/RegisterForm';
-import ForgotPassword from '@/components/User/ForgotPassword'; // Import the ForgotPassword component
+import ForgotPassword from '@/components/User/ForgotPassword';
 
 const Logowanie = () => {
-  const [isRegistering, setIsRegistering] = useState(false); // Toggle between login and register
-  const [isForgotPassword, setIsForgotPassword] = useState(false); // Toggle between login and forgot password
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   return (
     <Layout title="Hvyt | Logowanie">
@@ -24,7 +24,7 @@ const Logowanie = () => {
                 <div
                   className="p-10 w-full md:w-1/2 flex flex-col justify-start"
                   style={{
-                    backgroundImage: `url('/images/image-logowanie.png')`, // Replace with the actual path
+                    backgroundImage: `url('/images/image-logowanie.png')`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}
@@ -38,7 +38,7 @@ const Logowanie = () => {
                 <div className="p-10 w-full md:w-1/2 flex flex-col justify-between">
                   {!isRegistering && (
                     <LoginForm
-                      onForgotPassword={() => setIsForgotPassword(true)} // Pass handler to LoginForm
+                      onForgotPassword={() => setIsForgotPassword(true)}
                     />
                   )}
                   {isRegistering && (
@@ -85,9 +85,7 @@ const Logowanie = () => {
               </div>
             </>
           ) : (
-            <ForgotPassword
-              onBackToLogin={() => setIsForgotPassword(false)} // Pass handler to ForgotPassword
-            />
+            <ForgotPassword onBackToLogin={() => setIsForgotPassword(false)} />
           )}
         </div>
       </div>
