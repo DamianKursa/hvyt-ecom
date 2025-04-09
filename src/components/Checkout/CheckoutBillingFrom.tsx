@@ -167,28 +167,28 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
           <span className="ml-2">Firma</span>
         </label>
       </div>
-      {/* Dynamic Fields */}
+
+      {/* Always Render Personal Data Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {customerType === 'individual' ? (
-          <>
-            <input
-              type="text"
-              required
-              value={formData.firstName}
-              placeholder="Imię*"
-              onChange={(e) => handleInputChange('firstName', e.target.value)}
-              className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-            />
-            <input
-              type="text"
-              required
-              value={formData.lastName}
-              placeholder="Nazwisko*"
-              onChange={(e) => handleInputChange('lastName', e.target.value)}
-              className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-            />
-          </>
-        ) : (
+        <input
+          type="text"
+          required
+          value={formData.firstName}
+          placeholder="Imię*"
+          onChange={(e) => handleInputChange('firstName', e.target.value)}
+          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+        />
+        <input
+          type="text"
+          required
+          value={formData.lastName}
+          placeholder="Nazwisko*"
+          onChange={(e) => handleInputChange('lastName', e.target.value)}
+          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+        />
+
+        {/* Conditionally Render Company Fields */}
+        {customerType === 'company' && (
           <>
             <input
               type="text"
@@ -208,6 +208,8 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             />
           </>
         )}
+
+        {/* Always Render Phone and Email */}
         <input
           type="text"
           value={formData.phone}
