@@ -118,7 +118,7 @@ const nextConfig = {
       { source: '/zapomniane-haslo/:path*', destination: '/zapomniane-haslo/:path*' },
       { source: '/zwroty-i-reklamacje/:path*', destination: '/zwroty-i-reklamacje/:path*' },
       { source: '/produkt/:path*', destination: '/produkt/:path*' },
-     // { source: '/wp-json/:path*', destination: 'https://wp.hvyt.pl/wp-json/:path*' },
+      { source: '/wp-json/:path*', destination: 'https://wp.hvyt.pl/wp-json/:path*' },
       {
         source: '/',
         has: [
