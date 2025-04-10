@@ -55,8 +55,8 @@ const nextConfig = {
   async headers() {
     return [
       {
-        // Apply these headers to all routes (adjust the source if you need to target specific API routes)
-        source: '/:path*',
+        // This targets the WordPress REST API endpoints.
+        source: '/wp-json/:path*',
         headers: [
           {
             key: 'Access-Control-Allow-Origin',
@@ -68,7 +68,7 @@ const nextConfig = {
           },
           {
             key: 'Access-Control-Allow-Headers',
-            value: 'Content-Type, Authorization, X-Requested-With',
+            value: 'Content-Type, Authorization, X-WP-Nonce, X-HTTP-Method-Override, X-Requested-With',
           },
         ],
       },
