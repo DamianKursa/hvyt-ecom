@@ -52,28 +52,7 @@ const nextConfig = {
       },
     ];
   },
-  async headers() {
-    return [
-      {
-        // This targets the WordPress REST API endpoints.
-        source: '/wp-json/:path*',
-        headers: [
-          {
-            key: 'Access-Control-Allow-Origin',
-            value: 'https://wp.hvyt.pl',
-          },
-          {
-            key: 'Access-Control-Allow-Methods',
-            value: 'GET, POST, OPTIONS, PUT, DELETE',
-          },
-          {
-            key: 'Access-Control-Allow-Headers',
-            value: 'Content-Type, Authorization, X-WP-Nonce, X-HTTP-Method-Override, X-Requested-With',
-          },
-        ],
-      },
-    ];
-  },
+  
   async rewrites() {
     return [
       // Preserve Next.js internals
