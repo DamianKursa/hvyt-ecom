@@ -52,6 +52,28 @@ const nextConfig = {
       },
     ];
   },
+  async headers() {
+    return [
+      {
+        // Apply these headers to all routes (adjust the source if you need to target specific API routes)
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: 'https://wp.hvyt.pl',
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, OPTIONS, PUT, DELETE',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization, X-Requested-With',
+          },
+        ],
+      },
+    ];
+  },
   async rewrites() {
     return [
       // Preserve Next.js internals
