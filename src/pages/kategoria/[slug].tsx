@@ -374,7 +374,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         initialAttributes: aggregatorData.attributes,
         seoData,
       },
-      revalidate: 60,
+      revalidate: 21600,
     };
   } catch (error) {
     return {
@@ -385,7 +385,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         initialAttributes: [],
         seoData: null,
       },
-      revalidate: 300,
+      revalidate: 60,
     };
   }
 };
