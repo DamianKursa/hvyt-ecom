@@ -78,7 +78,7 @@ const Regulamin = () => {
   <ul>
     <li>przedpłata na konto Sprzedającego (przelew bankowy) – numer konta: 91 1140 2004 0000 3302 7916 7100, podany również w e-mailu potwierdzającym Zamówienie;</li>
     <li>płatność „za pobraniem”, gotówką – przy odbiorze u kuriera, z dodatkową prowizją 2 zł;</li>
-    <li>przedpłata za pomocą systemu płatności elektronicznych – przelewy24.pl (także karta kredytowa).</li>
+    <li>przedpłata za pomocą systemu płatności elektronicznych – paynow.pl (także karta kredytowa).</li>
   </ul>
   <p>Płatności elektroniczne realizowane są poprzez przekierowanie Zamawiającego do serwisu transakcyjnego, a następnie powrót do Sklepu po akceptacji formularza przelewu. System obsługuje spółka PayPro S.A. z Poznania (adres: ul. Kanclerska 15, 60-327 Poznań, KRS 0000347935, NIP 7792369887, kapitał zakładowy 4.500.000,00 zł). Dane osobowe są przekazywane PayPro S.A., administrującej danymi. W przypadku przedpłaty, Sprzedający oczekuje zapłaty przez 5 dni roboczych. Jeśli termin zapłaty upłynie, Sprzedający wyznacza dodatkowy termin, po którego bezskutecznym upływie odstępuje od Umowy sprzedaży.</p>
   <p>Czas realizacji Zamówienia zaczyna się od wpływu płatności na rachunek bankowy Sprzedającego lub otrzymania potwierdzenia z systemu płatności, bądź zawarcia Umowy sprzedaży (przy płatności za pobraniem).</p>
