@@ -51,27 +51,20 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
           &times;
         </button>
 
-        {/* Image Display */}
         <div
           className="relative flex items-center justify-center"
           style={{
-            maxHeight: '100vh', // Modal height should fit within the viewport height
-            overflow: 'hidden', // Prevent any overflow
+            width: '100%',
+            height: '100%',
+            position: 'relative', // necessary when using layout="fill"
+            maxHeight: '100vh', // ensures modal does not exceed viewport height
           }}
         >
           <Image
             src={images[currentIndex]}
             alt={`Image ${currentIndex + 1}`}
-            layout="responsive" // Preserve the image's original aspect ratio
-            width={1440} // Provide a reasonable width for large images
-            height={0} // Match the image's aspect ratio (or adjust for your image)
-            style={{
-              width: 'auto', // Let the width scale proportionally
-              height: '100%', // Scale height to fit the modal container
-              maxWidth: '100%', // Prevent the image from exceeding the modal width
-              maxHeight: '100%', // Prevent the image from exceeding the modal height
-              objectFit: 'contain', // Ensure no cropping
-            }}
+            layout="fill"
+            objectFit="cover"
             priority
           />
         </div>
