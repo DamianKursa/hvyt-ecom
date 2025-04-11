@@ -55,16 +55,15 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
           className="relative flex items-center justify-center"
           style={{
             width: '100%',
-            height: '100%',
-            position: 'relative', // necessary when using layout="fill"
-            maxHeight: '100vh', // ensures modal does not exceed viewport height
+            height: '80vh', // Using 80% of the viewport height for example
+            position: 'relative', // Required for layout="fill"
           }}
         >
           <Image
             src={images[currentIndex]}
             alt={`Image ${currentIndex + 1}`}
             layout="fill"
-            objectFit="cover"
+            objectFit="cover" // Cover the entire container, cropping if needed
             priority
           />
         </div>
