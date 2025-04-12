@@ -6,6 +6,8 @@ import {
   fetchProductsWithFilters,
   fetchSortedProducts,
 } from '../../utils/api/category';
+import { getCache, setCache } from '@/lib/cache';
+import crypto from 'crypto';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Allow only GET requests
@@ -67,13 +69,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const catId = parseInt(categoryId as string, 10);
       const pageNum = page ? parseInt(page as string, 10) : 1;
       const perPageNum = perPage ? parseInt(perPage as string, 10) : 12;
+
+      // Parse and normalize filters
       let parsedFilters: { name: string; value: string }[] = [];
       try {
         parsedFilters = JSON.parse(filters as string);
+        // Sort filters alphabetically by the filter name so that similar arrays yield the same key
+        parsedFilters.sort((a, b) => a.name.localeCompare(b.name));
       } catch (e) {
         return res.status(400).json({ error: 'Invalid filters parameter. Must be valid JSON.' });
       }
+
+      // Create a raw cache key
+      const rawKey = `fetchProductsWithFilters:${catId}:${pageNum}:${perPageNum}:${JSON.stringify(parsedFilters)}`;
+      // Optionally hash the key to get a fixed-length key, avoiding issues with very long strings
+      const cacheKey = crypto.createHash('md5').update(rawKey).digest('hex');
+
+      // Try to get data from cache
+      const cached = await getCache(cacheKey);
+      if (cached) {
+        return res.status(200).json(cached);
+      }
+
+      // No cache hit: call the function to fetch the data
       const result = await fetchProductsWithFilters(catId, parsedFilters, pageNum, perPageNum);
+      // Cache the result (for example, cache it for 3600 seconds = 1 hour)
+      await setCache(cacheKey, result, 3600);
       return res.status(200).json(result);
 
     } else if (action === 'fetchSortedProducts') {
