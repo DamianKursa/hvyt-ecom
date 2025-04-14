@@ -70,7 +70,7 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
               height: '100%', // Scale height to fit the modal container
               maxWidth: '100%', // Prevent the image from exceeding the modal width
               maxHeight: '100%', // Prevent the image from exceeding the modal height
-              objectFit: 'contain', // Ensure no cropping
+              objectFit: 'cover', // Ensure no cropping
             }}
             priority
           />
