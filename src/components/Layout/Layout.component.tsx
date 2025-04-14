@@ -50,7 +50,6 @@ const Layout: React.FC<ILayoutProps> = ({ children, title, description }) => {
       <Head>
         <title>{title}</title>
         {description && <meta name="description" content={description} />}
-        <link rel="canonical" href={`https://hvyt.pl${router.asPath}`} />
       </Head>
 
       <Header title={title} />
