@@ -22,16 +22,19 @@ const CartItem: React.FC<CartItemProps> = ({
   const isKoszykPage = router.pathname === '/koszyk';
   const { updateCartVariation } = React.useContext(CartContext);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [selectedVariation, setSelectedVariation] = useState<string | null>(
-    null,
-  );
+  // Replace the single selectedVariation state with an object to store selections per attribute
+  const [selectedVariations, setSelectedVariations] = useState<{
+    [key: string]: string;
+  }>({});
+
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const variationOptions = product.variationOptions ?? {};
 
+  // This function remains largely the same.
+  // It receives the attribute name and the selected value and then finds the full variation details.
   const handleSaveVariation = (name: string, newValue: string) => {
     console.log(`Saving Variation: ${name} -> ${newValue}`);
-    setSelectedVariation(newValue);
     const fullAttributeName = Object.keys(variationOptions).find(
       (key) =>
         key.trim().toLowerCase().endsWith(name.trim().toLowerCase()) ||
@@ -77,7 +80,7 @@ const CartItem: React.FC<CartItemProps> = ({
                     <p className="font-light text-neutral-dark mr-4">
                       {name.replace(/^Atrybut produktu:\s*/, '')}:{' '}
                       <span className="font-light">
-                        {selectedVariation || String(value)}
+                        {selectedVariations[name] || String(value)}
                       </span>
                     </p>
                     <button
@@ -156,8 +159,9 @@ const CartItem: React.FC<CartItemProps> = ({
                     '',
                   )}
                   :{' '}
-                  {selectedVariation ||
-                    Object.entries(product.attributes)[0][1]}
+                  {selectedVariations[
+                    Object.entries(product.attributes)[0][0]
+                  ] || Object.entries(product.attributes)[0][1]}
                 </p>
               )}
           </div>
@@ -238,10 +242,13 @@ const CartItem: React.FC<CartItemProps> = ({
                     (opt) => `${opt.option} | ${opt.price.toFixed(2)} zł`,
                   )}
                   selectedValue={
-                    selectedVariation || product.attributes?.[name] || ''
+                    selectedVariations[name] || product.attributes?.[name] || ''
                   }
                   onAttributeChange={(attribute, newValue) => {
-                    setSelectedVariation(newValue.split(' | ')[0]);
+                    setSelectedVariations((prev) => ({
+                      ...prev,
+                      [name]: newValue.split(' | ')[0],
+                    }));
                   }}
                 />
               </div>
@@ -255,19 +262,18 @@ const CartItem: React.FC<CartItemProps> = ({
               </button>
               <button
                 className={`w-1/2 py-3 text-white rounded-full text-base font-light transition ${
-                  selectedVariation
+                  Object.keys(selectedVariations).length > 0
                     ? 'bg-[#1C1C1C] hover:bg-black cursor-pointer'
                     : 'bg-gray-400 cursor-not-allowed'
                 }`}
-                disabled={!selectedVariation}
+                disabled={Object.keys(selectedVariations).length === 0}
                 onClick={() => {
-                  if (selectedVariation) {
-                    handleSaveVariation(
-                      Object.keys(variationOptions)[0],
-                      selectedVariation,
-                    );
-                    setModalOpen(false);
-                  }
+                  Object.entries(selectedVariations).forEach(
+                    ([attributeName, newValue]) => {
+                      handleSaveVariation(attributeName, newValue);
+                    },
+                  );
+                  setModalOpen(false);
                 }}
               >
                 Zapisz
