@@ -19,19 +19,6 @@ export default function Document(): JSX.Element {
         <meta name="author" content="HVYT" />
         <meta name="robots" content="index, follow" />
 
-        {/* Open Graph Meta Tags */}
-        <meta
-          property="og:title"
-          content="HVYT – Nowoczesne Gałki i Uchwyty Meblowe"
-        />
-        <meta
-          property="og:description"
-          content="Stylowe akcesoria wnętrzarskie: gałki, uchwyty, klamki i wieszaki. Odkryj nasze kolekcje!"
-        />
-        <meta property="og:url" content="https://hvyt.pl" />
-        <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://hvyt.pl/og-image.jpg" />
-
         {/* Favicon */}
         <link rel="icon" href="/favicon.png" />
 

@@ -245,9 +245,6 @@ const CategoryPage = ({
       <Head>
         <title>{seoTitle}</title>
         {seoDescription && <meta name="description" content={seoDescription} />}
-        <meta property="og:title" content={seoTitle} />
-        <meta property="og:description" content={seoDescription} />
-        <link rel="canonical" href={`https://hvyt.pl/category/${slug}`} />
       </Head>
       <div className="container max-w-[1440px] mt-[115px] px-4 md:px-0 mx-auto">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
@@ -374,7 +371,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         initialAttributes: aggregatorData.attributes,
         seoData,
       },
-      revalidate: 60,
+      revalidate: 21600,
     };
   } catch (error) {
     return {
@@ -385,7 +382,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
         initialAttributes: [],
         seoData: null,
       },
-      revalidate: 300,
+      revalidate: 60,
     };
   }
 };
