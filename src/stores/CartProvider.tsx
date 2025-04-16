@@ -153,11 +153,25 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       );
 
       if (product) {
-        const cleanName = name.replace(/^Atrybut produktu:\s*/, '').trim();
+        const cleanedName = name.replace(/^Atrybut produktu:\s*/, '').trim();
 
+        // Use optional chaining with nullish coalescing for iteration
+        Object.keys(product.attributes ?? {}).forEach((attrKey) => {
+          const currentCleaned = attrKey
+            .replace(/^Atrybut produktu:\s*/, '')
+            .trim();
+          if (currentCleaned.toLowerCase() === cleanedName.toLowerCase()) {
+            // Since we're inside the if(product) block, you can safely use an if-check
+            if (product.attributes) {
+              delete product.attributes[attrKey];
+            }
+          }
+        });
+
+        // Update product.attributes; if it's undefined, default to an empty object
         product.attributes = {
-          ...product.attributes,
-          [cleanName]: newVariation,
+          ...(product.attributes ?? {}),
+          [cleanedName]: newVariation,
         };
 
         if (typeof newPrice !== 'undefined') {
