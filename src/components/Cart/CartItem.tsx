@@ -30,10 +30,33 @@ const CartItem: React.FC<CartItemProps> = ({
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const variationOptions = product.variationOptions ?? {};
 
+  // Helper to find the matching variation (from baselinker_variations) based on the attribute and new value.
+  const findMatchingVariation = (
+    fullAttributeName: string,
+    newValue: string,
+  ) => {
+    if (!product.baselinker_variations) return null;
+    return product.baselinker_variations.find((variation) =>
+      variation.attributes.some(
+        (attr) =>
+          // Compare by cleaning the attribute name from WP with the fullAttributeName
+          attr.name
+            .replace(/^Atrybut produktu:\s*/, '')
+            .trim()
+            .toLowerCase() ===
+            fullAttributeName
+              .replace(/^Atrybut produktu:\s*/, '')
+              .trim()
+              .toLowerCase() && attr.option.trim() === newValue.trim(),
+      ),
+    );
+  };
+
   // Updated save handler accepts a cleaned attribute key.
   const handleSaveVariation = (cleanedName: string, newValue: string) => {
     console.log(`Saving Variation: ${cleanedName} -> ${newValue}`);
-    // Find the original key from variationOptions that corresponds to the cleaned name.
+
+    // Find the original attribute key from variationOptions that corresponds to the cleaned name.
     const fullAttributeName = Object.keys(variationOptions).find(
       (key) =>
         key
@@ -42,15 +65,25 @@ const CartItem: React.FC<CartItemProps> = ({
           .toLowerCase() === cleanedName.trim().toLowerCase(),
     );
     if (!fullAttributeName) return;
-    const matchingVariation = variationOptions[fullAttributeName]?.find(
+
+    // Use variationOptions to fetch the new price.
+    const matchingOption = variationOptions[fullAttributeName]?.find(
       (option) => option.option.trim() === newValue.trim(),
     );
-    if (matchingVariation) {
+
+    // Use our helper to find the matching baselinker variation (to update the variation ID)
+    const matchingVariation = findMatchingVariation(
+      fullAttributeName,
+      newValue,
+    );
+
+    if (matchingOption) {
       updateCartVariation(
         product.cartKey,
-        fullAttributeName,
+        fullAttributeName, // using the full attribute name as stored in WP
         newValue,
-        matchingVariation.price,
+        matchingOption.price,
+        matchingVariation?.id, // pass the new variation ID if found
       );
     }
   };

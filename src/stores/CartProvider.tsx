@@ -45,6 +45,7 @@ interface CartContextProps {
     name: string,
     newVariation: string,
     newPrice?: number,
+    newVariationId?: number,
   ) => void;
   applyCoupon: (coupon: Coupon) => void;
   removeCoupon: () => void;
@@ -145,45 +146,51 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     name: string,
     newVariation: string,
     newPrice?: number,
+    newVariationId?: number,
   ) => {
     setCart((prevCart) => {
       const updatedCart = { ...prevCart };
       const product = updatedCart.products.find(
         (item) => item.cartKey === cartKey,
       );
-
       if (product) {
+        // Clean the attribute name (for example, "Rozstaw")
         const cleanedName = name.replace(/^Atrybut produktu:\s*/, '').trim();
 
-        // Use optional chaining with nullish coalescing for iteration
-        Object.keys(product.attributes ?? {}).forEach((attrKey) => {
+        // Get the current attributes, defaulting to an empty object if undefined.
+        const attributes = product.attributes ?? {};
+
+        // Remove any keys that match the cleaned attribute.
+        Object.keys(attributes).forEach((attrKey) => {
           const currentCleaned = attrKey
             .replace(/^Atrybut produktu:\s*/, '')
             .trim();
           if (currentCleaned.toLowerCase() === cleanedName.toLowerCase()) {
-            // Since we're inside the if(product) block, you can safely use an if-check
-            if (product.attributes) {
-              delete product.attributes[attrKey];
-            }
+            delete attributes[attrKey];
           }
         });
 
-        // Update product.attributes; if it's undefined, default to an empty object
+        // Update the product attributes with the cleaned key.
         product.attributes = {
-          ...(product.attributes ?? {}),
+          ...attributes,
           [cleanedName]: newVariation,
         };
 
+        // Update product price if newPrice is provided.
         if (typeof newPrice !== 'undefined') {
           product.price = newPrice;
           product.totalPrice = newPrice * product.qty;
+        }
+
+        // Update the variation ID if a new one is provided.
+        if (newVariationId) {
+          product.variationId = newVariationId;
         }
 
         product.variationOptions = product.variationOptions || {};
 
         return recalculateCartTotals(updatedCart);
       }
-
       return prevCart;
     });
   };
