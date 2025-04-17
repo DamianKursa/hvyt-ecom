@@ -185,6 +185,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         // Update the variation ID if a new one is provided.
         if (newVariationId) {
           product.variationId = newVariationId;
+          product.cartKey = newVariationId.toString();
         }
 
         product.variationOptions = product.variationOptions || {};
