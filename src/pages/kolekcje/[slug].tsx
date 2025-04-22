@@ -9,6 +9,7 @@ import { Kolekcja } from '../../utils/functions/interfaces';
 import SkeletonCollectionPage from '@/components/Skeletons/SkeletonCollectionPage';
 import ProductPreview from '../../components/Product/ProductPreview.component';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 const CollectionPage = () => {
   const router = useRouter();
@@ -113,6 +114,13 @@ const CollectionPage = () => {
         currentKolekcja?.title.rendered || slugString || 'Ładowanie...'
       }`}
     >
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/kolekcje/${slug}`}
+        />
+      </Head>
       <section className="w-full py-16">
         <div className="container mx-auto max-w-grid-desktop px-4 md:px-0">
           {/* HERO SECTION */}

@@ -2,10 +2,18 @@ import React from 'react';
 import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component';
 import CartProgress from '@/components/Cart/CartProgress';
+import Head from 'next/head';
 
 const ZamowienieOtrzymane = () => {
   return (
     <Layout title="Dziękujemy za zamówienie!">
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/zamowienie-otrzymane`}
+        />
+      </Head>
       {/* Cart Progress */}
       <div className="mt-[55px] md:mt-0 container mx-auto px-4 mb-16 md:px-0">
         <CartProgress />

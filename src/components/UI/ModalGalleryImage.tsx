@@ -35,7 +35,7 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
       style={{ backgroundColor: 'rgba(46, 23, 18, 0.5)' }}
     >
       <div
-        className="relative bg-white rounded-lg shadow-lg mx-4 md:mx-0 px-4 md:px-0 flex items-center justify-center overflow-auto"
+        className="relative bg-white rounded-lg shadow-lg mx-4 md:mx-0 md:px-0 flex items-center justify-center overflow-auto"
         style={
           {
             // Allow vertical scroll if the image exceeds viewport height

@@ -1,10 +1,18 @@
 import React from 'react';
 import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
+import Head from 'next/head';
 
 const DostawaPage = () => {
   return (
     <Layout title="Hvyt | Dostawa">
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/dostawa`}
+        />
+      </Head>
       <section className="w-full py-16 px-4 md:px-0 bg-light-beige">
         <div className="container mx-auto max-w-grid-desktop">
           {/* Delivery Section */}

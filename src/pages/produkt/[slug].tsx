@@ -20,9 +20,10 @@ import { Product } from '@/stores/CartProvider';
 import useCrossSellProducts from '@/utils/hooks/useCrossSellProducts';
 import { InputField } from '@/components/Input/InputField.component';
 import { useForm, FormProvider } from 'react-hook-form';
+import Head from 'next/head';
 
 const NajczęściejKupowaneRazem = dynamic(
-  () => import('@/components/Product/NajczęściejKupowaneRazem'),
+  () => import('@/components/Product/CrossSell'),
   { ssr: false },
 );
 
@@ -436,6 +437,14 @@ const ProductPage = () => {
 
   return (
     <Layout title={`Hvyt | ${product?.name || 'Ładowanie...'}`}>
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/produkt/${slug}`}
+        />
+      </Head>
+
       <section className="max-w-[1440px] mt-[88px] md:mt-[140px] container mx-auto">
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
           <div className="order-1 w-full lg:order-1 lg:w-8/12">

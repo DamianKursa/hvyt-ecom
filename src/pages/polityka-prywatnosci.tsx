@@ -11,6 +11,12 @@ const PolitykaPrywatnosci = () => {
           name="description"
           content="Pełna treść Polityki Prywatności Sklepu Internetowego HVYT."
         />
+
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/kolekcje/polityka-prywatnosci`}
+        />
       </Head>
       <div className="max-w-4xl mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-center mb-8">
