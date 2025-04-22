@@ -246,7 +246,7 @@ const CategoryPage = ({
         <title>{seoTitle}</title>
         {seoDescription && <meta name="description" content={seoDescription} />}
         {/* <meta rel="canonical" href={`https://hvyt.pl/kategoria/${slug}`} /> */}
-        <link id="meta-cannonical" rel="canonical" href={`${process.env.NEXT_PUBLIC_SITE_URL}/kategoria/${slug}`} />
+        <link id="meta-canonical" rel="canonical" href={`${process.env.NEXT_PUBLIC_SITE_URL}/kategoria/${slug}`} />
       </Head>
       <div className="container max-w-[1440px] mt-[115px] px-4 md:px-0 mx-auto">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>

@@ -439,7 +439,7 @@ const ProductPage = () => {
     <Layout title={`Hvyt | ${product?.name || 'Ładowanie...'}`}>
       <Head>
         <link
-          id="meta-cannonical"
+          id="meta-canonical"
           rel="canonical"
           href={`${process.env.NEXT_PUBLIC_SITE_URL}/produkt/${slug}`}
         />
