@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import { getSinglePost } from '@/utils/api/getPosts';
 import Layout from '@/components/Layout/Layout.component';
 import Image from 'next/image';
+import Head from 'next/head';
 
 interface BlogPost {
   id: number;
@@ -38,6 +39,13 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
 
   return (
     <Layout title={post.title.rendered}>
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/blog/${post.slug}`}
+        />
+      </Head>
       <div className="container mx-auto py-16 max-w-[1130px] px-4 md:px-0">
         {/* Title */}
         <h1

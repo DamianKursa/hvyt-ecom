@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import Layout from '@/components/Layout/Layout.component';
+import Head from 'next/head';
 
 const WygodneZwroty = () => {
   useEffect(() => {
@@ -17,6 +18,13 @@ const WygodneZwroty = () => {
 
   return (
     <Layout title="Wygodne zwroty">
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/wygodne-zwroty`}
+        />
+      </Head>
       <div
         id="ak_returns_banner_59c63e5c-3a7e-4b8e-8165-999687ba3bc4"
         style={{ marginBottom: '20px' }}

@@ -177,6 +177,13 @@ const Regulamin = () => {
           name="description"
           content="Regulamin sklepu internetowego www.hvyt.pl"
         />
+
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/regulamin`}
+        />
+
       </Head>
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Here we add Tailwind typography modifiers for h2 elements */}

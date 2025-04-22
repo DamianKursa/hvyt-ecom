@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component';
 import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
+import Head from 'next/head';
 
 const WspolpracaPage = () => {
   const sectionRefs = {
@@ -21,6 +22,13 @@ const WspolpracaPage = () => {
 
   return (
     <Layout title="Współpraca">
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/wspolpraca`}
+        />
+      </Head>
       <section className="w-full px-4 md:px-0">
         <div className="container max-w-grid-desktop mx-auto">
           {/* Header Section */}

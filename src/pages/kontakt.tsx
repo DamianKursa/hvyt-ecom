@@ -5,6 +5,7 @@ import Layout from '../components/Layout/Layout.component';
 import SocialIcons from '@/components/UI/SocialIcons';
 import Checkbox from '@/components/UI/Checkbox';
 import { useState } from 'react';
+import Head from 'next/head';
 
 const Kontakt = () => {
   const methods = useForm();
@@ -56,6 +57,13 @@ const Kontakt = () => {
 
   return (
     <Layout title="Hvyt | Kontakt">
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/kontakt`}
+        />
+      </Head>
       <section className="container mx-auto mt-[55px] px-4 md:px-0">
         <div className="flex flex-col md:flex-row md:items-stretch justify-between rounded-[24px] overflow-hidden">
           {/* Left Side (Contact Information) */}

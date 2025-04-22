@@ -9,6 +9,7 @@ import WybierzColor from '@/components/Index/WybierzColor.component';
 import PasujemyWszedzie from '@/components/Index/Pasujemy.component';
 import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
 import Instagram from '@/components/Index/Instagram';
+import Head from 'next/head';
 
 const Index: NextPage = () => {
   const maintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true';
@@ -51,6 +52,13 @@ const Index: NextPage = () => {
       title="Nowoczesne gałki i uchwyty do mebli, klamki i wieszaki | HVYT"
       description="W naszej ofercie znajduje się szeroki wybór gałek i uchwytów meblowych, klamek do drzwi oraz wieszaków ściennych."
     >
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}`}
+        />
+      </Head>
       <Hero
         secondButtonText="Zobacz gałki"
         secondButtonLink="/kategoria/uchwyty-meblowe?pa_rodzaj=galki&pa_rodzaj=t-bary"

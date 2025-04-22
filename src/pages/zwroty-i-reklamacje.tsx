@@ -2,10 +2,18 @@ import React from 'react';
 import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
 import Link from 'next/link';
+import Head from 'next/head';
 
 const ZwrotyReklamacjePage = () => {
   return (
     <Layout title="Zwroty i Reklamacje">
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/zwroty-i-reklamacje`}
+        />
+      </Head>
       <section className="w-full">
         <div className="container mx-auto max-w-[1440px] px-4 md:px-0 mt-16 md:mt-4">
           <div className="flex flex-col md:flex-row gap-10 font-light text-[18px] items-start mb-12">

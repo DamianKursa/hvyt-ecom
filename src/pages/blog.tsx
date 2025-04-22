@@ -3,6 +3,7 @@ import { PostArchive } from '@/utils/functions/interfaces';
 import { getPostsArchive } from '@/utils/api/getPosts';
 import Layout from '@/components/Layout/Layout.component';
 import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
+import Head from 'next/head';
 
 const trimToWords = (text: string, wordLimit: number): string => {
   const words = text.split(' ');
@@ -82,6 +83,13 @@ const BlogArchive = () => {
 
   return (
     <Layout title="Hvyt | Blog">
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/blog`}
+        />
+      </Head>
       <div>
         {/* Header */}
         <header className="pt-[115px] mx-auto container max-w-grid-desktop px-4 md:px-0 py-6">

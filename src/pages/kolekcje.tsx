@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component';
 import SkeletonKolekcjePage from '../components/Skeletons/SkeletonKolekcjePage';
 import IconRenderer from '@/components/UI/IconRenderer';
+import Head from 'next/head';
 
 const KolekcjePage = () => {
   const [kolekcjePosts, setKolekcjePosts] = useState<any[]>([]);
@@ -38,6 +39,13 @@ const KolekcjePage = () => {
 
   return (
     <Layout title="Hvyt | Kolekcje">
+      <Head>
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/kolekcje`}
+        />
+      </Head>
       <section className="w-full px-4 lg:px-0 mt-[115px] mb-[150px]">
         <div className="container mx-auto max-w-grid-desktop">
           {/* Page Title and Text Section */}
