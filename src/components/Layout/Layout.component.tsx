@@ -49,7 +49,7 @@ const Layout: React.FC<ILayoutProps> = ({ children, title, description }) => {
     <>
       <Head>
         <title>{title}</title>
-        {description && <meta name="description" content={description} />}
+        {description && <meta id="meta-description" name="description" content={description} />}
       </Head>
 
       <Header title={title} />
