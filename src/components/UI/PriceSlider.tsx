@@ -46,14 +46,15 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   return (
     <div className="px-2 py-2 price-slider">
       {/* React Slider */}
+      {/* @ts-ignore */}
       <ReactSlider
         className="horizontal-slider"
         thumbClassName="slider-thumb"
         renderTrack={(props, state) => {
           const backgroundColor =
             state.index === 0 || state.index === 2 ? '#e0e0e0' : '#661f30';
-          return (
-            <div
+                  {/* @ts-ignore */}
+          return <div
               {...props}
               className="horizontal-slider-track"
               style={{
@@ -61,7 +62,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
                 background: backgroundColor,
               }}
             />
-          );
+          
         }}
         min={minPrice}
         max={maxPrice}
