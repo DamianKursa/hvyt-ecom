@@ -22,7 +22,7 @@ import { InputField } from '@/components/Input/InputField.component';
 import { useForm, FormProvider } from 'react-hook-form';
 
 const NajczęściejKupowaneRazem = dynamic(
-  () => import('@/components/Product/NajczęściejKupowaneRazem'),
+  () => import('@/components/Product/CrossSell'),
   { ssr: false },
 );
 
