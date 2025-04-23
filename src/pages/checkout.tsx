@@ -522,7 +522,7 @@ const Checkout: React.FC = () => {
                 totalProductsPrice={cart?.totalProductsPrice || 0}
                 onCheckout={handleOrderSubmit}
                 isCheckoutPage={true}
-                disabled={orderDisabled}
+                disabled={orderDisabled || !shippingMethod}
               />
             </div>
           </div>
