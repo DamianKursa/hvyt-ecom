@@ -118,7 +118,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
               </a>
             </Link>
           </li>
-          <li className="font-bold">
+          {/*<li className="font-bold">
             <Link href="/kategoria/meble" legacyBehavior>
               <a
                 onClick={toggleMenu}
@@ -144,7 +144,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 </span>
               </a>
             </Link>
-          </li>
+          </li> */}
           {/* Non-category links with same active/hover styles */}
           <li className="font-bold">
             <Link href="/kolekcje" legacyBehavior>
