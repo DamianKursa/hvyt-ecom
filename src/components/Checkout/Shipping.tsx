@@ -135,7 +135,7 @@ const Shipping: React.FC<ShippingProps> = ({
         }
         const data: ShippingZone[] = await response.json();
 
-        // 1️⃣ Define your restricted IDs
+        // 1) Restricted IDs & check:
         const restrictedIds = [
           '7543167',
           '7543168',
@@ -151,37 +151,36 @@ const Shipping: React.FC<ShippingProps> = ({
           '7564076',
           '7564079',
         ];
-        const cartContainsRestricted = !!cart?.products?.some(
-          (product: any) =>
-            restrictedIds.includes(String(product.productId)) ||
-            (product.variationId &&
-              restrictedIds.includes(String(product.variationId))),
-        );
+        const cartContainsRestricted =
+          cart?.products?.some(
+            (p: any) =>
+              restrictedIds.includes(String(p.productId)) ||
+              (p.variationId && restrictedIds.includes(String(p.variationId))),
+          ) ?? false;
 
-        // 2️⃣ Build your zones
-        const updatedZones = data.map((zone) => {
-          // If we have a restricted-ID product, show only the “Dostawa dużych mebli” method:
+        // 2) Your “duże meble” method:
+        const mebleOnlyMethod: ShippingMethod = {
+          id: 'dostawa_duzych_mebli',
+          title: 'Dostawa dużych mebli',
+          cost: 300,
+          enabled: true,
+        };
+
+        // 3) Build zones – if meble, only that one method:
+        const updatedZones: ShippingZone[] = data.map((zone) => {
           if (cartContainsRestricted) {
             return {
               ...zone,
-              methods: [
-                {
-                  id: 'dostawa_duzych_mebli',
-                  title: 'Dostawa dużych mebli',
-                  cost: 300, // flat fee
-                  enabled: true,
-                },
-              ],
+              methods: [mebleOnlyMethod],
             };
           }
 
-          // Otherwise, fall back to your normal filtering logic:
+          // otherwise your existing filtering logic:
           let filteredMethods = zone.methods.filter((method) => {
-            // filter out "flexible shipping"
             if (method.title.toLowerCase().includes('flexible shipping')) {
               return false;
             }
-            // filter out free-shipping labels when cartTotal < 300
+            // hide “darmowa” under 300
             if (
               method.title.toLowerCase().includes('darmowa') &&
               cartTotal < 300
@@ -191,7 +190,6 @@ const Shipping: React.FC<ShippingProps> = ({
             return true;
           });
 
-          // free-shipping logic for cartTotal >= 300
           if (cartTotal >= 300) {
             filteredMethods = filteredMethods.filter((method) =>
               [
@@ -215,7 +213,7 @@ const Shipping: React.FC<ShippingProps> = ({
             }
           }
 
-          // add InPost lockers (unless restricted)
+          // InPost lockers
           if (
             !filteredMethods.some(
               (m) => m.title.toLowerCase() === 'paczkomaty inpost',
@@ -230,7 +228,7 @@ const Shipping: React.FC<ShippingProps> = ({
             });
           }
 
-          // add GLS points (unless restricted)
+          // GLS points
           if (
             !filteredMethods.some(
               (m) => m.title.toLowerCase() === 'punkty gls',
@@ -245,7 +243,6 @@ const Shipping: React.FC<ShippingProps> = ({
             });
           }
 
-          // final cleanup
           return { ...zone, methods: filteredMethods };
         });
 
