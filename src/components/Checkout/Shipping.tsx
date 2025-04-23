@@ -133,9 +133,9 @@ const Shipping: React.FC<ShippingProps> = ({
         if (!response.ok) {
           throw new Error('Nie udało się pobrać metod dostawy');
         }
-        const data = await response.json();
+        const data: ShippingZone[] = await response.json();
 
-        // Define restricted IDs
+        // 1️⃣ Define your restricted IDs
         const restrictedIds = [
           '7543167',
           '7543168',
@@ -151,21 +151,37 @@ const Shipping: React.FC<ShippingProps> = ({
           '7564076',
           '7564079',
         ];
-        const cartContainsRestricted =
-          cart?.products?.some(
-            (product: any) =>
-              restrictedIds.includes(String(product.productId)) ||
-              (product.variationId &&
-                restrictedIds.includes(String(product.variationId))),
-          ) || false;
+        const cartContainsRestricted = !!cart?.products?.some(
+          (product: any) =>
+            restrictedIds.includes(String(product.productId)) ||
+            (product.variationId &&
+              restrictedIds.includes(String(product.variationId))),
+        );
 
-        let updatedZones = data.map((zone: ShippingZone) => {
+        // 2️⃣ Build your zones
+        const updatedZones = data.map((zone) => {
+          // If we have a restricted-ID product, show only the “Dostawa dużych mebli” method:
+          if (cartContainsRestricted) {
+            return {
+              ...zone,
+              methods: [
+                {
+                  id: 'dostawa_duzych_mebli',
+                  title: 'Dostawa dużych mebli',
+                  cost: 300, // flat fee
+                  enabled: true,
+                },
+              ],
+            };
+          }
+
+          // Otherwise, fall back to your normal filtering logic:
           let filteredMethods = zone.methods.filter((method) => {
-            // Filter out any 'flexible shipping' references
+            // filter out "flexible shipping"
             if (method.title.toLowerCase().includes('flexible shipping')) {
               return false;
             }
-            // Filter out 'darmowa' if cartTotal < 300
+            // filter out free-shipping labels when cartTotal < 300
             if (
               method.title.toLowerCase().includes('darmowa') &&
               cartTotal < 300
@@ -175,7 +191,7 @@ const Shipping: React.FC<ShippingProps> = ({
             return true;
           });
 
-          // If cartTotal >= 300, keep only certain methods
+          // free-shipping logic for cartTotal >= 300
           if (cartTotal >= 300) {
             filteredMethods = filteredMethods.filter((method) =>
               [
@@ -185,10 +201,9 @@ const Shipping: React.FC<ShippingProps> = ({
                 'punkty gls',
               ].includes(method.title.toLowerCase()),
             );
-            // If 'darmowa dostawa' not present, add it
             if (
               !filteredMethods.some(
-                (method) => method.title.toLowerCase() === 'darmowa dostawa',
+                (m) => m.title.toLowerCase() === 'darmowa dostawa',
               )
             ) {
               filteredMethods.push({
@@ -200,67 +215,39 @@ const Shipping: React.FC<ShippingProps> = ({
             }
           }
 
-          // Conditionally add Paczkomaty InPost
+          // add InPost lockers (unless restricted)
           if (
             !filteredMethods.some(
-              (method) => method.title.toLowerCase() === 'paczkomaty inpost',
+              (m) => m.title.toLowerCase() === 'paczkomaty inpost',
             ) &&
-            !cartContainsRestricted // add only if no restricted items
+            cartTotal < 300
           ) {
             filteredMethods.push({
               id: 'paczkomaty_inpost',
               title: 'Paczkomaty InPost',
-              cost: cartTotal >= 300 ? null : 15,
+              cost: 15,
               enabled: true,
             });
           }
 
-          // Conditionally add Punkty GLS
+          // add GLS points (unless restricted)
           if (
             !filteredMethods.some(
-              (method) => method.title.toLowerCase() === 'punkty gls',
+              (m) => m.title.toLowerCase() === 'punkty gls',
             ) &&
-            !cartContainsRestricted // add only if no restricted items
+            cartTotal < 300
           ) {
             filteredMethods.push({
               id: 'punkty_gls',
               title: 'Punkty GLS',
-              cost: cartTotal >= 300 ? null : 15,
+              cost: 15,
               enabled: true,
             });
           }
 
-          // Final filter pass: remove if cartContainsRestricted
-          if (cartContainsRestricted) {
-            filteredMethods = filteredMethods.filter((method) => {
-              return (
-                method.id !== 'paczkomaty_inpost' && method.id !== 'punkty_gls'
-              );
-            });
-          }
-
-          if (cartContainsRestricted) {
-            filteredMethods = filteredMethods.filter(
-              (m) => m.id !== 'paczkomaty_inpost' && m.id !== 'punkty_gls',
-            );
-          }
-          if (cartContainsRestricted) {
-            filteredMethods.push({
-              id: 'dostawa_duzych_mebli',
-              title: 'Dostawa dużych mebli',
-              cost: 300,
-              enabled: true,
-            });
-          } else {
-            filteredMethods = filteredMethods.filter(
-              (m) => m.id !== 'dostawa_duzych_mebli',
-            );
-          }
+          // final cleanup
           return { ...zone, methods: filteredMethods };
         });
-
-        console.log('cartContainsRestricted:', cartContainsRestricted);
-        console.log('updatedZones:', updatedZones);
 
         setShippingZones(updatedZones);
       } catch (err) {
@@ -268,13 +255,12 @@ const Shipping: React.FC<ShippingProps> = ({
         setError(
           'Wystąpił błąd podczas ładowania metod dostawy. Ponowna próba za 5 sekund.',
         );
-        setTimeout(() => {
-          fetchShippingMethods();
-        }, 5000);
+        setTimeout(fetchShippingMethods, 5000);
       } finally {
         setLoading(false);
       }
     };
+
     fetchShippingMethods();
   }, [cart, cartTotal]);
 
