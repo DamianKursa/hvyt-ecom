@@ -173,6 +173,25 @@ kształtów i pomóc odnaleźć prawdziwych wnętrzarskich przyjaciół.</p>
 <p>Pokój dziecięcy jest miejscem absolutnie magicznym. To tutaj buduje się rodzinne więzi, rozwiązuje dziecięce problemy i śmieje do utraty tchu, szukając łaskotek. Meble w pokoju dziecięcym odgrywają rolę magazynów, które pomieszczą wszystko: ubrania, zabawki i książki. Gałki do mebli dziecięcych muszą więc posiadać dwie funkcje: być poręczne i bezpieczne dla małych użytkowników.</p>`,
     },
   ],
+  meble: [
+    {
+      title: 'Meble HVYT – nowi najlepsi przyjaciele Twojego domu',
+      content: `
+        <p>Szukasz mebli, które nie są tylko tłem dla wnętrza, ale jego bohaterami? U nas znajdziesz takie, które mają osobowość, charakter i wyczucie stylu. Nie tylko dobrze wyglądają, ale też świetnie się sprawdzają na co dzień – bez marudzenia, bez skrzypienia, za to z klasą. Bo meble HVYT to nie tylko design. To nowi najlepsi przyjaciele Twojego domu.</p>`,
+    },
+    {
+      title: 'Emma, Jamie, Axel, Sol – poznaj ich bliżej',
+      content: `
+        <p>Emma to szafka RTV, która wie, jak robić wrażenie –fornir, ciągłość usłojenia, grube płyty i system click-clack. Dostarczana w całości złożona, gotowa na relaks z Tobą i Twoim pilotem. Jamie to z kolei stolik nocny z charakterem – czarny fornir, szuflada otwierana od spodu i opcjonalna gałka, jeśli lubisz klasykę z twistem. Axel – ten mały minimalistyczny spryciarz – występuje w wersji z naturalnego lub barwionego dębu, a także lakierowanego MDF-u w kolorze olive i chestnut. Prosty, kompaktowy, ale z efektem wow. A Sol? Ten to dopiero osobowość! Malowana proszkowo stal w kolorze kremowym i kulka z lakierowanego drewna w odcieniu kasztanu. Obłe formy, nietypowe połączenie kolorystyczne i dużo uroku.</p>`,
+    },
+    {
+      title: 'Design, który zostaje na dłużej',
+      content: `
+<p>Wszystkie nasze meble powstają w Polsce z najlepszych materiałów. Łączą piękno z funkcjonalnością i są gotowe, by stać się częścią Twojej codzienności. Nie wymagają montażu, za to dają dużo satysfakcji – w codziennym użytkowaniu i w patrzeniu, jak dobrze wyglądają.
+
+HVYT – nowi najlepsi przyjaciele Twojego domu.</p>`,
+    },
+  ],
 };
 
 export type { Section };

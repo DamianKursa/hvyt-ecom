@@ -42,12 +42,14 @@ const filterOrder: Record<string, string[]> = {
   ],
   klamki: ['Kształt rozety', 'Kolor', 'Materiał'],
   wieszaki: ['Kolor', 'Materiał'],
+  meble: ['Rodzaj, Wykończenie, Styl'],
 };
 
 const icons: Record<string, string> = {
   'uchwyty-meblowe': '/icons/uchwyty-kształty.svg',
   klamki: '/icons/klamki-kształty.svg',
   wieszaki: '/icons/wieszaki-kształty.svg',
+  meble: '/images/HVYT_meble_znak graficzny_burgundy.png',
 };
 
 const ignoredParams = new Set([
@@ -246,7 +248,11 @@ const CategoryPage = ({
         <title>{seoTitle}</title>
         {seoDescription && <meta name="description" content={seoDescription} />}
         {/* <meta rel="canonical" href={`https://hvyt.pl/kategoria/${slug}`} /> */}
-        <link id="meta-canonical" rel="canonical" href={`${process.env.NEXT_PUBLIC_SITE_URL}/kategoria/${slug}`} />
+        <link
+          id="meta-canonical"
+          rel="canonical"
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/kategoria/${slug}`}
+        />
       </Head>
       <div className="container max-w-[1440px] mt-[115px] px-4 md:px-0 mx-auto">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
@@ -394,6 +400,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     { params: { slug: 'uchwyty-meblowe' } },
     { params: { slug: 'klamki' } },
     { params: { slug: 'wieszaki' } },
+    { params: { slug: 'meble' } },
   ];
 
   return {

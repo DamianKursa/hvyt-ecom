@@ -118,6 +118,33 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
               </a>
             </Link>
           </li>
+          <li className="font-bold">
+            <Link href="/kategoria/meble" legacyBehavior>
+              <a
+                onClick={toggleMenu}
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${
+                  currentPath === '/kategoria/meble'
+                    ? 'bg-beige-light text-dark-pastel-red'
+                    : ''
+                }`}
+              >
+                <span className="p-2">Meble</span>
+                <span
+                  className={`ml-2 ${
+                    currentPath === '/kategoria/meble'
+                      ? 'inline'
+                      : 'hidden group-hover:inline'
+                  }`}
+                >
+                  <img
+                    src="/icons/HVYT_meble_znak graficzny_burgundy.png"
+                    alt="Meble icon"
+                    className="h-6 pr-2"
+                  />
+                </span>
+              </a>
+            </Link>
+          </li>
           {/* Non-category links with same active/hover styles */}
           <li className="font-bold">
             <Link href="/kolekcje" legacyBehavior>
@@ -144,20 +171,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 }`}
               >
                 <span className="p-2">O nas</span>
-              </a>
-            </Link>
-          </li>
-          <li className="font-bold">
-            <Link href="/kontakt" legacyBehavior>
-              <a
-                onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${
-                  currentPath === '/kontakt'
-                    ? 'bg-beige-light text-dark-pastel-red'
-                    : ''
-                }`}
-              >
-                <span className="p-2">Kontakt</span>
               </a>
             </Link>
           </li>

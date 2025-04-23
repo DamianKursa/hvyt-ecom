@@ -135,6 +135,15 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                         </Link>
                       </li>
                       <li>
+                        <Link href="/kategoria/meble">
+                          <span
+                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/wieszaki')}`}
+                          >
+                            Meble
+                          </span>
+                        </Link>
+                      </li>
+                      <li>
                         <Link href="/kolekcje">
                           <span
                             className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kolekcje')}`}
@@ -149,15 +158,6 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                             className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/o-nas')}`}
                           >
                             O nas
-                          </span>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/kontakt">
-                          <span
-                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kontakt')}`}
-                          >
-                            Kontakt
                           </span>
                         </Link>
                       </li>

@@ -1,6 +1,11 @@
 // CartProvider.tsx
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
 export interface Product {
   cartKey: string;
   name: string;
@@ -11,6 +16,7 @@ export interface Product {
   productId: number;
   slug?: string;
   variationId?: number;
+  categories?: Category[];
   attributes?: { [key: string]: string };
   variationOptions?: { [key: string]: { option: string; price: number }[] };
   baselinker_variations?: {

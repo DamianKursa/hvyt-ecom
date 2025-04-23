@@ -16,7 +16,7 @@ import { useProductState } from '@/utils/hooks/useProductState';
 import { CartContext } from '@/stores/CartProvider';
 import { useWishlist } from '@/context/WhishlistContext';
 import Image from 'next/image';
-import { Product } from '@/stores/CartProvider';
+import { Product, Category } from '@/stores/CartProvider';
 import useCrossSellProducts from '@/utils/hooks/useCrossSellProducts';
 import { InputField } from '@/components/Input/InputField.component';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -56,6 +56,8 @@ const ProductPage = () => {
     snackbar,
   } = state;
 
+  const categories: Category[] = product?.categories ?? [];
+  const isMeble = categories.some((c) => c.slug === 'meble');
   const [validationError, setValidationError] = useState<string | null>(null);
   const [showNotifyForm, setShowNotifyForm] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
@@ -100,7 +102,7 @@ const ProductPage = () => {
           });
           return;
         }
-
+        console.log('🔍 fetched productData:', productData);
         // Save fetched product to your state
         dispatch({ type: 'SET_PRODUCT', payload: productData });
 
@@ -187,6 +189,7 @@ const ProductPage = () => {
             price: matchedVariation.price.toFixed(2),
             regular_price: matchedVariation.regular_price.toFixed(2),
             sale_price: matchedVariation.sale_price.toFixed(2),
+            on_sale: matchedVariation.on_sale,
             image: matchedVariation.image
               ? { sourceUrl: matchedVariation.image.src }
               : undefined,
@@ -468,6 +471,14 @@ const ProductPage = () => {
                   ? parseFloat(product.price).toFixed(2)
                   : '0.00'}{' '}
               zł
+              {isMeble && (
+                <span
+                  className="ml-2 text-sm font-semibold uppercase"
+                  style={{ backgroundColor: '#9FC1DF', color: '#fff' }}
+                >
+                  PREORDER
+                </span>
+              )}
             </p>
             {validationError && (
               <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg mt-2">

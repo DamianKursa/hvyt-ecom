@@ -81,6 +81,7 @@ export interface Variation {
   price?: string;
   regular_price?: string;
   sale_price?: string;
+  on_sale?: boolean;
   image?: {
     sourceUrl: string;
   };
@@ -98,6 +99,8 @@ export interface Product {
   slug: string;
   salePrice?: string;
   regularPrice?: string;
+  on_sale?: boolean;
+  categories?: { id: number; name: string; slug: string }[];
   description: string;
   image: string;
   images?: {

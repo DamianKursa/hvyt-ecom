@@ -5,12 +5,14 @@ interface DeliveryReturnInfoProps {
   onScrollToSection?: () => void;
   stock?: number | null;
   stockStatus?: string;
+  isMeble?: boolean;
 }
 
 const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
   onScrollToSection,
   stock,
   stockStatus,
+  isMeble,
 }) => {
   const items = [
     {
@@ -26,22 +28,27 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
     },
   ];
 
-  // Render stock row only if stock is a positive number or stockStatus is instock.
-  const shouldRenderStockRow =
-    (typeof stock === 'number' && stock > 0) || stockStatus === 'instock';
+  // Filter out interactive item for meble
+  const filteredItems = isMeble
+    ? items.filter((item) => !item.isInteractive)
+    : items;
 
-  // Determine total number of rows.
-  const totalRows = items.length + (shouldRenderStockRow ? 1 : 0);
+  // Render stock row if meble or if stock positive / in stock
+  const shouldRenderStockRow =
+    Boolean(isMeble) ||
+    (typeof stock === 'number' && stock > 0) ||
+    stockStatus === 'instock';
 
   return (
     <div className="mt-4 border border-beige-dark rounded-[24px]">
-      {items.map((item, index) => (
+      {filteredItems.map((item, index) => (
         <div
           key={index}
           className={`flex items-center p-4 space-x-4 ${
-            // If a stock row exists, these items are never the last overall;
-            // otherwise, only add border if it's not the last item in items.
-            index !== totalRows - 1 ? 'border-b border-[#DAD3C8]' : ''
+            // Only add border if not last filtered item or if stock row exists
+            index !== filteredItems.length - 1 || shouldRenderStockRow
+              ? 'border-b border-[#DAD3C8]'
+              : ''
           }`}
           style={{ width: '80%' }}
         >
@@ -76,11 +83,15 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
             height={24}
           />
           <span className="text-black font-medium">
-            {typeof stock === 'number' && stock > 0
-              ? stock >= 50
-                ? 'Ponad 50 szt. na stanie. Wysyłka w 24h!'
-                : `Tylko ${stock} szt. na stanie. Wysyłka w 24h!`
-              : stockStatus === 'instock' && 'Na stanie. Wysyłka w 24h!'}
+            {isMeble
+              ? 'PREORDER. Zamów taniej teraz i otrzymaj w czerwcu.'
+              : typeof stock === 'number' && stock > 0
+                ? stock >= 50
+                  ? 'Ponad 50 szt. na stanie. Wysyłka w 24h!'
+                  : `Tylko ${stock} szt. na stanie. Wysyłka w 24h!`
+                : stockStatus === 'instock'
+                  ? 'Na stanie. Wysyłka w 24h!'
+                  : null}
           </span>
         </div>
       )}

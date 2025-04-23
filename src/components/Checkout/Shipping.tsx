@@ -147,6 +147,9 @@ const Shipping: React.FC<ShippingProps> = ({
           '7535637',
           '7535655',
           '7535679',
+          '7563916',
+          '7564076',
+          '7564079',
         ];
         const cartContainsRestricted =
           cart?.products?.some(
@@ -236,6 +239,19 @@ const Shipping: React.FC<ShippingProps> = ({
             });
           }
 
+          if (cartContainsRestricted) {
+            filteredMethods.push({
+              id: 'dostawa_duzych_mebli',
+              title: 'Dostawa dużych mebli',
+              cost: 300, // flat fee
+              enabled: true,
+            });
+          } else {
+            // ensure it’s not in there when no restricted items
+            filteredMethods = filteredMethods.filter(
+              (m) => m.id !== 'dostawa_duzych_mebli',
+            );
+          }
           return { ...zone, methods: filteredMethods };
         });
 
