@@ -25,6 +25,7 @@ const Layout: React.FC<ILayoutProps> = ({ children, title, description }) => {
     'klamki',
     'wieszaki',
     'produkt',
+    'meble',
   ];
 
   const isFullWidthHero =
@@ -49,7 +50,13 @@ const Layout: React.FC<ILayoutProps> = ({ children, title, description }) => {
     <>
       <Head>
         <title>{title}</title>
-        {description && <meta id="meta-description" name="description" content={description} />}
+        {description && (
+          <meta
+            id="meta-description"
+            name="description"
+            content={description}
+          />
+        )}
       </Head>
 
       <Header title={title} />
