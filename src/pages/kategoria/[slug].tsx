@@ -42,7 +42,7 @@ const filterOrder: Record<string, string[]> = {
   ],
   klamki: ['Kształt rozety', 'Kolor', 'Materiał'],
   wieszaki: ['Kolor', 'Materiał'],
-  meble: ['Rodzaj, Wykończenie, Styl'],
+  meble: ['Rodzaj', 'Wykończenie', 'Styl'],
 };
 
 const icons: Record<string, string> = {
