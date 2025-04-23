@@ -663,6 +663,7 @@ const ProductPage = () => {
                   ? (selectedVariation as any).stock_status
                   : product && (product as any).stock_status
               }
+              isMeble={isMeble}
             />
           </div>
         </div>

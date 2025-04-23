@@ -137,7 +137,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       <li>
                         <Link href="/kategoria/meble">
                           <span
-                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/wieszaki')}`}
+                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/meble')}`}
                           >
                             Meble
                           </span>
