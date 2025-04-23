@@ -240,14 +240,18 @@ const Shipping: React.FC<ShippingProps> = ({
           }
 
           if (cartContainsRestricted) {
+            filteredMethods = filteredMethods.filter(
+              (m) => m.id !== 'paczkomaty_inpost' && m.id !== 'punkty_gls',
+            );
+          }
+          if (cartContainsRestricted) {
             filteredMethods.push({
               id: 'dostawa_duzych_mebli',
               title: 'Dostawa dużych mebli',
-              cost: 300, // flat fee
+              cost: 300,
               enabled: true,
             });
           } else {
-            // ensure it’s not in there when no restricted items
             filteredMethods = filteredMethods.filter(
               (m) => m.id !== 'dostawa_duzych_mebli',
             );
