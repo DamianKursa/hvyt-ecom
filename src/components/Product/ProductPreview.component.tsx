@@ -108,25 +108,21 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const firstImage = product.images?.[0]?.src || '/fallback-image.jpg';
   const secondImage = product.images?.[1]?.src || firstImage;
 
-  const regular = parseFloat(product.regular_price || '0');
-  const sale = parseFloat(
-    product.sale_price !== undefined ? product.sale_price : product.price,
-  );
-  const hasDiscount = sale < regular && regular > 0;
-  const discountPercent = hasDiscount
-    ? Math.round(((regular - sale) / regular) * 100)
-    : 0;
-
   // Render logic
   const renderPrice = () => {
+    // 1) variable products
     if (product.variations?.nodes?.length) {
       const vPrice = parseFloat(product.variations.nodes[0].price || '0');
       return <span>od {vPrice.toFixed(2)} zł</span>;
     }
+
+    // 2) simple products
     const regular = parseFloat(product.regular_price || '0');
     const sale = parseFloat(
       product.sale_price !== undefined ? product.sale_price : product.price,
     );
+
+    // on sale?
     if (sale < regular) {
       return (
         <>
@@ -140,11 +136,9 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
       );
     }
 
+    // not on sale
     return <span>{sale.toFixed(2)} zł</span>;
   };
-  const productPrice = product?.variations?.nodes?.length
-    ? `od ${parseFloat(product.variations.nodes[0].price || '0').toFixed(2)} zł`
-    : `${parseFloat(product.price || '0').toFixed(2)} zł`;
 
   const truncatedName =
     product.name.length > 25
@@ -169,12 +163,6 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Discount badge */}
-      {hasDiscount && (
-        <div className="absolute top-2 left-2 z-20 bg-dark-pastel-red text-white text-xs font-semibold px-2 py-1 rounded">
-          -{discountPercent}%
-        </div>
-      )}
       {/* Wishlist Button */}
       <button
         onClick={handleWishlistClick}

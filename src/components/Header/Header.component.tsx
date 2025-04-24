@@ -134,7 +134,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           </span>
                         </Link>
                       </li>
-                      {/* <li>
+                      <li>
                         <Link href="/kategoria/meble">
                           <span
                             className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/meble')}`}
@@ -142,7 +142,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                             Meble
                           </span>
                         </Link>
-                      </li>*/}
+                      </li>
                       <li>
                         <Link href="/kolekcje">
                           <span

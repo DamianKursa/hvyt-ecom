@@ -49,7 +49,6 @@ export const fetchProductsByCategoryId = async (
       page,
       per_page: perPage,
       status: 'publish',
-      _fields: 'id,name,price,regular_price,sale_price,slug,images',
     };
 
     filters.forEach((filter) => {
@@ -91,6 +90,7 @@ export const fetchProductsByCategoryId = async (
     return {
       products: [],
       totalProducts: 0,
+      _fields: 'id,name,price,regular_price,sale_price,slug,images',
     };
   }
 };
