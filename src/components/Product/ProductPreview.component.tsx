@@ -7,8 +7,6 @@ interface Product {
   name: string;
   price: string;
   slug: string;
-  regular_price?: string;
-  sale_price?: string;
   categorySlug?: string;
   images: { src: string }[];
   variations?: {
@@ -108,37 +106,9 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const firstImage = product.images?.[0]?.src || '/fallback-image.jpg';
   const secondImage = product.images?.[1]?.src || firstImage;
 
-  // Render logic
-  const renderPrice = () => {
-    // 1) variable products
-    if (product.variations?.nodes?.length) {
-      const vPrice = parseFloat(product.variations.nodes[0].price || '0');
-      return <span>od {vPrice.toFixed(2)} zł</span>;
-    }
-
-    // 2) simple products
-    const regular = parseFloat(product.regular_price || '0');
-    const sale = parseFloat(
-      product.sale_price !== undefined ? product.sale_price : product.price,
-    );
-
-    // on sale?
-    if (sale < regular) {
-      return (
-        <>
-          <span className="text-gray-500 line-through mr-2">
-            {regular.toFixed(2)} zł
-          </span>
-          <span className="text-dark-pastel-red font-bold">
-            {sale.toFixed(2)} zł
-          </span>
-        </>
-      );
-    }
-
-    // not on sale
-    return <span>{sale.toFixed(2)} zł</span>;
-  };
+  const productPrice = product?.variations?.nodes?.length
+    ? `od ${parseFloat(product.variations.nodes[0].price || '0').toFixed(2)} zł`
+    : `${parseFloat(product.price || '0').toFixed(2)} zł`;
 
   const truncatedName =
     product.name.length > 25
@@ -251,8 +221,15 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
 
       {/* Title and Price */}
       <div className="mt-2 text-left">
-        <h3 className="text-[16px] font-semibold">{product.name}</h3>
-        <p className="text-base font-light">{renderPrice()}</p>
+        <h3
+          className="text-[16px] font-semibold text-neutral-darkest"
+          title={product.name}
+        >
+          {truncatedName}
+        </h3>
+        <p className="text-base font-light text-neutral-darkest">
+          {productPrice}
+        </p>
       </div>
 
       {/* Clickable Overlay */}
