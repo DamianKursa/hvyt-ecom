@@ -531,10 +531,11 @@ const ProductPage = () => {
                     {/* your -XX% badge */}
                     {isOnSale && (
                       <span
-                        className="absolute top-2 right-2 px-2 py-1 text-xs font-semibold rounded"
+                        className="absolute top-2 right-2 px-2 font-semibold rounded-full"
                         style={{
                           backgroundColor: '#661F30', // same as your sale-price color
                           color: '#fff',
+                          fontSize: '18px',
                         }}
                       >
                         -{discountPct}%
@@ -561,7 +562,7 @@ const ProductPage = () => {
               })()}
 
               {isMeble && (
-                <span className="px-4 py-2 rounded-full bg-[#9FC1DF] ml-2 text-sm font-semibold uppercase">
+                <span className="px-4 py-2 rounded-full bg-[#9FC1DF] ml-2 text-[18px] font-semibold uppercase">
                   PREORDER
                 </span>
               )}

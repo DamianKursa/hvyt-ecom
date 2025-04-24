@@ -15,7 +15,7 @@ const ExpandableSection: React.FC<{ title: string; content: string }> = ({
 
   return (
     <div className="mb-8">
-      <h3 className="text-2xl font-bold mb-2">{title}</h3>
+      <h2 className="text-2xl font-bold mb-2">{title}</h2>
       <div
         className={`formatted-content ${isExpanded ? '' : 'line-clamp-3'} overflow-hidden`}
         dangerouslySetInnerHTML={{ __html: content }}

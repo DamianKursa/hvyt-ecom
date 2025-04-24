@@ -26,6 +26,7 @@ const Layout: React.FC<ILayoutProps> = ({ children, title, description }) => {
     'wieszaki',
     'produkt',
     'meble',
+    'galki',
   ];
 
   const isFullWidthHero =

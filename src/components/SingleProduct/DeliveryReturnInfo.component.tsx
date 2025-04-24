@@ -28,10 +28,8 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
     },
   ];
 
-  // Filter out interactive item for meble
-  const filteredItems = isMeble
-    ? items.filter((item) => !item.isInteractive)
-    : items;
+  // Always show both items, even for meble
+  const filteredItems = items;
 
   // Render stock row if meble or if stock positive / in stock
   const shouldRenderStockRow =
@@ -45,7 +43,6 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
         <div
           key={index}
           className={`flex items-center p-4 space-x-4 ${
-            // Only add border if not last filtered item or if stock row exists
             index !== filteredItems.length - 1 || shouldRenderStockRow
               ? 'border-b border-[#DAD3C8]'
               : ''
