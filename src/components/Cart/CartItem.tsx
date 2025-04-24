@@ -22,31 +22,68 @@ const CartItem: React.FC<CartItemProps> = ({
   const isKoszykPage = router.pathname === '/koszyk';
   const { updateCartVariation } = React.useContext(CartContext);
   const [isModalOpen, setModalOpen] = useState(false);
-  const [selectedVariation, setSelectedVariation] = useState<string | null>(
-    null,
-  );
-  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  // Store selected attribute changes keyed by "cleaned" attribute names
+  const [selectedVariations, setSelectedVariations] = useState<{
+    [key: string]: string;
+  }>({});
 
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
   const variationOptions = product.variationOptions ?? {};
 
-  const handleSaveVariation = (name: string, newValue: string) => {
-    console.log(`Saving Variation: ${name} -> ${newValue}`);
-    setSelectedVariation(newValue);
+  // Helper to find the matching variation (from baselinker_variations) based on the attribute and new value.
+  const findMatchingVariation = (
+    fullAttributeName: string,
+    newValue: string,
+  ) => {
+    if (!product.baselinker_variations) return null;
+    return product.baselinker_variations.find((variation) =>
+      variation.attributes.some(
+        (attr) =>
+          // Compare by cleaning the attribute name from WP with the fullAttributeName
+          attr.name
+            .replace(/^Atrybut produktu:\s*/, '')
+            .trim()
+            .toLowerCase() ===
+            fullAttributeName
+              .replace(/^Atrybut produktu:\s*/, '')
+              .trim()
+              .toLowerCase() && attr.option.trim() === newValue.trim(),
+      ),
+    );
+  };
+
+  // Updated save handler accepts a cleaned attribute key.
+  const handleSaveVariation = (cleanedName: string, newValue: string) => {
+    console.log(`Saving Variation: ${cleanedName} -> ${newValue}`);
+
+    // Find the original attribute key from variationOptions that corresponds to the cleaned name.
     const fullAttributeName = Object.keys(variationOptions).find(
       (key) =>
-        key.trim().toLowerCase().endsWith(name.trim().toLowerCase()) ||
-        key.trim().toLowerCase() === name.trim().toLowerCase(),
+        key
+          .replace(/^Atrybut produktu:\s*/, '')
+          .trim()
+          .toLowerCase() === cleanedName.trim().toLowerCase(),
     );
     if (!fullAttributeName) return;
-    const matchingVariation = variationOptions[fullAttributeName]?.find(
+
+    // Use variationOptions to fetch the new price.
+    const matchingOption = variationOptions[fullAttributeName]?.find(
       (option) => option.option.trim() === newValue.trim(),
     );
-    if (matchingVariation) {
+
+    // Use our helper to find the matching baselinker variation (to update the variation ID)
+    const matchingVariation = findMatchingVariation(
+      fullAttributeName,
+      newValue,
+    );
+
+    if (matchingOption) {
       updateCartVariation(
         product.cartKey,
-        fullAttributeName,
+        fullAttributeName, // using the full attribute name as stored in WP
         newValue,
-        matchingVariation.price,
+        matchingOption.price,
+        matchingVariation?.id, // pass the new variation ID if found
       );
     }
   };
@@ -70,14 +107,27 @@ const CartItem: React.FC<CartItemProps> = ({
               {product.name}
             </h3>
             {product.attributes &&
-              Object.entries(product.attributes).map(([name, value]) => {
-                if (!variationOptions[name]) return null;
+              Object.entries(product.attributes).map(([attrKey, value]) => {
+                // Clean the attribute key for display.
+                const cleanedKey = attrKey.replace(/^Atrybut produktu:\s*/, '');
+                // Only display if there’s a corresponding option in variationOptions.
+                const matchingOptionKey = Object.keys(variationOptions).find(
+                  (key) =>
+                    key
+                      .replace(/^Atrybut produktu:\s*/, '')
+                      .trim()
+                      .toLowerCase() === cleanedKey.toLowerCase(),
+                );
+                if (!matchingOptionKey) return null;
                 return (
-                  <div key={name} className="mt-3 flex flex-wrap items-center">
+                  <div
+                    key={cleanedKey}
+                    className="mt-3 flex flex-wrap items-center"
+                  >
                     <p className="font-light text-neutral-dark mr-4">
-                      {name.replace(/^Atrybut produktu:\s*/, '')}:{' '}
+                      {cleanedKey}:{' '}
                       <span className="font-light">
-                        {selectedVariation || String(value)}
+                        {selectedVariations[cleanedKey] || String(value)}
                       </span>
                     </p>
                     <button
@@ -149,17 +199,16 @@ const CartItem: React.FC<CartItemProps> = ({
           </div>
           <div className="mt-1">
             {product.attributes &&
-              Object.entries(product.attributes).length > 0 && (
-                <p className="text-xs text-neutral-dark">
-                  {Object.entries(product.attributes)[0][0].replace(
-                    /^Atrybut produktu:\s*/,
-                    '',
-                  )}
-                  :{' '}
-                  {selectedVariation ||
-                    Object.entries(product.attributes)[0][1]}
-                </p>
-              )}
+              Object.entries(product.attributes).length > 0 &&
+              (() => {
+                const [attrKey, value] = Object.entries(product.attributes)[0];
+                const cleanedKey = attrKey.replace(/^Atrybut produktu:\s*/, '');
+                return (
+                  <p className="text-xs text-neutral-dark">
+                    {cleanedKey}: {selectedVariations[cleanedKey] || value}
+                  </p>
+                );
+              })()}
           </div>
         </div>
         <div className="flex flex-col items-end">
@@ -192,6 +241,7 @@ const CartItem: React.FC<CartItemProps> = ({
         </div>
       </div>
 
+      {/* Edit Attribute Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-[#36313266] flex items-center justify-center z-50">
           <div
@@ -211,41 +261,52 @@ const CartItem: React.FC<CartItemProps> = ({
               Produkty zostaną dodane do koszyka z uwzględnieniem ich aktualnych
               cen. Czy chcesz kontynuować?
             </p>
-            {Object.entries(variationOptions).map(([name, options]) => (
-              <div key={name} className="mb-4" ref={dropdownRef}>
-                <label className="text-[#1C1C1C] text-base font-light mb-[16px] px-[16px] block flex items-center">
-                  {name.replace(/^Atrybut produktu:\s*/, '')}
-                  {name.includes('Rozstaw') && (
-                    <div className="relative group ml-2">
-                      <img
-                        src="/icons/info.svg"
-                        alt="Info"
-                        className="w-6 h-6 cursor-pointer"
-                      />
-                      <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 bg-beige-dark text-black font-light text-[12px] rounded-[5px] px-4 py-2 hidden group-hover:block z-50 shadow-lg w-[180px]">
-                        <div className="absolute left-1/2 transform -translate-x-1/2 -top-[6px] w-3 h-3 bg-beige-dark rotate-45"></div>
-                        Rozstaw to odległość pomiędzy środkami otworów
-                        montażowych.
+            {Object.entries(variationOptions).map(([key, options]) => {
+              // Compute a clean key for storing and display.
+              const cleanedKey = key.replace(/^Atrybut produktu:\s*/, '');
+              return (
+                <div key={cleanedKey} className="mb-4" ref={dropdownRef}>
+                  <label className="text-[#1C1C1C] text-base font-light mb-[16px] px-[16px] block flex items-center">
+                    {cleanedKey}
+                    {key.includes('Rozstaw') && (
+                      <div className="relative group ml-2">
+                        <img
+                          src="/icons/info.svg"
+                          alt="Info"
+                          className="w-6 h-6 cursor-pointer"
+                        />
+                        <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 bg-beige-dark text-black font-light text-[12px] rounded-[5px] px-4 py-2 hidden group-hover:block z-50 shadow-lg w-[180px]">
+                          <div className="absolute left-1/2 transform -translate-x-1/2 -top-[6px] w-3 h-3 bg-beige-dark rotate-45"></div>
+                          Rozstaw to odległość pomiędzy środkami otworów
+                          montażowych.
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </label>
-                <AttributeSwitcher
-                  isCartPage={true}
-                  key={name}
-                  attributeName={name}
-                  options={(options as { option: string; price: number }[]).map(
-                    (opt) => `${opt.option} | ${opt.price.toFixed(2)} zł`,
-                  )}
-                  selectedValue={
-                    selectedVariation || product.attributes?.[name] || ''
-                  }
-                  onAttributeChange={(attribute, newValue) => {
-                    setSelectedVariation(newValue.split(' | ')[0]);
-                  }}
-                />
-              </div>
-            ))}
+                    )}
+                  </label>
+                  <AttributeSwitcher
+                    isCartPage={true}
+                    key={key}
+                    attributeName={key}
+                    options={(
+                      options as { option: string; price: number }[]
+                    ).map(
+                      (opt) => `${opt.option} | ${opt.price.toFixed(2)} zł`,
+                    )}
+                    selectedValue={
+                      selectedVariations[cleanedKey] ||
+                      product.attributes?.[cleanedKey] ||
+                      ''
+                    }
+                    onAttributeChange={(attribute, newValue) => {
+                      setSelectedVariations((prev) => ({
+                        ...prev,
+                        [cleanedKey]: newValue.split(' | ')[0],
+                      }));
+                    }}
+                  />
+                </div>
+              );
+            })}
             <div className="flex justify-between items-center mt-[48px] mb-[8px] gap-4">
               <button
                 className="w-1/2 py-3 text-black border border-black rounded-full text-base font-light hover:bg-gray-100 transition"
@@ -255,19 +316,18 @@ const CartItem: React.FC<CartItemProps> = ({
               </button>
               <button
                 className={`w-1/2 py-3 text-white rounded-full text-base font-light transition ${
-                  selectedVariation
+                  Object.keys(selectedVariations).length > 0
                     ? 'bg-[#1C1C1C] hover:bg-black cursor-pointer'
                     : 'bg-gray-400 cursor-not-allowed'
                 }`}
-                disabled={!selectedVariation}
+                disabled={Object.keys(selectedVariations).length === 0}
                 onClick={() => {
-                  if (selectedVariation) {
-                    handleSaveVariation(
-                      Object.keys(variationOptions)[0],
-                      selectedVariation,
-                    );
-                    setModalOpen(false);
-                  }
+                  Object.entries(selectedVariations).forEach(
+                    ([cleanedKey, newValue]) => {
+                      handleSaveVariation(cleanedKey, newValue);
+                    },
+                  );
+                  setModalOpen(false);
                 }}
               >
                 Zapisz

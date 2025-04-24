@@ -24,7 +24,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const [showOverlay, setShowOverlay] = useState(false);
 
-  // Obsługa przekierowania na podstawie parametrów w URL (np. dla zamówień)
+  /* Obsługa przekierowania na podstawie parametrów w URL (np. dla zamówień)
   useEffect(() => {
     if (router.query['wc-api']) {
       setShowOverlay(true);
@@ -53,7 +53,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       }
     }
   }, [router.query, router]);
-
+*/
   // Przesyłanie zdarzenia pageview do dataLayer po zmianie trasy
   useEffect(() => {
     const handleRouteChange = (url: string) => {

@@ -16,7 +16,7 @@ import {
 
 import { getCache, setCache } from '../../lib/cache';
 
-const CACHE_TTL = 3600;
+const CACHE_TTL = 21600;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { action } = req.query;

@@ -45,6 +45,7 @@ interface CartContextProps {
     name: string,
     newVariation: string,
     newPrice?: number,
+    newVariationId?: number,
   ) => void;
   applyCoupon: (coupon: Coupon) => void;
   removeCoupon: () => void;
@@ -145,31 +146,52 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     name: string,
     newVariation: string,
     newPrice?: number,
+    newVariationId?: number,
   ) => {
     setCart((prevCart) => {
       const updatedCart = { ...prevCart };
       const product = updatedCart.products.find(
         (item) => item.cartKey === cartKey,
       );
-
       if (product) {
-        const cleanName = name.replace(/^Atrybut produktu:\s*/, '').trim();
+        // Clean the attribute name (for example, "Rozstaw")
+        const cleanedName = name.replace(/^Atrybut produktu:\s*/, '').trim();
 
+        // Get the current attributes, defaulting to an empty object if undefined.
+        const attributes = product.attributes ?? {};
+
+        // Remove any keys that match the cleaned attribute.
+        Object.keys(attributes).forEach((attrKey) => {
+          const currentCleaned = attrKey
+            .replace(/^Atrybut produktu:\s*/, '')
+            .trim();
+          if (currentCleaned.toLowerCase() === cleanedName.toLowerCase()) {
+            delete attributes[attrKey];
+          }
+        });
+
+        // Update the product attributes with the cleaned key.
         product.attributes = {
-          ...product.attributes,
-          [cleanName]: newVariation,
+          ...attributes,
+          [cleanedName]: newVariation,
         };
 
+        // Update product price if newPrice is provided.
         if (typeof newPrice !== 'undefined') {
           product.price = newPrice;
           product.totalPrice = newPrice * product.qty;
+        }
+
+        // Update the variation ID if a new one is provided.
+        if (newVariationId) {
+          product.variationId = newVariationId;
+          product.cartKey = newVariationId.toString();
         }
 
         product.variationOptions = product.variationOptions || {};
 
         return recalculateCartTotals(updatedCart);
       }
-
       return prevCart;
     });
   };

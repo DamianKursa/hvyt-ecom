@@ -180,8 +180,17 @@ const Shipping: React.FC<ShippingProps> = ({
                 'kurier gls - darmowa wysyłka',
                 'paczkomaty inpost',
                 'punkty gls',
+                'kurier gls pobranie',
               ].includes(method.title.toLowerCase()),
             );
+
+            filteredMethods = filteredMethods.map((method) => {
+              if (method.title.toLowerCase() === 'kurier gls pobranie') {
+                return { ...method, cost: null };
+              }
+              return method;
+            });
+
             // If 'darmowa dostawa' not present, add it
             if (
               !filteredMethods.some(
