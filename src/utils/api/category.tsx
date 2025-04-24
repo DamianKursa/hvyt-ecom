@@ -49,7 +49,7 @@ export const fetchProductsByCategoryId = async (
       page,
       per_page: perPage,
       status: 'publish',
-      _fields: 'id,name,price,slug,images',
+      _fields: 'id,name,price,regular_price,sale_price,slug,images',
     };
 
     filters.forEach((filter) => {

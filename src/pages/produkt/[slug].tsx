@@ -464,18 +464,50 @@ const ProductPage = () => {
             <h1 className=" text-[24px] md:text-[32px] font-semibold">
               {product?.name}
             </h1>
-            <p className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
-              {selectedVariation?.price
-                ? parseFloat(selectedVariation.price).toFixed(2)
-                : product?.price
-                  ? parseFloat(product.price).toFixed(2)
-                  : '0.00'}{' '}
-              zł
+            <p className="flex items-center gap-2">
+              {(() => {
+                if (!product) return null;
+
+                const isVariable = product.type === 'variable';
+
+                const salePrice = isVariable
+                  ? selectedVariation?.sale_price?.toString() ||
+                    product.baselinker_variations?.[0]?.sale_price?.toString()
+                  : product.sale_price;
+
+                const regularPrice = isVariable
+                  ? selectedVariation?.regular_price?.toString() ||
+                    product.baselinker_variations?.[0]?.regular_price?.toString()
+                  : product.regular_price;
+
+                const effectivePrice = product.price;
+
+                const isOnSale =
+                  salePrice &&
+                  regularPrice &&
+                  parseFloat(salePrice) < parseFloat(regularPrice);
+
+                if (isOnSale) {
+                  return (
+                    <>
+                      <span className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
+                        {parseFloat(salePrice).toFixed(2)} zł
+                      </span>
+                      <span className="text-[16px] text-gray-500 line-through">
+                        {parseFloat(regularPrice).toFixed(2)} zł
+                      </span>
+                    </>
+                  );
+                } else {
+                  return (
+                    <span className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
+                      {parseFloat(effectivePrice).toFixed(2)} zł
+                    </span>
+                  );
+                }
+              })()}
               {isMeble && (
-                <span
-                  className="ml-2 text-sm font-semibold uppercase"
-                  style={{ backgroundColor: '#9FC1DF', color: '#fff' }}
-                >
+                <span className="px-4 py-2 rounded-full bg-[#9FC1DF] ml-2 text-sm font-semibold uppercase">
                   PREORDER
                 </span>
               )}

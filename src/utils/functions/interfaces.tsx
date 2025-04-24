@@ -96,9 +96,10 @@ export interface Product {
   id: string;
   name: string;
   price: string;
+  type?: 'simple' | 'variable';
   slug: string;
-  salePrice?: string;
-  regularPrice?: string;
+  sale_price?: string;
+  regular_price?: string;
   on_sale?: boolean;
   categories?: { id: number; name: string; slug: string }[];
   description: string;
