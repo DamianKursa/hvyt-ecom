@@ -148,7 +148,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
       {discountPct > 0 && (
         <div
           className="absolute top-2 left-2 px-2 py-1 rounded text-white text-sm font-bold z-20"
-          style={{ backgroundColor: '#D71F27' /* same as your sale color */ }}
+          style={{ backgroundColor: '#661F30' /* same as your sale color */ }}
         >
           -{discountPct}%
         </div>

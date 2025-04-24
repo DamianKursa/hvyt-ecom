@@ -464,22 +464,109 @@ const ProductPage = () => {
             <h1 className=" text-[24px] md:text-[32px] font-semibold">
               {product?.name}
             </h1>
-            <p className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
-              {selectedVariation?.price
-                ? parseFloat(selectedVariation.price).toFixed(2)
-                : product?.price
-                  ? parseFloat(product.price).toFixed(2)
-                  : '0.00'}{' '}
-              zł
+            <p className="relative flex items-center gap-2">
+              {(() => {
+                if (!product) return null;
+
+                // --- detect variable vs simple by looking for your baselinker_variations array ---
+                const isVariable =
+                  Array.isArray(product.baselinker_variations) &&
+                  product.baselinker_variations.length > 0;
+
+                // --- helpers to pick the right number from either variation or product ---
+                const getNumber = (val: unknown): number =>
+                  typeof val === 'string' || typeof val === 'number'
+                    ? parseFloat(val as any) || 0
+                    : 0;
+
+                let salePrice = 0;
+                let regularPrice = 0;
+
+                if (isVariable) {
+                  // console.log out so you can inspect what you actually received
+                  console.log('🔍 variation data:', {
+                    selectedVariation,
+                    allVariations: product.baselinker_variations,
+                  });
+
+                  // pick the selected variation, or fall back to the first one
+                  const v =
+                    selectedVariation ?? product.baselinker_variations?.[0];
+
+                  salePrice =
+                    getNumber((v as any).sale_price) ||
+                    getNumber((v as any).price); // if nobody set sale_price, use price
+                  regularPrice =
+                    getNumber((v as any).regular_price) || salePrice;
+                } else {
+                  // simple product
+                  // GraphQL sometimes delivers camelCase, sometimes snake_case, so check both
+                  console.log('🔍 simple product data:', {
+                    price: product.price,
+                    sale_price: (product as any).sale_price,
+                    salePrice: (product as any).salePrice,
+                    regular_price: (product as any).regular_price,
+                    regularPrice: (product as any).regularPrice,
+                  });
+
+                  salePrice =
+                    getNumber((product as any).sale_price) ||
+                    getNumber((product as any).salePrice) ||
+                    getNumber(product.price);
+                  regularPrice =
+                    getNumber((product as any).regular_price) ||
+                    getNumber((product as any).regularPrice) ||
+                    salePrice;
+                }
+
+                const isOnSale = salePrice < regularPrice;
+                const discountPct = isOnSale
+                  ? Math.round(
+                      ((regularPrice - salePrice) / regularPrice) * 100,
+                    )
+                  : 0;
+
+                return (
+                  <>
+                    {/* your -XX% badge */}
+                    {isOnSale && (
+                      <span
+                        className="absolute top-2 right-2 px-2 py-1 text-xs font-semibold rounded"
+                        style={{
+                          backgroundColor: '#661F30', // same as your sale-price color
+                          color: '#fff',
+                        }}
+                      >
+                        -{discountPct}%
+                      </span>
+                    )}
+
+                    {/* sale vs regular display */}
+                    {isOnSale ? (
+                      <>
+                        <span className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
+                          {salePrice.toFixed(2)} zł
+                        </span>
+                        <span className="text-[16px] text-gray-500 line-through ml-2">
+                          {regularPrice.toFixed(2)} zł
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
+                        {salePrice.toFixed(2)} zł
+                      </span>
+                    )}
+                  </>
+                );
+              })()}
+
               {isMeble && (
-                <span
-                  className="ml-2 text-sm font-semibold uppercase"
-                  style={{ backgroundColor: '#9FC1DF', color: '#fff' }}
-                >
+                <span className="px-4 py-2 rounded-full bg-[#9FC1DF] ml-2 text-sm font-semibold uppercase">
                   PREORDER
                 </span>
               )}
             </p>
+
             {validationError && (
               <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg mt-2">
                 <span>{validationError}</span>
