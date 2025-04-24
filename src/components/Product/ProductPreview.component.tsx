@@ -6,6 +6,8 @@ import { useWishlist } from '@/context/WhishlistContext';
 interface Product {
   name: string;
   price: string;
+  regular_price?: string;
+  sale_price?: string;
   slug: string;
   categorySlug?: string;
   images: { src: string }[];
@@ -106,6 +108,15 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const firstImage = product.images?.[0]?.src || '/fallback-image.jpg';
   const secondImage = product.images?.[1]?.src || firstImage;
 
+  const regular = parseFloat(product.regular_price ?? product.price);
+  const sale = product.sale_price
+    ? parseFloat(product.sale_price)
+    : parseFloat(product.price);
+
+  // percent discount
+  const discountPct =
+    sale < regular ? Math.round(((regular - sale) / regular) * 100) : 0;
+
   const productPrice = product?.variations?.nodes?.length
     ? `od ${parseFloat(product.variations.nodes[0].price || '0').toFixed(2)} zł`
     : `${parseFloat(product.price || '0').toFixed(2)} zł`;
@@ -133,6 +144,15 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* — discount badge top-left — */}
+      {discountPct > 0 && (
+        <div
+          className="absolute top-2 left-2 px-2 py-1 rounded text-white text-sm font-bold z-20"
+          style={{ backgroundColor: '#D71F27' /* same as your sale color */ }}
+        >
+          -{discountPct}%
+        </div>
+      )}
       {/* Wishlist Button */}
       <button
         onClick={handleWishlistClick}
@@ -219,17 +239,23 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
           )}
       </div>
 
-      {/* Title and Price */}
+      {/* Title + Price */}
       <div className="mt-2 text-left">
-        <h3
-          className="text-[16px] font-semibold text-neutral-darkest"
-          title={product.name}
-        >
-          {truncatedName}
-        </h3>
-        <p className="text-base font-light text-neutral-darkest">
-          {productPrice}
-        </p>
+        <h3 className="text-[16px] font-semibold">{truncatedName}</h3>
+        <div className="mt-1 flex items-baseline">
+          {sale < regular && (
+            <span className="text-gray-500 line-through mr-2">
+              {regular.toFixed(2)} zł
+            </span>
+          )}
+          <span
+            className={`text-base font-bold ${
+              sale < regular ? 'text-dark-pastel-red' : 'text-neutral-darkest'
+            }`}
+          >
+            {sale.toFixed(2)} zł
+          </span>
+        </div>
       </div>
 
       {/* Clickable Overlay */}
