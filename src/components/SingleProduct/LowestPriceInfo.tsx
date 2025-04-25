@@ -35,21 +35,29 @@ const LowestPriceInfo: React.FC<LowestPriceInfoProps> = ({
   let regularPrice = 0;
 
   if (selectedVariation) {
-    salePrice = getNumber(
-      selectedVariation.sale_price ?? selectedVariation.price,
-    );
-    regularPrice = getNumber(selectedVariation.regular_price ?? salePrice);
+    // If a variation is selected, use its price—but only treat sale_price > 0 as a real sale
+    const base = getNumber(selectedVariation.price);
+    const rawSale = getNumber(selectedVariation.sale_price);
+    salePrice = rawSale > 0 ? rawSale : base;
+    const rawReg = getNumber(selectedVariation.regular_price);
+    regularPrice = rawReg > 0 ? rawReg : base;
   } else if (variations.length > 0) {
-    salePrice = getNumber(variations[0].price);
-    regularPrice = getNumber(variations[0].regular_price ?? salePrice);
+    // No variation picked yet: look at first VARIATION
+    const first = variations[0];
+    const rawSale = first.sale_price ?? 0;
+    salePrice = rawSale > 0 ? rawSale : getNumber(first.price);
+    const rawReg = first.regular_price ?? salePrice;
+    regularPrice = rawReg > 0 ? rawReg : salePrice;
   } else {
-    salePrice =
-      getNumber(product.sale_price ?? product.salePrice) ||
-      getNumber(product.price);
-    regularPrice =
-      getNumber(product.regular_price ?? product.regularPrice) || salePrice;
+    // Simple product
+    const prodSale = getNumber(product.sale_price ?? product.salePrice);
+    const prodBase = getNumber(product.price);
+    salePrice = prodSale > 0 ? prodSale : prodBase;
+    const prodReg = getNumber(product.regular_price ?? product.regularPrice);
+    regularPrice = prodReg > 0 ? prodReg : salePrice;
   }
 
+  // Only show if there's a real discount
   if (salePrice >= regularPrice) return null;
 
   return (
