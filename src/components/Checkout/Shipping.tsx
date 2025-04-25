@@ -120,7 +120,7 @@ const Shipping: React.FC<ShippingProps> = ({
     'darmowa dostawa': '/icons/free-shipping.svg',
     'kurier gls pobranie': '/icons/GLS_Logo_2021.svg',
     'punkty gls': '/icons/GLS_Logo_2021.svg',
-    'dostawa duzych mebli': '/images/duza-dostawa.png',
+    'dostawa dużych mebli': '/images/duza-dostawa.png',
   };
 
   // ─── FETCH SHIPPING METHODS ──────────────────────────────────────────────
@@ -190,6 +190,12 @@ const Shipping: React.FC<ShippingProps> = ({
             }
             return true;
           });
+
+          if (!cartContainsRestricted) {
+            filteredMethods = filteredMethods.filter(
+              (m) => m.id !== mebleOnlyMethod.id,
+            );
+          }
 
           if (cartTotal >= 300) {
             filteredMethods = filteredMethods.filter((method) =>

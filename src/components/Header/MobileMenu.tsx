@@ -137,7 +137,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                   }`}
                 >
                   <img
-                    src="/icons/HVYT_meble_znak graficzny_burgundy.png"
+                    src="/images/HVYT_meble_znak graficzny_burgundy.png"
                     alt="Meble icon"
                     className="h-6 pr-2"
                   />

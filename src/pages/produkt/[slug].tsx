@@ -21,6 +21,7 @@ import useCrossSellProducts from '@/utils/hooks/useCrossSellProducts';
 import { InputField } from '@/components/Input/InputField.component';
 import { useForm, FormProvider } from 'react-hook-form';
 import Head from 'next/head';
+import LowestPriceInfo from '@/components/SingleProduct/LowestPriceInfo';
 
 const NajczęściejKupowaneRazem = dynamic(
   () => import('@/components/Product/CrossSell'),
@@ -567,7 +568,10 @@ const ProductPage = () => {
                 </span>
               )}
             </p>
-
+            <LowestPriceInfo
+              product={product!}
+              selectedVariation={selectedVariation || null}
+            />
             {validationError && (
               <div className="bg-red-100 text-red-700 px-4 py-2 rounded-lg mt-2">
                 <span>{validationError}</span>
