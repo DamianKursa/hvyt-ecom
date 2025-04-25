@@ -120,7 +120,6 @@ const Shipping: React.FC<ShippingProps> = ({
     'darmowa dostawa': '/icons/free-shipping.svg',
     'kurier gls pobranie': '/icons/GLS_Logo_2021.svg',
     'punkty gls': '/icons/GLS_Logo_2021.svg',
-    'dostawa dużych mebli': '/images/duza-dostawa.png',
   };
 
   // ─── FETCH SHIPPING METHODS ──────────────────────────────────────────────
@@ -134,9 +133,9 @@ const Shipping: React.FC<ShippingProps> = ({
         if (!response.ok) {
           throw new Error('Nie udało się pobrać metod dostawy');
         }
-        const data: ShippingZone[] = await response.json();
+        const data = await response.json();
 
-        // 1) Restricted IDs & check:
+        // Define restricted IDs
         const restrictedIds = [
           '7543167',
           '7543168',
@@ -154,34 +153,19 @@ const Shipping: React.FC<ShippingProps> = ({
         ];
         const cartContainsRestricted =
           cart?.products?.some(
-            (p: any) =>
-              restrictedIds.includes(String(p.productId)) ||
-              (p.variationId && restrictedIds.includes(String(p.variationId))),
-          ) ?? false;
+            (product: any) =>
+              restrictedIds.includes(String(product.productId)) ||
+              (product.variationId &&
+                restrictedIds.includes(String(product.variationId))),
+          ) || false;
 
-        // 2) Your “duże meble” method:
-        const mebleOnlyMethod: ShippingMethod = {
-          id: 'dostawa_duzych_mebli',
-          title: 'Dostawa dużych mebli',
-          cost: 300,
-          enabled: true,
-        };
-
-        // 3) Build zones – if meble, only that one method:
-        const updatedZones: ShippingZone[] = data.map((zone) => {
-          if (cartContainsRestricted) {
-            return {
-              ...zone,
-              methods: [mebleOnlyMethod],
-            };
-          }
-
-          // otherwise your existing filtering logic:
+        let updatedZones = data.map((zone: ShippingZone) => {
           let filteredMethods = zone.methods.filter((method) => {
+            // Filter out any 'flexible shipping' references
             if (method.title.toLowerCase().includes('flexible shipping')) {
               return false;
             }
-            // hide “darmowa” under 300
+            // Filter out 'darmowa' if cartTotal < 300
             if (
               method.title.toLowerCase().includes('darmowa') &&
               cartTotal < 300
@@ -191,12 +175,7 @@ const Shipping: React.FC<ShippingProps> = ({
             return true;
           });
 
-          if (!cartContainsRestricted) {
-            filteredMethods = filteredMethods.filter(
-              (m) => m.id !== mebleOnlyMethod.id,
-            );
-          }
-
+          // If cartTotal >= 300, keep only certain methods
           if (cartTotal >= 300) {
             filteredMethods = filteredMethods.filter((method) =>
               [
@@ -206,9 +185,10 @@ const Shipping: React.FC<ShippingProps> = ({
                 'punkty gls',
               ].includes(method.title.toLowerCase()),
             );
+            // If 'darmowa dostawa' not present, add it
             if (
               !filteredMethods.some(
-                (m) => m.title.toLowerCase() === 'darmowa dostawa',
+                (method) => method.title.toLowerCase() === 'darmowa dostawa',
               )
             ) {
               filteredMethods.push({
@@ -220,38 +200,50 @@ const Shipping: React.FC<ShippingProps> = ({
             }
           }
 
-          // InPost lockers
+          // Conditionally add Paczkomaty InPost
           if (
             !filteredMethods.some(
-              (m) => m.title.toLowerCase() === 'paczkomaty inpost',
+              (method) => method.title.toLowerCase() === 'paczkomaty inpost',
             ) &&
-            cartTotal < 300
+            !cartContainsRestricted // add only if no restricted items
           ) {
             filteredMethods.push({
               id: 'paczkomaty_inpost',
               title: 'Paczkomaty InPost',
-              cost: 15,
+              cost: cartTotal >= 300 ? null : 15,
               enabled: true,
             });
           }
 
-          // GLS points
+          // Conditionally add Punkty GLS
           if (
             !filteredMethods.some(
-              (m) => m.title.toLowerCase() === 'punkty gls',
+              (method) => method.title.toLowerCase() === 'punkty gls',
             ) &&
-            cartTotal < 300
+            !cartContainsRestricted // add only if no restricted items
           ) {
             filteredMethods.push({
               id: 'punkty_gls',
               title: 'Punkty GLS',
-              cost: 15,
+              cost: cartTotal >= 300 ? null : 15,
               enabled: true,
+            });
+          }
+
+          // Final filter pass: remove if cartContainsRestricted
+          if (cartContainsRestricted) {
+            filteredMethods = filteredMethods.filter((method) => {
+              return (
+                method.id !== 'paczkomaty_inpost' && method.id !== 'punkty_gls'
+              );
             });
           }
 
           return { ...zone, methods: filteredMethods };
         });
+
+        console.log('cartContainsRestricted:', cartContainsRestricted);
+        console.log('updatedZones:', updatedZones);
 
         setShippingZones(updatedZones);
       } catch (err) {
@@ -259,12 +251,13 @@ const Shipping: React.FC<ShippingProps> = ({
         setError(
           'Wystąpił błąd podczas ładowania metod dostawy. Ponowna próba za 5 sekund.',
         );
-        setTimeout(fetchShippingMethods, 5000);
+        setTimeout(() => {
+          fetchShippingMethods();
+        }, 5000);
       } finally {
         setLoading(false);
       }
     };
-
     fetchShippingMethods();
   }, [cart, cartTotal]);
 
