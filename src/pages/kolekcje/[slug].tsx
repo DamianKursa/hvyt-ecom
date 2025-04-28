@@ -84,6 +84,15 @@ const CollectionPage = () => {
   const currentKolekcja = kolekcjeData?.find(
     (kolekcja: Kolekcja) => kolekcja.slug === slugString,
   );
+  const seoTitle =
+    currentKolekcja?.yoast_head_json?.title ||
+    currentKolekcja?.title.rendered ||
+    `Hvyt | Kolekcja`;
+
+  const seoDescription =
+    currentKolekcja?.yoast_head_json?.description ||
+    stripHTML(currentKolekcja?.content.rendered || '') ||
+    '';
 
   const handleCollectionClick = (kolekcjaSlug: string) => {
     setLoading(true);
@@ -109,12 +118,10 @@ const CollectionPage = () => {
   }
 
   return (
-    <Layout
-      title={`Hvyt | ${
-        currentKolekcja?.title.rendered || slugString || 'Ładowanie...'
-      }`}
-    >
+    <Layout title={seoTitle}>
       <Head>
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDescription} />
         <link
           id="meta-canonical"
           rel="canonical"
