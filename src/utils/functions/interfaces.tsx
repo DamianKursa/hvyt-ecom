@@ -103,6 +103,7 @@ export interface Product {
   on_sale?: boolean;
   categories?: { id: number; name: string; slug: string }[];
   description: string;
+  short_description?: string;
   image: string;
   images?: {
     src: string;
@@ -113,6 +114,12 @@ export interface Product {
     key: string;
     value: string;
   }[];
+  yoast_head_json?: {
+    title?: string;
+    description?: string;
+    canonical?: string;
+    [key: string]: any;
+  };
   lowest_price?: string;
   baselinker_variations?: Array<{
     id: number;
@@ -158,7 +165,10 @@ export interface Kolekcja {
   imageUrl: string;
   featured_media?: number;
   yoast_head_json?: {
-    og_image?: { url: string }[];
+    title?: string;
+    description?: string;
+    canonical?: string;
+    [key: string]: any;
   };
   acf?: {
     ikonka_1?: string;

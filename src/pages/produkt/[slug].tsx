@@ -57,6 +57,17 @@ const ProductPage = () => {
     snackbar,
   } = state;
 
+  const seoTitle =
+    product?.yoast_head_json?.title ||
+    product?.meta_data?.find((m) => m.key === '_yoast_wpseo_title')?.value ||
+    `Hvyt | ${product?.name}`;
+
+  const seoDescription =
+    product?.yoast_head_json?.description ||
+    product?.meta_data?.find((m) => m.key === '_yoast_wpseo_metadesc')?.value ||
+    product?.short_description ||
+    '';
+
   const categories: Category[] = product?.categories ?? [];
   const isMeble = categories.some((c) => c.slug === 'meble');
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -440,8 +451,10 @@ const ProductPage = () => {
       : (product as any)?.stock_status === 'outofstock';
 
   return (
-    <Layout title={`Hvyt | ${product?.name || 'Ładowanie...'}`}>
+    <Layout title={seoTitle}>
       <Head>
+        <title>{seoTitle}</title>
+        <meta name="description" content={seoDescription} />
         <link
           id="meta-canonical"
           rel="canonical"

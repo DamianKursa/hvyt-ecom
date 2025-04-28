@@ -25,6 +25,18 @@ export interface Product {
     attributes: { name: string; option: string }[];
   }[];
   availableStock?: number;
+  short_description?: string;
+  meta_data?: Array<{
+    id?: number;
+    key: string;
+    value: any;
+  }>;
+  yoast_head_json?: {
+    title?: string;
+    description?: string;
+    canonical?: string;
+    [key: string]: any;
+  };
 }
 
 export interface Coupon {
