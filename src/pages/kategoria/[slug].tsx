@@ -72,6 +72,15 @@ const CategoryPage = ({
   seoData,
   initialAttributes,
 }: CategoryPageProps) => {
+  useEffect(() => {
+    console.log('🛠 CategoryPage props on mount:', {
+      category,
+      initialProducts,
+      initialTotalProducts,
+      seoData,
+      initialAttributes,
+    });
+  }, []);
   const router = useRouter();
   const slug = Array.isArray(router.query.slug)
     ? router.query.slug[0]
@@ -243,7 +252,7 @@ const CategoryPage = ({
   }
 
   return (
-    <Layout title={`Hvyt | ${category.name || 'Loading...'}`}>
+    <Layout title={seoTitle}>
       <Head>
         <title>{seoTitle}</title>
         {seoDescription && <meta name="description" content={seoDescription} />}

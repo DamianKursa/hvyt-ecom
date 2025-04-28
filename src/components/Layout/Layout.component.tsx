@@ -28,9 +28,10 @@ const Layout: React.FC<ILayoutProps> = ({ children, title, description }) => {
     'meble',
     'galki',
   ];
-
+  const isCategoryRoute = router.pathname.startsWith('/kategoria');
   const isFullWidthHero =
     noMarginPages.includes(router.pathname) ||
+    isCategoryRoute ||
     fullWidthCategories.some((slug) => router.asPath.includes(`/${slug}`));
 
   useEffect(() => {
