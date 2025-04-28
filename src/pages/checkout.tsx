@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import React, { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
@@ -16,7 +17,6 @@ import { pushGTMEvent } from '@/utils/gtm';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
-
   const [customerType, setCustomerType] = useState<'individual' | 'company'>(
     'individual',
   );
@@ -371,6 +371,59 @@ const Checkout: React.FC = () => {
           quantity: product.qty,
         })),
       });
+
+      // ── Facebook Purchase tracking ───────────────────────────────
+      const purchaseEventId = createdOrder.id.toString();
+
+      // PIXEL → browser
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq(
+          'track',
+          'Purchase',
+          {
+            value: cart.totalProductsPrice,
+            currency: 'PLN',
+            content_ids: cart.products.map((p) => p.productId),
+            contents: cart.products.map((p) => ({
+              id: p.productId,
+              quantity: p.qty,
+            })),
+          },
+          { eventID: purchaseEventId },
+        );
+      }
+
+      // CAPI → server
+      // … after fbq('track','Purchase',…) …
+      {
+        const fbp = document.cookie.match(/_fbp=([^;]+)/)?.[1];
+        const fbc = document.cookie.match(/_fbc=([^;]+)/)?.[1];
+        fetch('/api/fb-capi', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventName: 'Purchase',
+            eventId: purchaseEventId,
+            customData: {
+              value: cart.totalProductsPrice,
+              currency: 'PLN',
+              content_ids: cart.products.map((p) => p.productId),
+              contents: cart.products.map((p) => ({
+                id: p.productId,
+                quantity: p.qty,
+              })),
+            },
+            userData: { fbp, fbc, email },
+          }),
+        })
+          .then(async (res) => {
+            const json = await res.json();
+            if (!res.ok) console.error('🚨 CAPI error response:', json);
+            else console.log('✅ CAPI success:', json);
+          })
+          .catch((err) => console.error('❌ CAPI network error:', err));
+      }
+      // ── end Facebook Purchase tracking ────────────────────────────
 
       localStorage.setItem('recentOrderId', createdOrder.id.toString());
       localStorage.setItem('recentOrderKey', createdOrder.order_key);

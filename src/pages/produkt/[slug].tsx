@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
@@ -217,9 +218,6 @@ const ProductPage = () => {
     });
   };
 
-  // **********************************************
-  // Stock Logic – works for both simple and variable products
-  // **********************************************
   let availableStock = 0;
   if (product) {
     if (
@@ -312,7 +310,7 @@ const ProductPage = () => {
       return;
     }
 
-    // Proceed with add-to-cart logic
+    // — Your existing "build cartItem" logic —
     const price = parseFloat(selectedVariation?.price || product.price);
     const variationOptions: {
       [key: string]: { option: string; price: number }[];
@@ -347,27 +345,69 @@ const ProductPage = () => {
       availableStock,
     };
 
-    // Add item to cart
     addCartItem(cartItem);
 
-    // GA4 conversion tracking: Push add_to_cart event into the dataLayer
+    // 4) Google GA4
     (window as any).window.dataLayer?.push({
       event: 'add_to_cart',
       ecommerce: {
         currency: 'PLN',
-        value: parseFloat((quantity * price).toFixed(2)),
+        value: cartItem.totalPrice,
         items: [
           {
             item_id: product.id,
             item_name: product.name,
-            price: parseFloat(price.toFixed(2)),
-            quantity: quantity,
-            // You can include additional properties like category, brand, etc.
+            price: cartItem.price,
+            quantity: cartItem.qty,
           },
         ],
       },
     });
 
+    const eventId = uuidv4();
+
+    // → Browser Pixel
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq(
+        'track',
+        'AddToCart',
+        {
+          content_type: 'product',
+          content_ids: [product.id],
+          value: cartItem.totalPrice,
+          currency: 'PLN',
+        },
+        { eventID: eventId },
+      );
+    }
+
+    {
+      const fbp = document.cookie.match(/_fbp=([^;]+)/)?.[1];
+      const fbc = document.cookie.match(/_fbc=([^;]+)/)?.[1];
+      fetch('/api/fb-capi', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventName: 'AddToCart',
+          eventId,
+          customData: {
+            content_type: 'product',
+            content_ids: [product.id],
+            value: cartItem.totalPrice,
+            currency: 'PLN',
+          },
+          userData: { fbp, fbc },
+        }),
+      })
+        .then(async (res) => {
+          const json = await res.json();
+          if (!res.ok) console.error('🚨 CAPI error response:', json);
+          else console.log('✅ CAPI success:', json);
+        })
+        .catch((err) => console.error('❌ CAPI network error:', err));
+    }
+
+    // 6) Show cart modal
     dispatch({ type: 'TOGGLE_MODAL', payload: true });
   };
 
