@@ -26,13 +26,16 @@ const CollectionPage = () => {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Utility to remove HTML tags
+  // Utility to remove HTML tags (safe on both SSR and client)
   const stripHTML = (html: string) => {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    return div.textContent || div.innerText || '';
+    if (typeof document !== 'undefined') {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      return div.textContent || div.innerText || '';
+    }
+    // simple regex fallback on server
+    return html.replace(/<[^>]+>/g, '');
   };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
