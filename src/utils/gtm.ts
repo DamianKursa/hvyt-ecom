@@ -4,7 +4,7 @@ import { trackPinterest } from './pinterest';
 type EcommercePayload = {
   value?: number;
   currency?: string;
-  items?: Array<{ quantity?: number }>;
+  items?: any[];
   transaction_id?: string;
   [k: string]: any;
 };
