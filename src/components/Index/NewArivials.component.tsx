@@ -108,13 +108,13 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
           Zobacz nasze nowości
         </h2>
         <p className="font-size-text-medium text-neutral-darkest mt-2">
-          Nowa gałka HALOHOLD projektu Moniki Rogusz-Witkoś.
+          Nowi najlepsi przyjaciele Twojego domu
         </p>
         <Link
-          href="/kategoria/uchwyty-meblowe?sort=Najnowsze+produkty"
+          href="/kategoria/meble"
           className="mt-4 px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
         >
-          Zobacz nowości →
+          Zobacz meble →
         </Link>
       </div>
       <div className="md:hidden">
@@ -229,13 +229,13 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
               Zobacz nasze nowości
             </h2>
             <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
-              Nowa gałka HALOHOLD projektu Moniki Rogusz-Witkoś.
+              Nowi najlepsi przyjaciele Twojego domu
             </p>
             <Link
-              href="/kategoria/uchwyty-meblowe?sort=Najnowsze+produkty"
+              href="/kategoria/meble"
               className="mt-[40px] inline-block px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
             >
-              Zobacz nowości →
+              Zobacz meble →
             </Link>
           </motion.div>
         </div>
