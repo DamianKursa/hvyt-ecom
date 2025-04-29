@@ -21,7 +21,11 @@ const IconRenderer: React.FC<IconRendererProps> = ({
   top = 20,
   left = 30,
 }) => {
-  const filteredIcons = icons.filter((icon) => !!icon);
+  const normalizedIcons = icons.map((icon) =>
+    icon === 'krawędziowy' ? 'krawedziowy' : icon,
+  );
+
+  const filteredIcons = normalizedIcons.filter((icon) => Boolean(icon));
 
   return (
     <div
