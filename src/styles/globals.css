@@ -312,7 +312,83 @@ input:focus {
   position: absolute;
   left: 0;
 }
-
+p.lead {
+  margin-top: 0;
+  margin-bottom: 1.5em;
+}
+.form-row {
+  margin-bottom: 1.2em;
+}
+.form-row label {
+  display: block;
+  margin-bottom: 0.3em;
+  font-style: italic;
+}
+.form-row input[type="text"],
+.form-row input[type="email"] {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #000;
+  padding: 4px 2px;
+  font-size: 1em;
+}
+.address-block {
+  margin: 2em 0;
+  text-align: center;
+  font-weight: bold;
+}
+.address-block small {
+  display: block;
+  font-weight: normal;
+  margin-top: 0.2em;
+}
+.statement-title {
+  text-align: center;
+  font-style: italic;
+  margin: 2em 0 1em;
+  font-weight: bold;
+}
+.statement-text {
+  margin-bottom: 1em;
+}
+.statement-text input {
+  border: none;
+  border-bottom: 1px solid #000;
+  width: 60%;
+  padding: 2px;
+  margin: 0 0.3em;
+}
+.bank-account {
+  margin: 1.5em 0;
+}
+.bank-account input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #000;
+  padding: 4px 2px;
+}
+.signature {
+  margin-top: 2em;
+}
+.signature .date {
+  width: 40%;
+  display: inline-block;
+  border-bottom: 1px solid #000;
+  padding: 4px 2px;
+}
+.signature .name {
+  width: 50%;
+  display: inline-block;
+  border-bottom: 1px solid #000;
+  padding: 4px 2px;
+  margin-left: 2em;
+}
+.signature label {
+  display: block;
+  margin-bottom: 0.3em;
+  font-style: italic;
+  font-size: 0.9em;
+}
 
 
 

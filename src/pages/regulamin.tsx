@@ -1,173 +1,605 @@
+// pages/regulamin.tsx
 import React from 'react';
 import Head from 'next/head';
 import Layout from '@/components/Layout/Layout.component';
+import ExpandableSection from '@/components/UI/ExpandableSection';
 
 const Regulamin = () => {
-  const htmlContent = `
-  <h1 class="mt-6 mb-2 text-[45px]" >Regulamin sklepu internetowego www.hvyt.pl</h1>
-  <p>Niniejszy Regulamin określa zasady składania i realizacji Zamówień poprzez stronę internetową działającą pod adresem URL: www.hvyt.pl</p>
-  <p>Użytkownik ma prawo przed złożeniem Zamówienia do negocjacji warunków Umowy sprzedaży ze Sprzedającym. W przypadku zrezygnowania przez Użytkownika z możliwości zawarcia Umowy sprzedaży w drodze indywidualnych negocjacji, zastosowanie ma niniejszy Regulamin.</p>
+  const chapters = [
+    {
+      title: 'ROZDZIAŁ I – INFORMACJE OGÓLNE',
+      content: `
+<section>
+  <ol class="list-decimal ml-4">
+    <li>
+      Użyte w niniejszym Regulaminie pojęcia oznaczają:
+      <ol type="a" class="list-lower-alpha ml-6">
+        <li>
+          <strong>a) Sprzedający</strong> - Pani Marta Wontorczyk prowadząca jednoosobową działalność gospodarczą pod firmą HVYT by Marta Wontorczyk pod adresem: Głogoczów 996, 32-444 Głogoczów, zgodnie z wpisem do Centralnej Ewidencji i Informacji o Działalności Gospodarczej RP nadzorowanej przez Ministerstwo Rozwoju i Technologii, organ dokonujący wpisu do CEiDG: Urząd Miasta Mogilany, NIP: 676-257-05-84, REGON 384282914, magazyn: Głogoczów 996, 32-444 Głogoczów email: <a href="mailto:hello@hvyt.pl"><u>hello@hvyt.pl</u></a>, tel. kontaktowy: +48 513 790 697, codziennie w Dni robocze od poniedziałku do piątku w godzinach: 9:00-15:00 (Użytkownik ponosi opłatę za połączenie wg taryfy opłat operatora, z usług którego korzysta Użytkownik);
+        </li>
+        <li>
+          <strong>b) Sklep internetowy</strong> – zespół stron internetowych pod
+          adresem URL: <a href="https://hvyt.pl" target="_blank" rel="noopener">https://hvyt.pl</a>
+          prowadzony przez Sprzedającego w j. polskim umożliwiający zawieranie
+          Umów sprzedaży;
+        </li>
+        <li>
+          <strong>c) Zamawiający</strong> – pełnoletnia osoba fizyczna, która posiada zdolność do czynności prawnych (co obejmuje także Konsumenta-Przedsiębiorcę), osoba prawna lub jednostka organizacyjna nie będąca osobą prawną, której przepisy szczególne przyznają zdolność prawną, dokonująca Zamówienia w ramach Sklepu internetowego;
+        </li>
+        <li>
+          <strong>d) Użytkownik</strong> – każda osoba korzystająca ze Sklepu
+          internetowego;
+        </li>
+        <li>
+          <strong>e) Produkt lub Produkty</strong> – gałki, uchwyty meblowe,
+          klamki, wieszaki, a także inne produkty oferowane przez Sprzedającego
+          w Sklepie internetowym do sprzedaży detalicznej;
+        </li>
+        <li>
+          <strong>f) Strona Produktu</strong> – pojedyncza podstrona w Sklepie
+          internetowym, na której przedstawione są szczegółowe informacje na
+          temat Produktu;
+        </li>
+        <li>
+          <strong>g) Cena</strong> – cena brutto Produktu umieszczona obok informacji
+          o Produkcie;
+        </li>
+        <li>
+          <strong>h) Zamówienie</strong> – oświadczenie woli Zamawiającego złożone
+          za pośrednictwem Sklepu internetowego, wskazujące Produkt lub zestaw
+          Produktów określonych do realizacji przez Zamawiającego, zgodnie z
+          niniejszym Regulaminem;
+        </li>
+        <li>
+          <strong>i) Dni robocze</strong> – dni tygodnia od poniedziałku do piątku,
+          z wyłączeniem dni ustawowo wolnych od pracy;
+        </li>
+        <li>
+          <strong>j) Umowa sprzedaży</strong> – umowa Sprzedaży Produktu w
+          rozumieniu przepisów Kodeksu cywilnego zawarta pomiędzy Sprzedającym,
+          a Zamawiającym z wykorzystaniem Sklepu internetowego, tj. zawierana za
+          pomocą środków porozumiewania się na odległość;
+        </li>
+        <li>
+          <strong>k) Konto</strong> – narzędzie dostępne w systemie Sklepu
+          internetowego, po wprowadzeniu adresu e-mail (Login) i Hasła,
+          umożliwiające m.in. śledzenie w Sklepie internetowym etapów realizacji
+          Zamówienia, przeglądanie historii Zamówień, edycję danych
+          kontaktowych Zamawiającego oraz zmianę Hasła, itp.;
+        </li>
+        <li>
+          <strong>l) Login</strong> – adres e-mail wskazany przez Użytkownika podczas
+          rejestracji w Sklepie internetowym, wymagany wraz z Hasłem do
+          założenia Konta;
+        </li>
+        <li>
+          <strong>m) Hasło</strong> – ciąg znaków (litery, cyfry) wybrany przez
+          Użytkownika podczas rejestracji Konta, wykorzystywany w celu
+          zabezpieczenia dostępu do Konta;
+        </li>
+        <li>
+          <strong>n) Konsument</strong> – osoba fizyczna dokonująca ze Sprzedającym
+          czynności prawnej niezwiązanej bezpośrednio z jej działalnością
+          gospodarczą lub zawodową, zgodnie z definicją zawartą w art. 22 (1)
+          Kodeksu cywilnego;
+        </li>
+        <li>
+          <strong>o) Konsument-Przedsiębiorca</strong> osoba prowadząca jednoosobową działalność gospodarczą zawierająca  Umowę sprzedaży związaną bezpośrednio z prowadzoną przez nią działalnością gospodarczą lub zawodową, <u>lecz nieposiadającą dla niej charakteru zawodowego</u>, wynikającego w szczególności z przedmiotu wykonywanej przez nią działalności gospodarczej, udostępnionego na podstawie przepisów o Centralnej Ewidencji i Informacji o Działalności Gospodarczej, zgodnie z definicją zawartą w art. 7aa Ustawy konsumenckiej;
+        </li>
+        <li>
+          <strong>p) Kodeks cywilny</strong> – ustawa z dnia 24 kwietnia 1964 r.
+          Kodeks cywilny (t. jedn. Dz. U. z 2024 r., poz. 1061 z późn. zm.);
+        </li>
+        <li>
+          <strong>q) Ustawa konsumencka</strong> – ustawa z dnia 30 maja 2014 r. o
+          prawach konsumenta (t. jedn. Dz. U. z 2024 r., poz. 1796);
+        </li>
+        <li>
+          <strong>r) Ustawa o świadczeniu usług drogą elektroniczną</strong> – ustawa
+          z dnia 18 lipca 2002 r. o świadczeniu usług drogą elektroniczną (t.
+          jedn. Dz. U. z 2024 r., poz. 1513);
+        </li>
+        <li>
+          <strong>s) Kodeks dobrych praktyk</strong> – zbiór zasad postępowania, a w
+          szczególności norm etycznych i zawodowych, o których mowa w art. 2 pkt 5
+          Ustawy o przeciwdziałaniu nieuczciwym praktykom rynkowym z dnia
+          23 sierpnia 2007 r. (t. jedn. Dz. U. z 2023 r., poz. 845 z późn. zm.);
+        </li>
+        <li>
+          <strong>t) Regulamin</strong> – niniejszy Regulamin Sklepu internetowego.
+        </li>
+      </ol>
+    </li>
+  </ol>
+</section>
+      `,
+    },
+    {
+      title: 'ROZDZIAŁ II - POSTANOWIENIA OGÓLNE',
+      content: `
+<ol class="list-decimal ml-4 space-y-4">
+  <li>
+    Złożenie Zamówienia na Produkty oferowane w Sklepie internetowym i realizacja Zamówień odbywa się na podstawie niniejszego Regulaminu oraz powszechnie obowiązujących przepisów prawa. Niniejszy Regulamin jest regulaminem, o którym mowa w art. 8. Ustawy o świadczeniu usług drogą elektroniczną.  </li>
+  <li>
+    Liczba oferowanych Produktów objętych promocją lub podlegających wyprzedaży może być ograniczona przez Sprzedającego np. czasowo lub ilościowo, a o wszelkich ograniczeniach Sprzedający będzie informować przy danej promocji lub wyprzedaży. Realizacja Zamówień na Produkty promocyjne odbywa się wówczas w kolejności, w jakiej zostały one złożone przez Zamawiających. Promocje oferowane w Sklepie internetowym nie łączą się, chyba że co innego wynika z zasad danej promocji.
+  </li>
+  <li>
+    <strong>Informacje podane w Sklepie internetowym (w szczególności dotyczące Cen) nie stanowią oferty handlowej w rozumieniu art. 66 Kodeksu cywilnego, stanowią one jedynie zaproszenie do składania ofert Sprzedającemu określone w art. 71 Kodeksu cywilnego.</strong>
+  </li>
+  <li>
+    Wszystkie podane na stronie Sklepu internetowego Ceny są wyrażone w złotych polskich  (PLN) i są cenami brutto (zawierają podatek VAT).     </li>
+  <li>
+    Zabronione jest wykorzystywanie Sklepu internetowego do przesyłania niezamówionej informacji handlowej, tzw. spamu w rozumieniu Ustawy o świadczeniu usług drogą elektroniczną, a także wykorzystywanie Sklepu internetowego w sposób sprzeczny z prawem, dobrymi obyczajami, naruszający dobra osobiste osób trzecich lub uzasadnione interesy Sprzedającego.
+  </li>
+  <li value="7">
+    W celu korzystania ze Sklepu internetowego Użytkownik powinien we własnym zakresie uzyskać dostęp do stanowiska komputerowego lub innego urządzenia końcowego z dostępem do Internetu i aktywnej poczty elektronicznej. Korzystanie ze Sklepu internetowego jest możliwe dla Użytkownika dysponującego następującym wyposażeniem:    
+<ol type="a" class="list-lower-alpha ml-6 space-y-2">
+      <li>a) komputer PC lub inne urządzenie z dostępem do Internetu;</li>
+      <li>b) dostęp do Internetu;</li>
+      <li>c) przeglądarka internetowa, np. Firefox, Opera, Internet Explorer lub Google Chrome lub inna;</li>
+      <li>d) aktywne konto e-mail;</li>
+      <li>e) włączona obsługa niezbędnych plików cookies.</li>
+    </ol>
+  </li>
+  <li>
+    Bezpośredni kontakt ze Sprzedającym jest możliwy mailowo, telefonicznie lub przy użyciu formularza kontaktowego dostępnego w zakładce Kontakt. Wszelkie dane kontaktowe Sprzedającego podane są w niniejszym Regulaminie oraz w Sklepie internetowym. Sprzedający nie pobiera żadnych opłat za komunikację z nim z wykorzystaniem wskazanych w niniejszym ustępie środków porozumiewania na odległość.
+  </li>
+  <li>
+    Sprzedający informuje, że nie stosuje żadnego Kodeksu dobrych praktyk.
+  </li>
+</ol>
+
+      `,
+    },
+    {
+      title: 'ROZDZIAŁ III - USŁUGI ŚWIADCZONE DROGĄ ELEKTRONICZNĄ',
+      content: `
+<ol class="list-decimal ml-4 space-y-4">
+  <li>
+    Usługi świadczone drogą elektroniczną przez Sprzedającego na podstawie niniejszego Regulaminu
+    polegają na umożliwieniu Użytkownikom dokonywania zakupów w Sklepie internetowym, w
+    szczególności z wykorzystaniem Konta oraz usługi przypomnienia Hasła do Konta i otrzymywania
+    od Sprzedającego drogą mailową informacji handlowych, marketingowych, reklamowych dot.
+    Produktów Sprzedającego (newsletter), a także usługi dodania Produktu do listy życzeń oraz
+    zamieszczenia opinii o Produkcie na Stronie Produktu. W Sklepie internetowym jest także
+    dostępna bezpłatna wyszukiwarka Produktów. Usługi te są świadczone 24h na dobę przez 7 dni w
+    tygodniu. Usługi te są nieodpłatne dla Użytkowników.
+  </li>
+  <li>
+    Korzystanie z Konta wymaga dokonania przez Użytkownika rejestracji i podania adresu e-mail
+    będącego jednocześnie Loginem oraz ustalenia Hasła. Na adres e-mail Użytkownika wskazany w
+    formularzu rejestracyjnym zostanie wysłana wiadomość z potwierdzeniem dokonania prawidłowej
+    rejestracji Konta. Z chwilą potwierdzenia rejestracji Konta dochodzi do zawarcia umowy dotyczącej
+    prowadzenia Konta pomiędzy Użytkownikiem, a Sprzedającym na warunkach określonych w
+    Regulaminie.
+  </li>
+  <li>
+    Rejestracja Konta jest bezpłatna i dobrowolna. Login i Hasło mają charakter poufny. Użytkownik
+    korzystający z Loginu i Hasła proszony jest o zachowanie tych informacji w poufności. Hasło nie
+    jest znane Sprzedającemu. Konto jest niezbywalne, Użytkownikowi nie wolno korzystać z Kont
+    innych Użytkowników oraz udostępniać innym osobom możliwości korzystania ze swojego Konta,
+    w tym z Loginu i Hasła. Użytkownik kontaktując się ze Sprzedającym może w każdej chwili
+    zrezygnować z Konta.
+  </li>
+  <li>
+    Usługa przypomnienia Hasła do Konta polega na umożliwieniu Użytkownikowi, który dokonał
+    rejestracji Konta przesłania na wskazany podczas rejestracji Konta adres e-mail linku, który
+    umożliwi utworzenie nowego Hasła do Konta.
+  </li>
+  <li>
+    Korzystanie z usługi newslettera możliwe jest przez każdego Użytkownika,
+    który wyrazi zgodę na subskrypcję newslettera podczas składania Zamówienia
+    lub rejestracji Konta lub wpisze adres email w udostępnione w tym celu pole.
+    Z chwilą subskrypcji newslettera dochodzi do zawarcia umowy o świadczenie
+    usług elektronicznych pomiędzy Użytkownikiem, a Sprzedającym na warunkach
+    określonych w Regulaminie. Użytkownik może w każdej chwili zrezygnować
+    z newslettera.
+  </li>
+  <li>
+    Sprzedający udostępnia w Sklepie internetowym bezpłatną wyszukiwarkę
+    Produktów; wyszukanie jest możliwe po wpisaniu nazwy Produktu lub jej
+    fragmentu.
+  </li>
+  <li>
+    Usługa dodania Produktu do listy życzeń umożliwia zapamiętanie Produktu
+    w systemie Sklepu internetowego i w każdej chwili, po zalogowaniu się,
+    wyświetlenie tylko tych zapamiętanych przez Użytkownika Produktów.
+    Usługa ta dostępna jest tylko dla Użytkowników posiadających aktywne Konto.
+  </li>
+  <li>
+    Usługa zamieszczenia opinii o Produkcie umożliwia Użytkownikowi zamieszczenie subiektywnej opinii o Produkcie na Stronie Produktu, wraz z jego oceną w pięciogwiazdkowej skali. Opinia jest zamieszczona na Stronie Sklepu po jej akceptacji przez Sprzedającego. Użytkownik nie otrzymuje żadnego wynagrodzenia od Sprzedającego, ani innych korzyści za skorzystanie z tej usługi. Sprzedający informuje, że nie weryfikuje pochodzenia danej opinii od klienta Sklepu internetowego.
+  </li>
+  <li>
+    Przesyłając i udostępniając treści poprzez oferowane przez Sprzedającego nieodpłatne usługi, o których mowa w niniejszym Regulaminie, Użytkownik dokonuje dobrowolnego rozpowszechniania i wprowadzania tych treści. W razie jakichkolwiek wątpliwości przyjąć należy, że Sprzedający jedynie zapewnia Użytkownikom odpowiednie zasoby informatyczne do udostępniania i rozpowszechniania treści, jednak treści tych nie należy utożsamiać z poglądami Sprzedającego. Każdy z Użytkowników ponosi odpowiedzialność za zamieszczane i udostępniane przez siebie treści poprzez korzystanie z usług świadczonych drogą elektroniczną przez Sprzedającego.
+  </li>
+  <li>
+    Użytkownicy nie mogą zamieszczać, ani udostępniać w Sklepie internetowym treści, które mogłyby w jakikolwiek sposób naruszać dobra osobiste osób trzecich, czy Sprzedającego, czy też naruszać jakiekolwiek inne prawa osób trzecich, w tym prawa autorskie, prawa własności przemysłowej, tajemnicę przedsiębiorstwa. Zabronione jest także zamieszczanie przez Użytkowników jakichkolwiek treści o charakterze obraźliwym, naruszających dobre obyczaje, przepisy prawne lub normy społeczne, czy też treści zawierające jakiekolwiek dane osobowe osób trzecich bez ich zgody, a także treści o charakterze reklamowym.
+  </li>
+  <li>
+    Umowa o świadczenie usług drogą elektroniczną przez Sprzedającego w zakresie usług opisanych w niniejszym Rozdziale zawierana jest na czas nieoznaczony. Użytkownik może w każdym czasie nieodpłatnie rozwiązać tę umowę w trybie natychmiastowym, co pozostaje bez wpływu na wykonanie już zawartych Umów sprzedaży, chyba że strony postanowią inaczej.
+  </li>
+  <li>
+    Sprzedający może wypowiedzieć umowę z 14-dniowym terminem wypowiedzenia, jeżeli:
+    <ol type="a" class="list-lower-alpha ml-6 space-y-2">
+      <li>a) cel rejestracji lub sposób korzystania z usług jest sprzeczny z zasadami Sklepu;</li>
+      <li>b) działalność Użytkownika narusza normy obyczajowe, nawołuje do przemocy lub narusza prawa osób trzecich;</li>
+      <li>c) Sprzedający otrzymał zawiadomienie o bezprawności podanych danych lub związanej z nimi działalności;</li>
+      <li>d) Użytkownik dopuszcza się przesyłania spamu;</li>
+      <li>e) Użytkownik uporczywie narusza Regulamin;</li>
+      <li>f) podane dane adresowe budzą uzasadnione wątpliwości, a ich weryfikacja nie przyniosła rezultatu.</li>
+    </ol>
+  </li>
+  <li>
+    Sprzedający dokłada wszelkich starań, aby zapewnić prawidłowe i nieprzerwane działanie Sklepu internetowego. W przypadku, gdy usługi oferowane przez Sprzedającego wskazane w niniejszym Regulaminie np. są z nim niezgodne, nie działają prawidłowo, Użytkownikowi przysługuje prawo do złożenia reklamacji. Użytkownicy proszeni są o składanie reklamacji w formie elektronicznej na adres e-mail:<a href="mailto:hello@hvyt.pl">hello@hvyt.pl</a> w celu usprawnienia procesu rozpatrywania reklamacji, wskazując w reklamacji swoje dane osobowe, kontaktowy nr tel. lub e-mail oraz o opisanie zgłaszanych zastrzeżeń.
+  </li>
+  <li>
+    Reklamacje związane z usługami świadczonymi drogą elektroniczną przez Sprzedającego rozpatrywane są w terminie do 30 dni od złożenia stosownej reklamacji, ale jeśli reklamacja zostanie złożona przez Konsumenta lub Konsumenta-Przedsiębiorcę – termin na jej rozpatrzenie wynosi 14 dni od dnia złożenia reklamacji, zgodnie z obowiązującymi przepisami. O sposobie jej rozpatrzenia Użytkownik zostanie poinformowany przez Sprzedającego drogą mailową.
+  </li>
+  <li>
+    Zgodnie z przepisami Rozporządzenia Parlamentu Europejskiego i Rady (UE) 2022/2065 z dnia 19 października 2022 r. w sprawie jednolitego rynku usług cyfrowych oraz zmiany dyrektywy 2000/31/WE, tzw. Akt o usługach cyfrowych (DSA) Sprzedający informuje, że w przypadku, gdy Użytkownik znajdzie w Sklepie internetowym informacje, które w jego ocenie stanowić mogą treści naruszające przepisy prawa polskiego, unijnego lub prawa państwa członkowskiego Unii Europejskiej, np. nawoływanie do terroryzmu, propagowania totalitaryzmu, mowa nienawiści, treści dyskryminujące, naruszenie prawa własności intelektualnej, sprzedaż produktów podrobionych, świadczenie usług z naruszeniem praw konsumenta, treści przedstawiające seksualne wykorzystywanie dzieci lub z posługiwaniem się zwierzęciem, cyberprzemoc, nielegalna reklama, naruszenie tajemnicy, inne treści dyskryminujące, itd. - proszony jest o niezwłoczne powiadomienie Sprzedającego
+  </li>
+  <li>
+    Zgłoszenia można dokonać mailowo na adres: Zgłoszenia można dokonać mailowo na adres: hello@hvyt.pl podając swoje imię i nazwisko, adres URL strony www, na której znajdują się niezgodne z prawem informacje, a także uzasadnienie poglądu Użytkownika o niezgodności treści z prawem. podając swoje imię i nazwisko, adres URL strony www, na której znajdują się niezgodne z prawem informacje, a także uzasadnienie poglądu Użytkownika o niezgodności treści z prawem.
+  </li>
+  <li>
+    Użytkownik proszony jest również o złożenie oświadczenia potwierdzającego powzięte w dobrej wierze przekonanie, że informacje i zarzuty zawarte w zgłoszeniu są prawidłowe i kompletne. Jeśli Użytkownik chce uzyskać od Sprzedającego informację zwrotną nt. statusu zgłoszenia oraz podjętych przez Sprzedającego działań, proszony jest o podanie kontaktowego adresu email. Sprzedający sprawdzi zgłoszenie jak najszybciej. W przypadku, gdy zgłoszone informacje okażą się niezgodne z prawem Sprzedający podejmie niezwłocznie odpowiednie działania, a  jeśli Użytkownik wnioskował o powiadomienie go o sprawie – Sprzedający poinformuje Użytkownika o podjętych działaniach.
+  </li>
+</ol>
+      `,
+    },
+    {
+      title: 'ROZDZIAŁ IV - ZAMÓWIENIE I ZAWARCIE UMOWY SPRZEDAŻY',
+      content: `
+<ol class="list-decimal ml-4 space-y-4">
+  <li>
+    Dokonując zakupów Produktów w Sklepie internetowym Użytkownik może (ale nie musi)
+    zakładać Konto.
+  </li>
+  <li>
+    W celu złożenia Zamówienia w Sklepie internetowym Użytkownik proszony jest o dokonanie
+    następujących czynności:
+    <ol type="a" class="list-lower-alpha ml-6 space-y-2">
+      <li>
+        dokonanie wyboru Produktu, który ma być zakupiony, ilości zamawianego Produktu,
+        ewentualnie parametrów (np. rozmiar, kolor, wariant), o ile są dostępne dla
+        danego Produktu, i kliknięcie przycisku „Dodaj do koszyka”;
+      </li>
+      <li>
+        jeśli Zamawiający wybrał już wszystkie Produkty do zamówienia, powinien kliknąć
+        na logo koszyka w prawym górnym rogu strony, żeby zobaczyć zamawiane Produkty i
+        przejść do koszyka; w tym kroku Użytkownik może podać kod kuponu uprawniającego
+        do otrzymania rabatu, o ile otrzymał taki wcześniej od Sprzedającego, a następnie
+        kliknąć „Przejdź do kasy”;
+      </li>
+      <li>
+        w kolejnym kroku należy podać jednorazowo swoje dane do wysyłki lub zalogować się
+        na Konto (w tym kroku Zamawiający może wpisać uwagi do Zamówienia skierowane
+        do Sprzedającego, jak i odhaczając odpowiedni check-box zarejestrować Konto),
+        można także podać inny adres dostawy niż adres Zamawiającego, następnie należy
+        wybrać metodę płatności i dostawy spośród dostępnych w formularzu Zamówienia, a
+        w celu zakończenia składania Zamówienia, po weryfikacji informacji wprowadzonych
+        przez Zamawiającego i ich ewentualnej modyfikacji oraz akceptacji Regulaminu,
+        należy kliknąć przycisk „Zamawiam i płacę”.
+      </li>
+    </ol>
+  </li>
+  <li>
+    Składanie Zamówień w Sklepie internetowym jest możliwe 24h na dobę, 7 dni w tygodniu,
+    jednakże Sprzedający realizuje wysyłkę Zamówień jedynie w Dni robocze.
+  </li>
+  <li>
+    <strong> Wysłanie Zamówienia przez Zamawiającego stanowi ofertę Zamawiającego złożoną Sprzedającemu
+    co do zawarcia Umowy sprzedaży, zgodnie z treścią Regulaminu.</strong>
+  </li>
+  <li>
+  Zamawiający otrzymuje od Sprzedającego:
+    <ol type="a" class="list-lower-alpha ml-6 space-y-2">
+      <li>
+        a) mailowe potwierdzenie otrzymania Zamówienia w postaci automatycznie generowanej
+        wiadomości e-mail zawierającej numer i datę Zamówienia, dane Zamawiającego, opis
+        Produktu (lub odnośnik do opisu na Stronie Produktu w Sklepie internetowym), Cenę
+        i inne informacje dot. Zamówienia;
+      </li>
+      <li>
+        b) potwierdzenie zawarcia Umowy sprzedaży, tj. wiadomość mailową o dokonaniu zapłaty
+        za Zamówienie na adres e-mail wskazany przez Zamawiającego w Zamówieniu. Potwierdzenie
+        zawarcia Umowy sprzedaży wysyłane jest po zweryfikowaniu wniesienia zapłaty za Zamówienie
+        i przyjęciu Zamówienia do realizacji. W przypadku płatności przy odbiorze, potwierdzeniem
+        jest wiadomość mailowa potwierdzająca przyjęcie Zamówienia do realizacji. Z chwilą
+        otrzymania powyższego potwierdzenia dochodzi do zawarcia Umowy sprzedaży w j. polskim.
+      </li>
+    </ol>
+  </li>
+  <li>
+    Do momentu kliknięcia przycisku „Zamawiam i płacę” Użytkownik może w każdej chwili zmienić
+    wcześniej dokonany wybór Produktu lub przerwać proces zamawiania i zrezygnować z Zamówienia.
+    Zamawiający jest związany Regulaminem od chwili dokonania Zamówienia. Sprzedający nie określa
+    minimalnej kwoty Zamówienia.
+  </li>
+  <li>
+    Treści Umów sprzedaży przechowywane są przez system informatyczny Sklepu internetowego przez
+    okres posiadania Konta, a treść tych umów jest udostępniana wyłącznie stronom Umowy sprzedaży.
+    Każdy Zamawiający, po zalogowaniu do Konta, ma dostęp do wszystkich swoich Umów sprzedaży
+    zawartych w Sklepie przez okres ich przechowywania. W razie braku Konta, umowy są przechowywane
+    do upływu okresu odpowiedzialności Sprzedającego z tytułu rękojmi.
+  </li>
+</ol>
+
+      `,
+    },
+    {
+      title: 'ROZDZIAŁ V - FORMY PŁATNOŚCI, KOSZTY DOSTAWY',
+      content: `
+<ol class="list-decimal ml-4 space-y-4">
+  <li>
+    Dostępnymi w Sklepie internetowym formami płatności są:
+    <ol type="a" class="list-lower-alpha ml-6 space-y-2">
+      <li>
+        a) płatność z góry na rachunek bankowy Sprzedającego nr 91 1140 2004 0000 3302 7916 7100 wskazany także w wiadomości mailowej potwierdzającej złożenie Zamówienia;
+      </li>
+      <li>
+        b) płatność z góry za Zamówienie za pomocą bramki płatności elektronicznych Paynow – także przy użyciu kodu BLIK oraz za pomocą karty kredytowej (obsługiwane karty płatnicze: Visa, Visa Electron, MasterCard, MasterCard Electronic, Maestro);
+      </li>
+      <li>
+        c) płatność przy odbiorze Zamówienia od dostawcy – ta forma płatności wiąże się z koniecznością poniesienia przez Zamawiającego dodatkowej opłaty w kwocie 2 zł.
+      </li>
+    </ol>
+  </li>
+  <li>
+    Płatności elektroniczne realizowane są w ten sposób, że Zamawiający Produkt w Sklepie internetowym wybiera jako formę płatności płatność elektroniczną i zostaje przekierowany do serwisu transakcyjnego, gdzie po zalogowaniu się do banku albo wybraniu płatności poprzez bank obsługujący płatności BLIK, otrzymuje gotowy do zaakceptowania formularz przelewu z odpowiednią kwotą, tytułem przelewu i danymi Sprzedającego. Po zaakceptowaniu przelewu, Zamawiający zostaje z powrotem przekierowany na stronę Sklepu internetowego.  
+  </li>
+  <li>
+    Operatorem bramki płatności elektronicznych Paynow jest mBank S.A. z siedzibą w Warszawie przy ul. Prostej 18, wpisana pod numerem KRS 0000025237 do Rejestru Przedsiębiorców prowadzonego przez Sąd Rejonowy dla m. st. Warszawy, XII Wydział Gospodarczy Krajowego Rejestru Sądowego, numer NIP: 526-021-50-88. Regulamin płatności dostępny jest pod adresem: <a href="https://paynow.pl/regulaminy"><u>https://paynow.pl/regulaminy</u></a> Dane osobowe Zamawiającego przekazywane są spółce mBank S.A., która jest ich administratorem danych osobowych. Podmiotem świadczącym obsługę płatności online w zakresie płatności kartami jest Autopay S.A.".  </li>
+  <li>
+    W przypadku przedpłaty za Zamówienie, Sprzedający oczekuje na opłacenie Zamówienia przez 2 Dni robocze od zawarcia Umowy sprzedaży. Po bezskutecznym upływie tego terminu Sprzedający wezwie Zamawiającego do zapłaty za Zamówienie wskazując dodatkowy termin, a po bezskutecznym jego upływie, Zamówienie zostanie anulowane.  </li>
+  <li>
+    Czas rozpoczęcia realizacji Zamówienia pokrywa się z momentem uzyskania informacji o dokonaniu płatności z systemu płatności elektronicznych lub operatora karty płatniczej, z momentem wpływu zapłaty na rachunek bankowy Sprzedającego, bądź z momentem zawarcia Umowy sprzedaży -  w razie wyboru płatności za pobraniem. W przypadku wyboru przez Klienta sposobu płatności przelewem lub kartą płatniczą - od dnia uznania rachunku bankowego Sprzedawcy.”).  </li>
+  <li>
+    Sprzedający realizuje dostawy zamówionych Produktów do miejsca wskazanego przez Zamawiającego, zgodnie z metodą dostawy wybraną przez Zamawiającego spośród dostępnych w Sklepie internetowym podczas składania Zamówienia. Koszty dostawy podawane są każdorazowo przy wyborze metody dostawy przez Zamawiającego podczas dokonywania Zamówienia, a także są szczegółowo wskazane w zakładce <strong>Dostawa.</strong>  </li>
+  <li>
+    Całkowity koszt Zamówienia (tj. Cena Produktu wraz z kosztami wybranej metody dostawy Zamówienia) widoczne są dla Zamawiającego w panelu Zamówienia przed złożeniem Zamówienia oraz w mailu potwierdzającym dokonanie Zamówienia, jak i na Koncie po zalogowaniu się przez Użytkownika. Obciążenie Konsumenta lub Konsumenta - Przedsiębiorcy dodatkowymi kosztami nastąpi wyłącznie po uzyskaniu jego wyraźnej zgody.  </li>
+  <li>
+    Zamówienia na kwotę 300 zł i wyżej (do kwoty tej nie wliczają się koszty dostawy) realizowane  są na adres dostawy na terenie polski na koszt Sprzedającego.  </li>
+</ol>
+
+      `,
+    },
+    {
+      title: 'ROZDZIAŁ VI -  REALIZACJA ZAMÓWIENIA',
+      content: `
+<ol class="list-decimal ml-4 space-y-4">
+  <li>
+Dla danego Zamówienia wiążąca jest Cena z momentu złożenia Zamówienia.
+  </li>
+  <li>
+    Przewidywany czas realizacji Zamówienia, tj. nadania przesyłki z Zamówieniem to z reguły  1 Dzień roboczy po otrzymania przez Sprzedającego informacji o dokonaniu zapłaty, wpływie zapłaty na rachunek bankowy Sprzedającego lub zawarciu Umowy sprzedaży  w razie płatności za pobraniem.
+  </li>
+  <li>
+    Termin otrzymania Zamówienia = czas przekazania Zamówienia do wysyłki + czas dostawy Produktów do Zamawiającego.
+  </li>
+  <li>
+    Sprzedający realizuje wysyłkę zamówionych Produktów na terenie Rzeczpospolitej Polskiej. W przypadku, gdy adres dostawy znajduje się poza terytorium Polski, Zamawiający proszony jest o niezwłoczny kontakt ze Sprzedającym w celu ustalenia indywidualnych warunków Umowy sprzedaży, w szczególności kosztów dostawy Zamówienia.
+  </li>
+  <li>
+    Dostawa Produktów uzależniona od stopnia wyczerpania zapasów Produktów czy ich dostępności do sprzedaży, dlatego w przypadku braku Produktu w ofercie sprzedaży, Zamawiający zostanie o tym niezwłocznie poinformowany, i ma wówczas prawo do rezygnacji z całości Zamówienia, bądź rezygnacji z Produktu, którego brakuje, bądź do wyrażenia zgody na wydłużenie realizacji Zamówienia, lub też wyrażenia zgody na zamianę brakującego Produktu na podobny o zbliżonych właściwościach i Cenie.
+  </li>
+  <li>
+    Zamawiający zobowiązany jest do odbioru Zamówienia i dokonania za niego zapłaty. W przypadku, gdy Zamawiającym nie jest Konsument lub Konsument-Przedsiębiorca, Sprzedający zastrzega sobie prawo własności Produktu do momentu zapłaty.
+  </li>
+  <li>
+    Przy dostawie Zamówienia Zamawiający proszony jest o sprawdzenie, czy opakowanie przesyłki, jak i Produkty w niej zawarte, nie posiadają uszkodzenia wynikłego z transportu, czy są nienaruszone, zgodne z Zamówieniem. Sprawdzenie przesyłki to bezpłatna usługa, gwarantująca najwyższą jakość usług. W razie stwierdzenia uszkodzenia przesyłki, niekompletności lub niezgodności przesyłki z Zamówieniem, Zamawiający proszony jest o spisanie protokoły szkody w obecności dostawcy lub w dedykowanym punkcie odbioru Zamówienia oraz niezwłoczne zgłoszenie tego faktu do Sprzedającego -  to ważne ponieważ zgłoszenie do przewoźnika jest podstawą reklamacji dokonywanej przez Sprzedającego.  Reklamacje dotyczące rozbieżności powinny być zgłoszone w ciągu 14 dni.
+  </li>
+  <li>
+    Na każdy sprzedany Produkt wystawiany jest paragon fiskalny lub faktura VAT (o ile Zamawiający zażyczył sobie wystawienia faktury) dołączane do wysyłanego Zamówienia. Dokument sprzedaży stanowi pisemne potwierdzenie treści złożonego Zamówienia i zawartej Umowy sprzedaży. 
+  </li>
+  <li>
+    Zamawiający jest na bieżąco informowany o zmianie statusu Zamówienia drogą mailową.
+  </li>
+</ol>
+
+      `,
+    },
+    {
+      title: 'ROZDZIAŁ VII -  REKLAMACJE',
+      content: `
+  <ol class="list-decimal ml-4 space-y-4">
+    <li>
+    Sprzedający informuje, że nie ponosi względem Zamawiających <u>nie będących</u> Konsumentami oraz Konsumentami-Przedsiębiorcami odpowiedzialności za wady Produktu zgodnie z zasadami odpowiedzialności z tytułu rękojmi wskazanymi w przepisach Kodeksu cywilnego, w szczególności art. 556 oraz 556(1) – 576 Kodeksu cywilnego, bowiem odpowiedzialność Sprzedającego z tytułu rękojmi zostaje wyłączona na zasadzie art. 558 §1. Kodeksu cywilnego.
+    </li>
+    <li>
+    Sprzedający ponosi względem Konsumentów oraz Konsumentów-Przedsiębiorców odpowiedzialność za niezgodność Produktu z Umową sprzedaży na zasadach wskazanych w przepisach Ustawy konsumenckiej – Rozdział 5B, w szczególności art. 43a-43g Ustawy konsumenckiej. Sprzedający ponosi odpowiedzialność za brak zgodności Produktu z Umową sprzedaży, która to niezgodność zaistniała w dostarczenia Produktu i ujawniła się w ciągu dwóch lat od tej chwili.
+    </li>
+    <li>
+    W przypadku stwierdzenia niezgodności Produktu z Umową sprzedaży Konsument lub Konsument-Przedsiębiorca może złożyć reklamację do Sprzedającego z tytułu rękojmi przesyłając ją drogą e-mailową na adres poczty elektronicznej: <a href="mailto:hello@hvyt.pl" ><u>hello@hvyt.pl</u></a> lub pisemnie na adres: Hvyt by Marta Wontorczyk, Głogoczów 996, 32-444 Głogoczów.
+    </li>
+    <li>
+    Zamawiający, składając reklamację do Sprzedającego proszony jest w celu usprawnienia przebiegu rozpatrywania reklamacji, o podanie następujących informacji: imię i nazwisko, nr Zamówienia, adres e-mail oraz o dokładnie opisanie niezgodności Produktu z Umową sprzedaży oraz żądania reklamacyjnego z tytułu rękojmi (wymiana na nowy, obniżenie Ceny, odstąpienie od Umowy sprzedaży w razie istotnej niezgodności Produktu z Umową sprzedaży).
+    </li>
+    <li>
+    Reklamacje rozpatrywane są w terminie do 14 dni od złożenia stosownej reklamacji, zgodnie z obowiązującymi przepisami. O sposobie jej rozpatrzenia Zamawiający zostanie poinformowany przez Sprzedającego <u>wyłącznie</u> drogą mailową na wskazany przez Zamawiającego adres email. 
+    </li>
+    <li>
+    Sprzedający informuje, że <u>wyraża zgodę</u> na rozstrzyganie sporów konsumenckich w trybie ustawy z dnia 23 września 2016 roku o pozasądowym rozwiązywaniu sporów konsumenckich (Dz. U. 2016, poz. 1823). W razie nie uznania reklamacji przez Sprzedającego, Konsument może skorzystać z pozasądowych sposobów rozpatrywania reklamacji i dochodzenia roszczeń i zwrócić się o interwencję do Wojewódzkiego Inspektoratu Inspekcji Handlowej w Krakowie, ul. Ujastek 1, 31-752 Kraków, <a href="mailto:sekretariat@krakow.wiih.gov.pl"><u>sekretariat@krakow.wiih.gov.pl</u></a>, <a href="https://krakow.wiih.gov.pl"><u>https://krakow.wiih.gov.pl</u></a> Szczegółowe procedury skorzystania z pomocy Inspekcji Handlowej oraz adresy instytucji dostępne są także na stronie internetowej <a href="https://polubownie.uokik.gov.pl"><u>https://polubownie.uokik.gov.pl</u></a> Pozasądowe dochodzenie roszczeń po zakończeniu postępowania reklamacyjnego jest bezpłatne. <strong>W celu uniknięcia wątpliwości Sprzedający wskazuje, że uprawnienia opisane w niniejszym ustępie 6. <u>nie przysługują</u> Zamawiającemu, który jest Konsumentem – Przedsiębiorcą.</strong>
+    </li>
+    <li>
+     Sprzedający nie odbiera reklamowanych przesyłek za pobraniem, czy nadanych do paczkomatu.
+    </li>
+  </ol>
+      `,
+    },
+    {
+      title: 'ROZDZIAŁ VIII - DANE OSOBOWE',
+      content: `
+  <ol class="list-decimal ml-4 space-y-4">
+    <li>
+      Użytkownik dokonując Zamówienia w Sklepie internetowym bez rejestracji Konta, i/lub rejestrując Konto, i/lub kontaktując się ze Sprzedającym (mailowo, telefonicznie lub za pośrednictwem formularza kontaktowego), i/lub zapisując się do newslettera, i/lub zamieszczając opinię o Produkcie, czy korzystając z innych usług świadczonych przez Sprzedającego drogą elektroniczną opisanych szczegółowo w Rozdziale III Regulaminu - przekazuje Sprzedającemu swoje dane osobowe (imię i nazwisko, adres, adres email, nr telefonu, ewentualnie nazwa firmy, adres prowadzenia działalności, NIP, adres IP komputera, z którego korzysta Użytkownik podczas przeglądania stron Sklepu internetowego, czy korzystania z innych usług świadczonych drogą elektroniczną).      
+    </li>
+    <li>
+    Podstawą prawną przetwarzania danych osobowych jest wykonanie umowy zawartej z Użytkownikiem w zakresie sprzedaży Produktów, wykonania pozostałych usług świadczonych drogą elektroniczną przez Sprzedającego lub kontakt z Użytkownikiem na podstawie żądania Użytkownika, zgodnie z postanowieniami art. 6. ust. 1. lit. b)  Rozporządzenia Parlamentu Europejskiego i Rady (UE) 2016/679 z dnia 27 kwietnia 2016 r. w sprawie ochrony osób fizycznych w związku z przetwarzaniem danych osobowych i w sprawie swobodnego przepływu takich danych oraz uchylenia dyrektywy 95/46/WE (ogólne rozporządzenie o ochronie danych) (zwane dalej <strong>„Rozporządzeniem RODO”</strong>). W przypadku rejestracji Konta i/lub subskrypcji newslettera, czy zamieszczenia opinii o Produkcie – podstawą prawną przetwarzania danych osobowych jest zgoda Użytkownika, zgodnie z postanowieniami art. 6. ust. 1. lit. a)  Rozporządzenia RODO.    
+    </li>
+    <li>
+      Administratorem danych osobowych jest Sprzedający. Podanie danych osobowych w każdej z sytuacji wskazanych w pkt. 1. jest dobrowolne, lecz niezbędne dla potrzeb realizacji celu, dla którego dane zostały pozyskane. Dane Zamawiających mogą być udostępniane jedynie podmiotom wskazanym w niniejszym Regulaminie w celu wykonania Umowy sprzedaży, a także innym uprawnionym do tego podmiotom, zgodnie z obowiązującymi przepisami prawa, np. Państwowej Inspekcji Handlowej, sądom, organom ścigania - na ich żądanie. Dane Użytkownika nie będą przetwarzane w sposób zautomatyzowany, ani nie podlegają profilowaniu. Dane nie są przekazywane poza Europejski Obszar Gospodarczy.    
+    </li>
+    <li>
+      Więcej informacji dot. przetwarzania danych osobowych, w tym praw Użytkownika znajduje się w <strong>Polityce prywatności</strong>, która stanowi integralną część Regulaminu.   
+    </li>
+  </ol>
+      `,
+    },
+    {
+      title: 'ROZDZIAŁ IX – PRAWO DO ODSTĄPIENIA OD UMOWY SPRZEDAŻY',
+      content: `
+  <ol class="list-decimal ml-4 space-y-4">
+    <li>
+      Zgodnie z art. 27. Ustawy konsumenckiej, Sprzedający informuje o prawie Konsumenta oraz Konsumenta-Przedsiębiorcy do odstąpienia od Umowy sprzedaży w terminie 14 dni bez podania jakiejkolwiek przyczyny, jednakże <u>Sprzedający wydłużył ten termin do 30 dni.</u> Termin do odstąpienia od Umowy wygasa po upływie 30 dni od dnia, w którym Konsument lub Konsument-Przedsiębiorca wszedł w posiadanie rzeczy lub w którym osoba trzecia inna niż przewoźnik i wskazana przez Konsumenta lub Konsumenta-Przedsiębiorcę, weszła w posiadanie rzeczy.
+    </li>
+    <li>
+      Aby skorzystać z prawa odstąpienia od Umowy sprzedaży należy poinformować Sprzedającego o decyzji o odstąpieniu od Umowy sprzedaży w drodze jednoznacznego oświadczenia (na przykład w postaci pisma wysłanego listownie lub pocztą elektroniczną). Jeżeli Konsument lub Konsument-Przedsiębiorca skorzysta z formy wysyłki oświadczenia o odstąpieniu od Umowy sprzedaży pocztą elektroniczną, Sprzedający prześle Konsumentowi lub Konsumentowi-Przedsiębiorcy niezwłocznie potwierdzenie otrzymania informacji o odstąpieniu od umowy na trwałym nośniku (na przykład pocztą elektroniczną).
+    </li>
+    <li>
+      Konsument lub Konsument-Przedsiębiorca może także skorzystać z wzoru formularza odstąpienia od umowy, który stanowi Załącznik  nr 1 do niniejszego Regulaminu, jednak nie jest to obowiązkowe.
+    </li>
+    <li>
+      Aby zachować termin do odstąpienia od Umowy sprzedaży wystarczy, aby wysłanie informacji dotyczącej wykonania przysługującego Konsumentowi lub Konsumentowi-Przedsiębiorcy prawa odstąpienia od umowy przed upływem terminu do odstąpienia od Umowy sprzedaży.
+    </li>
+    <li>
+    <u>Skutki odstąpienia od umowy:</u> w przypadku odstąpienia od Umowy sprzedaży Sprzedający zwraca Konsumentowi lub Konsumentowi-Przedsiębiorcy wszystkie otrzymane od niego płatności, w tym koszty dostarczenia Produktów (z wyjątkiem dodatkowych kosztów wynikających z wybranego przez Konsumenta lub Konsumenta-Przedsiębiorcę sposobu dostarczenia innego niż najtańszy zwykły sposób dostarczenia oferowany przez Sprzedającego), niezwłocznie, a w każdym przypadku nie później niż 14 dni od dnia, w którym Sprzedający został poinformowany o decyzji Konsumenta lub Konsumenta-Przedsiębiorcy o wykonaniu prawa odstąpienia od Umowy sprzedaży.
+    </li>
+    <li>
+    Zwrotu płatności Sprzedający dokona przy użyciu takich samych sposobów płatności, jakie zostały przez Konsumenta lub Konsumenta-Przedsiębiorcę użyte w pierwotnej transakcji, chyba że Konsument lub Konsument-Przedsiębiorca wyraźnie zgodził się na inne rozwiązanie; w każdym przypadku Konsument lub Konsument-Przedsiębiorca nie poniesie żadnych opłat w związku z tym zwrotem należności. W przypadku wystąpienia konieczności zwrotu środków za transakcję dokonaną przez klienta kartą płatniczą sprzedający dokonana zwrotu na rachunek bankowy przypisany do karty płatniczej Zamawiającego. Sprzedający może wstrzymać się ze zwrotem płatności do czasu otrzymania Produktów lub do czasu dostarczenia mu dowodu ich odesłania, w zależności od tego, które zdarzenie nastąpi wcześniej.  
+    </li>
+    <li>
+    Zwracane Produkty Konsument lub Konsument-Przedsiębiorca proszony jest odesłać lub przekazać na następujący adres Sprzedającego, Hvyt by Marta Wontorczyk, Głogoczów 996, 32-444 Głogoczów, niezwłocznie, a w każdym razie nie później niż 14 dni od dnia, w którym Konsument lub Konsument-Przedsiębiorca poinformował Sprzedającego o odstąpieniu od Umowy sprzedaży. Termin jest zachowany, jeżeli Konsument lub Konsument-Przedsiębiorca odeśle Produkt przed upływem terminu 14 dni. Konsument lub Konsument-Przedsiębiorca będzie musiał ponieść bezpośrednie koszty zwrotu Produktów. W celu ułatwienia zwrotu Produktu Sprzedający umożliwia zwrot poprzez aplikację Wygodny Zwrot obsługiwaną przez Allekurier Sp.  o.o. zgodnie z zasadami wskazanymi w regulaminie na <a href="https://allekurier.pl/info/regulamin"><u>https://allekurier.pl/info/regulamin</u></a> Sprzedający nie odbiera zwracanych przesyłek z Produktami za pobraniem, czy nadanych do paczkomatu.
+    </li>
+    <li>
+    Konsument lub Konsument-Przedsiębiorca odpowiada tylko za zmniejszenie wartości Produktów wynikające z korzystania z nich w sposób inny niż było to konieczne do stwierdzenia charakteru, cech i funkcjonowania Produktów. Oznacza to, że jeśli Konsument lub Konsument-Przedsiębiorca zwraca Produkt uszkodzony, używany w innym celu niż jest to konieczne do stwierdzenia charakteru, cech i funkcjonowania Produktu, Sprzedającemu przysługuje uprawnienie do zwrotu Konsumentowi lub Konsumentowi-Przedsiębiorcy Ceny pomniejszonej o utraconą wartość Produktu poprzez nieprawidłowe korzystanie z Produktu. Konsument lub Konsument-Przedsiębiorca proszony jest o należyte zabezpieczenie zwracanych Produktów na czas ich transportu do Sprzedającego.
+    </li>
+    <li>
+    Zgodnie z postanowienia art. 38. ust.1. Ustawy konsumenckiej, Konsumentowi oraz Konsumentowi - Przedsiębiorcy <u>nie przysługuje prawo do odstąpienia od umowy</u> w odniesieniu do umów:
+    a. o świadczenie usług, jeżeli przedsiębiorca wykonał w pełni usługę za wyraźną zgodą Konsumenta lub Konsumenta-Przedsiębiorcy, który został poinformowany przed rozpoczęciem świadczenia, że po spełnieniu świadczenia przez przedsiębiorcę utraci prawo odstąpienia od umowy;
+      <ul>
+        <li>
+          b. w której cena lub wynagrodzenie zależy od wahań na rynku finansowym, nad którymi przedsiębiorca nie sprawuje kontroli, i które mogą wystąpić przed upływem terminu do odstąpienia od umowy;
+      </li>
+      <li>
+        c. w której przedmiotem świadczenia jest rzecz nieprefabrykowana, wyprodukowana według specyfikacji Konsumenta lub Konsumenta-Przedsiębiorcy lub służąca zaspokojeniu jego zindywidualizowanych potrzeb;        </li>
+      <li>
+        d. w której przedmiotem świadczenia jest rzecz ulegająca szybkiemu zepsuciu lub mająca krótki termin przydatności do użycia;      
+      </li>
+      <li>
+        e. w której przedmiotem świadczenia jest rzecz dostarczana w zapieczętowanym opakowaniu, której po otwarciu opakowania nie można zwrócić ze względu na ochronę zdrowia lub ze względów higienicznych, jeżeli opakowanie zostało otwarte po dostarczeniu;
+      </li>
+      <li>
+        f. w której przedmiotem świadczenia są rzeczy, które po dostarczeniu, ze względu na swój charakter, zostają nierozłącznie połączone z innymi rzeczami;      
+      </li>
+      <li>
+        g. w której przedmiotem świadczenia są napoje alkoholowe, których cena została uzgodniona przy zawarciu umowy, a których dostarczenie może nastąpić dopiero po upływie 30 dni i których wartość zależy od wahań na rynku, nad którymi przedsiębiorca nie ma kontroli;
+      </li>
+      <li>
+        h. w której Konsument lub Konsument-Przedsiębiorca wyraźnie żądał, aby przedsiębiorca do niego przyjechał w celu dokonania pilnej naprawy lub konserwacji; jeżeli przedsiębiorca świadczy dodatkowo inne usługi niż te, których wykonania Konsument żądał, lub dostarcza rzeczy inne niż części zamienne niezbędne do wykonania naprawy lub konserwacji, prawo odstąpienia od umowy przysługuje Konsumentowi lub Konsumentowi-Przedsiębiorcy w odniesieniu do dodatkowych usług lub rzeczy;
+      </li>
+      <li>
+        i. w której przedmiotem świadczenia są nagrania dźwiękowe lub wizualne albo programy komputerowe dostarczane w zapieczętowanym opakowaniu, jeżeli opakowanie zostało otwarte po dostarczeniu;
+      </li>
+      <li>
+        j. o dostarczanie dzienników, periodyków lub czasopism, z wyjątkiem umowy o prenumeratę; k. zawartej w drodze aukcji publicznej;
+      </li>
+      <li>
+        l. o świadczenie usług w zakresie zakwaterowania, innych niż do celów mieszkalnych, przewozu rzeczy, najmu samochodów, gastronomii, usług związanych z wypoczynkiem, wydarzeniami rozrywkowymi, sportowymi lub kulturalnymi, jeżeli w umowie oznaczono dzień lub okres świadczenia usługi;
+      </li>
+      <li>
+        m. o dostarczanie treści cyfrowych, które nie są zapisane na nośniku materialnym, jeżeli spełnianie świadczenia rozpoczęło się za wyraźną zgodą Konsumenta lub Konsumenta-Przedsiębiorcy przed upływem terminu do odstąpienia od umowy i po poinformowaniu go przez przedsiębiorcę o utracie prawa odstąpienia od umowy.
+      </li>
+      </ul>
+    </li>
+  </ol>
+      `,
+    },
+    {
+      title: 'ROZDZIAŁ X - POZOSTAŁE POSTANOWIENIA',
+      content: `
+  <ol class="list-decimal ml-4 space-y-4">
+    <li>
+      W sprawach nie uregulowanych niniejszym Regulaminem zastosowanie mają odpowiednie przepisy prawa polskiego, w szczególności Kodeksu cywilnego, Ustawy o świadczeniu usług drogą elektroniczną, Rozporządzenia RODO, a w odniesieniu do Konsumentów oraz Konsumentów-Przedsiębiorców również Ustawy konsumenckiej.
+    </li>
+    <li>
+      W celu uniknięcia wątpliwości stwierdza się, że żadne z postanowień niniejszego Regulaminu nie ogranicza, ani nie wyłącza uprawnień Konsumenta, jakie przysługują mu na podstawie przepisów prawa.
+    </li>
+    <li>
+      Sprzedający jest uprawniony do wprowadzania zmian do niniejszego Regulaminu z ważnych przyczyn (np. zmiana przepisów prawa, zmiana zasad funkcjonowania Sklepu internetowego). W przypadku wprowadzenia zmian do niniejszego Regulaminu, Użytkownik zostanie powiadomiony z co najmniej 14-dniowym wyprzedzeniem przed dniem wejścia w życie zmian (odpowiednia informacja o zmianach w Regulaminie zostanie umieszczona w Sklepie internetowym, a Użytkownik posiadający Konto lub subskrybujący newsletter – otrzyma także informację drogą mailową). W razie braku akceptacji zmienionego Regulaminu, Użytkownik ma prawo do rezygnacji z korzystania ze Sklepu internetowego i wypowiedzenia umowy o świadczenie usług. Nie wyłącza to, ani nie ogranicza prawa Użytkownika do rezygnacji z korzystania ze Sklepu internetowego w każdym czasie.
+    </li>
+    <li>
+      Sprzedający informuje także, że wszelkie zdjęcia, teksty, rysunki, grafiki, znaki towarowe, elementy Sklepu internetowego, czy logotypy zamieszone w Sklepie internetowym podlegają ochronie na podstawie przepisów ustawy z dnia 04.02.1994 r o prawie autorskich i prawach pokrewnych. Jakiekolwiek wykorzystanie, czy też udostępnienie treści pochodzących ze Sklepu internetowego, także we fragmentach, wymaga uzyskania uprzedniej zgody Sprzedającego.
+    </li>
+    <li>
+      Treść niniejszego Regulaminu może zostać utrwalona poprzez wydrukowanie, zapisanie na nośniku lub pobranie w każdej chwili ze strony Sklepu internetowego.
+    </li>
+    <li>
+      Postanowienia Regulaminu należy interpretować w sposób zapewniający ich zgodność z obowiązującymi przepisami prawa. 
+    </li>
+  </ol>
+      `,
+    },
+    {
+      title:
+        'Załącznik nr 1 – wzór oświadczenia o odstąpieniu od umowy przez Konsumenta lub Konsumenta-Przedsiębiorcy',
+      content: `
+
+      <form>
+      <div class="form-row">
+        <label>Imię i nazwisko konsumenta / dane firmy Konsumenta-Przedsiębiorcy</label>
+        <input type="text" name="consumerName">
+      </div>
+      <div class="form-row">
+        <label>Adres zamieszkania / adres siedziby Konsumenta-Przedsiębiorcy</label>
+        <input type="text" name="consumerAddress">
+      </div>
+      <div class="form-row">
+        <label>Telefon kontaktowy</label>
+        <input type="text" name="consumerPhone">
+      </div>
+      <div class="form-row">
+        <label>E-mail</label>
+        <input type="email" name="consumerEmail">
+      </div>
+      <div class="form-row">
+        <label>Nr zamówienia oraz nr paragonu / faktury</label>
+        <input type="text" name="orderNumber">
+      </div>
   
-  <h2 class="mt-6 mb-2 text-[25px]">Rozdział I - Definicje</h2>
-  <p>Użyte w niniejszym Regulaminie pojęcia oznaczają:</p>
-  <ul>
-    <li><strong>Sprzedający</strong> – Pani Marta Wontorczyk, prowadząca jednoosobową działalność gospodarczą pod firmą HVYT by Marta Wontorczyk pod adresem: ul. Głogoczów 996, 32-444 Głogoczów, gmina Myślenice, na podstawie wpisu do Centralnej Ewidencji i Informacji o Działalności Gospodarczej RP nadzorowanej przez Ministerstwo Przedsiębiorczości i Technologii, organ dokonujący wpisu Sprzedającego do CEiDG: Urząd Miasta Mogilany, NIP: 676-257-05-84, REGON 384282914, e-mail: hello@hvyt.pl;</li>
-    <li><strong>Sklep internetowy</strong> – platforma internetowa prowadzona przez Sprzedającego pod adresem URL: hvyt.pl, umożliwiająca zawarcie Umowy sprzedaży;</li>
-    <li><strong>Zamawiający</strong> – pełnoletnia osoba fizyczna posiadająca zdolność do czynności prawnych (w tym osoba prowadząca jednoosobową działalność gospodarczą), osoba prawna lub jednostka organizacyjna niebędąca osobą prawną, która dokonuje Zamówienia w ramach Sklepu internetowego;</li>
-    <li><strong>Użytkownik</strong> – każda osoba korzystająca ze strony Sklepu internetowego;</li>
-    <li><strong>Towar lub Towary</strong> – gałki, uchwyty meblowe, klamki, wieszaki oraz inne produkty oferowane przez Sprzedającego do sprzedaży detalicznej;</li>
-    <li><strong>Strona Towaru</strong> – pojedyncza podstrona, na której przedstawione są szczegółowe informacje o Towarze;</li>
-    <li><strong>Cena</strong> – cena brutto Towaru widoczna obok informacji o Towarze, nie uwzględniająca kosztów dostawy ani dodatkowych kosztów zaakceptowanych przez Zamawiającego;</li>
-    <li><strong>Zamówienie</strong> – oświadczenie woli Zamawiającego złożone za pośrednictwem Sklepu, określające Towar lub zestaw Towarów do realizacji;</li>
-    <li><strong>Dni robocze</strong> – dni od poniedziałku do piątku, z wyłączeniem dni ustawowo wolnych od pracy;</li>
-    <li><strong>Umowa sprzedaży</strong> – umowa sprzedaży Towarów zawarta między Sprzedającym a Zamawiającym za pośrednictwem Sklepu, a w przypadku Konsumenta – zawierana na odległość zgodnie z ustawą konsumencką;</li>
-    <li><strong>Konsument</strong> – osoba fizyczna dokonująca czynności prawnej niezwiązanej bezpośrednio z działalnością gospodarczą, zgodnie z art. 22(1) Kodeksu cywilnego;</li>
-    <li><strong>Konto Zamawiającego</strong> – narzędzie dostępne w systemie Sklepu, umożliwiające m.in. śledzenie realizacji Zamówienia, przeglądanie historii oraz edycję danych;</li>
-    <li><strong>Login</strong> – adres e-mail podany podczas rejestracji w Sklepie, wymagany wraz z Hasłem do założenia Konta Zamawiającego;</li>
-    <li><strong>Hasło</strong> – ciąg znaków wybrany podczas rejestracji Konta Zamawiającego, służący do zabezpieczenia dostępu;</li>
-    <li><strong>Kodeks cywilny</strong> – ustawa z dnia 24 kwietnia 1964 r. (t. jedn. Dz. U. z 2019 r., poz. 1145 z późn. zm.);</li>
-    <li><strong>Ustawa konsumencka</strong> – ustawa z dnia 30 maja 2014 r. o prawach konsumenta (Dz. U. z 2019 r., poz. 134, późn. zm.);</li>
-    <li><strong>Ustawa o świadczeniu usług drogą elektroniczną</strong> – ustawa z dnia 18 lipca 2002 r. (t. jedn. Dz. U. z 2019 r., poz. 123, z późn. zm.);</li>
-    <li><strong>Kodeks dobrych praktyk</strong> – zbiór zasad etycznych i zawodowych, o których mowa w art. 2 pkt. 5 Ustawy o przeciwdziałaniu nieuczciwym praktykom rynkowym z dnia 23 sierpnia 2007 r. (Dz. U. z 2017 r., poz. 2070, z późn. zm.);</li>
-    <li><strong>Regulamin</strong> – niniejszy regulamin Sklepu internetowego.</li>
-  </ul>
+      <div class="address-block">
+        Hvyt by Marta Wontorczyk, Głogoczów 996, 32-444 Głogoczów<br>
+        <small>z dopiskiem „odstąpienie od umowy”</small>
+      </div>
   
-  <h2 class="mt-6 mb-2 text-[25px]" >Rozdział II - Postanowienia ogólne</h2>
-  <p>Złożenie Zamówienia na Towary oferowane w Sklepie internetowym oraz realizacja Zamówień odbywa się na podstawie niniejszego Regulaminu oraz obowiązujących przepisów prawa. Niniejszy Regulamin jest regulaminem, o którym mowa w art. 8 Ustawy o świadczeniu usług drogą elektroniczną.</p>
-  <p>Liczba oferowanych Towarów objętych promocją lub wyprzedażą jest ograniczona. Zamówienia na takie Towary realizowane są w kolejności ich złożenia, aż do wyczerpania zapasów. Promocje nie łączą się, chyba że zasady promocji określone są inaczej.</p>
-  <p>Informacje podane na stronie Sklepu, w tym dotyczące Cen Towarów, nie stanowią oferty handlowej w rozumieniu art. 66 Kodeksu cywilnego, lecz jedynie zaproszenie do składania ofert określone w art. 71 Kodeksu cywilnego.</p>
-  <p>Wszystkie ceny są wyrażone w złotych polskich (PLN) i są cenami brutto (zawierają podatek VAT).</p>
-  <p>Wykorzystywanie Sklepu lub strony hvyt.pl do przesyłania niezamówionej informacji handlowej (spam) lub w sposób sprzeczny z prawem, dobrymi obyczajami, naruszający dobra osobiste osób trzecich lub interesy Sprzedającego jest zabronione.</p>
-  <p>Aby korzystać ze Sklepu, Użytkownik musi mieć dostęp do urządzenia z Internetem, aktywną pocztę elektroniczną, przeglądarkę (np. Firefox, Chrome, Internet Explorer) oraz konto e-mail.</p>
-  <p>Bezpośredni kontakt ze Sprzedającym jest możliwy poprzez mail, telefon lub formularz kontaktowy dostępny w zakładce Kontakt, gdzie również znajdują się dane kontaktowe Sprzedającego.</p>
-  <p>Sprzedający informuje, że nie stosuje żadnego Kodeksu dobrych praktyk.</p>
+      <div class="statement-title">
+        Oświadczenie o odstąpieniu od umowy zawartej na odległość
+      </div>
   
-  <h2 class="mt-6 mb-2 text-[25px]" >Rozdział III - Usługi świadczone drogą elektroniczną</h2>
-  <p>Usługi świadczone drogą elektroniczną na podstawie niniejszego Regulaminu obejmują umożliwienie dokonywania zakupów w Sklepie, korzystanie z Konta Zamawiającego, przypomnienie Hasła do Konta, polecanie Towarów w serwisach społecznościowych oraz subskrypcję newslettera. Usługi te są dostępne 24h na dobę, 7 dni w tygodniu, i są bezpłatne.</p>
-  <p>Korzystanie z usługi Konta Zamawiającego wymaga rejestracji i podania danych osobowych (imię, nazwisko, adres, telefon, ewentualnie inny adres dostawy, NIP, adres email – będący jednocześnie Loginem) oraz ustalenia Hasła. Po potwierdzeniu rejestracji dochodzi do zawarcia umowy o prowadzenie Konta Zamawiającego pomiędzy Użytkownikiem a Sprzedającym.</p>
-  <p>Rejestracja Konta jest bezpłatna, a Login i Hasło mają charakter poufny – Sprzedający nie zna Hasła.</p>
-  <p>Każdy Użytkownik może posiadać tylko jedno Konto Zamawiającego, które jest niezbywalne. Użytkownik nie może korzystać z Konta innych osób ani udostępniać swojego Loginu i Hasła. Użytkownik może zrezygnować z Konta w dowolnym momencie.</p>
-  <p>Usługa przypomnienia Hasła polega na przesłaniu na wskazany adres e-mail linka umożliwiającego utworzenie nowego Hasła.</p>
-  <p>Usługa polecania Towaru w serwisach społecznościowych umożliwia publikację opinii o Towarach – Użytkownik nie otrzymuje za to wynagrodzenia.</p>
-  <p>Korzystanie z newslettera jest możliwe po wyrażeniu zgody przez Użytkownika. Subskrypcja newslettera powoduje zawarcie umowy o świadczenie usług elektronicznych na warunkach Regulaminu, z możliwością rezygnacji w dowolnym momencie.</p>
-  <p>Zamieszczając treści za pośrednictwem oferowanych usług, Użytkownik dobrowolnie je rozpowszechnia. Sprzedający udostępnia jedynie narzędzia do publikacji – treści nie są utożsamiane z poglądami Sprzedającego. Użytkownik ponosi odpowiedzialność za swoje treści.</p>
-  <p>Użytkownicy nie mogą publikować treści naruszających dobra osobiste osób trzecich, prawa autorskie, tajemnicę przedsiębiorstwa lub normy społeczne, ani danych osobowych bez zgody.</p>
-  <p>Umowa o świadczenie usług drogą elektroniczną dotycząca Konta, newslettera i pozostałych usług jest zawierana na czas nieoznaczony. Użytkownik może ją wypowiedzieć bezpłatnie, a wypowiedzenie nie wpływa na wykonanie już zawartych Umów sprzedaży, chyba że strony postanowią inaczej.</p>
-  <p>Sprzedający może wypowiedzieć umowę z 14-dniowym terminem wypowiedzenia, jeżeli:</p>
-  <ul>
-    <li>cel rejestracji lub sposób korzystania z usług jest sprzeczny z zasadami Sklepu,</li>
-    <li>działalność Użytkownika narusza normy obyczajowe, nawołuje do przemocy lub narusza prawa osób trzecich,</li>
-    <li>Sprzedający otrzymał zawiadomienie o bezprawności podanych danych lub związanej z nimi działalności,</li>
-    <li>Użytkownik dopuszcza się przesyłania spamu,</li>
-    <li>Użytkownik uporczywie narusza Regulamin,</li>
-    <li>podane dane adresowe budzą uzasadnione wątpliwości, a ich weryfikacja nie przyniosła rezultatu.</li>
-  </ul>
-  <p>Sprzedający dokłada wszelkich starań, aby Sklep działał prawidłowo. W przypadku awarii lub niezgodności usług, Użytkownik ma prawo do reklamacji. Reklamacje proszone są drogą elektroniczną na adres hello@hvyt.pl lub listownie na adres Sprzedającego. Dla usprawnienia procesu reklamacyjnego, prosimy o podanie danych kontaktowych oraz opisanie zastrzeżeń.</p>
-  <p>Reklamacje dotyczące usług drogą elektroniczną rozpatrywane są do 30 dni, o czym Użytkownik zostanie poinformowany.</p>
+      <div class="statement-text">
+        Działając zgodnie z art. 27 ustawy z dnia 31.05.2014 roku o prawach konsumenta, niniejszym oświadczam, że odstępuję od umowy sprzedaży następujących towarów
+        <input type="text" name="returnedGoods">
+      </div>
   
-  <h2 class="mt-6 mb-2 text-[25px]" >Rozdział IV - Zamówienie i zawarcie umowy sprzedaży</h2>
-  <p>Aby dokonać Zamówienia, Użytkownik może (ale nie musi) utworzyć Konto Zamawiającego. W przypadku rejestracji, dane nie muszą być wprowadzane przy kolejnych Zamówieniach.</p>
-  <p>Zamówienia można składać 24h na dobę, 7 dni w tygodniu, ale realizowane są tylko w Dni robocze.</p>
-  <p>Zamówienie składa się z wyboru Towaru, ilości, ewentualnie parametrów (np. rozmiar, kolor), kliknięcia „Dodaj do koszyka”, a następnie przejścia do Zamówienia poprzez przycisk lub ikonę koszyka. Następnie Użytkownik loguje się, rejestruje lub kupuje bez rejestracji, ewentualnie zapisuje do newslettera, wybiera sposób dostawy i płatności, rodzaj dokumentu sprzedaży, potwierdza pełnoletniość i akceptuje Regulamin, po czym klika „Zamawiam i płacę”.</p>
-  <p>Po złożeniu Zamówienia, Użytkownik otrzymuje e-mail z potwierdzeniem i numerem Zamówienia. Umowa sprzedaży zawierana jest w momencie przesłania Zamówienia z nadanym numerem. Umowa jest zawierana w języku polskim.</p>
-  <p>Do momentu kliknięcia „Zamawiam i płacę”, Użytkownik może zmienić wybór Towarów, ich ilość lub zrezygnować. Sprzedający nie ustala minimalnej wartości Zamówienia.</p>
-  <p>Treści Umów sprzedaży są przechowywane przez system Sklepu przez okres posiadania Konta Zamawiającego i dostępne tylko stronom Umowy. W przypadku braku Konta, umowy są przechowywane do upływu okresu odpowiedzialności Sprzedającego z tytułu rękojmi.</p>
+      <p class="statement-text">
+        Umowa sprzedaży została zawarta z Hvyt by Marta Wontorczyk w dniu
+        <input type="text" name="contractDate"> roku, a odbiór przeze mnie produktów nastąpił w dniu
+        <input type="text" name="deliveryDate"> roku.
+      </p>
   
-  <h2 class="mt-6 mb-2 text-[25px]" >Rozdział V - Formy płatności, koszty dostawy</h2>
-  <p>Dostępnymi formami płatności są:</p>
-  <ul>
-    <li>przedpłata na konto Sprzedającego (przelew bankowy) – numer konta: 91 1140 2004 0000 3302 7916 7100, podany również w e-mailu potwierdzającym Zamówienie;</li>
-    <li>płatność „za pobraniem”, gotówką – przy odbiorze u kuriera, z dodatkową prowizją 2 zł;</li>
-    <li>przedpłata za pomocą systemu płatności elektronicznych – paynow.pl (także karta kredytowa).</li>
-  </ul>
-  <p>Płatności elektroniczne realizowane są poprzez przekierowanie Zamawiającego do serwisu transakcyjnego, a następnie powrót do Sklepu po akceptacji formularza przelewu. System obsługuje spółka PayPro S.A. z Poznania (adres: ul. Kanclerska 15, 60-327 Poznań, KRS 0000347935, NIP 7792369887, kapitał zakładowy 4.500.000,00 zł). Dane osobowe są przekazywane PayPro S.A., administrującej danymi. W przypadku przedpłaty, Sprzedający oczekuje zapłaty przez 5 dni roboczych. Jeśli termin zapłaty upłynie, Sprzedający wyznacza dodatkowy termin, po którego bezskutecznym upływie odstępuje od Umowy sprzedaży.</p>
-  <p>Czas realizacji Zamówienia zaczyna się od wpływu płatności na rachunek bankowy Sprzedającego lub otrzymania potwierdzenia z systemu płatności, bądź zawarcia Umowy sprzedaży (przy płatności za pobraniem).</p>
-  <p>Zamówienia na terenie Polski realizowane są przez firmę kurierską, a szczegóły dotyczące terminów i kosztów dostawy znajdują się w zakładce Dostawa.</p>
-  <p>Całkowity koszt dostawy (Cena Towarów plus koszty dostawy) jest widoczny przy składaniu Zamówienia, w e-mailu potwierdzającym oraz w zakładce „Moje konto/zamówienia”. Dodatkowe koszty pojawią się tylko po wyraźnej zgodzie Konsumenta.</p>
-  <p>Zamówienia o wartości 300 zł i wyżej (bez kosztów dostawy) realizowane są na koszt Sprzedającego.</p>
+      <div class="bank-account">
+        <label>Proszę o zwrot środków na następujący rachunek bankowy:</label>
+        <input type="text" name="bankAccount">
+      </div>
   
-  <h2 class="mt-6 mb-2 text-[25px]" >Rozdział VI - Realizacja zamówienia</h2>
-  <p>Dla danego Zamówienia wiążąca jest Cena z momentu jego złożenia.</p>
-  <p>Towary dostępne od ręki wysyłane są niezwłocznie, najpóźniej w ciągu 1 dnia roboczego od wpływu płatności, lub po potwierdzeniu płatności/systemu lub zawarciu Umowy (przy płatności za pobraniem). Towary wysyłane są maksymalnie w ciągu 30 dni, chyba że strony ustalą inaczej.</p>
-  <p>Przewidywany czas realizacji Zamówienia to suma czasu od przyjęcia Zamówienia do wysłania Towarów oraz przewidywanego czasu dostawy.</p>
-  <p>Jeśli niektóre Towary nie mogą być wysłane, Sprzedający niezwłocznie informuje Zamawiającego, który ma prawo do rezygnacji z całości Zamówienia, lub z części Towarów, lub wyrażenia zgody na wydłużenie terminu, lub zamiany brakującego Towaru na podobny.</p>
-  <p>Dostawy realizowane są na terenie Polski, a w przypadku adresu poza granicami Polski, Zamawiający powinien skontaktować się ze Sprzedającym w celu ustalenia warunków dostawy.</p>
-  <p>Zamawiający zobowiązuje się do odbioru Towarów i zapłaty ceny. W przypadku gdy Zamawiający nie jest Konsumentem, Sprzedający zastrzega sobie prawo własności Towaru do momentu zapłaty.</p>
-  <p>Po odbiorze Towarów, Zamawiający proszony jest o sprawdzenie przesyłki w obecności kuriera. W razie uszkodzeń lub niezgodności, należy spisać protokół szkody oraz niezwłocznie zgłosić ten fakt. Reklamacje dotyczące rozbieżności muszą być zgłoszone w ciągu 14 dni.</p>
-  <p>Na każdy sprzedany Towar wystawiana jest faktura elektroniczna, potwierdzająca zawarcie Umowy sprzedaży. Sprzedający zobowiązuje się do dostarczenia Towarów bez wad, zgodnie z ofertą sprzedaży.</p>
-  <p>Zamawiający jest informowany o zmianie statusu Zamówienia drogą mailową.</p>
-  
-  <h2 class="mt-6 mb-2 text-[25px]" >Rozdział VII - Prawo konsumenta do odstąpienia od umowy</h2>
-  <p>Zgodnie z art. 27 Ustawy konsumenckiej, Konsument ma prawo odstąpić od Umowy sprzedaży w ciągu 14 dni bez podania przyczyny. Termin odstąpienia wygasa po 14 dniach od dnia, w którym Konsument wszedł w posiadanie rzeczy lub osoba wskazana przez Konsumenta (inaczej niż przewoźnik) weszła w posiadanie rzeczy.</p>
-  <p>Aby skorzystać z prawa odstąpienia, Konsument musi poinformować Sprzedającego o swojej decyzji w sposób jednoznaczny (np. listownie lub mailowo). Jeśli oświadczenie zostanie wysłane pocztą elektroniczną, Sprzedający niezwłocznie potwierdzi jego otrzymanie na trwałym nośniku (np. e-mail).</p>
-  <p>Konsument może skorzystać z formularza odstąpienia, który stanowi Załącznik nr 1 do niniejszego Regulaminu – ale nie jest to obowiązkowe.</p>
-  <p>Aby zachować termin, wystarczy, że oświadczenie o odstąpieniu zostanie wysłane przed upływem 14 dni.</p>
-  <p>Skutki odstąpienia: Sprzedający zwraca wszystkie otrzymane płatności, w tym koszty dostawy (z wyjątkiem dodatkowych kosztów wybranego sposobu dostawy innego niż najtańszy) w ciągu 14 dni od otrzymania oświadczenia. Zwrot dokonuje się przy użyciu tych samych metod płatności, co w pierwotnej transakcji, chyba że Konsument zgodził się inaczej. Konsument nie ponosi żadnych opłat za zwrot. W przypadku płatności kartą kredytową, zwrot środków nastąpi na rachunek przypisany do karty kredytowej.</p>
-  <p>Sprzedający może wstrzymać zwrot płatności do czasu otrzymania Towarów lub dowodu ich odesłania – w zależności od tego, które zdarzenie nastąpi wcześniej.</p>
-  <p>Konsument powinien odesłać lub przekazać Towary na adres: Hvyt by Marta Wontorczyk, ul. Głogoczów 996, 32-444 Głogoczów, niezwłocznie, lecz nie później niż 14 dni od powiadomienia o odstąpieniu. Termin zostaje zachowany, jeśli Towar zostanie odesłany przed upływem 14 dni. Konsument ponosi koszty zwrotu Towarów oraz powinien zabezpieczyć Towary na czas transportu.</p>
-  <p>Konsument odpowiada za zmniejszenie wartości Towarów wynikające z korzystania z nich w sposób inny niż niezbędny do oceny ich charakteru, cech i funkcjonowania. Jeśli Towar zostanie zwrócony uszkodzony lub używany w nadmierny sposób, Sprzedający ma prawo pomniejszyć cenę o utraconą wartość.</p>
-  <p>Zgodnie z art. 38 Ustawy konsumenckiej, prawo odstąpienia nie przysługuje do umów:</p>
-  <ul>
-    <li>o świadczenie usług, jeśli Sprzedający w pełni wykonał usługę za wyraźną zgodą Konsumenta, poinformowanego przed rozpoczęciem świadczenia, że po wykonaniu usługi Konsument traci prawo odstąpienia;</li>
-    <li>w której wynagrodzenie zależy od wahań na rynku finansowym, nad którymi Sprzedający nie ma kontroli;</li>
-    <li>w której przedmiotem świadczenia jest rzecz nieprefabrykowana, wyprodukowana według specyfikacji Konsumenta lub służąca zaspokojeniu jego zindywidualizowanych potrzeb;</li>
-    <li>w której przedmiotem świadczenia jest rzecz szybko psująca się lub o krótkim terminie przydatności;</li>
-    <li>w której przedmiotem świadczenia jest rzecz dostarczana w zapieczętowanym opakowaniu, której po otwarciu opakowania zwrot jest niemożliwy ze względów zdrowotnych lub higienicznych;</li>
-    <li>w której przedmiotem świadczenia są rzeczy, które po dostarczeniu zostają nierozłącznie połączone z innymi rzeczami;</li>
-    <li>w której przedmiotem świadczenia są napoje alkoholowe, których cena została ustalona przy zawarciu umowy, a ich dostawa następuje po 30 dniach, a ich wartość zależy od wahań rynkowych;</li>
-    <li>w której Konsument wyraźnie żądał, aby Sprzedający przyjechał w celu pilnej naprawy lub konserwacji; jeśli dodatkowo Sprzedający wykonuje inne usługi lub dostarcza inne rzeczy, prawo odstąpienia przysługuje tylko do tych dodatkowych usług lub rzeczy;</li>
-    <li>w której przedmiotem świadczenia są nagrania dźwiękowe lub wizualne albo programy komputerowe dostarczane w zapieczętowanym opakowaniu, jeśli opakowanie zostało otwarte;</li>
-    <li>o dostarczanie dzienników, periodyków lub czasopism, z wyjątkiem umowy o prenumeratę;</li>
-    <li>zawartej w drodze aukcji publicznej;</li>
-    <li>o świadczenie usług w zakresie zakwaterowania (nie mieszkalnych), przewozu rzeczy, najmu samochodów, gastronomii, usług związanych z wypoczynkiem, wydarzeniami rozrywkowymi, sportowymi lub kulturalnymi, jeżeli umowa określa dzień lub okres świadczenia usługi;</li>
-    <li>o dostarczanie treści cyfrowych, które nie są zapisane na nośniku materialnym, jeżeli świadczenie rozpoczęło się za zgodą Konsumenta przed upływem terminu odstąpienia i po poinformowaniu o utracie prawa odstąpienia.</li>
-  </ul>
-  
-  <h2 class="mt-6 mb-2 text-[25px]">Rozdział VIII - Reklamacje</h2>
-  <p>Sprzedający ponosi odpowiedzialność za wady Towaru zgodnie z art. 556 i nast. Kodeksu cywilnego. Jeśli nabywcą nie jest Konsument, odpowiedzialność z tytułu rękojmi zostaje wyłączona na podstawie art. 558 §1 Kodeksu cywilnego.</p>
-  <p>W przypadku stwierdzenia wad Towaru, Zamawiający może złożyć reklamację drogą e-mailową na adres hello@hvyt.pl lub listownie na adres: Hvyt by Marta Wontorczyk, ul. Głogoczów 996, 32-444 Głogoczów, lub korzystając z gwarancji producenta, przesłać reklamację bezpośrednio do producenta lub serwisu, jeśli do Towaru dołączono dokument gwarancyjny.</p>
-  <p>Sprzedający nie udziela gwarancji na towary w rozumieniu art. 577 Kodeksu cywilnego, a jedynie przekazuje oświadczenia gwarancyjne producentów.</p>
-  <p>Zamawiający, wysyłający reklamowany Towar, powinien podać: imię i nazwisko, adres, nr Zamówienia, adres e-mail oraz opisać wadę Towaru i swoje żądania. Do reklamacji dołącza się kopię dowodu zakupu (paragonu).</p>
-  <p>Reklamacje rozpatrywane są do 14 dni od ich złożenia, a o sposobie rozpatrzenia Użytkownik zostaje poinformowany.</p>
-  <p>Sprzedający zgadza się na rozstrzyganie sporów konsumenckich zgodnie z ustawą z 23 września 2016 r. o pozasądowym rozwiązywaniu sporów konsumenckich. W razie nieuznania reklamacji, Konsument może skorzystać z procedur pozasądowych i zwrócić się do Wojewódzkiego Inspektoratu Inspekcji Handlowej w Krakowie (ul. Ujastek 1, 31-752 Kraków) lub na stronę <a href="http://www.uokik.gov.pl" target="_blank" rel="noopener noreferrer">www.uokik.gov.pl</a> w zakładce „Rozstrzyganie sporów konsumenckich”. Dodatkowo, Konsument będący osobą fizyczną może złożyć skargę przez unijną platformę ODR: <a href="http://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer">http://ec.europa.eu/consumers/odr/</a>.</p>
-  
-  <h2 class="mt-6 mb-2 text-[25px]">Rozdział IX - Dane osobowe</h2>
-  <p>Użytkownik, dokonując Zamówienia (bez rejestracji lub po rejestracji Konta Zamawiającego) oraz kontaktując się ze Sprzedającym, przekazuje swoje dane osobowe: imię, nazwisko, adres, e-mail, nr telefonu, ewentualnie nazwę firmy, adres prowadzenia działalności, NIP, adres IP komputera, z którego korzysta.</p>
-  <p>W przypadku Zamówień bez rejestracji lub kontaktu ze Sprzedającym – podstawą prawną przetwarzania danych jest wykonanie Umowy sprzedaży/świadczenia usług drogą elektroniczną, a w przypadku rejestracji lub newslettera – zgoda Użytkownika, zgodnie z art. 6 ust. 1 lit. b) lub a) Rozporządzenia RODO.</p>
-  <p>Administratorem danych osobowych jest Sprzedający. Podanie danych jest dobrowolne, ale niezbędne do realizacji celów. Dane nie będą udostępniane osobom trzecim bez uprzedniej zgody Użytkownika i nie będą profilowane ani przetwarzane w sposób zautomatyzowany. Więcej informacji znajduje się w Polityce prywatności, stanowiącej integralną część Regulaminu.</p>
-  
-  <h2 class="mt-6 mb-2 text-[25px]">Rozdział X - Pozostałe postanowienia</h2>
-  <p>W sprawach nieuregulowanych niniejszym Regulaminem zastosowanie mają przepisy prawa polskiego, w szczególności Kodeksu cywilnego, Ustawy o świadczeniu usług drogą elektroniczną oraz Ustawy konsumenckiej (dla Konsumentów).</p>
-  <p>Niniejszy Regulamin nie ogranicza uprawnień Konsumenta wynikających z prawa państwa Konsumenta – w przypadku korzystniejszych przepisów, obowiązują one obu stron.</p>
-  <p>Sprzedający ma prawo wprowadzać zmiany w Regulaminie z ważnych przyczyn (np. zmiana przepisów prawa, zmiana zasad funkcjonowania Sklepu). W przypadku zmian, Użytkownik zostanie powiadomiony z 14-dniowym wyprzedzeniem (zmiany zostaną opublikowane na stronie Sklepu, a Użytkownicy posiadający Konto Zamawiającego lub subskrybujący newsletter otrzymają informację mailowo). W razie braku akceptacji zmienionego Regulaminu, Użytkownik może zrezygnować z korzystania ze Sklepu i wypowiedzieć umowę o świadczenie usług.</p>
-  <p>Treść Regulaminu może być utrwalona poprzez wydrukowanie, zapisanie lub pobranie ze strony Sklepu.</p>
-  <p>Postanowienia Regulaminu należy interpretować w sposób zgodny z obowiązującymi przepisami prawa.</p>
-  <p>Głogoczów, dnia 26 sierpnia 2021 roku.</p>
-  
-  <p><strong>Załącznik nr 1 – wzór oświadczenia o odstąpieniu od umowy przez Konsumenta.</strong></p>
-  <p>Formularz ten należy wypełnić i odesłać tylko w przypadku chęci odstąpienia od Umowy sprzedaży</p>
-  <p>…………………………………………….<br/>
-  Imię i nazwisko konsumenta<br/>
-  ……………………………………………….<br/>
-  adres zamieszkania<br/>
-  ……………………………………………….<br/>
-  telefon kontaktowy<br/>
-  ……………………………………………….<br/>
-  e-mail<br/>
-  ……………………………………………….<br/>
-  nr zamówienia oraz nr paragonu fiskalnego<br/>
-  Hvyt by Marta Wontorczyk, ul. Głogoczów 996, 32-444 Głogoczów,<br/>
-  z dopiskiem „odstąpienie od umowy www.hvyt.pl”<br/><br/>
-  Oświadczenie konsumenta o odstąpieniu od umowy zawartej na odległość<br/><br/>
-  Działając zgodnie z art. 27 ustawy z dnia 31.05.2014 roku o prawach konsumenta, niniejszym oświadczam, że
-  odstępuję od umowy sprzedaży następujących towarów …<br/><br/>
-  Umowa sprzedaży została zawarta z Hvyt by Marta Wontorczyk w dniu ………….. roku, a odbiór przeze mnie Towarów
-  nastąpił w dniu ……………….. roku. [i]<br/><br/>
-  Proszę o zwrot środków na następujący rachunek bankowy: ……………..<br/><br/>
-  …………………………………..<br/><br/>
-  Data i podpis konsumenta (tylko jeśli dokument będzie wysłany do Sprzedającego w wersji papierowej)<br/><br/>
-  [i] Niepotrzebne skreślić
-  `;
+      <div class="signature">
+        <label>Data i podpis odstępującego od umowy sprzedaży (tylko jeśli dokument będzie wysłany do Sprzedającego w wersji papierowej)</label>
+        <span class="date"></span>
+      </div>
+    </form>
+      `,
+    },
+  ];
 
   return (
     <Layout title="Regulamin">
@@ -177,20 +609,47 @@ const Regulamin = () => {
           name="description"
           content="Regulamin sklepu internetowego www.hvyt.pl"
         />
-
         <link
           id="meta-canonical"
           rel="canonical"
           href={`${process.env.NEXT_PUBLIC_SITE_URL}/regulamin`}
         />
-
       </Head>
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        {/* Here we add Tailwind typography modifiers for h2 elements */}
-        <div
-          className="prose prose-lg prose-h2:text-2xl prose-h2:mb-10"
-          dangerouslySetInnerHTML={{ __html: htmlContent }}
-        />
+      <div className=" mx-auto py-12">
+        <h1 className="mt-6 mb-4 text-[45px] font-bold">
+          REGULAMIN SKLEPU INTERNETOWEGO
+        </h1>
+        <p className="mb-4">
+          Niniejszy Regulamin określa zasady składania i realizacji Zamówień
+          poprzez stronę internetową działającą pod adresem URL:{' '}
+          <a
+            href="https://hvyt.pl"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            https://hvyt.pl
+          </a>
+        </p>
+
+        <p className="mb-8">
+          <strong>
+            Użytkownik ma prawo przed złożeniem Zamówienia do negocjacji
+            warunków Umowy sprzedaży ze Sprzedającym. W przypadku zrezygnowania
+            przez Użytkownika z możliwości zawarcia Umowy sprzedaży na drodze
+            indywidualnych negocjacji, zastosowanie ma niniejszy Regulamin oraz
+            powszechnie obowiązujące przepisy prawa polskiego.
+          </strong>
+        </p>
+
+        {/* Expandable Rozdziały */}
+        {chapters.map((chap, idx) => (
+          <ExpandableSection
+            key={idx}
+            title={chap.title}
+            content={chap.content}
+          />
+        ))}
       </div>
     </Layout>
   );
