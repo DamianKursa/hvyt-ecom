@@ -63,6 +63,7 @@ const ignoredParams = new Set([
   'utm_content',
   'utm_term',
   'utm_id',
+  'fbclid',
   'srsltid',
   'gbraid',
 ]);
