@@ -18,7 +18,7 @@ const PolitykaPrywatnosci = () => {
           href={`${process.env.NEXT_PUBLIC_SITE_URL}/polityka-prywatnosci`}
         />
       </Head>
-      <div className="max-w-4xl mx-auto px-4 py-12">
+      <div className="max-w-4xl mx-auto px-4">
         <h1 className="text-4xl font-bold text-center mb-8">
           POLITYKA PRYWATNOŚCI i PLIKÓW COOKIES
         </h1>

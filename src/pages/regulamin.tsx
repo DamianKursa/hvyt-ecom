@@ -615,11 +615,11 @@ Dla danego Zamówienia wiążąca jest Cena z momentu złożenia Zamówienia.
           href={`${process.env.NEXT_PUBLIC_SITE_URL}/regulamin`}
         />
       </Head>
-      <div className=" mx-auto py-12">
-        <h1 className="mt-6 mb-4 text-[45px] font-bold">
+      <div className=" max-w-4xl mx-auto">
+        <h1 className=" mb-4 text-4xl font-bold">
           REGULAMIN SKLEPU INTERNETOWEGO
         </h1>
-        <p className="mb-4">
+        <p className="mb-4 ">
           Niniejszy Regulamin określa zasady składania i realizacji Zamówień
           poprzez stronę internetową działającą pod adresem URL:{' '}
           <a
