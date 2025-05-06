@@ -1,7 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
+import { useUserContext } from '@/context/UserContext';
+import { ExternalIdContext } from '@/context/ExternalIdContext';
 import Layout from '@/components/Layout/Layout.component';
 import SingleProductGallery from '@/components/SingleProduct/SingleProductGallery.component';
 import SingleProductDetails from '@/components/SingleProduct/SingleProductDetails';
@@ -23,6 +25,7 @@ import { InputField } from '@/components/Input/InputField.component';
 import { useForm, FormProvider } from 'react-hook-form';
 import Head from 'next/head';
 import LowestPriceInfo from '@/components/SingleProduct/LowestPriceInfo';
+import { pushGTMEvent } from '@/utils/gtm';
 
 const NajczęściejKupowaneRazem = dynamic(
   () => import('@/components/Product/CrossSell'),
@@ -45,7 +48,8 @@ const ProductPage = () => {
   const frequentlyBoughtTogetherRef = useRef<HTMLDivElement>(null);
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [waitingListError, setWaitingListError] = useState<string | null>(null);
-
+  const externalAnonId = useContext(ExternalIdContext);
+  const { user } = useUserContext();
   const {
     product,
     loading,
@@ -94,6 +98,7 @@ const ProductPage = () => {
     useCrossSellProducts(product ? product.id.toString() : null);
 
   // Fetch product data on slug change
+
   useEffect(() => {
     const fetchData = async () => {
       if (!slug) return;
@@ -102,7 +107,6 @@ const ProductPage = () => {
         const res = await fetch(
           `/api/product?slug=${encodeURIComponent(slug)}`,
         );
-
         if (!res.ok) {
           throw new Error('No product found');
         }
@@ -115,29 +119,39 @@ const ProductPage = () => {
           });
           return;
         }
+
         console.log('🔍 fetched productData:', productData);
-        // Save fetched product to your state
         dispatch({ type: 'SET_PRODUCT', payload: productData });
 
-        // Once the product data is fetched, push the "view_item" event to the dataLayer.
-        // We use a type cast (window as any) to bypass TypeScript's strict typing.
-        if (typeof window !== 'undefined' && (window as any).dataLayer) {
-          (window as any).dataLayer.push({
-            event: 'view_item',
-            ecommerce: {
-              items: [
-                {
-                  item_id: productData.id,
-                  item_name: productData.name,
-                  price: productData.price
-                    ? parseFloat(productData.price).toFixed(2)
-                    : '0.00',
-                  // You can add additional properties here, e.g., category, variant, etc.
-                },
-              ],
+        pushGTMEvent('view_item', {
+          items: [
+            {
+              item_id: productData.id,
+              item_name: productData.name,
+              price: parseFloat(productData.price).toFixed(2),
             },
-          });
-        }
+          ],
+          value: parseFloat(productData.price),
+          currency: 'PLN',
+        });
+        fetch('/api/pinterest-capi', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventName: 'view_content',
+            items: [
+              {
+                item_id: productData.id,
+                item_name: productData.name,
+                price: parseFloat(productData.price).toFixed(2),
+                quantity: 1,
+              },
+            ],
+            value: parseFloat(productData.price),
+            currency: 'PLN',
+            click_id: document.cookie.match(/_epik=([^;]+)/)?.[1] || '',
+          }),
+        });
       } catch (error) {
         dispatch({ type: 'SET_ERROR', payload: 'Error loading product data' });
         dispatch({
@@ -363,6 +377,26 @@ const ProductPage = () => {
         ],
       },
     });
+    // … right after your fb-capi block …
+    fetch('/api/pinterest-capi', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        eventName: 'add_to_cart',
+        items: [
+          {
+            item_id: cartItem.productId,
+            item_name: cartItem.name,
+            price: cartItem.price,
+            quantity: cartItem.qty,
+          },
+        ],
+        value: cartItem.totalPrice,
+        currency: 'PLN',
+        order_id: cartItem.cartKey,
+        click_id: document.cookie.match(/_epik=([^;]+)/)?.[1] || '',
+      }),
+    });
 
     const eventId = uuidv4();
 
@@ -381,9 +415,32 @@ const ProductPage = () => {
       );
     }
 
+    // inside handleAddToCart, after your fbq('AddToCart', …) call:
+
     {
-      const fbp = document.cookie.match(/_fbp=([^;]+)/)?.[1];
-      const fbc = document.cookie.match(/_fbc=([^;]+)/)?.[1];
+      // 1) Coerce cookies & FB Login ID to strings
+      const fbp: string = document.cookie.match(/_fbp=([^;]+)/)?.[1] ?? '';
+      const fbc: string = document.cookie.match(/_fbc=([^;]+)/)?.[1] ?? '';
+      const fbLoginId: string = (window as any).fb_login_id ?? '';
+
+      // 2) Guarantee a non-null anon ID
+      // externalAnonId comes from context and can be string|null
+      // If it's null, fall back to a newly generated UUID
+      const anonId: string = externalAnonId ?? uuidv4();
+
+      // 3) Pick real user.id when logged in, else our stable anonId
+      const externalId: string = user?.id != null ? String(user.id) : anonId;
+
+      // 4) Build your userData map — all string values
+      const userData: Record<string, string> = {
+        fb_login_id: fbLoginId,
+        fbp,
+        fbc,
+        external_id: externalId,
+      };
+      if (user?.email) userData.email = user.email;
+
+      // 5) Fire the CAPI fetch
       fetch('/api/fb-capi', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -396,12 +453,12 @@ const ProductPage = () => {
             value: cartItem.totalPrice,
             currency: 'PLN',
           },
-          userData: { fbp, fbc },
+          userData, // ← now every field is string
         }),
       })
         .then(async (res) => {
           const json = await res.json();
-          if (!res.ok) console.error('🚨 CAPI error response:', json);
+          if (!res.ok) console.error('🚨 CAPI error:', json);
           else console.log('✅ CAPI success:', json);
         })
         .catch((err) => console.error('❌ CAPI network error:', err));

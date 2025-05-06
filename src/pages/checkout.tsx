@@ -12,6 +12,7 @@ import CheckoutAddressForm from '@/components/Checkout/CheckoutAdressForm';
 import Shipping from '@/components/Checkout/Shipping';
 import Payment from '@/components/Checkout/Payment';
 import { CartContext } from '@/stores/CartProvider';
+import { ExternalIdContext } from '@/context/ExternalIdContext';
 import { useUserContext } from '@/context/UserContext';
 import { pushGTMEvent } from '@/utils/gtm';
 
@@ -63,7 +64,7 @@ const Checkout: React.FC = () => {
   });
 
   const [isShippingDifferent, setIsShippingDifferent] = useState(false);
-
+  const externalAnonId = useContext(ExternalIdContext);
   const { user } = useUserContext();
   const { cart } = useContext(CartContext);
 
@@ -372,7 +373,6 @@ const Checkout: React.FC = () => {
         })),
       });
 
-      // ── Facebook Purchase tracking ───────────────────────────────
       const purchaseEventId = createdOrder.id.toString();
 
       // PIXEL → browser
@@ -393,12 +393,29 @@ const Checkout: React.FC = () => {
         );
       }
 
-      // CAPI → server
-      // … after fbq('track','Purchase',…) …
+      // ── Your updated CAPI block ────────────────────────────
       {
         const fbp = document.cookie.match(/_fbp=([^;]+)/)?.[1];
         const fbc = document.cookie.match(/_fbc=([^;]+)/)?.[1];
-        fetch('/api/fb-capi', {
+        const fbLoginId = (window as any).fb_login_id;
+
+        // use real user.id if available, otherwise your one‐and‐only anon ID
+        const externalId = user?.id || externalAnonId || uuidv4();
+
+        const userData = {
+          fb_login_id: fbLoginId,
+          fbp,
+          fbc,
+          external_id: externalId,
+          fn: billingData.firstName,
+          ln: billingData.lastName,
+          phone: billingData.phone,
+          zip: billingData.postalCode,
+          ct: billingData.city,
+          email, // optional
+        };
+
+        await fetch('/api/fb-capi', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -413,17 +430,44 @@ const Checkout: React.FC = () => {
                 quantity: p.qty,
               })),
             },
-            userData: { fbp, fbc, email },
+            userData, // ← your full object here
           }),
         })
           .then(async (res) => {
             const json = await res.json();
-            if (!res.ok) console.error('🚨 CAPI error response:', json);
+            if (!res.ok) console.error('🚨 CAPI error:', json);
             else console.log('✅ CAPI success:', json);
           })
           .catch((err) => console.error('❌ CAPI network error:', err));
       }
+      // ── end CAPI block ────────────────────────────────────
+
       // ── end Facebook Purchase tracking ────────────────────────────
+      const pinterestPayload = {
+        eventName: 'purchase',
+        items: cart.products.map((p) => ({
+          item_id: p.productId,
+          item_name: p.name,
+          price: p.price,
+          quantity: p.qty,
+        })),
+        value: cart.totalProductsPrice,
+        currency: 'PLN',
+        order_id: createdOrder.id.toString(),
+        click_id: document.cookie.match(/_epik=([^;]+)/)?.[1] || '',
+        firstName: billingData.firstName,
+        lastName: billingData.lastName,
+        phone: billingData.phone,
+        postalCode: billingData.postalCode,
+        city: billingData.city,
+        country: mapCountry(billingData.country),
+      };
+
+      // fire-and-forget so it won’t block the redirect
+      const blob = new Blob([JSON.stringify(pinterestPayload)], {
+        type: 'application/json',
+      });
+      navigator.sendBeacon('/api/pinterest-capi', blob);
 
       localStorage.setItem('recentOrderId', createdOrder.id.toString());
       localStorage.setItem('recentOrderKey', createdOrder.order_key);

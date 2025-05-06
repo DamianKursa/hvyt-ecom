@@ -11,6 +11,7 @@ import client from '@/utils/apollo/ApolloClient';
 import LoadingOverlay from '@/components/UI/LoadingOverlay';
 import axios from 'axios';
 import type { AppProps } from 'next/app';
+import { ExternalIdProvider } from '@/context/ExternalIdContext';
 
 import '@/styles/globals.css';
 import 'nprogress/nprogress.css';
@@ -72,6 +73,25 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <>
+      <Script id="fb-pixel" strategy="afterInteractive">
+        {`
+          !function(f,b,e,v,n,t,s){
+            if(f.fbq) return;
+            n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq) f._fbq=n;
+            n.push=n; n.loaded=!0; n.version='2.0';
+            n.queue=[]; t=b.createElement(e); t.async=!0;
+            t.src=v; s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)
+          }(
+            window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js'
+          );
+          fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID}');
+          fbq('track', 'PageView');
+        `}
+      </Script>
       {/* Ładowanie Cookiebot tylko w środowisku produkcyjnym */}
       {process.env.NODE_ENV === 'production' && (
         <Script
@@ -87,11 +107,13 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ApolloProvider client={client}>
         {showOverlay && <LoadingOverlay />}
         <CartProvider>
-          <UserProvider>
-            <WishlistProvider>
-              <Component {...pageProps} />
-            </WishlistProvider>
-          </UserProvider>
+          <ExternalIdProvider>
+            <UserProvider>
+              <WishlistProvider>
+                <Component {...pageProps} />
+              </WishlistProvider>
+            </UserProvider>
+          </ExternalIdProvider>
         </CartProvider>
       </ApolloProvider>
     </>

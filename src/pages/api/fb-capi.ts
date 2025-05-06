@@ -22,9 +22,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { eventName, eventId, customData, userData } = req.body
 
+  // Build up the user_data object
   const user_data: Record<string,string> = {}
-  if (userData?.email) user_data.em = sha256(userData.email)
-  if (userData?.phone) user_data.ph = sha256(userData.phone)
+
+  // PII fields to hash
+  if (userData?.email)        user_data.em           = sha256(userData.email)
+  if (userData?.phone)        user_data.ph           = sha256(userData.phone)
+  if (userData?.fn)           user_data.fn           = sha256(userData.fn)
+  if (userData?.ln)           user_data.ln           = sha256(userData.ln)
+  if (userData?.zip)          user_data.zp           = sha256(userData.zip)
+  if (userData?.ct)           user_data.ct           = sha256(userData.ct)
+  if (userData?.external_id)  user_data.external_id  = sha256(userData.external_id)
+
+  // Browser identifiers (keep unhashed)
+  if (userData?.fbp)          user_data.fbp          = userData.fbp
+  if (userData?.fbc)          user_data.fbc          = userData.fbc
+  if (userData?.fb_login_id)  user_data.fb_login_id  = userData.fb_login_id
+
+  // Standard network/user-agent info
   if (req.headers['x-forwarded-for']) {
     user_data.client_ip_address = (req.headers['x-forwarded-for'] as string).split(',')[0]
   } else if (req.socket.remoteAddress) {
