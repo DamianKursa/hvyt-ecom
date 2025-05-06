@@ -486,6 +486,47 @@ const PolitykaPrywatnosci = () => {
           <p>Głogoczów, dnia 15.04.2025 roku</p>
         </div>
       </div>
+      <style jsx>{`
+        .policyList {
+          counter-reset: item;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .policyList > li {
+          counter-increment: item;
+          position: relative;
+          margin-bottom: 0.75em;
+          padding-left: 2em;
+        }
+
+        .policyList > li::before {
+          content: counter(item) '. ';
+          position: absolute;
+          left: 0;
+        }
+
+        .policyList > li ol {
+          counter-reset: subitem;
+          list-style: none;
+          margin: 0.5em 0 0;
+          padding: 0;
+        }
+
+        .policyList > li ol > li {
+          counter-increment: subitem;
+          position: relative;
+          margin-bottom: 0.5em;
+          padding-left: 2em;
+        }
+
+        .policyList > li ol > li::before {
+          content: counter(item) '.' counter(subitem) ' ';
+          position: absolute;
+          left: 0;
+        }
+      `}</style>
     </Layout>
   );
 };
