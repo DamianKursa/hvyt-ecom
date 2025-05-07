@@ -54,11 +54,11 @@ const getProductTypeIcon = (product: Product): string | null => {
     '';
 
   if (value.includes('relingi')) return '/icons/kolekcja/uchwyt.svg';
-  if (value.includes('krawędziowe')) return '/icons/kolekcja/krawędziowy.svg';
+  if (value.includes('krawędziowe')) return '/icons/kolekcja/krawedziowy.svg';
   if (value.includes('gałki')) return '/icons/kolekcja/gałka.svg';
   if (value.includes('t-bar')) return '/icons/kolekcja/t-bar.svg';
   if (value.includes('podluzne')) return '/icons/kolekcja/uchwyt.svg';
-  if (value.includes('muszlowe')) return '/icons/kolekcja/krawędziowy.svg';
+  if (value.includes('muszlowe')) return '/icons/kolekcja/krawedziowy.svg';
 
   return slugLower.includes('uchwyt') ? '/icons/kolekcja/uchwyt.svg' : null;
 };
@@ -121,11 +121,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
     ? `od ${parseFloat(product.variations.nodes[0].price || '0').toFixed(2)} zł`
     : `${parseFloat(product.price || '0').toFixed(2)} zł`;
 
-  const truncatedName =
-    product.name.length > 25
-      ? `${product.name.substring(0, 25)}...`
-      : product.name;
-
+  const fullName = product.name;
   const imageSize = isSmall ? 250 : 350;
   const cardHeight = isSmall ? '300px' : '400px';
 
@@ -241,7 +237,12 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
 
       {/* Title + Price */}
       <div className="mt-2 text-left">
-        <h3 className="text-[16px] font-semibold">{truncatedName}</h3>
+        <h3
+          className="text-[16px] font-semibold whitespace-normal break-words"
+          style={{ hyphens: 'auto' }}
+        >
+          {fullName}
+        </h3>
         <div className="mt-1 flex items-baseline">
           {sale < regular && (
             <span className="text-gray-500 line-through mr-2">
