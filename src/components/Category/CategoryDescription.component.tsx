@@ -4,6 +4,8 @@ import { categoryContent, Section } from './CategoryContent';
 
 interface CategoryDescriptionProps {
   category: string;
+  /** raw HTML from WP term.description */
+  wpDescription?: string;
   fullWidth?: boolean;
 }
 
@@ -32,43 +34,79 @@ const ExpandableSection: React.FC<{ title: string; content: string }> = ({
 
 const CategoryDescription: React.FC<CategoryDescriptionProps> = ({
   category,
+  wpDescription = '',
   fullWidth = true,
 }) => {
-  const categorySections: Section[] = categoryContent[category] || [
-    { title: 'Brak opisu dla tej kategorii', content: '' },
-  ];
+  const sections: Section[] = categoryContent[category] || [];
 
-  return (
+  // Shared section wrapper
+  const SectionWrapper: React.FC<{ children: React.ReactNode }> = ({
+    children,
+  }) => (
     <section
-      className={`bg-[#F5F5F5] px-4 mt-[64px] md:mt-[88px] md:mt-0 md:my-[115px] py-[88px] ${fullWidth ? 'w-full' : 'container mx-auto'}`}
+      className={`bg-[#F5F5F5] px-4 mt-[64px] md:mt-[88px] md:mt-0 md:my-[115px] py-[88px] ${
+        fullWidth ? 'w-full' : 'container mx-auto'
+      }`}
       style={{ backgroundColor: 'var(--color-beige)' }}
     >
       <div className="max-w-[1440px] mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-          {/* Text Column */}
-          <div className="w-full md:w-1/2 text-left">
-            {categorySections.map((section, index) => (
-              <ExpandableSection
-                key={index}
-                title={section.title}
-                content={section.content}
-              />
-            ))}
-          </div>
-
-          {/* Image Column */}
-          <div className="w-full md:w-1/2 flex justify-center">
-            <Image
-              src={`/images/${category}-description.jpg`}
-              alt={`${category} description image`}
-              width={800}
-              height={500}
-              className="rounded-lg shadow-lg object-cover"
-            />
-          </div>
+          {children}
         </div>
       </div>
     </section>
+  );
+
+  // 1) Fallback: no hard-coded sections, but we have WP HTML
+  if (sections.length === 0 && wpDescription) {
+    return (
+      <SectionWrapper>
+        {/* Text column */}
+        <div className="w-full md:w-1/2 text-left">
+          <div
+            className="formatted-content-category"
+            dangerouslySetInnerHTML={{ __html: wpDescription }}
+          />
+        </div>
+        {/* Image column */}
+        <div className="w-full md:w-1/2 flex justify-center">
+          <Image
+            src={`/images/${category}-description.jpg`}
+            alt={`${category} description image`}
+            width={800}
+            height={500}
+            className="rounded-lg shadow-lg object-cover"
+          />
+        </div>
+      </SectionWrapper>
+    );
+  }
+
+  // 2) Hard-coded expandable sections
+  return (
+    <SectionWrapper>
+      {/* Left: your ExpandableSection list */}
+      <div className="w-full md:w-1/2 text-left">
+        {sections.map((section, i) => (
+          <ExpandableSection
+            key={i}
+            title={section.title}
+            content={section.content}
+          />
+        ))}
+      </div>
+
+      {/* Right: the same image */}
+      <div className="w-full md:w-1/2 flex justify-center">
+        <Image
+          src={`/images/${category}-description.jpg`}
+          alt={`${category} description image`}
+          width={800}
+          height={500}
+          className="rounded-lg shadow-lg object-cover"
+        />
+      </div>
+    </SectionWrapper>
   );
 };
 

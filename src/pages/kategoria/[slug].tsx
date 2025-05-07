@@ -352,7 +352,12 @@ const CategoryPage = ({
         initialAttributes={initialAttributes}
       />
       <div className="w-full">
-        <CategoryDescription category={slug || ''} />
+        <div className="w-full">
+          <CategoryDescription
+            category={slug || ''}
+            wpDescription={seoData?.description || ''}
+          />
+        </div>
       </div>
     </Layout>
   );
@@ -361,52 +366,67 @@ const CategoryPage = ({
 export const getStaticProps: GetStaticProps = async (context) => {
   const slug = context.params?.slug as string;
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const wpApi =
+    process.env.NEXT_PUBLIC_WP_REST_API || 'https://hvyt.pl/wp-json/wp/v2';
+
+  let categoryInfo = { id: 0, name: 'Unknown', slug };
+  let seoData: SEOData | null = null;
 
   try {
-    const aggregatorRes = await fetch(
-      `${baseUrl}/api/category-aggregator?slug=${encodeURIComponent(slug)}&page=1&perPage=12`,
+    // Fetch the WP product_cat term by slug (includes yoast_head_json)
+    const termRes = await fetch(
+      `${wpApi}/product_cat?slug=${encodeURIComponent(slug)}` +
+        `&_fields=id,name,description,yoast_head_json`,
     );
-    if (!aggregatorRes.ok) throw new Error('Error fetching aggregated data');
-    const aggregatorData = await aggregatorRes.json();
 
-    const fs = require('fs');
-    const path = require('path');
-    const seoFilePath = path.join(process.cwd(), 'data', 'seo-data.json');
-    const seoContent = fs.readFileSync(seoFilePath, 'utf-8');
-    const seoJSON = JSON.parse(seoContent);
-    const seoArray: any[] = seoJSON.categories || [];
-    const seoEntry = seoArray.find((entry) => entry.slug === slug);
-    let seoData = null;
-    if (seoEntry) {
-      seoData = {
-        yoastTitle: seoEntry.yoastTitle || '',
-        yoastDescription: seoEntry.yoastDescription || '',
-        description: seoEntry.description || '',
-      };
+    if (termRes.ok) {
+      const [term] = await termRes.json();
+      if (term) {
+        categoryInfo = { id: term.id, name: term.name, slug };
+        seoData = {
+          yoastTitle: term.yoast_head_json?.title ?? '',
+          yoastDescription: term.yoast_head_json?.description ?? '',
+          description: term.description ?? '',
+        };
+      }
+    } else {
+      console.warn(
+        `WP term fetch failed: ${termRes.status} ${termRes.statusText}`,
+      );
     }
-
-    return {
-      props: {
-        category: aggregatorData.category,
-        initialProducts: aggregatorData.products,
-        initialTotalProducts: aggregatorData.totalProducts,
-        initialAttributes: aggregatorData.attributes,
-        seoData,
-      },
-      revalidate: 21600,
-    };
-  } catch (error) {
-    return {
-      props: {
-        category: { id: 0, name: 'Unknown', slug },
-        initialProducts: [],
-        initialTotalProducts: 0,
-        initialAttributes: [],
-        seoData: null,
-      },
-      revalidate: 60,
-    };
+  } catch (err) {
+    console.warn('Error fetching category term from WP:', err);
   }
+
+  // aggregator fetch remains the same…
+  let aggregatorData = {
+    category: categoryInfo,
+    products: [] as any[],
+    totalProducts: 0,
+    attributes: [] as any[],
+  };
+  try {
+    const aggRes = await fetch(
+      `${baseUrl}/api/category-aggregator` +
+        `?slug=${encodeURIComponent(slug)}` +
+        `&page=1&perPage=12`,
+    );
+    if (aggRes.ok) aggregatorData = await aggRes.json();
+    else console.error('Aggregator fetch failed:', await aggRes.text());
+  } catch (err) {
+    console.error('Aggregator fetch error:', err);
+  }
+
+  return {
+    props: {
+      category: categoryInfo,
+      initialProducts: aggregatorData.products,
+      initialTotalProducts: aggregatorData.totalProducts,
+      initialAttributes: aggregatorData.attributes,
+      seoData, // now never contains undefined
+    },
+    revalidate: 21600,
+  };
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {

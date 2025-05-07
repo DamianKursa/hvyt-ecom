@@ -352,5 +352,11 @@ p.lead {
   font-size: 0.9em;
 }
 
-
+.formatted-content-category h1,.formatted-content-category h2{
+  font-size: 24px !important;
+}
+.formatted-content-category {
+ font-size: 18px;
+ font-weight: 100;
+}
 
