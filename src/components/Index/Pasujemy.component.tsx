@@ -75,15 +75,17 @@ const PasujemyWszedzie = () => {
                 isVisible ? 'min-h-[435px]' : ''
               }`}
             >
-              <Image
-                src="/images/6_2.png"
-                alt="Meble dziecięce"
-                fill
-                className="object-cover rounded-lg"
-              />
-              <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                Meble dziecięce
-              </div>
+              <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-dzieciecych">
+                <Image
+                  src="/images/6_2.png"
+                  alt="Meble dziecięce"
+                  fill
+                  className="object-cover rounded-lg"
+                />
+                <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
+                  Meble dziecięce
+                </div>
+              </Link>
             </div>
             <div
               className={`relative w-full transition-all duration-[4000ms] min-h-[350px] ${
