@@ -61,9 +61,11 @@ const LowestPriceInfo: React.FC<LowestPriceInfoProps> = ({
   if (salePrice >= regularPrice) return null;
 
   return (
-    <p className="w-full text-[18px] text-gray-400 mt-1 mb-4">
-      Najniższa cena w okresie 30 dni przed obniżką: {regularPrice.toFixed(2)}{' '}
-      zł
+    <p className="w-full text-[16px] text-black mt-1 mb-4">
+      Najniższa cena w okresie 30 dni przed obniżką:{' '}
+      <span className="font-light text-gray-400">
+        {regularPrice.toFixed(2)} zł
+      </span>
     </p>
   );
 };
