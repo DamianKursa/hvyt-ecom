@@ -659,7 +659,7 @@ const ProductPage = () => {
                         <span className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
                           {salePrice.toFixed(2)} zł
                         </span>
-                        <span className="text-[16px] text-gray-500 line-through ml-2">
+                        <span className="text-[16px] text-[#969394] line-through ml-2">
                           {regularPrice.toFixed(2)} zł
                         </span>
                       </>
