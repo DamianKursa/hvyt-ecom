@@ -67,6 +67,8 @@ const ignoredParams = new Set([
   'srsltid',
   'gbraid',
   'mc_cid',
+  'mc_eid',
+  'UNIQID',
 ]);
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
