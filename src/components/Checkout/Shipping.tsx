@@ -183,6 +183,7 @@ const Shipping: React.FC<ShippingProps> = ({
                 'kurier gls - darmowa wysyłka',
                 'paczkomaty inpost',
                 'punkty gls',
+                'kurier gls pobranie',
               ].includes(method.title.toLowerCase()),
             );
             // If 'darmowa dostawa' not present, add it
