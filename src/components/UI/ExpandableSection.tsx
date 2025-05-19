@@ -53,7 +53,7 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full text-[24px] flex justify-between items-center py-2 text-lg font-semibold"
       >
-        <span className="text-[20px]">{title}</span>
+        <span className="text-[20px] text-start">{title}</span>
         <Image
           src={isExpanded ? '/icons/minus.svg' : '/icons/plus-sign.svg'}
           alt={isExpanded ? 'Collapse' : 'Expand'}
