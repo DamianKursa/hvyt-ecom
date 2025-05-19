@@ -541,8 +541,7 @@ Dla danego Zamówienia wiążąca jest Cena z momentu złożenia Zamówienia.
       `,
     },
     {
-      title:
-        'Załącznik nr 1 – wzór oświadczenia o odstąpieniu od umowy przez Konsumenta lub Konsumenta-Przedsiębiorcy',
+      title: 'Załącznik nr 1 – wzór oświadczenia o odstąpieniu od umowy przez Konsumenta lub Konsumenta-Przedsiębiorcy',
       content: `
 
       <form>
