@@ -46,7 +46,7 @@ const KolekcjePage = () => {
           href={`${process.env.NEXT_PUBLIC_SITE_URL}/kolekcje`}
         />
       </Head>
-      <section className="w-full px-4 lg:px-0 mt-[115px] mb-[150px]">
+      <section className="w-full px-4 mt-[115px] mb-[150px]">
         <div className="container mx-auto max-w-grid-desktop">
           {/* Page Title and Text Section */}
           <div className="text-left mb-12">

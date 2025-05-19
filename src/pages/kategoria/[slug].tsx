@@ -271,7 +271,7 @@ const CategoryPage = ({
           href={`${process.env.NEXT_PUBLIC_SITE_URL}/kategoria/${slug}`}
         />
       </Head>
-      <div className="container max-w-[1440px] mt-[115px] px-4 md:px-0 mx-auto">
+      <div className="container max-w-[1440px] mt-[115px] px-4 mx-auto">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
         <div className="flex items-center mb-8">
           <h1 className="text-[32px] mt-[24px] md:text-[40px] font-bold text-[#661F30] flex items-center gap-4">
