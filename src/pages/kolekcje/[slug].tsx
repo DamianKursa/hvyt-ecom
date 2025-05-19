@@ -132,7 +132,7 @@ const CollectionPage = () => {
         />
       </Head>
       <section className="w-full py-16">
-        <div className="container mx-auto max-w-grid-desktop px-4 md:px-0">
+        <div className="container mx-auto max-w-grid-desktop px-4">
           {/* HERO SECTION */}
           <div
             className="grid grid-cols-1 md:grid-cols-2 mb-12 rounded-[25px] relative"
