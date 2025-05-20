@@ -96,10 +96,6 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             postalCode: address.postalCode || '',
             country: address.country || 'Polska',
           });
-
-          if (address.email) {
-            setEmail(address.email);
-          }
         }
       } catch (err) {
         console.error('Error fetching billing address:', err);
