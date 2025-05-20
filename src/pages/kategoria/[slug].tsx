@@ -54,6 +54,7 @@ const icons: Record<string, string> = {
 
 const ignoredParams = new Set([
   'slug',
+  'page',
   'gad_source',
   'gclid',
   'utm_source',
@@ -115,10 +116,19 @@ const CategoryPage = ({
     const updateFiltersFromQuery = () => {
       const queryFilters: { name: string; value: string }[] = [];
       let sortFromQuery = 'Sortowanie';
+      let pageFromQuery = 1;
+      
       Object.keys(router.query).forEach((key) => {
         if (ignoredParams.has(key)) return;
         if (key === 'sort') {
           sortFromQuery = router.query[key] as string;
+          return;
+        }
+        if (key === 'page') {
+          const pageNum = parseInt(router.query[key] as string, 10);
+          if (!isNaN(pageNum) && pageNum > 0) {
+            pageFromQuery = pageNum;
+          }
           return;
         }
         const values = router.query[key];
@@ -128,11 +138,12 @@ const CategoryPage = ({
           queryFilters.push({ name: key, value: values });
         }
       });
+      
       setActiveFilters(queryFilters);
       if (sortFromQuery !== 'Sortowanie') {
         setSortingOption(sortFromQuery);
       }
-      setCurrentPage(1);
+      setCurrentPage(pageFromQuery);
     };
 
     if (router.isReady) {
@@ -151,6 +162,22 @@ const CategoryPage = ({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const pageFromUrl = urlParams.get('page');
+      const page = pageFromUrl ? parseInt(pageFromUrl, 10) : 1;
+      
+      if (!isNaN(page) && page > 0 && page !== currentPage) {
+        setCurrentPage(page);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentPage]);
+
 
   // Build dynamic SWR key based on filters, sorting, and page
   const buildApiEndpoint = () => {
@@ -253,6 +280,15 @@ const CategoryPage = ({
 
   const onPageChange = (page: number) => {
     setCurrentPage(page);
+    
+    const url = new URL(window.location.href);
+    if (page === 1) {
+      url.searchParams.delete('page');
+    } else {
+      url.searchParams.set('page', page.toString());
+    }
+    
+    window.history.pushState(null, '', url.pathname + url.search);
   };
 
   if (error) {
