@@ -1,3 +1,5 @@
+// File: components/Bestsellers.tsx
+
 import React, { useState } from 'react';
 import useSWR from 'swr';
 import ProductPreview from '../Product/ProductPreview.component';
@@ -5,56 +7,63 @@ import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import SkeletonProduct from '@/components/Skeletons/SkeletonProduct';
 
 interface Product {
-  id: string;
+  id: number | string;
   slug: string;
   name: string;
   price: string;
-  image: { src: string };
+  images: { src: string }[];
 }
 
 interface BestsellersProps {
   title?: string;
   description?: string;
+  perPage?: number;
 }
 
 const itemsPerPage = 3.8;
 const gutter = 24;
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) =>
+  fetch(url).then((res) => {
+    if (!res.ok) return Promise.reject(res);
+    return res.json();
+  });
 
-const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
-  const categoryId = 123;
-  const filters = JSON.stringify([]);
-  const apiUrl = `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryId}&page=1&perPage=12&sortingOption=default&filters=${encodeURIComponent(filters)}`;
+const Bestsellers: React.FC<BestsellersProps> = ({
+  title,
+  description,
+  perPage = 12,
+}) => {
+  // SWR will call our updated API route
+  const apiUrl = `/api/bestsellers?perPage=${perPage}`;
 
-  // SWR to fetch data
   const { data, error } = useSWR(apiUrl, fetcher, {
-    refreshInterval: 3600000,
-    dedupingInterval: 600000,
+    refreshInterval: 3_600_000, // revalidate every hour
+    dedupingInterval: 600_000, // dedupe within 10 minutes
   });
 
   const loading = !data && !error;
   const products: Product[] = data
-    ? (data.products || []).map((product: any) => ({
-        id: product.id,
-        slug: product.slug,
-        name: product.name,
-        price: product.price,
-        image: { src: product.images?.[0]?.src || '/fallback-image.jpg' },
+    ? (data.products as any[]).map((p) => ({
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        price: p.price,
+        images: Array.isArray(p.images)
+          ? p.images.map((img: any) => ({ src: img.src }))
+          : [{ src: '/fallback-image.jpg' }],
       }))
     : [];
 
-  // Limit to maximum 12 products
-  const displayedProducts = products.slice(0, 12);
+  const displayedProducts = products.slice(0, perPage);
   const totalItems = loading ? 4 : displayedProducts.length;
 
-  // Pagination state for desktop view
   const [currentIndex, setCurrentIndex] = useState(0);
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < totalItems - itemsPerPage;
 
-  const handlePrev = () => canGoPrev && setCurrentIndex(currentIndex - 1);
-  const handleNext = () => canGoNext && setCurrentIndex(currentIndex + 1);
+  const handlePrev = () => canGoPrev && setCurrentIndex((i) => i - 1);
+  const handleNext = () => canGoNext && setCurrentIndex((i) => i + 1);
 
   return (
     <section className="container max-w-grid-desktop py-16 sm:px-4 md:px-0 mx-auto">
@@ -64,10 +73,10 @@ const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
             {title || 'Bestsellers'}
           </h2>
           <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
-            {description || 'Poznaj nasze najpopularniejsze modele.'}
+            {description || 'Poznaj nasze najchętniej kupowane produkty.'}
           </p>
         </div>
-        {/* Custom Navigation - Desktop Only */}
+        {/* Desktop navigation arrows */}
         <div className="hidden md:flex items-center space-x-4">
           <button
             onClick={handlePrev}
@@ -105,7 +114,9 @@ const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
         <div
           className="flex transition-transform duration-300"
           style={{
-            transform: `translateX(-${(currentIndex % totalItems) * (100 / itemsPerPage)}%)`,
+            transform: `translateX(-${
+              (currentIndex % totalItems) * (100 / itemsPerPage)
+            }%)`,
             gap: `${gutter}px`,
           }}
         >
@@ -129,19 +140,14 @@ const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
                     width: `calc((100% / ${itemsPerPage}) - ${gutter}px)`,
                   }}
                 >
-                  <ProductPreview
-                    product={{
-                      ...(product as Product),
-                      images: [{ src: (product as Product).image.src }],
-                    }}
-                  />
+                  <ProductPreview product={product as Product} />
                 </div>
               ),
           )}
         </div>
       </div>
 
-      {/* Mobile View: Responsive Slider */}
+      {/* Mobile View */}
       <div className="md:hidden">
         {loading ? (
           <div className="flex gap-4">
@@ -153,12 +159,7 @@ const Bestsellers: React.FC<BestsellersProps> = ({ title, description }) => {
           <ResponsiveSlider
             items={displayedProducts}
             renderItem={(product: Product) => (
-              <ProductPreview
-                product={{
-                  ...product,
-                  images: [{ src: product.image.src }],
-                }}
-              />
+              <ProductPreview product={product} />
             )}
           />
         )}
