@@ -35,6 +35,36 @@ const NajczęściejKupowaneRazem = dynamic(
 const Instagram = dynamic(() => import('@/components/Index/Instagram'), {
   ssr: false,
 });
+// ────────── Add this "BaselinkerVariation" alias at the top ──────────
+interface BaselinkerVariation {
+  id: number;
+  sku: string;
+  in_stock: boolean;
+  stock_quantity: string;
+  price: number;
+  regular_price: number;
+  sale_price: number;
+  description: string;
+  visible: boolean;
+  manage_stock: boolean;
+  purchasable: boolean;
+  on_sale: boolean;
+  image: {
+    id: number;
+    src: string;
+  };
+  attributes: Array<{
+    id: string;
+    name: string;
+    option: string;
+  }>;
+  weight: string;
+  meta_data: Array<{
+    key: string;
+    value: string;
+  }>;
+}
+// ──────────────────────────────────────────────────────────────────────
 
 interface NotifyFormData {
   notifyEmail: string;
@@ -123,6 +153,69 @@ const ProductPage = () => {
         console.log('🔍 fetched productData:', productData);
         dispatch({ type: 'SET_PRODUCT', payload: productData });
 
+        // ─────────────── LOOK UP VARIANT BY URL PARAM ───────────────
+
+        const queryAttrKey = Object.keys(query).find((key) =>
+          key.startsWith('attribute_pa_'),
+        );
+        if (
+          queryAttrKey &&
+          Array.isArray(productData.baselinker_variations) &&
+          productData.baselinker_variations.length > 0
+        ) {
+          const attributeValue = query[queryAttrKey];
+          if (typeof attributeValue === 'string') {
+            // Cast JSON to our typed array:
+            const variations =
+              productData.baselinker_variations as BaselinkerVariation[];
+
+            // Find a variation where option “160 mm” (with a space) matches “160mm” (URL)
+            const matchedVariation = variations.find((variation) =>
+              variation.attributes.some(
+                (attr) =>
+                  // strip spaces so “160 mm” and “160mm” both become “160mm”
+                  attr.option.replace(/\s+/g, '').toLowerCase() ===
+                  attributeValue.replace(/\s+/g, '').toLowerCase(),
+              ),
+            );
+
+            if (matchedVariation) {
+              // Now extract the full name string, e.g. “Atrybut produktu: Rozstaw”
+              const exactName = matchedVariation.attributes.find(
+                (attr) =>
+                  attr.option.replace(/\s+/g, '').toLowerCase() ===
+                  attributeValue.replace(/\s+/g, '').toLowerCase(),
+              )?.name;
+
+              if (exactName) {
+                dispatch({
+                  type: 'UPDATE_ATTRIBUTE',
+                  payload: { name: exactName, value: attributeValue },
+                });
+              }
+
+              dispatch({
+                type: 'SET_VARIATION',
+                payload: {
+                  id: matchedVariation.id.toString(),
+                  name: matchedVariation.id.toString(),
+                  price: matchedVariation.price.toString(),
+                  regular_price: matchedVariation.regular_price.toString(),
+                  sale_price: matchedVariation.sale_price.toString(),
+                  on_sale: matchedVariation.on_sale,
+                  image: matchedVariation.image
+                    ? { sourceUrl: matchedVariation.image.src }
+                    : undefined,
+                  attributes: matchedVariation.attributes.map((a) => ({
+                    id: a.id,
+                    name: a.name,
+                    option: a.option,
+                  })),
+                },
+              });
+            }
+          }
+        }
         pushGTMEvent('view_item', {
           items: [
             {
