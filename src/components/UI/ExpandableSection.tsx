@@ -51,7 +51,7 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
       {/* Section Title */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full text-[24px] flex justify-between items-center py-2 text-lg font-semibold"
+        className="w-full text-[24px] flex justify-between text-left items-center py-2 text-lg font-semibold"
       >
         <span className="text-[20px]">{title}</span>
         <Image
