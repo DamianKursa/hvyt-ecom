@@ -2,13 +2,13 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 import { getCache, setCache } from '../../lib/cache';
 
-const CACHE_TTL = 3600; 
+const CACHE_TTL = 3600;
 
 const WooCommerceAPI = axios.create({
-  baseURL: process.env.REST_API, 
+  baseURL: process.env.REST_API,
   auth: {
-    username: process.env.WC_CONSUMER_KEY || '', 
-    password: process.env.WC_CONSUMER_SECRET || '', 
+    username: process.env.WC_CONSUMER_KEY || '',
+    password: process.env.WC_CONSUMER_SECRET || '',
   },
 });
 
@@ -29,10 +29,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(200).json(cachedReviews);
       }
 
+      // ← Add status: 'approved' here
       const response = await WooCommerceAPI.get('/products/reviews', {
         params: {
           product: productId,
           per_page: 50,
+          status: 'approved',    
         },
       });
 
@@ -46,12 +48,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'All fields are required' });
       }
 
+      // ← Add status: 'hold' here
       const response = await WooCommerceAPI.post('/products/reviews', {
         product_id: productId,
         reviewer: name,
         reviewer_email: email,
         review: content,
         rating,
+        status: 'hold',         
       });
 
       return res.status(201).json(response.data);

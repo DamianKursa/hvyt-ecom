@@ -42,8 +42,11 @@ const Instagram = () => {
       <div className="hidden md:block">
         <div className="grid grid-cols-4 gap-6">
           {posts.map((post, index) => (
-            <div
+            <a
               key={index}
+              href={post.permalink}
+              target="_blank"
+              rel="noopener noreferrer"
               className="relative w-[322px] h-[322px] col-span-1"
             >
               {post.media_type === 'VIDEO' ? (
@@ -61,7 +64,7 @@ const Instagram = () => {
                   className="rounded-lg"
                 />
               )}
-            </div>
+            </a>
           ))}
         </div>
         <div className="flex justify-center mt-8">
@@ -81,7 +84,13 @@ const Instagram = () => {
 
       <div className="md:hidden grid grid-cols-2 gap-4 px-4">
         {posts.map((post, index) => (
-          <div key={index} className="relative w-full h-[158px]">
+          <a
+            key={index}
+            href={post.permalink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative w-full h-[158px]"
+          >
             {post.media_type === 'VIDEO' ? (
               <video
                 src={post.media_url}
@@ -97,7 +106,7 @@ const Instagram = () => {
                 className="rounded-lg"
               />
             )}
-          </div>
+          </a>
         ))}
       </div>
       <div className="md:hidden flex justify-center mt-8">

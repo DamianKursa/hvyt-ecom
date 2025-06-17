@@ -35,6 +35,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void }> = ({
           email: formData.email,
           content: formData.content,
           rating: formData.rating,
+          status: 'hold',
         }),
       });
       if (!res.ok) {
