@@ -765,11 +765,6 @@ const ProductPage = () => {
                 );
               })()}
 
-              {isMeble && (
-                <span className="px-4 py-2 rounded-full bg-[#9FC1DF] ml-2 text-[18px] font-semibold uppercase">
-                  PREORDER
-                </span>
-              )}
             </p>
             <LowestPriceInfo
               product={product!}

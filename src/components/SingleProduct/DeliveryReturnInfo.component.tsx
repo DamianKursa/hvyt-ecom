@@ -80,15 +80,13 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
             height={24}
           />
           <span className="text-black font-medium">
-            {isMeble
-              ? 'PREORDER. Zamów taniej teraz i otrzymaj w czerwcu.'
-              : typeof stock === 'number' && stock > 0
-                ? stock >= 50
-                  ? 'Ponad 50 szt. na stanie. Wysyłka w 24h!'
-                  : `Tylko ${stock} szt. na stanie. Wysyłka w 24h!`
-                : stockStatus === 'instock'
-                  ? 'Na stanie. Wysyłka w 24h!'
-                  : null}
+            {typeof stock === 'number' && stock > 0
+              ? stock >= 50
+              ? 'Ponad 50 szt. na stanie. Wysyłka w 24h!'
+              : `Tylko ${stock} szt. na stanie. Wysyłka w 24h!`
+            : stockStatus === 'instock'
+              ? 'Na stanie. Wysyłka w 24h!'
+              : null}
           </span>
         </div>
       )}
