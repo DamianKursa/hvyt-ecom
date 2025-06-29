@@ -8,6 +8,8 @@ interface Product {
   price: string;
   regular_price?: string;
   sale_price?: string;
+  date_on_sale_from?: string;
+  date_on_sale_to?: string;
   slug: string;
   categorySlug?: string;
   images: { src: string }[];
@@ -36,10 +38,10 @@ const getProductTypeIcon = (product: Product): string | null => {
   const attributes = Array.isArray(product.attributes)
     ? product.attributes
     : Object.entries(product.attributes || {}).map(([key, value]) => ({
-        name: key.replace(/^pa_/, '').replace(/-/g, ' '), // Normalize attribute names
-        options: (value as { options?: string[] })?.options || [],
-        option: (value as { option?: string })?.option || '',
-      }));
+      name: key.replace(/^pa_/, '').replace(/-/g, ' '), // Normalize attribute names
+      options: (value as { options?: string[] })?.options || [],
+      option: (value as { option?: string })?.option || '',
+    }));
 
   if (slugLower.includes('klamka')) return '/icons/kolekcja/klamka.svg';
   if (slugLower.includes('wieszak')) return '/icons/kolekcja/wieszak.svg';
@@ -67,10 +69,10 @@ const getProductColorSwatch = (product: Product): string | null => {
   const attributes = Array.isArray(product.attributes)
     ? product.attributes
     : Object.entries(product.attributes || {}).map(([key, value]) => ({
-        name: key.replace(/^pa_/, '').replace(/-/g, ' '),
-        options: (value as { options?: string[] })?.options || [],
-        option: (value as { option?: string })?.option || '',
-      }));
+      name: key.replace(/^pa_/, '').replace(/-/g, ' '),
+      options: (value as { options?: string[] })?.options || [],
+      option: (value as { option?: string })?.option || '',
+    }));
 
   const colorAttr = attributes.find(
     (attr) => attr.name.toLowerCase() === 'kolor',
@@ -108,14 +110,27 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const firstImage = product.images?.[0]?.src || '/fallback-image.jpg';
   const secondImage = product.images?.[1]?.src || firstImage;
 
+  // ─── pull sale dates ───
   const regular = parseFloat(product.regular_price ?? product.price);
-  const sale = product.sale_price
+  const salePrice = product.sale_price
     ? parseFloat(product.sale_price)
-    : parseFloat(product.price);
+    : regular;
+  const saleFrom = product.date_on_sale_from;
+  const saleTo = product.date_on_sale_to;
 
-  // percent discount
-  const discountPct =
-    sale < regular ? Math.round(((regular - sale) / regular) * 100) : 0;
+  const now = new Date();
+  const startDate = saleFrom ? new Date(saleFrom) : null;
+  const endDate = saleTo ? new Date(saleTo) : null;
+
+  // ─── date‐gated sale check ───
+  const isSaleActive =
+    salePrice < regular &&
+    (!startDate || now >= startDate) &&
+    (!endDate || now <= endDate);
+
+  const discountPct = isSaleActive
+    ? Math.round(((regular - salePrice) / regular) * 100)
+    : 0;
 
   const productPrice = product?.variations?.nodes?.length
     ? `od ${parseFloat(product.variations.nodes[0].price || '0').toFixed(2)} zł`
@@ -244,18 +259,33 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
           {fullName}
         </h3>
         <div className="mt-1 flex items-baseline">
-          {sale < regular && (
-            <span className="text-gray-500 line-through mr-2">
-              {regular.toFixed(2)} zł
-            </span>
+          {/* — date-gated discount badge — */}
+          {isSaleActive && (
+            <div
+              className="absolute top-2 left-2 px-2 py-1 rounded-full text-white text-sm font-bold z-20"
+              style={{ backgroundColor: '#661F30' }}
+            >
+              -{discountPct}%
+            </div>
           )}
-          <span
-            className={`text-base font-bold ${
-              sale < regular ? 'text-dark-pastel-red' : 'text-neutral-darkest'
-            }`}
-          >
-            {sale.toFixed(2)} zł
-          </span>
+
+          {/* — date-gated price display — */}
+          <div className="mt-1 flex items-baseline">
+            {!isSaleActive ? (
+              <span className="text-base font-bold text-neutral-darkest">
+                {regular.toFixed(2)} zł
+              </span>
+            ) : (
+              <>
+                <span className="text-gray-500 line-through mr-2">
+                  {regular.toFixed(2)} zł
+                </span>
+                <span className="text-base font-bold text-dark-pastel-red">
+                  {salePrice.toFixed(2)} zł
+                </span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 

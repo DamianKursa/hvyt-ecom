@@ -304,16 +304,16 @@ const ProductPage = () => {
       type: 'SET_VARIATION',
       payload: matchedVariation
         ? {
-            ...matchedVariation,
-            id: matchedVariation.id.toString(),
-            price: matchedVariation.price.toFixed(2),
-            regular_price: matchedVariation.regular_price.toFixed(2),
-            sale_price: matchedVariation.sale_price.toFixed(2),
-            on_sale: matchedVariation.on_sale,
-            image: matchedVariation.image
-              ? { sourceUrl: matchedVariation.image.src }
-              : undefined,
-          }
+          ...matchedVariation,
+          id: matchedVariation.id.toString(),
+          price: matchedVariation.price.toFixed(2),
+          regular_price: matchedVariation.regular_price.toFixed(2),
+          sale_price: matchedVariation.sale_price.toFixed(2),
+          on_sale: matchedVariation.on_sale,
+          image: matchedVariation.image
+            ? { sourceUrl: matchedVariation.image.src }
+            : undefined,
+        }
         : null,
     });
   };
@@ -350,7 +350,7 @@ const ProductPage = () => {
           (sum, variation) => {
             const qty =
               (variation as any).stock_quantity !== null &&
-              (variation as any).stock_quantity !== ''
+                (variation as any).stock_quantity !== ''
                 ? Number((variation as any).stock_quantity)
                 : 0;
             return sum + qty;
@@ -601,15 +601,15 @@ const ProductPage = () => {
     () =>
       selectedVariation?.image?.sourceUrl
         ? [
-            {
-              id: selectedVariation.id,
-              sourceUrl: selectedVariation.image.sourceUrl || '',
-            },
-          ]
+          {
+            id: selectedVariation.id,
+            sourceUrl: selectedVariation.image.sourceUrl || '',
+          },
+        ]
         : product?.images?.map((img, index) => ({
-            id: `image-${index}`,
-            sourceUrl: img.src || '',
-          })) || [{ id: 'default-id', sourceUrl: product?.image || '' }],
+          id: `image-${index}`,
+          sourceUrl: img.src || '',
+        })) || [{ id: 'default-id', sourceUrl: product?.image || '' }],
     [selectedVariation, product],
   );
 
@@ -677,7 +677,7 @@ const ProductPage = () => {
                   Array.isArray(product.baselinker_variations) &&
                   product.baselinker_variations.length > 0;
 
-                // --- helpers to pick the right number from either variation or product ---
+                // ─── price + date logic ───
                 const getNumber = (val: unknown): number =>
                   typeof val === 'string' || typeof val === 'number'
                     ? parseFloat(val as any) || 0
@@ -685,34 +685,16 @@ const ProductPage = () => {
 
                 let salePrice = 0;
                 let regularPrice = 0;
+                let saleFrom: string | undefined;
+                let saleTo: string | undefined;
 
                 if (isVariable) {
-                  // console.log out so you can inspect what you actually received
-                  console.log('🔍 variation data:', {
-                    selectedVariation,
-                    allVariations: product.baselinker_variations,
-                  });
-
-                  // pick the selected variation, or fall back to the first one
-                  const v =
-                    selectedVariation ?? product.baselinker_variations?.[0];
-
-                  salePrice =
-                    getNumber((v as any).sale_price) ||
-                    getNumber((v as any).price); // if nobody set sale_price, use price
-                  regularPrice =
-                    getNumber((v as any).regular_price) || salePrice;
+                  const v = selectedVariation ?? product.baselinker_variations![0];
+                  salePrice = getNumber((v as any).sale_price) || getNumber((v as any).price);
+                  regularPrice = getNumber((v as any).regular_price) || salePrice;
+                  saleFrom = (v as any).date_on_sale_from;
+                  saleTo = (v as any).date_on_sale_to;
                 } else {
-                  // simple product
-                  // GraphQL sometimes delivers camelCase, sometimes snake_case, so check both
-                  console.log('🔍 simple product data:', {
-                    price: product.price,
-                    sale_price: (product as any).sale_price,
-                    salePrice: (product as any).salePrice,
-                    regular_price: (product as any).regular_price,
-                    regularPrice: (product as any).regularPrice,
-                  });
-
                   salePrice =
                     getNumber((product as any).sale_price) ||
                     getNumber((product as any).salePrice) ||
@@ -721,23 +703,30 @@ const ProductPage = () => {
                     getNumber((product as any).regular_price) ||
                     getNumber((product as any).regularPrice) ||
                     salePrice;
+                  saleFrom = (product as any).date_on_sale_from;
+                  saleTo = (product as any).date_on_sale_to;
                 }
 
-                const isOnSale = salePrice < regularPrice;
-                const discountPct = isOnSale
-                  ? Math.round(
-                      ((regularPrice - salePrice) / regularPrice) * 100,
-                    )
+                const now = new Date();
+                const startDate = saleFrom ? new Date(saleFrom) : null;
+                const endDate = saleTo ? new Date(saleTo) : null;
+                const isSaleActive =
+                  salePrice < regularPrice &&
+                  (!startDate || now >= startDate) &&
+                  (!endDate || now <= endDate);
+
+                const discountPct = isSaleActive
+                  ? Math.round(((regularPrice - salePrice) / regularPrice) * 100)
                   : 0;
 
                 return (
                   <>
-                    {/* your -XX% badge */}
-                    {isOnSale && (
+                    {/* ─── Replace that block with this ─── */}
+                    {isSaleActive && (
                       <span
                         className="absolute top-2 right-2 px-2 font-semibold rounded-full"
                         style={{
-                          backgroundColor: '#661F30', // same as your sale-price color
+                          backgroundColor: '#661F30',
                           color: '#fff',
                           fontSize: '18px',
                         }}
@@ -746,8 +735,7 @@ const ProductPage = () => {
                       </span>
                     )}
 
-                    {/* sale vs regular display */}
-                    {isOnSale ? (
+                    {isSaleActive ? (
                       <>
                         <span className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
                           {salePrice.toFixed(2)} zł
@@ -758,7 +746,7 @@ const ProductPage = () => {
                       </>
                     ) : (
                       <span className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
-                        {salePrice.toFixed(2)} zł
+                        {regularPrice.toFixed(2)} zł
                       </span>
                     )}
                   </>
@@ -891,11 +879,10 @@ const ProductPage = () => {
                       }
                     }}
                     disabled={showNotifyForm && !isNotifyEmailValid}
-                    className={`w-4/5 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors ${
-                      showNotifyForm && !isNotifyEmailValid
-                        ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-black text-white hover:bg-dark-pastel-red'
-                    }`}
+                    className={`w-4/5 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors ${showNotifyForm && !isNotifyEmailValid
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-black text-white hover:bg-dark-pastel-red'
+                      }`}
                   >
                     Powiadom o dostępności
                   </button>
@@ -911,11 +898,10 @@ const ProductPage = () => {
                 onClick={handleAddToCart}
                 type="button"
                 disabled={availableStock <= 0 || quantity > availableStock}
-                className={`w-4/5 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors ${
-                  availableStock <= 0 || quantity > availableStock
-                    ? 'bg-gray-400 text-white cursor-not-allowed'
-                    : 'bg-black text-white hover:bg-dark-pastel-red'
-                }`}
+                className={`w-4/5 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors ${availableStock <= 0 || quantity > availableStock
+                  ? 'bg-gray-400 text-white cursor-not-allowed'
+                  : 'bg-black text-white hover:bg-dark-pastel-red'
+                  }`}
               >
                 Dodaj do koszyka
                 <Image

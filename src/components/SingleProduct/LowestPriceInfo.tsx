@@ -7,16 +7,24 @@ export interface LowestPriceInfoProps {
     salePrice?: string | number;
     regular_price?: string | number;
     regularPrice?: string | number;
+    date_on_sale_from?: string;
+    date_on_sale_to?: string;
+
     baselinker_variations?: Array<{
       price: number;
       sale_price?: number;
       regular_price?: number;
+      date_on_sale_from?: string;
+      date_on_sale_to?: string;
+
     }>;
   };
   selectedVariation?: {
     price?: string | number;
     sale_price?: string | number;
     regular_price?: string | number;
+    date_on_sale_from?: string;
+    date_on_sale_to?: string;
   } | null;
 }
 
@@ -57,8 +65,24 @@ const LowestPriceInfo: React.FC<LowestPriceInfoProps> = ({
     regularPrice = prodReg > 0 ? prodReg : salePrice;
   }
 
-  // Only show if there's a real discount
-  if (salePrice >= regularPrice) return null;
+  // ─── date gating ───
+  const rawFrom =
+    selectedVariation?.date_on_sale_from ??
+    product.date_on_sale_from ??
+    product.baselinker_variations?.[0]?.date_on_sale_from;
+  const rawTo =
+    selectedVariation?.date_on_sale_to ??
+    product.date_on_sale_to ??
+    product.baselinker_variations?.[0]?.date_on_sale_to;
+  const now = new Date();
+  const saleFrom = rawFrom ? new Date(rawFrom) : null;
+  const saleTo = rawTo ? new Date(rawTo) : null;
+  const isSaleActive =
+    salePrice < regularPrice &&
+    (!saleFrom || now >= saleFrom) &&
+    (!saleTo || now <= saleTo);
+
+  if (!isSaleActive) return null;
 
   return (
     <p className="w-full text-[16px] text-[#969394] mt-1 mb-4">
