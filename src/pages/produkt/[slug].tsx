@@ -450,6 +450,7 @@ const ProductPage = () => {
       attributes: selectedAttributes,
       variationOptions,
       availableStock,
+
     };
 
     addCartItem(cartItem);
@@ -677,6 +678,12 @@ const ProductPage = () => {
                   Array.isArray(product.baselinker_variations) &&
                   product.baselinker_variations.length > 0;
 
+                // Pick the variation we will use for price / sale checks
+                const variationRef: any =
+                  isVariable
+                    ? selectedVariation ?? product.baselinker_variations![0]
+                    : null;
+
                 // ─── price + date logic ───
                 const getNumber = (val: unknown): number =>
                   typeof val === 'string' || typeof val === 'number'
@@ -689,11 +696,13 @@ const ProductPage = () => {
                 let saleTo: string | undefined;
 
                 if (isVariable) {
-                  const v = selectedVariation ?? product.baselinker_variations![0];
-                  salePrice = getNumber((v as any).sale_price) || getNumber((v as any).price);
-                  regularPrice = getNumber((v as any).regular_price) || salePrice;
-                  saleFrom = (v as any).date_on_sale_from;
-                  saleTo = (v as any).date_on_sale_to;
+                  salePrice =
+                    getNumber((variationRef as any).sale_price) ||
+                    getNumber((variationRef as any).price);
+                  regularPrice =
+                    getNumber((variationRef as any).regular_price) || salePrice;
+                  saleFrom = (variationRef as any).date_on_sale_from;
+                  saleTo = (variationRef as any).date_on_sale_to;
                 } else {
                   salePrice =
                     getNumber((product as any).sale_price) ||
@@ -707,10 +716,18 @@ const ProductPage = () => {
                   saleTo = (product as any).date_on_sale_to;
                 }
 
+                // rely on WooCommerce on_sale flag when it exists
+                const onSaleFlag = isVariable
+                  ? Boolean((variationRef as any)?.on_sale)
+                  : Boolean((product as any).on_sale);
+
                 const now = new Date();
-                const startDate = saleFrom ? new Date(saleFrom) : null;
-                const endDate = saleTo ? new Date(saleTo) : null;
+                const toDate = (raw?: string): Date | null =>
+                  raw ? new Date(raw.replace(' ', 'T')) : null;
+                const startDate = toDate(saleFrom);
+                const endDate = toDate(saleTo);
                 const isSaleActive =
+                  onSaleFlag &&
                   salePrice < regularPrice &&
                   (!startDate || now >= startDate) &&
                   (!endDate || now <= endDate);
