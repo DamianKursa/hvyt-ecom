@@ -3,6 +3,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useWishlist } from '@/context/WhishlistContext';
 
+/** Ensures we never get NaN from parseFloat */
+const safeParse = (v: unknown): number => {
+  const n = typeof v === 'string' || typeof v === 'number' ? parseFloat(v as any) : NaN;
+  return isNaN(n) ? 0 : n;
+};
+
 interface Product {
   name: string;
   price: string;
@@ -13,9 +19,11 @@ interface Product {
   slug: string;
   categorySlug?: string;
   images: { src: string }[];
+  on_sale?: boolean;
   variations?: {
     nodes: {
       price: string;
+      on_sale?: boolean;
     }[];
   };
   attributes?: Array<{ name: string; options?: string[]; option?: string }>;
@@ -110,23 +118,38 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const firstImage = product.images?.[0]?.src || '/fallback-image.jpg';
   const secondImage = product.images?.[1]?.src || firstImage;
 
-  // ─── pull sale dates ───
-  const regular = parseFloat(product.regular_price ?? product.price);
-  const salePrice = product.sale_price
-    ? parseFloat(product.sale_price)
-    : regular;
-  const saleFrom = product.date_on_sale_from;
-  const saleTo = product.date_on_sale_to;
+  // ─── derive prices safely ───
+  const variationPrices = product.variations?.nodes
+    ?.map((v) => safeParse(v.price))
+    .filter((p) => p > 0) || [];
 
+  const basePrice = variationPrices.length > 0
+    ? Math.min(...variationPrices)
+    : safeParse(product.price);
+
+  // prefer explicit regular_price, else basePrice
+  const regular = product.regular_price != null && product.regular_price !== ''
+    ? safeParse(product.regular_price)
+    : basePrice;
+
+  // prefer explicit sale_price, else basePrice
+  const salePrice = product.sale_price != null && product.sale_price !== ''
+    ? safeParse(product.sale_price)
+    : basePrice;
+
+  // ─── now your existing date/gating logic ───
+  const saleFrom = product.date_on_sale_from
+    ? new Date(product.date_on_sale_from)
+    : null;
+  const saleTo = product.date_on_sale_to
+    ? new Date(product.date_on_sale_to)
+    : null;
   const now = new Date();
-  const startDate = saleFrom ? new Date(saleFrom) : null;
-  const endDate = saleTo ? new Date(saleTo) : null;
-
-  // ─── date‐gated sale check ───
   const isSaleActive =
     salePrice < regular &&
-    (!startDate || now >= startDate) &&
-    (!endDate || now <= endDate);
+    (product.on_sale !== undefined
+      ? product.on_sale
+      : ((!saleFrom || now >= saleFrom) && (!saleTo || now <= saleTo)));
 
   const discountPct = isSaleActive
     ? Math.round(((regular - salePrice) / regular) * 100)
@@ -156,7 +179,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* — discount badge top-left — */}
-      {discountPct > 0 && (
+      {isSaleActive && discountPct > 0 && (
         <div
           className="absolute top-2 left-2 px-2 py-1 rounded-full text-white text-sm font-bold z-20"
           style={{ backgroundColor: '#661F30' /* same as your sale color */ }}
@@ -259,16 +282,6 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
           {fullName}
         </h3>
         <div className="mt-1 flex items-baseline">
-          {/* — date-gated discount badge — */}
-          {isSaleActive && (
-            <div
-              className="absolute top-2 left-2 px-2 py-1 rounded-full text-white text-sm font-bold z-20"
-              style={{ backgroundColor: '#661F30' }}
-            >
-              -{discountPct}%
-            </div>
-          )}
-
           {/* — date-gated price display — */}
           <div className="mt-1 flex items-baseline">
             {!isSaleActive ? (
