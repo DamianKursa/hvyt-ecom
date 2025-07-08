@@ -92,6 +92,9 @@ const ProductPage = () => {
     snackbar,
   } = state;
 
+  // Helper: removes every space and hyphen, then lower-cases
+  const normalize = (s: string) => s.replace(/[\s-]+/g, '').toLowerCase();
+
   const seoTitle =
     product?.yoast_head_json?.title ||
     product?.meta_data?.find((m) => m.key === '_yoast_wpseo_title')?.value ||
@@ -154,43 +157,36 @@ const ProductPage = () => {
         dispatch({ type: 'SET_PRODUCT', payload: productData });
 
         // ─────────────── LOOK UP VARIANT BY URL PARAM ───────────────
+        const queryAttrKey = Object.keys(query).find(k => k.startsWith('attribute_pa_'));
 
-        const queryAttrKey = Object.keys(query).find((key) =>
-          key.startsWith('attribute_pa_'),
-        );
         if (
           queryAttrKey &&
           Array.isArray(productData.baselinker_variations) &&
           productData.baselinker_variations.length > 0
         ) {
-          const attributeValue = query[queryAttrKey];
-          if (typeof attributeValue === 'string') {
-            // Cast JSON to our typed array:
-            const variations =
-              productData.baselinker_variations as BaselinkerVariation[];
+          const attributeValue = query[queryAttrKey];          // e.g. "192-mm"
 
-            // Find a variation where option “160 mm” (with a space) matches “160mm” (URL)
-            const matchedVariation = variations.find((variation) =>
-              variation.attributes.some(
-                (attr) =>
-                  // strip spaces so “160 mm” and “160mm” both become “160mm”
-                  attr.option.replace(/\s+/g, '').toLowerCase() ===
-                  attributeValue.replace(/\s+/g, '').toLowerCase(),
-              ),
+          if (typeof attributeValue === 'string') {
+            const variations = productData.baselinker_variations as BaselinkerVariation[];
+
+            // find the variation whose option matches, ignoring spaces & hyphens
+            const matchedVariation = variations.find(v =>
+              v.attributes.some(a =>
+                normalize(a.option) === normalize(attributeValue)
+              )
             );
 
             if (matchedVariation) {
-              // Now extract the full name string, e.g. “Atrybut produktu: Rozstaw”
-              const exactName = matchedVariation.attributes.find(
-                (attr) =>
-                  attr.option.replace(/\s+/g, '').toLowerCase() ===
-                  attributeValue.replace(/\s+/g, '').toLowerCase(),
-              )?.name;
+              // pull the exact attribute object that matched
+              const matchedAttr = matchedVariation.attributes.find(a =>
+                normalize(a.option) === normalize(attributeValue)
+              );
 
-              if (exactName) {
+              if (matchedAttr) {
+                // store the canonical WooCommerce value (e.g. "192 mm")
                 dispatch({
                   type: 'UPDATE_ATTRIBUTE',
-                  payload: { name: exactName, value: attributeValue },
+                  payload: { name: matchedAttr.name, value: matchedAttr.option },
                 });
               }
 
@@ -206,7 +202,7 @@ const ProductPage = () => {
                   image: matchedVariation.image
                     ? { sourceUrl: matchedVariation.image.src }
                     : undefined,
-                  attributes: matchedVariation.attributes.map((a) => ({
+                  attributes: matchedVariation.attributes.map(a => ({
                     id: a.id,
                     name: a.name,
                     option: a.option,
@@ -295,10 +291,10 @@ const ProductPage = () => {
       type: 'UPDATE_ATTRIBUTE',
       payload: { name: attributeName, value },
     });
-    const matchedVariation = product?.baselinker_variations?.find((variation) =>
-      variation.attributes.every(
-        (attr) => updatedAttributes[attr.name] === attr.option,
-      ),
+    const matchedVariation = product?.baselinker_variations?.find(v =>
+      v.attributes.every(a =>
+        normalize(updatedAttributes[a.name]!) === normalize(a.option)
+      )
     );
     dispatch({
       type: 'SET_VARIATION',
