@@ -22,6 +22,8 @@ export interface Product {
   baselinker_variations?: {
     id: number;
     price: number;
+    image?: { src: string };
+    stock_quantity?: string | number | null;
     attributes: { name: string; option: string }[];
   }[];
   availableStock?: number;
@@ -43,6 +45,7 @@ export interface Coupon {
   code: string;
   discountValue: number;
   discountType?: 'percent' | 'fixed';
+  allowedCats?: number[];
 }
 
 export interface Cart {
@@ -60,9 +63,9 @@ interface CartContextProps {
   clearCart: () => void;
   updateCartVariation: (
     cartKey: string,
-    name: string,
-    newVariation: string,
-    newPrice?: number,
+    attributeName: string,
+    newValue: string,
+    newVariationId: number
   ) => void;
   applyCoupon: (coupon: Coupon) => void;
   removeCoupon: () => void;
@@ -70,13 +73,13 @@ interface CartContextProps {
 
 export const CartContext = createContext<CartContextProps>({
   cart: { products: [], totalProductsCount: 0, totalProductsPrice: 0 },
-  addCartItem: () => {},
-  updateCartItem: () => {},
-  removeCartItem: () => {},
-  clearCart: () => {},
-  updateCartVariation: () => {},
-  applyCoupon: () => {},
-  removeCoupon: () => {},
+  addCartItem: () => { },
+  updateCartItem: () => { },
+  removeCartItem: () => { },
+  clearCart: () => { },
+  updateCartVariation: () => { },
+  applyCoupon: () => { },
+  removeCoupon: () => { },
 });
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
@@ -160,45 +163,70 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
   const updateCartVariation = (
     cartKey: string,
-    name: string,
-    newVariation: string,
-    newPrice?: number,
+    attributeName: string,  // e.g. “Atrybut produktu: Rozstaw”
+    newValue: string,       // e.g. “160 mm”
+    newVariationId: number  // 12345
   ) => {
-    setCart((prevCart) => {
-      const updatedCart = { ...prevCart };
-      const product = updatedCart.products.find(
-        (item) => item.cartKey === cartKey,
+    setCart(prev => {
+      const updatedCart = { ...prev };
+
+      // 1 find the old line
+      const idx = updatedCart.products.findIndex(p => p.cartKey === cartKey);
+      if (idx === -1) return prev;
+
+      const oldItem = updatedCart.products[idx];
+
+      // 2 no change? do nothing
+      if (oldItem.variationId === newVariationId) return prev;
+
+      // 3 look‑up the full variation chosen in the modal
+      const chosen = oldItem.baselinker_variations?.find(
+        v => v.id === newVariationId
       );
+      if (!chosen) return prev; // safety
 
-      if (product) {
-        const cleanName = name.replace(/^Atrybut produktu:\s*/, '').trim();
-
-        product.attributes = {
-          ...product.attributes,
-          [cleanName]: newVariation,
-        };
-
-        if (typeof newPrice !== 'undefined') {
-          product.price = newPrice;
-          product.totalPrice = newPrice * product.qty;
-        }
-
-        product.variationOptions = product.variationOptions || {};
-
-        return recalculateCartTotals(updatedCart);
-      }
-
-      return prevCart;
-    });
-  };
-
-  const removeCartItem = (cartKey: string) => {
-    setCart((prevCart) => {
-      const updatedCart = {
-        ...prevCart,
-        products: prevCart.products.filter((item) => item.cartKey !== cartKey),
+      // 4 build the *new* cart line
+      const newItem: Product = {
+        ...oldItem,
+        cartKey: String(chosen.id),      // <- new key
+        variationId: chosen.id,
+        price: chosen.price,
+        totalPrice: chosen.price * oldItem.qty,
+        image:
+          chosen.image?.src ||
+          oldItem.image ||
+          '/fallback-image.jpg',
+        availableStock: Number(chosen.stock_quantity ?? 0),
+        attributes: {
+          ...oldItem.attributes,
+          [attributeName]: newValue,
+        },
       };
 
+      // 5 replace the array element
+      updatedCart.products.splice(idx, 1, newItem);
+      return recalculateCartTotals(updatedCart);
+    });
+  };
+  const removeCartItem = (cartKey: string) => {
+    setCart((prevCart) => {
+      const remaining = prevCart.products.filter((p) => p.cartKey !== cartKey);
+
+      let newCoupon = prevCart.coupon;
+      if (newCoupon?.allowedCats && newCoupon.allowedCats.length) {
+        const stillHas = remaining.some((p) =>
+          p.categories?.some((c) => newCoupon!.allowedCats!.includes(c.id)),
+        );
+        if (!stillHas) {
+          newCoupon = undefined;
+        }
+      }
+
+      const updatedCart = {
+        ...prevCart,
+        products: remaining,
+        coupon: newCoupon,
+      };
       return recalculateCartTotals(updatedCart);
     });
   };

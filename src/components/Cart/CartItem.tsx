@@ -12,6 +12,12 @@ interface CartItemProps {
   onRemoveItem?: (product: Product) => void;
 }
 
+/** ① We now track both the human label and the Woo variation ID */
+interface SelVar {
+  label: string;
+  id: number;
+}
+
 const CartItem: React.FC<CartItemProps> = ({
   product,
   onIncreaseQuantity,
@@ -20,40 +26,60 @@ const CartItem: React.FC<CartItemProps> = ({
 }) => {
   const router = useRouter();
   const isKoszykPage = router.pathname === '/koszyk';
+
+  /** ② Provider now expects (cartKey, attrName, newValue, newVariationId) */
   const { updateCartVariation } = React.useContext(CartContext);
+
   const [isModalOpen, setModalOpen] = useState(false);
-  const [selectedVariation, setSelectedVariation] = useState<string | null>(
+  const [selectedVariation, setSelectedVariation] = useState<SelVar | null>(
     null,
   );
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const variationOptions = product.variationOptions ?? {};
+  /** ③ Build a map { attributeName → [ {option, price, id} ] } */
+  const variationOptions = React.useMemo(() => {
+    if (!product.baselinker_variations) return {};
+    const map: {
+      [attrName: string]: { option: string; price: number; id: number }[];
+    } = {};
+    product.baselinker_variations.forEach((v) => {
+      v.attributes.forEach((attr) => {
+        if (!map[attr.name]) map[attr.name] = [];
+        map[attr.name].push({
+          option: attr.option,
+          price: v.price,
+          id: v.id,
+        });
+      });
+    });
+    return map;
+  }, [product.baselinker_variations]);
 
-  const handleSaveVariation = (name: string, newValue: string) => {
-    console.log(`Saving Variation: ${name} -> ${newValue}`);
-    setSelectedVariation(newValue);
+  /** ④ Called when user clicks “Zapisz” in the modal */
+  const handleSaveVariation = (
+    attributeName: string,
+    newValue: string,
+    newVarId: number,
+  ) => {
     const fullAttributeName = Object.keys(variationOptions).find(
       (key) =>
-        key.trim().toLowerCase().endsWith(name.trim().toLowerCase()) ||
-        key.trim().toLowerCase() === name.trim().toLowerCase(),
+        key.trim().toLowerCase().endsWith(attributeName.trim().toLowerCase()) ||
+        key.trim().toLowerCase() === attributeName.trim().toLowerCase(),
     );
     if (!fullAttributeName) return;
-    const matchingVariation = variationOptions[fullAttributeName]?.find(
-      (option) => option.option.trim() === newValue.trim(),
+
+    updateCartVariation(
+      product.cartKey,
+      fullAttributeName,
+      newValue,
+      newVarId, // ← pass the chosen variation ID
     );
-    if (matchingVariation) {
-      updateCartVariation(
-        product.cartKey,
-        fullAttributeName,
-        newValue,
-        matchingVariation.price,
-      );
-    }
   };
 
+  /* ---------- RENDER ---------- */
   return (
     <>
-      {/* Desktop Layout */}
+      {/* Desktop row */}
       <div className="hidden md:flex items-center justify-between mb-6 border-b pb-4 last:border-none last:pb-0">
         <div className="flex items-center">
           <div className="w-[90px] h-[90px] relative rounded-[24px] overflow-hidden">
@@ -69,6 +95,8 @@ const CartItem: React.FC<CartItemProps> = ({
             <h3 className="text-base font-semibold text-neutral-darkest max-w-[200px] whitespace-normal break-words">
               {product.name}
             </h3>
+
+            {/* attributes */}
             {product.attributes &&
               Object.entries(product.attributes).map(([name, value]) => {
                 if (!variationOptions[name]) return null;
@@ -77,7 +105,7 @@ const CartItem: React.FC<CartItemProps> = ({
                     <p className="font-light text-neutral-dark mr-4">
                       {name.replace(/^Atrybut produktu:\s*/, '')}:{' '}
                       <span className="font-light">
-                        {selectedVariation || String(value)}
+                        {selectedVariation?.label ?? String(value)}
                       </span>
                     </p>
                     <button
@@ -96,6 +124,7 @@ const CartItem: React.FC<CartItemProps> = ({
               })}
           </div>
         </div>
+
         {onIncreaseQuantity && onDecreaseQuantity && (
           <QuantityChanger
             quantity={product.qty}
@@ -103,11 +132,13 @@ const CartItem: React.FC<CartItemProps> = ({
             onDecrease={() => onDecreaseQuantity(product)}
           />
         )}
+
         <div className="flex flex-col items-end">
           <p className="text-xl font-bold text-neutral-darkest">
             {product.totalPrice.toFixed(2)} zł
           </p>
         </div>
+
         {onRemoveItem && (
           <button
             className="text-red-500 hover:text-red-700 ml-4"
@@ -118,7 +149,7 @@ const CartItem: React.FC<CartItemProps> = ({
         )}
       </div>
 
-      {/* Mobile Layout */}
+      {/* Mobile card */}
       <div className="block md:hidden flex items-center justify-between mb-4 border-b pb-4">
         <div className="flex-shrink-0">
           <div className="w-[75px] h-[75px] relative rounded-[12px] overflow-hidden">
@@ -155,8 +186,7 @@ const CartItem: React.FC<CartItemProps> = ({
                     /^Atrybut produktu:\s*/,
                     '',
                   )}
-                  :{' '}
-                  {selectedVariation ||
+                  : {selectedVariation?.label ??
                     Object.entries(product.attributes)[0][1]}
                 </p>
               )}
@@ -192,6 +222,7 @@ const CartItem: React.FC<CartItemProps> = ({
         </div>
       </div>
 
+      {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-[#36313266] flex items-center justify-center z-50">
           <div
@@ -204,6 +235,7 @@ const CartItem: React.FC<CartItemProps> = ({
             >
               &times;
             </button>
+
             <h3 className="text-[24px] font-semibold text-[#1C1C1C] mb-[24px]">
               Edytuj rozstaw produktu
             </h3>
@@ -211,41 +243,36 @@ const CartItem: React.FC<CartItemProps> = ({
               Produkty zostaną dodane do koszyka z uwzględnieniem ich aktualnych
               cen. Czy chcesz kontynuować?
             </p>
-            {Object.entries(variationOptions).map(([name, options]) => (
-              <div key={name} className="mb-4" ref={dropdownRef}>
+
+            {/* One dropdown per attribute (usually only “Rozstaw”) */}
+            {Object.entries(variationOptions).map(([attrName, options]) => (
+              <div key={attrName} className="mb-4" ref={dropdownRef}>
                 <label className="text-[#1C1C1C] text-base font-light mb-[16px] px-[16px] block flex items-center">
-                  {name.replace(/^Atrybut produktu:\s*/, '')}
-                  {name.includes('Rozstaw') && (
-                    <div className="relative group ml-2">
-                      <img
-                        src="/icons/info.svg"
-                        alt="Info"
-                        className="w-6 h-6 cursor-pointer"
-                      />
-                      <div className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 bg-beige-dark text-black font-light text-[12px] rounded-[5px] px-4 py-2 hidden group-hover:block z-50 shadow-lg w-[180px]">
-                        <div className="absolute left-1/2 transform -translate-x-1/2 -top-[6px] w-3 h-3 bg-beige-dark rotate-45"></div>
-                        Rozstaw to odległość pomiędzy środkami otworów
-                        montażowych.
-                      </div>
-                    </div>
-                  )}
+                  {attrName.replace(/^Atrybut produktu:\s*/, '')}
                 </label>
+
                 <AttributeSwitcher
-                  isCartPage={true}
-                  key={name}
-                  attributeName={name}
-                  options={(options as { option: string; price: number }[]).map(
+                  isCartPage
+                  attributeName={attrName}
+                  options={options.map(
                     (opt) => `${opt.option} | ${opt.price.toFixed(2)} zł`,
                   )}
                   selectedValue={
-                    selectedVariation || product.attributes?.[name] || ''
+                    (selectedVariation?.label ??
+                      product.attributes?.[attrName]) ?? null     // ← guarantees string | null
                   }
                   onAttributeChange={(attribute, newValue) => {
-                    setSelectedVariation(newValue.split(' | ')[0]);
+                    const bare = newValue.split(' | ')[0];
+                    const varId =
+                      variationOptions[attribute]?.find(
+                        (o) => o.option === bare,
+                      )?.id ?? 0;
+                    setSelectedVariation({ label: bare, id: varId });
                   }}
                 />
               </div>
             ))}
+
             <div className="flex justify-between items-center mt-[48px] mb-[8px] gap-4">
               <button
                 className="w-1/2 py-3 text-black border border-black rounded-full text-base font-light hover:bg-gray-100 transition"
@@ -254,17 +281,18 @@ const CartItem: React.FC<CartItemProps> = ({
                 Anuluj
               </button>
               <button
-                className={`w-1/2 py-3 text-white rounded-full text-base font-light transition ${
-                  selectedVariation
-                    ? 'bg-[#1C1C1C] hover:bg-black cursor-pointer'
-                    : 'bg-gray-400 cursor-not-allowed'
-                }`}
+                className={`w-1/2 py-3 text-white rounded-full text-base font-light transition ${selectedVariation
+                  ? 'bg-[#1C1C1C] hover:bg-black cursor-pointer'
+                  : 'bg-gray-400 cursor-not-allowed'
+                  }`}
                 disabled={!selectedVariation}
                 onClick={() => {
                   if (selectedVariation) {
+                    const firstAttr = Object.keys(variationOptions)[0];
                     handleSaveVariation(
-                      Object.keys(variationOptions)[0],
-                      selectedVariation,
+                      firstAttr,
+                      selectedVariation.label,
+                      selectedVariation.id,
                     );
                     setModalOpen(false);
                   }

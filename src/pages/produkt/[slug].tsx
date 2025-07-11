@@ -445,6 +445,7 @@ const ProductPage = () => {
         : undefined,
       attributes: selectedAttributes,
       variationOptions,
+      baselinker_variations: product.baselinker_variations,
       availableStock,
 
     };

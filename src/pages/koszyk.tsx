@@ -63,7 +63,7 @@ const Koszyk: React.FC = () => {
     console.log('Proceeding to checkout...');
   };
 
-  const isCartEmpty = !cart || cart.totalProductsPrice === 0;
+  const isCartEmpty = !cart || cart.products.length === 0;
 
   return (
     <Layout title="Hvyt | Koszyk">
