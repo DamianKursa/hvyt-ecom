@@ -28,10 +28,12 @@ const Layout: React.FC<ILayoutProps> = ({ children, title, description }) => {
     'meble',
     'galki',
   ];
+  const isCollectionRoute = router.pathname.startsWith('/kolekcje');
   const isCategoryRoute = router.pathname.startsWith('/kategoria');
   const isFullWidthHero =
     noMarginPages.includes(router.pathname) ||
     isCategoryRoute ||
+    isCollectionRoute || 
     fullWidthCategories.some((slug) => router.asPath.includes(`/${slug}`));
 
   useEffect(() => {
