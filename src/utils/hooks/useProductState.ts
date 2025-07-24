@@ -47,7 +47,15 @@ type Action =
 function productReducer(state: ProductState, action: Action): ProductState {
   switch (action.type) {
     case 'SET_PRODUCT':
-      return { ...state, product: action.payload, loading: false };
+      return {
+        ...state,
+        product: action.payload,
+        loading: false,
+        selectedVariation: null,
+        selectedAttributes: {},
+        quantity: 1,
+        selectedColor: null,
+      };
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
     case 'SET_ERROR':
