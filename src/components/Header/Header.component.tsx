@@ -184,22 +184,30 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           className={iconClass}
                         />
                       </button>
-                      <Link
-                        href="/koszyk"
-                        className={
-                          `relative inline-flex items-center space-x-2 h-[40px] px-4 rounded-full transition-all ${count > 0
-                            ? 'bg-[#E95F7F] text-white'
-                            : 'hover:bg-[#DAD3C8] text-neutral-darkest'
-                          }`
-                        }
-                      >
-                        {count > 0 && <span className="text-lg font-medium">{count}</span>}
-                        <img
-                          src="/icons/cart.svg"
-                          alt="Cart"
-                          className={`w-6 h-6 ${count > 0 ? 'filter invert' : ''}`}
-                        />
-                      </Link>
+                      {count > 0 ? (
+                        <Link
+                          href="/koszyk"
+                          className="relative inline-flex items-center space-x-2 h-[40px] px-4 rounded-full transition-all bg-[#E95F7F] text-white"
+                        >
+                          <span className="text-lg font-medium">{count}</span>
+                          <img
+                            src="/icons/cart.svg"
+                            alt="Cart"
+                            className="w-6 h-6 filter invert"
+                          />
+                        </Link>
+                      ) : (
+                        <Link
+                          href="/koszyk"
+                          className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] transition-all"
+                        >
+                          <img
+                            src="/icons/cart.svg"
+                            alt="Cart"
+                            className="w-full h-full"
+                          />
+                        </Link>
+                      )}
                       <button onClick={toggleMobileMenu}>
                         <img
                           src={
@@ -263,22 +271,30 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       </div>
 
                       {/* Cart Icon */}
-                      <Link
-                        href="/koszyk"
-                        className={
-                          `relative inline-flex items-center space-x-2 h-[43px] px-4 rounded-full transition-all ${count > 0
-                            ? 'bg-[#E95F7F] text-white'
-                            : 'hover:bg-[#DAD3C8] text-neutral-darkest'
-                          }`
-                        }
-                      >
-                        {count > 0 && <span className="text-lg font-medium">{count}</span>}
-                        <img
-                          src="/icons/cart.svg"
-                          alt="Cart"
-                          className={`w-6 h-6 ${count > 0 ? 'filter invert' : ''}`}
-                        />
-                      </Link>
+                      {count > 0 ? (
+                        <Link
+                          href="/koszyk"
+                          className="relative inline-flex items-center space-x-2 h-[43px] px-4 rounded-full transition-all bg-[#E95F7F] text-white"
+                        >
+                          <span className="text-lg font-medium">{count}</span>
+                          <img
+                            src="/icons/cart.svg"
+                            alt="Cart"
+                            className="w-6 h-6 filter invert"
+                          />
+                        </Link>
+                      ) : (
+                        <Link
+                          href="/koszyk"
+                          className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] transition-all"
+                        >
+                          <img
+                            src="/icons/cart.svg"
+                            alt="Cart"
+                            className="w-full h-full"
+                          />
+                        </Link>
+                      )}
                     </div>
                   )}
                 </div>
