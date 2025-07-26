@@ -27,7 +27,7 @@ const ResetPassword: React.FC = () => {
     setMessage('');
 
     if (password !== confirmPassword) {
-      setError('Hasła się nie zgadzają.');
+      setError('Wprowadzone hasła muszą być takie same');
       return;
     }
 
@@ -92,9 +92,8 @@ const ResetPassword: React.FC = () => {
                     required
                   />
                   <span
-                    className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${
-                      password ? 'opacity-0' : 'opacity-100'
-                    }`}
+                    className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${password ? 'opacity-0' : 'opacity-100'
+                      }`}
                   >
                     Nowe hasło<span className="text-red-500">*</span>
                   </span>
@@ -112,14 +111,13 @@ const ResetPassword: React.FC = () => {
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none font-light text-black text-left"
+                    className={`w-full border-b ${error ? 'border-[#A83232] focus:border-[#A83232]' : 'border-gray-300 focus:border-black'} px-2 py-2 focus:outline-none font-light text-black text-left`}
                     aria-label="Powtórz hasło"
                     required
                   />
                   <span
-                    className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${
-                      confirmPassword ? 'opacity-0' : 'opacity-100'
-                    }`}
+                    className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${confirmPassword ? 'opacity-0' : 'opacity-100'
+                      }`}
                   >
                     Powtórz hasło<span className="text-red-500">*</span>
                   </span>
@@ -138,9 +136,14 @@ const ResetPassword: React.FC = () => {
                   </p>
                 )}
                 {error && (
-                  <p className="text-red-500 text-sm" aria-live="polite">
-                    {error}
-                  </p>
+                  <div className="flex items-center text-[#A83232] text-sm mt-1" aria-live="polite">
+                    <img
+                      src="/icons/Warning_Circle_Warning.svg"
+                      alt="Warning"
+                      className="w-4 h-4 mr-2"
+                    />
+                    <span>{error}</span>
+                  </div>
                 )}
 
                 {/* Submit Button */}
