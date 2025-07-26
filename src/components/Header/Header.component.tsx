@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useContext } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Breadcrumbs from '../UI/Breadcrumbs.component';
@@ -7,6 +7,7 @@ import MobileMenu from './MobileMenu';
 import SearchComponent from '../Search/SearchResults.component';
 import UserDropdown from './UserDropdown';
 import { useUserContext } from '@/context/UserContext';
+import { CartContext } from '@/stores/CartProvider'
 
 interface IHeaderProps {
   title?: string;
@@ -22,8 +23,10 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const isKoszykPage = router.pathname === '/koszyk';
   const isOnasPage = router.pathname === '/o-nas';
   const isKCheckoutPage = router.pathname === '/checkout';
-  const { user, logout, fetchUser } = useUserContext();
 
+  const { user, logout, fetchUser } = useUserContext();
+  const { cart } = useContext(CartContext)
+  const count = cart?.totalProductsCount ?? 0
   let dropdownTimeout: ReturnType<typeof setTimeout>;
 
   useEffect(() => {
@@ -181,11 +184,20 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           className={iconClass}
                         />
                       </button>
-                      <Link href="/koszyk">
+                      <Link
+                        href="/koszyk"
+                        className={
+                          `relative inline-flex items-center space-x-2 h-[40px] px-4 rounded-full transition-all ${count > 0
+                            ? 'bg-[#E95F7F] text-white'
+                            : 'hover:bg-[#DAD3C8] text-neutral-darkest'
+                          }`
+                        }
+                      >
+                        {count > 0 && <span className="text-lg font-medium">{count}</span>}
                         <img
                           src="/icons/cart.svg"
                           alt="Cart"
-                          className={iconClass}
+                          className={`w-6 h-6 ${count > 0 ? 'filter invert' : ''}`}
                         />
                       </Link>
                       <button onClick={toggleMobileMenu}>
@@ -251,14 +263,21 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       </div>
 
                       {/* Cart Icon */}
-                      <Link href="/koszyk">
-                        <span className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img
-                            src="/icons/cart.svg"
-                            alt="Cart"
-                            className="w-full h-full"
-                          />
-                        </span>
+                      <Link
+                        href="/koszyk"
+                        className={
+                          `relative inline-flex items-center space-x-2 h-[43px] px-4 rounded-full transition-all ${count > 0
+                            ? 'bg-[#E95F7F] text-white'
+                            : 'hover:bg-[#DAD3C8] text-neutral-darkest'
+                          }`
+                        }
+                      >
+                        {count > 0 && <span className="text-lg font-medium">{count}</span>}
+                        <img
+                          src="/icons/cart.svg"
+                          alt="Cart"
+                          className={`w-6 h-6 ${count > 0 ? 'filter invert' : ''}`}
+                        />
                       </Link>
                     </div>
                   )}
