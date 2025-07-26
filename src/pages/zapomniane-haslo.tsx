@@ -62,8 +62,8 @@ const ResetPassword: React.FC = () => {
   return (
     <Layout title="Hvyt | Resetuj Hasło">
       <div className="bg-[#F9F6F2] flex justify-center items-center mt-12">
-        <div className="w-full max-w-4xl bg-white rounded-[40px] shadow-md overflow-hidden">
-          <div className="flex flex-col md:flex-row h-[400px]">
+        <div className="mx-4 w-full max-w-4xl bg-white rounded-[40px] shadow-md overflow-visible">
+          <div className="flex flex-col md:flex-row">
             {/* Left Section */}
             <div
               className="p-10 w-full md:w-1/2 flex flex-col justify-start"

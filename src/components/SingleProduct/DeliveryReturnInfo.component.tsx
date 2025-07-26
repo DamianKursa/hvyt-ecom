@@ -39,15 +39,32 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
 
   return (
     <div className="mt-4 border border-beige-dark rounded-[24px]">
+      {shouldRenderStockRow && (
+        <div
+          className={`flex items-center p-4 space-x-4 w-full ${filteredItems.length > 0 ? 'border-b border-[#DAD3C8]' : ''}`}
+        >
+          <Image
+            src="/icons/stock.svg"
+            alt="Stock info"
+            width={24}
+            height={24}
+          />
+          <span className="text-black font-medium">
+            {typeof stock === 'number' && stock > 0
+              ? stock >= 50
+                ? 'Ponad 50 szt. na stanie. Wysyłka w 24h!'
+                : `Tylko ${stock} szt. na stanie. Wysyłka w 24h!`
+              : stockStatus === 'instock'
+                ? 'Na stanie. Wysyłka w 24h!'
+                : null}
+          </span>
+        </div>
+      )}
       {filteredItems.map((item, index) => (
         <div
           key={index}
-          className={`flex items-center p-4 space-x-4 ${
-            index !== filteredItems.length - 1 || shouldRenderStockRow
-              ? 'border-b border-[#DAD3C8]'
-              : ''
-          }`}
-          style={{ width: '80%' }}
+          className={`flex items-center p-4 space-x-4 w-full ${index < filteredItems.length - 1 ? 'border-b border-[#DAD3C8]' : ''
+            }`}
         >
           <Image src={item.icon} alt={item.alt} width={24} height={24} />
           <span className="text-black">
@@ -67,29 +84,6 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
           </span>
         </div>
       ))}
-
-      {shouldRenderStockRow && (
-        <div
-          className="flex items-center p-4 space-x-4"
-          style={{ width: '80%' }}
-        >
-          <Image
-            src="/icons/stock.svg"
-            alt="Stock info"
-            width={24}
-            height={24}
-          />
-          <span className="text-black font-medium">
-            {typeof stock === 'number' && stock > 0
-              ? stock >= 50
-              ? 'Ponad 50 szt. na stanie. Wysyłka w 24h!'
-              : `Tylko ${stock} szt. na stanie. Wysyłka w 24h!`
-            : stockStatus === 'instock'
-              ? 'Na stanie. Wysyłka w 24h!'
-              : null}
-          </span>
-        </div>
-      )}
     </div>
   );
 };
