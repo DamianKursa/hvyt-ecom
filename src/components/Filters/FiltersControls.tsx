@@ -39,9 +39,9 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
         {/* Toggle Filters Button */}
         <button
           onClick={toggleFilters}
-          className="filters-toggle border border-beige-dark rounded-[24px] p-[7px_16px] mr-[32px] font-bold flex justify-between items-center w-1/2"
+          className="filters-toggle border border-beige-dark rounded-[24px] px-4 h-12 mr-[32px] font-bold flex justify-center items-center w-1/2"
         >
-          <span className="font-semibold text-left">Filtry</span>
+          <span className="font-semibold text-center">Filtry</span>
           {!isMobile && (
             <img
               src={
@@ -57,6 +57,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
         {/* Sorting Dropdown */}
         <div className="relative w-1/2">
           <CustomDropdown
+            className={`${sorting !== 'Sortowanie' ? 'border border-dark-pastel-red text-dark-pastel-red' : ''} h-12 flex items-center justify-center px-4 text-center`}
             options={sortingOptions}
             selectedValue={sorting}
             placeholder="Sortowanie"
