@@ -908,24 +908,52 @@ const ProductPage = () => {
                 </form>
               </FormProvider>
             ) : (
-              <button
-                onClick={handleAddToCart}
-                type="button"
-                disabled={availableStock <= 0 || quantity > availableStock}
-                className={`w-4/5 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors ${availableStock <= 0 || quantity > availableStock
-                  ? 'bg-gray-400 text-white cursor-not-allowed'
-                  : 'bg-black text-white hover:bg-dark-pastel-red'
-                  }`}
-              >
-                Dodaj do koszyka
-                <Image
-                  src="/icons/dodaj-do-koszyka.svg"
-                  alt="Add to Cart"
-                  width={28}
-                  height={28}
-                  className="ml-2"
-                />
-              </button>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={handleAddToCart}
+                  type="button"
+                  disabled={availableStock <= 0 || quantity > availableStock}
+                  className={
+                    `flex-1 py-3 text-[16px] md:text-[24px] font-light rounded-full flex justify-center items-center transition-colors ${availableStock <= 0 || quantity > availableStock
+                      ? 'bg-gray-400 text-white cursor-not-allowed'
+                      : 'bg-black text-white hover:bg-dark-pastel-red'
+                    }`
+                  }
+                >
+                  Dodaj do koszyka
+                  <Image
+                    src="/icons/dodaj-do-koszyka.svg"
+                    alt="Add to Cart"
+                    width={28}
+                    height={28}
+                    className="ml-2"
+                  />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleWishlistClick}
+                  className={`w-[60px] h-[60px] flex items-center justify-center rounded-full transition-colors border border-black ${isInWishlist(product?.slug ?? '')
+                    ? 'bg-transparent'
+                    : 'hover:bg-[#DAD3C8]'
+                    }`}
+                >
+                  <Image
+                    src={
+                      isInWishlist(product?.slug ?? '')
+                        ? '/icons/heart-added.svg'
+                        : '/icons/wishlist.svg'
+                    }
+                    alt={
+                      isInWishlist(product?.slug ?? '')
+                        ? 'Usuń z ulubionych'
+                        : 'Dodaj do ulubionych'
+                    }
+                    width={30}
+                    height={30}
+                  />
+                </button>
+              </div>
             )}
             {successMessage && (
               <div className="bg-[#2A5E45] text-white px-4 py-2 rounded-lg mt-4 flex items-center">
