@@ -29,43 +29,62 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
 
   const handleFilterRemove = (filter: { name: string; value: string }) => {
     onRemoveFilter(filter);
-    // Reset sorting to default ("Sortowanie") when a filter is removed
-    onSortingChange('Sortowanie');
   };
 
   if (isMobile) {
     return (
-      <div className="flex justify-between items-center mb-4">
-        {/* Toggle Filters Button */}
-        <button
-          onClick={toggleFilters}
-          className="filters-toggle border border-beige-dark rounded-[24px] px-4 h-12 mr-[32px] font-bold flex justify-center items-center w-1/2"
-        >
-          <span className="font-semibold text-center">Filtry</span>
-          {!isMobile && (
-            <img
-              src={
-                filtersVisible
-                  ? '/icons/arrow-left-black.svg'
-                  : '/icons/arrow-right-black.svg'
-              }
-              alt="Toggle Filters"
-              className="w-[24px] h-[24px]"
+      <>
+        <div className="flex justify-between items-center mb-4">
+          {/* Toggle Filters Button */}
+          <button
+            onClick={toggleFilters}
+            className="filters-toggle border border-beige-dark rounded-[24px] px-4 h-12 mr-[32px] font-bold flex justify-center items-center w-1/2"
+          >
+            <span className="font-semibold text-center">Filtry</span>
+            {!isMobile && (
+              <img
+                src={
+                  filtersVisible
+                    ? '/icons/arrow-left-black.svg'
+                    : '/icons/arrow-right-black.svg'
+                }
+                alt="Toggle Filters"
+                className="w-[24px] h-[24px]"
+              />
+            )}
+          </button>
+          {/* Sorting Dropdown */}
+          <div className="relative w-1/2">
+            <CustomDropdown
+              className={`${sorting !== 'Sortowanie' ? 'border border-dark-pastel-red text-dark-pastel-red' : ''} h-12 flex items-center justify-center px-4 text-center`}
+              options={sortingOptions}
+              selectedValue={sorting}
+              placeholder="Sortowanie"
+              onChange={(value) => onSortingChange(value)}
+              isProductPage={false}
             />
-          )}
-        </button>
-        {/* Sorting Dropdown */}
-        <div className="relative w-1/2">
-          <CustomDropdown
-            className={`${sorting !== 'Sortowanie' ? 'border border-dark-pastel-red text-dark-pastel-red' : ''} h-12 flex items-center justify-center px-4 text-center`}
-            options={sortingOptions}
-            selectedValue={sorting}
-            placeholder="Sortowanie"
-            onChange={(value) => onSortingChange(value)}
-            isProductPage={false}
-          />
+          </div>
         </div>
-      </div>
+        {filters.length > 0 && (
+          <div className="flex gap-2 flex-wrap mt-2">
+            {filters.map((filter) => (
+              <span
+                key={`${filter.name}-${filter.value}`}
+                className="flex items-center text-sm bg-gray-100 rounded px-2 py-1"
+              >
+                {filter.value}
+                <button
+                  onClick={() => handleFilterRemove(filter)}
+                  className="ml-1 text-gray-500 hover:text-red-500"
+                  aria-label="Usuń filtr"
+                >
+                  &times;
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+      </>
     );
   }
 
