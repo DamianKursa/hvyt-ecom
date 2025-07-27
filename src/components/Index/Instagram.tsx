@@ -40,14 +40,14 @@ const Instagram = () => {
       </div>
 
       <div className="hidden md:block">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 auto-rows-fr">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 justify-items-center">
           {posts.map((post, index) => (
             <a
               key={index}
               href={post.permalink}
               target="_blank"
               rel="noopener noreferrer"
-              className="relative w-full aspect-square col-span-1 overflow-hidden"
+              className="relative aspect-square col-span-1 overflow-hidden w-full md:w-[322px] md:h-[322px]"
             >
               {post.media_type === 'VIDEO' ? (
                 <video
