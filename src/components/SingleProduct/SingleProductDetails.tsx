@@ -23,8 +23,12 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
       const doc = parser.parseFromString(content, 'text/html');
       const imageSources: string[] = [];
 
-      // Add icons to links
+      // Add icons to links and enforce open in new tab
       doc.querySelectorAll('a').forEach((link) => {
+        // Ensure links open in a new tab safely
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+
         const icon = document.createElement('img');
         icon.src = '/icons/download-single.svg';
         icon.alt = 'Download';
@@ -104,7 +108,7 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
           title="Wymiary"
           content={cleanHTML(
             product.meta_data.find((meta) => meta.key === 'wymiary')?.value ||
-              '',
+            '',
           )}
         />
       )}
@@ -112,15 +116,15 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
       {product.meta_data?.find(
         (meta) => meta.key === 'informacje_dodatkowe',
       ) && (
-        <ExpandableSection
-          title="Informacje dodatkowe"
-          content={cleanHTML(
-            product.meta_data.find(
-              (meta) => meta.key === 'informacje_dodatkowe',
-            )?.value || '',
-          )}
-        />
-      )}
+          <ExpandableSection
+            title="Informacje dodatkowe"
+            content={cleanHTML(
+              product.meta_data.find(
+                (meta) => meta.key === 'informacje_dodatkowe',
+              )?.value || '',
+            )}
+          />
+        )}
 
       {product.meta_data?.find((meta) => meta.key === 'karta') && (
         <ExpandableSection
