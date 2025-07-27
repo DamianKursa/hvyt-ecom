@@ -44,7 +44,7 @@ const WybierzColor = () => {
 
   return (
     <section
-      className="container mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] py-16"
+      className="container px-4 md:px-4 lg:px-4 2xl:px-0 mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] py-16"
       ref={sectionRef}
     >
       {/* Title, Description, and Button */}
@@ -72,9 +72,8 @@ const WybierzColor = () => {
         <div className="space-y-6">
           <div className="flex gap-6">
             <div
-              className={`relative transition-all duration-[4000ms] ${
-                isVisible ? 'min-h-[435px]' : 'min-h-[350px]'
-              } w-[50%]`}
+              className={`relative transition-all duration-[4000ms] ${isVisible ? 'min-h-[435px]' : 'min-h-[350px]'
+                } w-[50%]`}
             >
               <Link href="/kategoria/uchwyty-meblowe?pa_kolor=srebrny">
                 <Image
@@ -90,9 +89,8 @@ const WybierzColor = () => {
               </Link>
             </div>
             <div
-              className={`relative transition-all duration-[4000ms] ${
-                isVisible ? 'min-h-[435px]' : 'min-h-[350px]'
-              } w-[50%]`}
+              className={`relative transition-all duration-[4000ms] ${isVisible ? 'min-h-[435px]' : 'min-h-[350px]'
+                } w-[50%]`}
             >
               <Link href="/kategoria/uchwyty-meblowe?pa_kolor=czarny">
                 <Image
@@ -110,9 +108,8 @@ const WybierzColor = () => {
           </div>
           <div className="flex gap-6">
             <div
-              className={`relative transition-all duration-[4000ms] ${
-                isVisible ? 'w-[50%] min-h-[435px]' : 'w-[30%] min-h-[350px]'
-              }`}
+              className={`relative transition-all duration-[4000ms] ${isVisible ? 'w-[50%] min-h-[435px]' : 'w-[30%] min-h-[350px]'
+                }`}
             >
               <Link href="/kategoria/uchwyty-meblowe?pa_kolor=zloty">
                 <Image
@@ -128,9 +125,8 @@ const WybierzColor = () => {
               </Link>
             </div>
             <div
-              className={`relative transition-all duration-[4000ms] ${
-                isVisible ? 'w-[50%] min-h-[435px]' : 'w-[70%] min-h-[350px]'
-              }`}
+              className={`relative transition-all duration-[4000ms] ${isVisible ? 'w-[50%] min-h-[435px]' : 'w-[70%] min-h-[350px]'
+                }`}
             >
               <Link href="/kategoria/uchwyty-meblowe?pa_kolor=pozostale">
                 <Image

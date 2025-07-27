@@ -29,7 +29,7 @@ const Instagram = () => {
   }
 
   return (
-    <section className="container mx-auto max-w-grid-desktop py-16 md:px-0">
+    <section className="mx-auto max-w-grid-desktop py-16 px-4 md:px-4 lg:px-4 xl:px-4 min-[1440px]:px-0">
       <div className="px-4 md:px-0 mb-8">
         <h2 className="font-size-h2 font-bold text-neutral-darkest text-left">
           Hvyt w waszych domach
@@ -39,15 +39,15 @@ const Instagram = () => {
         </p>
       </div>
 
-      <div className="hidden md:block">
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 justify-items-center">
+      <div className="hidden md:block px-4 min-[1440px]:px-0">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
           {posts.map((post, index) => (
             <a
               key={index}
               href={post.permalink}
               target="_blank"
               rel="noopener noreferrer"
-              className="relative aspect-square col-span-1 overflow-hidden w-full md:w-[322px] md:h-[322px]"
+              className="relative aspect-square col-span-1 overflow-hidden w-full max-w-[322px]"
             >
               {post.media_type === 'VIDEO' ? (
                 <video
@@ -82,7 +82,7 @@ const Instagram = () => {
         </div>
       </div>
 
-      <div className="md:hidden grid grid-cols-2 gap-4 px-4">
+      <div className="md:hidden grid grid-cols-2 gap-4 px-4 min-[1440px]:px-0">
         {posts.map((post, index) => (
           <a
             key={index}

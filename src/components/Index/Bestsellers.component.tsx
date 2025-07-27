@@ -45,14 +45,14 @@ const Bestsellers: React.FC<BestsellersProps> = ({
   const loading = !data && !error;
   const products: Product[] = data
     ? (data.products as any[]).map((p) => ({
-        id: p.id,
-        slug: p.slug,
-        name: p.name,
-        price: p.price,
-        images: Array.isArray(p.images)
-          ? p.images.map((img: any) => ({ src: img.src }))
-          : [{ src: '/fallback-image.jpg' }],
-      }))
+      id: p.id,
+      slug: p.slug,
+      name: p.name,
+      price: p.price,
+      images: Array.isArray(p.images)
+        ? p.images.map((img: any) => ({ src: img.src }))
+        : [{ src: '/fallback-image.jpg' }],
+    }))
     : [];
 
   const displayedProducts = products.slice(0, perPage);
@@ -66,7 +66,7 @@ const Bestsellers: React.FC<BestsellersProps> = ({
   const handleNext = () => canGoNext && setCurrentIndex((i) => i + 1);
 
   return (
-    <section className="container max-w-grid-desktop py-16 sm:px-4 md:px-0 mx-auto">
+    <section className="container max-w-grid-desktop py-16 px-0 md:px-4 lg:px-4 xl:px-4 2xl:px-0 mx-auto">
       <div className="flex justify-between mb-[40px]">
         <div className="flex px-[16px] lg:px-0 flex-col h-full">
           <h2 className="font-size-h2 font-bold text-neutral-darkest">
@@ -80,11 +80,10 @@ const Bestsellers: React.FC<BestsellersProps> = ({
         <div className="hidden md:flex items-center space-x-4">
           <button
             onClick={handlePrev}
-            className={`p-3 rounded-full shadow-lg ${
-              canGoPrev
-                ? 'bg-black text-white'
-                : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
-            }`}
+            className={`p-3 rounded-full shadow-lg ${canGoPrev
+              ? 'bg-black text-white'
+              : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
+              }`}
             disabled={!canGoPrev}
             aria-disabled={!canGoPrev}
           >
@@ -96,11 +95,10 @@ const Bestsellers: React.FC<BestsellersProps> = ({
           </button>
           <button
             onClick={handleNext}
-            className={`p-3 rounded-full shadow-lg ${
-              canGoNext
-                ? 'bg-black text-white'
-                : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
-            }`}
+            className={`p-3 rounded-full shadow-lg ${canGoNext
+              ? 'bg-black text-white'
+              : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
+              }`}
             disabled={!canGoNext}
             aria-disabled={!canGoNext}
           >
@@ -114,9 +112,8 @@ const Bestsellers: React.FC<BestsellersProps> = ({
         <div
           className="flex transition-transform duration-300"
           style={{
-            transform: `translateX(-${
-              (currentIndex % totalItems) * (100 / itemsPerPage)
-            }%)`,
+            transform: `translateX(-${(currentIndex % totalItems) * (100 / itemsPerPage)
+              }%)`,
             gap: `${gutter}px`,
           }}
         >

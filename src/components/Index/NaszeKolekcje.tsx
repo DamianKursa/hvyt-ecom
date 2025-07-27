@@ -43,7 +43,7 @@ const NaszeKolekcje = () => {
 
   return (
     <section
-      className="w-full pt-[88px] py-16 sm:px-4 md:px-0"
+      className="w-full pt-[88px] py-16 px-4 md:px-4 lg:px-4 2xl:px-0"
       style={{ backgroundColor: 'var(--color-beige)' }}
     >
       <div className="container mx-auto max-w-grid-desktop">

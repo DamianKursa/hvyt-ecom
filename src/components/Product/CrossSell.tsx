@@ -39,7 +39,7 @@ const CrossSell: React.FC<NajczesciejKupowaneProps> = ({
   };
 
   return (
-    <section className="container max-w-grid-desktop py-16 sm:px-4 md:px-0 mx-auto">
+    <section className="mx-auto max-w-grid-desktop py-16 px-4 md:px-4 lg:px-4 xl:px-4 2xl:px-0">
       <div className="flex justify-between mb-[40px]">
         <div className="flex px-[16px] lg:px-0 flex-col h-full">
           <h2 className="font-size-h2 font-bold text-neutral-darkest">
@@ -54,11 +54,10 @@ const CrossSell: React.FC<NajczesciejKupowaneProps> = ({
         <div className="hidden md:flex items-center space-x-4">
           <button
             onClick={handlePrev}
-            className={`p-3 rounded-full shadow-lg ${
-              canGoPrev
+            className={`p-3 rounded-full shadow-lg ${canGoPrev
                 ? 'bg-black text-white'
                 : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
-            }`}
+              }`}
             disabled={!canGoPrev}
             aria-disabled={!canGoPrev}
           >
@@ -70,11 +69,10 @@ const CrossSell: React.FC<NajczesciejKupowaneProps> = ({
           </button>
           <button
             onClick={handleNext}
-            className={`p-3 rounded-full shadow-lg ${
-              canGoNext
+            className={`p-3 rounded-full shadow-lg ${canGoNext
                 ? 'bg-black text-white'
                 : 'bg-neutral-lighter text-gray-500 cursor-not-allowed'
-            }`}
+              }`}
             disabled={!canGoNext}
             aria-disabled={!canGoNext}
           >

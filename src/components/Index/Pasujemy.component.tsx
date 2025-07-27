@@ -45,7 +45,7 @@ const PasujemyWszedzie = () => {
 
   return (
     <section
-      className="container mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] pb-[88px] py-16"
+      className="container px-4 md:px-4 lg:px-4 2xl:px-0 mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] pb-[88px] py-16"
       ref={sectionRef}
     >
       {/* Title, Description, and Button */}
@@ -71,9 +71,8 @@ const PasujemyWszedzie = () => {
         <div className="space-y-6">
           <div className="flex gap-6">
             <div
-              className={`relative w-full transition-all duration-[4000ms] min-h-[350px] ${
-                isVisible ? 'min-h-[435px]' : ''
-              }`}
+              className={`relative w-full transition-all duration-[4000ms] min-h-[350px] ${isVisible ? 'min-h-[435px]' : ''
+                }`}
             >
               <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-dzieciecych">
                 <Image
@@ -88,9 +87,8 @@ const PasujemyWszedzie = () => {
               </Link>
             </div>
             <div
-              className={`relative w-full transition-all duration-[4000ms] min-h-[350px] ${
-                isVisible ? 'min-h-[435px]' : ''
-              }`}
+              className={`relative w-full transition-all duration-[4000ms] min-h-[350px] ${isVisible ? 'min-h-[435px]' : ''
+                }`}
             >
               <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-pokojowych">
                 <Image
@@ -108,9 +106,8 @@ const PasujemyWszedzie = () => {
 
           <div className="flex gap-6">
             <div
-              className={`relative transition-all duration-[4000ms] ${
-                isVisible ? 'w-[50%] min-h-[435px]' : 'w-[70%] min-h-[350px]'
-              }`}
+              className={`relative transition-all duration-[4000ms] ${isVisible ? 'w-[50%] min-h-[435px]' : 'w-[70%] min-h-[350px]'
+                }`}
             >
               <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-kuchennych">
                 <Image
@@ -125,9 +122,8 @@ const PasujemyWszedzie = () => {
               </Link>
             </div>
             <div
-              className={`relative transition-all duration-[4000ms] ${
-                isVisible ? 'w-[50%] min-h-[435px]' : 'w-[30%] min-h-[350px]'
-              }`}
+              className={`relative transition-all duration-[4000ms] ${isVisible ? 'w-[50%] min-h-[435px]' : 'w-[30%] min-h-[350px]'
+                }`}
             >
               <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-szaf">
                 <Image
