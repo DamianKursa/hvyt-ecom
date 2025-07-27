@@ -650,7 +650,7 @@ const ProductPage = () => {
         />
       </Head>
 
-      <section className="max-w-[1440px] mt-[88px] md:mt-[140px] container mx-auto">
+      <section className="mx-auto max-w-[1440px] px-4 md:px-4 lg:px-4 xl:px-4 2xl:px-0 mt-[88px] md:mt-[140px]">
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
           <div className="order-1 w-full lg:order-1 lg:w-8/12">
             <div className="block lg:hidden min-h-[300px]">

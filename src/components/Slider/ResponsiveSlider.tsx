@@ -25,7 +25,7 @@ const ResponsiveSlider = <T extends {}>({
   if (!isClient) return null;
 
   return (
-    <div className="container mx-auto max-w-full px-4 relative">
+    <div className="mx-auto max-w-full px-4 md:px-4 lg:px-4 xl:px-4 2xl:px-0 relative">
       <Swiper
         spaceBetween={16}
         slidesPerView={1.2}
@@ -46,11 +46,10 @@ const ResponsiveSlider = <T extends {}>({
         {items.map((_, index) => (
           <div
             key={index}
-            className={`h-full transition-all duration-500 ${
-              index === activeIndex
-                ? 'bg-dark-pastel-red flex-grow'
-                : 'bg-neutral-light flex-1'
-            }`}
+            className={`h-full transition-all duration-500 ${index === activeIndex
+              ? 'bg-dark-pastel-red flex-grow'
+              : 'bg-neutral-light flex-1'
+              }`}
           />
         ))}
       </div>

@@ -10,6 +10,8 @@ import SkeletonCollectionPage from '@/components/Skeletons/SkeletonCollectionPag
 import ProductPreview from '../../components/Product/ProductPreview.component';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import KolekcjaDescription from '@/components/UI/KolekcjaDescription'; // adjust path
+
 
 const CollectionPage = () => {
   const router = useRouter();
@@ -226,6 +228,11 @@ const CollectionPage = () => {
               <ProductPreview key={product.id} product={product} />
             ))}
           </div>
+          <KolekcjaDescription
+            content={currentKolekcja?.acf?.dodatkowy_opis_kolekcji || ''}
+            imageUrl={featuredImage || '/placeholder.jpg'}
+            fullWidth={true} // or true if you want it full-bleed
+          />
         </div>
       </section>
     </Layout>
