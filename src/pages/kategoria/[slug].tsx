@@ -179,8 +179,8 @@ const CategoryPage = ({
 
   const fallback =
     activeFilters.length === 0 &&
-    sortingOption === 'Sortowanie' &&
-    currentPage === 1
+      sortingOption === 'Sortowanie' &&
+      currentPage === 1
       ? { products: initialProducts, totalProducts: initialTotalProducts }
       : undefined;
 
@@ -271,7 +271,7 @@ const CategoryPage = ({
           href={`${process.env.NEXT_PUBLIC_SITE_URL}/kategoria/${slug}`}
         />
       </Head>
-      <div className="container max-w-[1440px] mt-[115px] px-4 md:px-0 mx-auto">
+      <div className="mx-auto max-w-[1440px] mt-[115px] px-4 md:px-4 lg:px-4 xl:px-4 min-[1440px]:px-0">
         <nav className="breadcrumbs">{/* Breadcrumbs component */}</nav>
         <div className="flex items-center mb-8">
           <h1 className="text-[32px] mt-[24px] md:text-[40px] font-bold text-[#661F30] flex items-center gap-4">
@@ -315,8 +315,8 @@ const CategoryPage = ({
                 categoryId={category.id}
                 activeFilters={activeFilters}
                 onFilterChange={handleFilterChange}
-                setProducts={() => {}}
-                setTotalProducts={() => {}}
+                setProducts={() => { }}
+                setTotalProducts={() => { }}
                 filterOrder={filterOrder[slug || ''] || []}
                 initialAttributes={initialAttributes}
               />
@@ -347,8 +347,8 @@ const CategoryPage = ({
           // SWR revalidates automatically on state change.
         }}
         onClearFilters={clearFilters}
-        setProducts={() => {}}
-        setTotalProducts={() => {}}
+        setProducts={() => { }}
+        setTotalProducts={() => { }}
         productsCount={filteredProductCount}
         initialProductCount={initialTotalProducts}
         filterOrder={filterOrder[slug || ''] || []}
@@ -379,7 +379,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
     // Fetch the WP product_cat term by slug (includes yoast_head_json)
     const termRes = await fetch(
       `${wpApi}/product_cat?slug=${encodeURIComponent(slug)}` +
-        `&_fields=id,name,description,yoast_head_json`,
+      `&_fields=id,name,description,yoast_head_json`,
     );
 
     if (termRes.ok) {
@@ -411,8 +411,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     const aggRes = await fetch(
       `${baseUrl}/api/category-aggregator` +
-        `?slug=${encodeURIComponent(slug)}` +
-        `&page=1&perPage=12`,
+      `?slug=${encodeURIComponent(slug)}` +
+      `&page=1&perPage=12`,
     );
     if (aggRes.ok) aggregatorData = await aggRes.json();
     else console.error('Aggregator fetch failed:', await aggRes.text());

@@ -133,8 +133,8 @@ const CollectionPage = () => {
           href={`${process.env.NEXT_PUBLIC_SITE_URL}/kolekcje/${slug}`}
         />
       </Head>
-      <section className="w-full py-16">
-        <div className="container mx-auto max-w-grid-desktop px-4 md:px-0">
+      <section className="w-full py-16 mt-[115px]">
+        <div className="mx-auto max-w-grid-desktop px-4 md:px-4 lg:px-4 xl:px-4 min-[1440px]:px-0">
           {/* HERO SECTION */}
           <div
             className="grid grid-cols-1 md:grid-cols-2 mb-12 rounded-[25px] relative"
