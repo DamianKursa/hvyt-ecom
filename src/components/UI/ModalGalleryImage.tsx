@@ -16,6 +16,7 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
 
   const canGoPrev = currentIndex > 0;
   const canGoNext = currentIndex < images.length - 1;
+  const showArrows = images.length > 1;
 
   const handleNext = () => {
     if (canGoNext) {
@@ -76,33 +77,35 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
           />
         </div>
 
-        {/* Previous button */}
-        <button
-          onClick={handlePrevious}
-          className={`absolute left-8 top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-lg ${
-            canGoPrev
-              ? 'bg-black text-white'
-              : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-          } z-10`}
-          disabled={!canGoPrev}
-          aria-label="Previous Image"
-        >
-          <img src="/icons/arrow-left.svg" alt="Previous" className="h-6 w-6" />
-        </button>
+        {showArrows && (
+          // Previous button
+          <button
+            onClick={handlePrevious}
+            className={`absolute left-8 top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-lg ${canGoPrev
+                ? 'bg-black text-white'
+                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+              } z-10`}
+            disabled={!canGoPrev}
+            aria-label="Previous Image"
+          >
+            <img src="/icons/arrow-left.svg" alt="Previous" className="h-6 w-6" />
+          </button>
+        )}
 
-        {/* Next button */}
-        <button
-          onClick={handleNext}
-          className={`absolute right-8 top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-lg ${
-            canGoNext
-              ? 'bg-black text-white'
-              : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-          } z-10`}
-          disabled={!canGoNext}
-          aria-label="Next Image"
-        >
-          <img src="/icons/arrow-right.svg" alt="Next" className="h-6 w-6" />
-        </button>
+        {showArrows && (
+          // Next button
+          <button
+            onClick={handleNext}
+            className={`absolute right-8 top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-lg ${canGoNext
+                ? 'bg-black text-white'
+                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+              } z-10`}
+            disabled={!canGoNext}
+            aria-label="Next Image"
+          >
+            <img src="/icons/arrow-right.svg" alt="Next" className="h-6 w-6" />
+          </button>
+        )}
       </div>
     </div>
   );
