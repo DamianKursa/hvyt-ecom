@@ -79,22 +79,20 @@ const Reviews = ({ productId }: { productId: number }) => {
           <div className="hidden md:flex items-center space-x-4">
             <button
               onClick={handlePrev}
-              className={`p-3 rounded-full shadow-lg ${
-                canGoPrev
-                  ? 'bg-black text-white'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
+              className={`p-3 rounded-full shadow-lg ${canGoPrev
+                ? 'bg-black text-white'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               disabled={!canGoPrev}
             >
               <img src="/icons/arrow-left.svg" alt="Previous" />
             </button>
             <button
               onClick={handleNext}
-              className={`p-3 rounded-full shadow-lg ${
-                canGoNext
-                  ? 'bg-black text-white'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
+              className={`p-3 rounded-full shadow-lg ${canGoNext
+                ? 'bg-black text-white'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               disabled={!canGoNext}
             >
               <img src="/icons/arrow-right.svg" alt="Next" />
@@ -131,25 +129,38 @@ const Reviews = ({ productId }: { productId: number }) => {
 
         {/* Success Message */}
         {submitted && (
-          <div className="mt-6 p-4 bg-green-100 text-green-700 rounded-lg text-center">
-            Dziękujemy za podzielenie się Twoją opinią.
+          <div className="flex justify-center mt-6">
+            <div className="inline-flex items-center bg-green-800 text-white px-4 py-2 rounded-[25px]">
+              <img
+                src="/icons/circle-check.svg"
+                alt="Success"
+                className="w-5 h-5 mr-2"
+              />
+              <span>Dziękujemy za podzielenie się Twoją opinią.</span>
+            </div>
           </div>
         )}
 
         {/* Add Review Button */}
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-white transition-all"
-          >
-            {showForm ? 'Schowaj formularz - ' : 'Dodaj swoją opinię + '}
-          </button>
-        </div>
+        {!showForm && (
+          <div className="flex justify-center mt-6 px-4">
+            <button
+              onClick={() => setShowForm(true)}
+              className="w-full sm:w-auto px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-white transition-all"
+            >
+              Dodaj opinię +
+            </button>
+          </div>
+        )}
 
         {/* Review Form */}
         {showForm && (
           <div className="flex justify-center mt-6">
-            <ReviewForm productId={productId} onSubmit={handleReviewSubmit} />
+            <ReviewForm
+              productId={productId}
+              onSubmit={handleReviewSubmit}
+              onCancel={() => setShowForm(false)}
+            />
           </div>
         )}
       </div>
