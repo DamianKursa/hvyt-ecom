@@ -1,7 +1,7 @@
 import React from 'react';
 import ProductPreview from './ProductPreview.component';
 import SkeletonProductPreview from '../Skeletons/SkeletonProductPreview.component';
-
+import clsx from 'clsx';
 interface ProductArchiveProps {
   products: any[];
   totalProducts: number;
@@ -37,11 +37,13 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
         <button
           key={pageNumber}
           onClick={() => handlePageClick(pageNumber)}
-          className={`px-2 ${
+          className={clsx(
+            'w-8 h-8 flex items-center justify-center',
             currentPage === pageNumber
-              ? 'font-bold text-black'
-              : 'text-gray-500'
-          }`}
+              ? 'text-black font-bold'
+              : ' text-gray-700 hover:bg-gray-100'
+          )}
+        /* … */
         >
           {pageNumber}
         </button>
@@ -55,11 +57,11 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {loading
           ? Array.from({ length: perPage }).map((_, index) => (
-              <SkeletonProductPreview key={index} />
-            ))
+            <SkeletonProductPreview key={index} />
+          ))
           : products.map((product) => (
-              <ProductPreview key={product.id} product={product} />
-            ))}
+            <ProductPreview key={product.id} product={product} />
+          ))}
       </div>
 
       {/* Pagination */}
