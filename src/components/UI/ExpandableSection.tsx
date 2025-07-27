@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import Image from 'next/image';
 
@@ -14,6 +14,17 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
   isWymiary = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isExpanded && contentRef.current) {
+      contentRef.current.querySelectorAll('a').forEach(link => {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+      });
+    }
+  }, [content, isExpanded]);
 
   const cleanHTML = (html: string) =>
     DOMPurify.sanitize(html, { USE_PROFILES: { html: true } });
@@ -44,9 +55,8 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
 
   return (
     <div
-      className={`py-2 border-b ${
-        isExpanded ? 'border-dark-pastel-red' : 'border-gray-300'
-      }`}
+      className={`py-2 border-b ${isExpanded ? 'border-dark-pastel-red' : 'border-gray-300'
+        }`}
     >
       {/* Section Title */}
       <button
@@ -68,7 +78,10 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
           {isWymiary ? (
             renderWymiaryContent()
           ) : (
-            <div dangerouslySetInnerHTML={{ __html: cleanHTML(content) }} />
+            <div
+              ref={contentRef}
+              dangerouslySetInnerHTML={{ __html: cleanHTML(content) }}
+            />
           )}
         </div>
       )}
