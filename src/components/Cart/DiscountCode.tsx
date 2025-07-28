@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { CartContext } from '@/stores/CartProvider';
 
 interface DiscountCodeProps {
@@ -19,6 +19,10 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     visible: boolean;
   }>({ message: '', type: 'success', visible: false });
   const [isLoading, setIsLoading] = useState(false);
+
+  const coupon = cart?.coupon;
+  const allowedCats: number[] = coupon?.allowedCats ?? [];
+
   const handleApplyCode = async () => {
     if (!code.trim()) {
       setSnackbar({
@@ -36,12 +40,23 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       const response = await fetch('/api/discount', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: code.trim(), cartTotal }),
+        body: JSON.stringify({
+          code: code.trim(),
+          cartTotal,
+          items: cart!.products.map((item) => ({
+            id: item.productId,
+            price: item.price,
+            quantity: item.qty,
+            // send whatever categories you already have (if any)
+            categories: item.categories?.map((c) => c.id) || [],
+          })),
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok || !data.valid) {
+        console.log('Coupon debug:', data.debug);
         setSnackbar({
           message: data.message || 'Niepoprawny kod rabatowy',
           type: 'error',
@@ -50,19 +65,25 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         return;
       }
 
-      const { discountValue, discountType } = data;
+      // pull the category restrictions out of the API response
+      const {
+        discountApplied,
+        discountType,
+        allowedCats = [], // 👈 default to empty array
+        excludedCats = [], // 👈 optional, only if you care about excludes
+      } = data;
 
-      let discountApplied = 0;
-      if (discountType === 'percent') {
-        // Calculate discount on the total order value
-        discountApplied = (cartTotal * discountValue) / 100;
-      } else if (discountType === 'fixed') {
-        discountApplied = discountValue;
-      }
+      // now store them on the coupon in context
+      applyCoupon({
+        code,
+        discountValue: discountApplied,
+        discountType,
+        allowedCats, // 👈 this is the key bit
+        // excludedCats, // 👈 uncomment if you want to support excludes
+      });
 
-      // Apply the coupon and update the total for the entire order
-      applyCoupon({ code, discountValue: discountApplied, discountType });
-      setCartTotal(cartTotal - discountApplied);
+      // adjust your local total
+      setCartTotal((prev) => prev - discountApplied);
 
       setSnackbar({
         message: 'Kod rabatowy został dodany',
@@ -78,9 +99,10 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       });
     } finally {
       setIsLoading(false);
-      setTimeout(() => {
-        setSnackbar((prev) => ({ ...prev, visible: false }));
-      }, 3000);
+      setTimeout(
+        () => setSnackbar((prev) => ({ ...prev, visible: false })),
+        3000,
+      );
     }
   };
 
@@ -97,14 +119,45 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       3000,
     );
   };
+  useEffect(() => {
+    // 1) Guard: if there's no cart or no coupon, bail out
+    if (!cart?.coupon) return;
+
+    // 2) Only consider category‐restricted coupons
+    const allowedCats = cart.coupon.allowedCats || [];
+    if (allowedCats.length === 0) return;
+
+    // 3) Check if any product still matches one of those categories
+    const stillHas = cart.products.some((p) =>
+      p.categories?.some((cat) => allowedCats.includes(cat.id)),
+    );
+
+    // 4) If not, clear the coupon
+    if (!stillHas) {
+      removeCoupon();
+      setCode('');
+      setCartTotal(cart.totalProductsPrice);
+      setSnackbar({
+        message: 'Kod rabatowy usunięty – brak produktów z wymaganej kategorii',
+        type: 'error',
+        visible: true,
+      });
+      setTimeout(
+        () => setSnackbar((prev) => ({ ...prev, visible: false })),
+        3000,
+      );
+    }
+  }, [
+    // 5) DEP: only watch cart?.products
+    cart?.products,
+  ]);
 
   return (
     <div
-      className={`border ${
-        isOpen
+      className={`border ${isOpen
           ? 'border-2 border-dark-pastel-red rounded-[24px] bg-beige-light'
-          : 'border-neutral-light rounded-[24px]'
-      } px-4 py-3 transition-all duration-300 ease-in-out mb-[33px]`}
+          : 'border-black rounded-[24px]'
+        } px-4 py-3 transition-all duration-300 ease-in-out mb-[33px]`}
     >
       {/* Dropdown Header */}
       <button
@@ -156,15 +209,13 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
               />
               <button
                 onClick={handleApplyCode}
-                className={`ml-4 px-4 py-2 border ${
-                  !code.trim()
+                className={`ml-4 px-4 py-2 border ${!code.trim()
                     ? 'border-neutral-light text-neutral-light'
                     : 'border-black text-black'
-                } rounded-full focus:outline-none ${
-                  !code.trim() || isLoading
+                  } rounded-full focus:outline-none ${!code.trim() || isLoading
                     ? 'opacity-50 cursor-not-allowed'
                     : ''
-                }`}
+                  }`}
                 disabled={!code.trim() || isLoading}
               >
                 {isLoading ? 'Ładowanie...' : 'Zapisz'}
@@ -177,9 +228,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       {/* Inline Message for Success or Error */}
       {snackbar.visible && (
         <div
-          className={`mt-4 px-4 py-2 rounded-lg flex items-center ${
-            snackbar.type === 'success' ? 'bg-[#2A5E45]' : 'bg-red-500'
-          } text-white`}
+          className={`mt-4 px-4 py-2 rounded-lg flex items-center ${snackbar.type === 'success' ? 'bg-[#2A5E45]' : 'bg-red-500'
+            } text-white`}
         >
           <span>{snackbar.message}</span>
         </div>

@@ -131,7 +131,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           onChange={(e) =>
             setBillingData((prev) => ({ ...prev, street: e.target.value }))
           }
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
         <input
           type="text"
@@ -144,7 +144,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
               buildingNumber: e.target.value,
             }))
           }
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
         <input
           type="text"
@@ -156,7 +156,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
               apartmentNumber: e.target.value,
             }))
           }
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
         <input
           type="text"
@@ -166,7 +166,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           onChange={(e) =>
             setBillingData((prev) => ({ ...prev, city: e.target.value }))
           }
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
         <input
           type="text"
@@ -176,7 +176,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           onChange={(e) =>
             setBillingData((prev) => ({ ...prev, postalCode: e.target.value }))
           }
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
         <input
           type="text"
@@ -189,7 +189,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
               country: e.target.value,
             }))
           }
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
       </div>
 
@@ -214,7 +214,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
               onChange={(e) =>
                 setShippingData((prev) => ({ ...prev, street: e.target.value }))
               }
-              className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
             <input
               type="text"
@@ -227,7 +227,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                   buildingNumber: e.target.value,
                 }))
               }
-              className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
             <input
               type="text"
@@ -239,7 +239,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                   apartmentNumber: e.target.value,
                 }))
               }
-              className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
             <input
               type="text"
@@ -249,7 +249,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
               onChange={(e) =>
                 setShippingData((prev) => ({ ...prev, city: e.target.value }))
               }
-              className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
             <input
               type="text"
@@ -262,7 +262,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                   postalCode: e.target.value,
                 }))
               }
-              className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
             <input
               type="text"
@@ -275,7 +275,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                   country: e.target.value,
                 }))
               }
-              className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
             <textarea
               placeholder="Dodatkowe informacje do zamówienia (opcjonalnie)"
@@ -286,7 +286,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                   additionalInfo: e.target.value,
                 }))
               }
-              className="col-span-1 md:col-span-2 border border-black rounded-[8px] p-4 bg-white focus:outline-none placeholder:font-light placeholder:text-black mt-4"
+              className="col-span-1 md:col-span-2 border border-[#969394] rounded-[8px] p-4 bg-white focus:outline-none placeholder:font-light placeholder:text-black mt-4"
             />
           </div>
         </div>

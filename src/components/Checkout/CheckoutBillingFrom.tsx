@@ -141,11 +141,10 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             className="hidden"
           />
           <span
-            className={`w-5 h-5 rounded-full border-2 ${
-              customerType === 'individual'
-                ? 'border-black border-[5px]'
-                : 'border-gray-400'
-            }`}
+            className={`w-5 h-5 rounded-full border-2 ${customerType === 'individual'
+              ? 'border-black border-[5px]'
+              : 'border-gray-400'
+              }`}
           ></span>
           <span className="ml-2">Klient indywidualny</span>
         </label>
@@ -158,11 +157,10 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             className="hidden"
           />
           <span
-            className={`w-5 h-5 rounded-full border-2 ${
-              customerType === 'company'
-                ? 'border-black border-[5px]'
-                : 'border-gray-400'
-            }`}
+            className={`w-5 h-5 rounded-full border-2 ${customerType === 'company'
+              ? 'border-black border-[5px]'
+              : 'border-gray-400'
+              }`}
           ></span>
           <span className="ml-2">Firma</span>
         </label>
@@ -176,7 +174,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
           value={formData.firstName}
           placeholder="Imię*"
           onChange={(e) => handleInputChange('firstName', e.target.value)}
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
         <input
           type="text"
@@ -184,7 +182,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
           value={formData.lastName}
           placeholder="Nazwisko*"
           onChange={(e) => handleInputChange('lastName', e.target.value)}
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
 
         {/* Conditionally Render Company Fields */}
@@ -196,7 +194,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
               placeholder="Nazwa firmy*"
               required
               onChange={(e) => handleInputChange('company', e.target.value)}
-              className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
             <input
               type="text"
@@ -204,7 +202,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
               placeholder="NIP*"
               required
               onChange={(e) => handleInputChange('vatNumber', e.target.value)}
-              className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
             />
           </>
         )}
@@ -216,7 +214,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
           required
           placeholder="Numer telefonu*"
           onChange={(e) => handleInputChange('phone', e.target.value)}
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
         <input
           type="email"
@@ -224,7 +222,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
           placeholder="Adres e-mail*"
           required
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border-b border-black p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
         />
       </div>
 
@@ -238,7 +236,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
         />
         <label
           htmlFor="newsletter"
-          className="flex items-center cursor-pointer w-5 h-5 border border-black rounded"
+          className="flex items-center cursor-pointer w-5 h-5 border border-[#969394] rounded"
         >
           {subscribeNewsletter && (
             <img src="/icons/check.svg" alt="check" className="w-4 h-4" />
