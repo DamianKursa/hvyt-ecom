@@ -15,12 +15,14 @@ const KolekcjaDescription: React.FC<KolekcjaDescriptionProps> = ({
   imageUrl,
   fullWidth = true,
 }) => {
+  if (!content || content.trim() === '') {
+    return null;
+  }
   // Shared section wrapper with beige background and padding
   const SectionWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <section
-      className={`bg-[#F5F5F5] px-4 mt-[64px] md:mt-[88px] md:my-[115px] py-[88px] ${
-        fullWidth ? 'w-full' : 'container mx-auto'
-      }`}
+      className={`bg-[#F5F5F5] px-4 mt-[64px] md:mt-[88px] md:my-[115px] py-[88px] ${fullWidth ? 'w-full' : 'container mx-auto'
+        }`}
       style={{ backgroundColor: 'var(--color-beige)' }}
     >
       <div className="max-w-[1440px] mx-auto">
