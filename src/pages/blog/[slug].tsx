@@ -108,7 +108,7 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
               </a>
               <a href="#">
                 <Image
-                  src="/icons/facebook.svg"
+                  src="/icons/Facebook.svg"
                   alt="Udostępnij na Facebook"
                   width={20}
                   height={20}
@@ -116,7 +116,7 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
               </a>
               <a href="#">
                 <Image
-                  src="/icons/instagram.svg"
+                  src="/icons/Instagram.svg"
                   alt="Udostępnij na Instagram"
                   width={20}
                   height={20}
