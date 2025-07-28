@@ -10,6 +10,7 @@ interface CartItemProps {
   onIncreaseQuantity?: (product: Product) => void;
   onDecreaseQuantity?: (product: Product) => void;
   onRemoveItem?: (product: Product) => void;
+  onVariationChange?: (productName: string) => void;
 }
 
 /** ① We now track both the human label and the Woo variation ID */
@@ -23,6 +24,7 @@ const CartItem: React.FC<CartItemProps> = ({
   onIncreaseQuantity,
   onDecreaseQuantity,
   onRemoveItem,
+  onVariationChange,
 }) => {
   const router = useRouter();
   const isKoszykPage = router.pathname === '/koszyk';
@@ -295,6 +297,9 @@ const CartItem: React.FC<CartItemProps> = ({
                       selectedVariation.id,
                     );
                     setModalOpen(false);
+                    if (onVariationChange) {
+                      onVariationChange(product.name);
+                    }
                   }
                 }}
               >

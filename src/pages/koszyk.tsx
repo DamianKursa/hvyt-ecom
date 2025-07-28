@@ -11,6 +11,7 @@ import { pushGTMEvent } from '@/utils/gtm';
 const Koszyk: React.FC = () => {
   const { cart, updateCartItem, removeCartItem } = useContext(CartContext);
   const [mounted, setMounted] = useState(false);
+  const [variationMessage, setVariationMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -99,11 +100,23 @@ const Koszyk: React.FC = () => {
         ) : (
           <div>
             <CartProgress />
+            {variationMessage && (
+              <div className="bg-green-800 text-white rounded-full py-3 px-4 mt-6 mb-6 flex items-center">
+                <img
+                  src="/icons/circle-check.svg"
+                  alt="Success"
+                  className="w-5 h-5 mr-2"
+                />
+                <span>{variationMessage}</span>
+              </div>
+            )}
             <div className="flex flex-col lg:flex-row gap-8">
               <CartItems
                 onIncreaseQuantity={handleIncreaseQuantity}
                 onDecreaseQuantity={handleDecreaseQuantity}
                 onRemoveItem={handleRemoveItem}
+                onVariationChange={(name: string) => setVariationMessage(`Rozstaw produktu ${name} został zmieniony`)
+                }
               />
               <CartSummary
                 totalProductsPrice={cart?.totalProductsPrice || 0}

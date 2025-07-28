@@ -6,12 +6,14 @@ interface CartItemsProps {
   onIncreaseQuantity: (product: Product) => void;
   onDecreaseQuantity: (product: Product) => void;
   onRemoveItem: (product: Product) => void;
+  onVariationChange?: (productName: string) => void;
 }
 
 const CartItems: React.FC<CartItemsProps> = ({
   onIncreaseQuantity,
   onDecreaseQuantity,
   onRemoveItem,
+  onVariationChange,
 }) => {
   const { cart, clearCart } = useContext(CartContext);
 
@@ -42,6 +44,7 @@ const CartItems: React.FC<CartItemsProps> = ({
             onIncreaseQuantity={onIncreaseQuantity}
             onDecreaseQuantity={onDecreaseQuantity}
             onRemoveItem={onRemoveItem}
+            onVariationChange={onVariationChange}
           />
         ))
       ) : (
