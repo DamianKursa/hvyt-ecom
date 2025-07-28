@@ -11,6 +11,7 @@ import ProductPreview from '../../components/Product/ProductPreview.component';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import KolekcjaDescription from '@/components/UI/KolekcjaDescription'; // adjust path
+import ProductArchive from '@/components/Product/ProductArchive';
 
 
 const CollectionPage = () => {
@@ -27,6 +28,8 @@ const CollectionPage = () => {
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<number>(12);
 
   // Utility to remove HTML tags (safe on both SSR and client)
   const stripHTML = (html: string) => {
@@ -49,10 +52,11 @@ const CollectionPage = () => {
         );
         if (!categoryRes.ok) throw new Error('Error fetching category');
         const categoryData = await categoryRes.json();
+        setPerPage(categoryData.product_count || 12);
 
         // Fetch products for that category
         const productsRes = await fetch(
-          `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryData.id}&page=1&perPage=12`,
+          `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryData.id}&page=${currentPage}&perPage=${categoryData.product_count || 12}`,
         );
         if (!productsRes.ok) throw new Error('Error fetching products');
         const productsJson = await productsRes.json();
@@ -84,7 +88,7 @@ const CollectionPage = () => {
       }
     };
     fetchData();
-  }, [slugString]);
+  }, [slugString, currentPage]);
 
   const currentKolekcja = kolekcjeData?.find(
     (kolekcja: Kolekcja) => kolekcja.slug === slugString,
@@ -223,11 +227,14 @@ const CollectionPage = () => {
           </div>
 
           {/* PRODUCTS LIST (mobile: 1 column, desktop: 3 columns) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {productsData?.products.map((product) => (
-              <ProductPreview key={product.id} product={product} />
-            ))}
-          </div>
+          <ProductArchive
+            products={productsData?.products || []}
+            totalProducts={productsData?.totalProducts || 0}
+            loading={loading}
+            perPage={perPage}
+            currentPage={currentPage}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
           <KolekcjaDescription
             content={currentKolekcja?.acf?.dodatkowy_opis_kolekcji || ''}
             imageUrl={featuredImage || '/placeholder.jpg'}

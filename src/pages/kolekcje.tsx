@@ -49,8 +49,8 @@ const KolekcjePage = () => {
       <section className="w-full px-4 lg:px-0 mt-[115px] mb-[150px]">
         <div className="container mx-auto max-w-grid-desktop">
           {/* Page Title and Text Section */}
-          <div className="text-left mb-12">
-            <h1 className="text-[32px] pt-[24px] md:text-[40px] font-bold text-dark-pastel-red">
+          <div className="text-left mb-8">
+            <h1 className="text-[48px] pt-[24px] md:text-[48px] font-bold text-dark-pastel-red">
               Kolekcje
             </h1>
           </div>
@@ -94,9 +94,8 @@ const KolekcjePage = () => {
                 {kolekcjePosts.slice(0, 3).map((kolekcja, index) => (
                   <div
                     key={kolekcja.id}
-                    className={`relative transition-all duration-300 ${
-                      index === 0 ? 'md:col-span-2' : 'md:col-span-1'
-                    }`}
+                    className={`relative transition-all duration-300 ${index === 0 ? 'md:col-span-2' : 'md:col-span-1'
+                      }`}
                     style={{ height: '445px' }}
                   >
                     <Link href={`/kolekcje/${kolekcja.slug}`}>
