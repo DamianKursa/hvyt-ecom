@@ -111,6 +111,7 @@ const ProductPage = () => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [showNotifyForm, setShowNotifyForm] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
+  const [wishlistMessage, setWishlistMessage] = useState<string | null>(null);
 
   const methods = useForm<NotifyFormData>({
     defaultValues: { notifyEmail: '' },
@@ -269,9 +270,12 @@ const ProductPage = () => {
     };
     if (isInWishlist(product.slug)) {
       removeFromWishlist(product.slug);
+      setWishlistMessage('Produkt został usunięty z ulubionych.');
     } else {
       addToWishlist(wishlistProduct);
+      setWishlistMessage('Produkt został dodany do ulubionych.');
     }
+    setTimeout(() => setWishlistMessage(null), 3000);
   };
 
   const handleScrollToFrequentlyBought = () => {
@@ -1022,6 +1026,16 @@ const ProductPage = () => {
       <div className="w-full">
         {product && <Reviews productId={Number(product.id)} />}
       </div>
+      {wishlistMessage && (
+        <div className="fixed bottom-4 left-4 bg-green-800 text-white rounded-full py-3 px-4 flex items-center shadow-lg">
+          <img
+            src="/icons/circle-check.svg"
+            alt="Success"
+            className="w-5 h-5 mr-2"
+          />
+          <span>{wishlistMessage}</span>
+        </div>
+      )}
     </Layout>
   );
 };

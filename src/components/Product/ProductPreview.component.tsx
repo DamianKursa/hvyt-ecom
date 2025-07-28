@@ -9,6 +9,18 @@ const safeParse = (v: unknown): number => {
   return isNaN(n) ? 0 : n;
 };
 
+/**
+ * Parses a WooCommerce date string like "2025-07-01 00:00:00" into a Date.
+ * Returns null when the date is missing or invalid.
+ */
+const parseDate = (raw?: string): Date | null => {
+  if (!raw) return null;
+  // Replace the space before time with 'T' so Safari / iOS can parse it.
+  const iso = raw.includes(' ') ? raw.replace(' ', 'T') : raw;
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? null : d;
+};
+
 interface Product {
   name: string;
   price: string;
@@ -114,6 +126,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+  const [wishlistMessage, setWishlistMessage] = useState<string | null>(null);
 
   const firstImage = product.images?.[0]?.src || '/fallback-image.jpg';
   const secondImage = product.images?.[1]?.src || firstImage;
@@ -138,12 +151,8 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
     : basePrice;
 
   // ─── now your existing date/gating logic ───
-  const saleFrom = product.date_on_sale_from
-    ? new Date(product.date_on_sale_from)
-    : null;
-  const saleTo = product.date_on_sale_to
-    ? new Date(product.date_on_sale_to)
-    : null;
+  const saleFrom = parseDate(product.date_on_sale_from);
+  const saleTo = parseDate(product.date_on_sale_to);
   const now = new Date();
   const isSaleActive =
     salePrice < regular &&
@@ -164,9 +173,14 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const cardHeight = isSmall ? '300px' : '400px';
 
   const handleWishlistClick = () => {
-    isInWishlist(product.slug)
-      ? removeFromWishlist(product.slug)
-      : addToWishlist(product);
+    if (isInWishlist(product.slug)) {
+      removeFromWishlist(product.slug);
+      setWishlistMessage('Produkt został usunięty z ulubionych.');
+    } else {
+      addToWishlist(product);
+      setWishlistMessage('Produkt został dodany do ulubionych.');
+    }
+    setTimeout(() => setWishlistMessage(null), 3000);
   };
 
   const typeIcon = getProductTypeIcon(product);
@@ -309,6 +323,16 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
           aria-label={`View product ${product.name}`}
         ></a>
       </Link>
+      {wishlistMessage && (
+        <div className="fixed bottom-4 left-4 bg-green-800 text-white rounded-full py-3 px-4 flex items-center shadow-lg z-50">
+          <img
+            src="/icons/circle-check.svg"
+            alt="Success"
+            className="w-5 h-5 mr-2"
+          />
+          <span>{wishlistMessage}</span>
+        </div>
+      )}
     </div>
   );
 };
