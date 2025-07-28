@@ -175,6 +175,8 @@ export interface Kolekcja {
     ikonka_2?: string;
     ikonka_3?: string;
     ikonka_4?: string;
+    dodatkowy_opis_kolekcji?: string;
+
   };
 }
 
