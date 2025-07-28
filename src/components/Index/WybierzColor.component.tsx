@@ -159,7 +159,7 @@ const WybierzColor = () => {
                   style={{ objectFit: 'cover' }}
                   className="rounded-lg"
                 />
-                <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
+                <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-dark-pastel-red">
                   {item.title}
                 </div>
               </div>

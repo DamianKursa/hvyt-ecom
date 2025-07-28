@@ -226,7 +226,7 @@ const CartItem: React.FC<CartItemProps> = ({
       {isModalOpen && (
         <div className="fixed inset-0 bg-[#36313266] flex items-center justify-center z-50">
           <div
-            className="bg-[#FAF7F5] px-[48px] py-[40px] w-full max-w-[650px] rounded-[24px] relative shadow-lg transition-all duration-300 ease-in-out"
+            className="bg-[#FAF7F5] mx-4 md:mx-0 px-[48px] py-[40px] w-full max-w-[650px] rounded-[24px] relative shadow-lg transition-all duration-300 ease-in-out"
             style={{ maxHeight: 'auto', overflowY: 'auto' }}
           >
             <button
@@ -283,7 +283,7 @@ const CartItem: React.FC<CartItemProps> = ({
               <button
                 className={`w-1/2 py-3 text-white rounded-full text-base font-light transition ${selectedVariation
                   ? 'bg-[#1C1C1C] hover:bg-black cursor-pointer'
-                  : 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-[#B2B0B1] cursor-not-allowed'
                   }`}
                 disabled={!selectedVariation}
                 onClick={() => {
