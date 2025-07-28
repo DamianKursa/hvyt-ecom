@@ -83,7 +83,7 @@ const Kontakt = () => {
                     <img
                       src="/icons/mapa.svg"
                       alt="Address Icon"
-                      className="mr-4 mt-1 w-6 h-6"
+                      className="mr-4 mt-1 md:w-6 h-6 w-8 h-8 "
                     />
                     <div className="text-left">
                       <span className="block font-bold mb-2">Adres</span>
@@ -96,7 +96,7 @@ const Kontakt = () => {
                     <img
                       src="/icons/mail.svg"
                       alt="Email Icon"
-                      className="mr-4 mt-1 w-6 h-6"
+                      className="mr-4 mt-1 w-8 h-8 md:w-6 h-6"
                     />
                     <div className="text-left">
                       <span className="block font-bold mb-2">Email</span>
@@ -108,7 +108,7 @@ const Kontakt = () => {
                     <img
                       src="/icons/telefon.svg"
                       alt="Phone Icon"
-                      className="mr-4 mt-1 w-6 h-6"
+                      className="mr-4 mt-1 w-8 h-8 md:w-6 h-6"
                     />
                     <div className="text-left">
                       <span className="block font-bold mb-2">Telefon</span>
@@ -195,11 +195,10 @@ const Kontakt = () => {
                 {/* Submission snackbar message */}
                 {submitMessage && (
                   <div
-                    className={`mt-2 px-4 py-2 rounded-lg flex items-center ${
-                      submitMessageType === 'success'
-                        ? 'bg-green-500 text-white'
-                        : 'bg-red-500 text-white'
-                    }`}
+                    className={`mt-2 px-4 py-2 rounded-lg flex items-center ${submitMessageType === 'success'
+                      ? 'bg-green-500 text-white'
+                      : 'bg-red-500 text-white'
+                      }`}
                   >
                     <span>{submitMessage}</span>
                   </div>
