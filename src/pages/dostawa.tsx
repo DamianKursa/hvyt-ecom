@@ -168,6 +168,27 @@ const DostawaPage = () => {
                         0,00 zł
                       </span>
                     </li>
+                    <li className="flex justify-between items-center">
+                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
+                        <span className="text-[16px] text-neutral-darkest font-light">
+                          Paczkomaty InPost (powyżej 300 zł)
+                        </span>
+                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
+                          <Image
+                            src="/icons/truck.svg"
+                            alt="Truck Icon"
+                            width={14}
+                            height={14}
+                          />
+                          <span className="text-[14px] ml-[8px] font-bold">
+                            InPost
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
+                        0,00 zł
+                      </span>
+                    </li>
                   </ul>
                   <p className="text-[18px] font-light text-neutral-darkest mt-10">
                     Czas dostawy powyższych przewoźników to od{' '}
