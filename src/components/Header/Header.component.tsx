@@ -8,6 +8,7 @@ import SearchComponent from '../Search/SearchResults.component';
 import UserDropdown from './UserDropdown';
 import { useUserContext } from '@/context/UserContext';
 import { CartContext } from '@/stores/CartProvider'
+import { useWishlist } from '@/context/WhishlistContext';
 
 interface IHeaderProps {
   title?: string;
@@ -26,6 +27,8 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
 
   const { user, logout, fetchUser } = useUserContext();
   const { cart } = useContext(CartContext)
+  const { wishlist } = useWishlist();
+  const favoriteCount = wishlist.length;
   const count = cart?.totalProductsCount ?? 0
   let dropdownTimeout: ReturnType<typeof setTimeout>;
 
@@ -236,12 +239,13 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
 
                       {/* Wishlist Icon */}
                       <Link href="/ulubione">
-                        <span className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] hover:text-neutral-darkest transition-all">
-                          <img
-                            src="/icons/wishlist.svg"
-                            alt="Wishlist"
-                            className="w-full h-full"
-                          />
+                        <span className="relative w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] transition-all">
+                          <img src="/icons/wishlist.svg" alt="Wishlist" className="w-full h-full" />
+                          {favoriteCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-dark-pastel-red text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                              {favoriteCount}
+                            </span>
+                          )}
                         </span>
                       </Link>
 

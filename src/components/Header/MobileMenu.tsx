@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useWishlist } from '@/context/WhishlistContext';
 
 interface MobileMenuProps {
   menuOpen: boolean;
@@ -16,6 +17,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const router = useRouter();
   const currentPath = router.asPath.split('?')[0];
+  const { wishlist } = useWishlist();
+  const favoriteCount = wishlist.length;
 
   // Handle click on "Moje konto"
   const handleAccountClick = (e: React.MouseEvent) => {
@@ -29,9 +32,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 bg-white z-50 w-full transition-transform duration-300 ease-in-out p-4 ${
-        menuOpen ? 'translate-y-0' : '-translate-y-full'
-      }`}
+      className={`fixed inset-0 bg-white z-50 w-full transition-transform duration-300 ease-in-out p-4 ${menuOpen ? 'translate-y-0' : '-translate-y-full'
+        }`}
     >
       {/* Main Menu links with 16px padding */}
       <div className="rounded-[25px] bg-[#E9E5DF] p-2 mt-[78px]">
@@ -41,19 +43,17 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href="/kategoria/uchwyty-meblowe" legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${
-                  currentPath === '/kategoria/uchwyty-meblowe'
-                    ? 'bg-beige-light text-dark-pastel-red'
-                    : ''
-                }`}
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/uchwyty-meblowe'
+                  ? 'bg-beige-light text-dark-pastel-red'
+                  : ''
+                  }`}
               >
                 <span className="p-2">Uchwyty</span>
                 <span
-                  className={`ml-2 ${
-                    currentPath === '/kategoria/uchwyty-meblowe'
-                      ? 'inline'
-                      : 'hidden group-hover:inline'
-                  }`}
+                  className={`ml-2 ${currentPath === '/kategoria/uchwyty-meblowe'
+                    ? 'inline'
+                    : 'hidden group-hover:inline'
+                    }`}
                 >
                   <img
                     src="/icons/uchwyty-kształty.svg"
@@ -68,19 +68,17 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href="/kategoria/klamki" legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${
-                  currentPath === '/kategoria/klamki'
-                    ? 'bg-beige-light text-dark-pastel-red'
-                    : ''
-                }`}
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/klamki'
+                  ? 'bg-beige-light text-dark-pastel-red'
+                  : ''
+                  }`}
               >
                 <span className="p-2">Klamki</span>
                 <span
-                  className={`ml-2 ${
-                    currentPath === '/kategoria/klamki'
-                      ? 'inline'
-                      : 'hidden group-hover:inline'
-                  }`}
+                  className={`ml-2 ${currentPath === '/kategoria/klamki'
+                    ? 'inline'
+                    : 'hidden group-hover:inline'
+                    }`}
                 >
                   <img
                     src="/icons/klamki-kształty.svg"
@@ -95,19 +93,17 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href="/kategoria/wieszaki" legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${
-                  currentPath === '/kategoria/wieszaki'
-                    ? 'bg-beige-light text-dark-pastel-red'
-                    : ''
-                }`}
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/wieszaki'
+                  ? 'bg-beige-light text-dark-pastel-red'
+                  : ''
+                  }`}
               >
                 <span className="p-2">Wieszaki</span>
                 <span
-                  className={`ml-2 ${
-                    currentPath === '/kategoria/wieszaki'
-                      ? 'inline'
-                      : 'hidden group-hover:inline'
-                  }`}
+                  className={`ml-2 ${currentPath === '/kategoria/wieszaki'
+                    ? 'inline'
+                    : 'hidden group-hover:inline'
+                    }`}
                 >
                   <img
                     src="/icons/wieszaki-kształty.svg"
@@ -122,19 +118,17 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href="/kategoria/meble" legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${
-                  currentPath === '/kategoria/meble'
-                    ? 'bg-beige-light text-dark-pastel-red'
-                    : ''
-                }`}
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/meble'
+                  ? 'bg-beige-light text-dark-pastel-red'
+                  : ''
+                  }`}
               >
                 <span className="p-2">Meble</span>
                 <span
-                  className={`ml-2 ${
-                    currentPath === '/kategoria/meble'
-                      ? 'inline'
-                      : 'hidden group-hover:inline'
-                  }`}
+                  className={`ml-2 ${currentPath === '/kategoria/meble'
+                    ? 'inline'
+                    : 'hidden group-hover:inline'
+                    }`}
                 >
                   <img
                     src="/images/HVYT_meble_znak graficzny_burgundy.png"
@@ -150,11 +144,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href="/kolekcje" legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${
-                  currentPath === '/kolekcje'
-                    ? 'bg-beige-light text-dark-pastel-red'
-                    : ''
-                }`}
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kolekcje'
+                  ? 'bg-beige-light text-dark-pastel-red'
+                  : ''
+                  }`}
               >
                 <span className="p-2">Kolekcje</span>
               </a>
@@ -164,11 +157,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href="/o-nas" legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${
-                  currentPath === '/o-nas'
-                    ? 'bg-beige-light text-dark-pastel-red'
-                    : ''
-                }`}
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/o-nas'
+                  ? 'bg-beige-light text-dark-pastel-red'
+                  : ''
+                  }`}
               >
                 <span className="p-2">O nas</span>
               </a>
@@ -192,9 +184,8 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                   Moje konto
                   {/* Optional arrow icon for visual feedback */}
                   <svg
-                    className={`ml-2 h-4 w-4 transform transition-transform duration-200 ${
-                      accountDropdownOpen ? 'rotate-180' : 'rotate-0'
-                    }`}
+                    className={`ml-2 h-4 w-4 transform transition-transform duration-200 ${accountDropdownOpen ? 'rotate-180' : 'rotate-0'
+                      }`}
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -295,12 +286,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href="/ulubione" legacyBehavior>
               <a onClick={toggleMenu} className="font-bold">
                 <div className="flex items-center">
-                  <img
-                    src="/icons/heart.svg"
-                    alt="Wishlist"
-                    className="h-6 mr-3"
-                  />
-                  Ulubione
+                  <img src="/icons/heart.svg" alt="Wishlist" className="h-6 mr-3" />
+                  <span>
+                    Ulubione{favoriteCount > 0 && ` (${favoriteCount})`}
+                  </span>
                 </div>
               </a>
             </Link>
