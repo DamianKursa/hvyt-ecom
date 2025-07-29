@@ -89,15 +89,20 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
     <Layout title="Moje konto">
       <div className="container mx-auto py-[64px] md:py-8 flex">
         {/* Sidebar (hidden on mobile) */}
-        <aside className="hidden md:block w-1/4 bg-beige  p-4 md:p-8 max-h-[410px] rounded-[25px]">
-          <div className="mb-6">
-            <h2 className="text-2xl font-semibold mb-4">Moje konto</h2>
+        <aside className="hidden md:block w-[300px] bg-beige  max-h-[410px] rounded-[25px]">
+          <div className="p-4">
+            <h2 className="text-2xl font-semibold">Moje konto</h2>
           </div>
           <ul className="space-y-4">
             {endpoints.map((endpoint) => (
               <li key={endpoint.key}>
                 <Link href={endpoint.path}>
-                  <div className="flex items-center py-2 rounded-[25px] hover:bg-gray-100 cursor-pointer">
+                  <div
+                    className={` px-4 flex items-center py-2 rounded-[25px] cursor-pointer ${router.asPath === endpoint.path
+                      ? 'bg-beige-light text-dark-pastel-red'
+                      : 'hover:bg-gray-100'
+                      }`}
+                  >
                     <Image
                       src={endpoint.icon}
                       alt={endpoint.label}

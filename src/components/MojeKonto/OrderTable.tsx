@@ -114,7 +114,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
 
               return (
                 <tr key={order.id} className="border-b border-neutral-light">
-                  <td className="py-3 font-bold px-4">#{order.id}</td>
+                  <td className="py-3  px-4">#{order.id}</td>
                   <td className="py-3 px-4">
                     {new Date(order.date_created).toLocaleDateString()}
                   </td>
@@ -135,7 +135,10 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
                         onClick={() => onViewDetails(order)}
                         className="text-black font-light underline"
                       >
-                        Szczegóły
+                        <span className="flex items-center">
+                          Szczegóły
+                          <img src="/icons/arrow-right-pagination-black.svg" alt="" className="ml-2" />
+                        </span>
                       </button>
                     ) : (
                       <Link

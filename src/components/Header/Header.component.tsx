@@ -254,13 +254,25 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                         onClick={handleUserClick}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
-                        className="relative w-6 h-6 flex items-center justify-center rounded-full"
+                        className={`relative w-6 h-6 flex items-center justify-center rounded-full cursor-pointer ${router.asPath.startsWith('/moje-konto') && user
+                          ? 'bg-white'
+                          : 'hover:bg-[#DAD3C8]'
+                          }`}
                       >
-                        <button className="w-full h-full flex items-center justify-center hover:text-neutral-darkest">
+                        <button
+                          className={`w-full h-full flex items-center justify-center transition-all ${router.asPath.startsWith('/moje-konto') && user
+                            ? 'text-dark-pastel-red'
+                            : 'hover:text-neutral-darkest'
+                            }`}
+                        >
                           <img
-                            src="/icons/user.svg"
+                            src={
+                              router.asPath.startsWith('/moje-konto') && user
+                                ? '/icons/user-pastel.svg'
+                                : '/icons/user.svg'
+                            }
                             alt="User"
-                            className="w-full h-full hover:bg-[#DAD3C8] rounded-full  hover:text-neutral-darkest transition-all "
+                            className="w-full h-full rounded-full transition-all"
                           />
                         </button>
                         {dropdownOpen && user && (
