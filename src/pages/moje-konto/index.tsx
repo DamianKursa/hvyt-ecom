@@ -115,6 +115,22 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
                 </Link>
               </li>
             ))}
+            <li>
+              <button
+                onClick={() => {
+                  fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+                  router.push('/logowanie');
+                }}
+                className="w-[100%] px-4 flex items-center py-2 rounded-[25px] cursor-pointer hover:bg-gray-100 text-[18px]"
+              >
+                <img
+                  src="/icons/logout-01.svg"
+                  alt="Wyloguj się"
+                  className="h-6 mr-3"
+                />
+                Wyloguj się
+              </button>
+            </li>
           </ul>
         </aside>
 

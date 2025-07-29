@@ -32,7 +32,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 bg-white z-50 w-full transition-transform duration-300 ease-in-out p-4 ${menuOpen ? 'translate-y-0' : '-translate-y-full'
+      className={`fixed inset-0 bg-white z-50 w-full overflow-y-auto max-h-full transition-transform duration-300 ease-in-out p-4 ${menuOpen ? 'translate-y-0' : '-translate-y-full'
         }`}
     >
       {/* Main Menu links with 16px padding */}
@@ -201,7 +201,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 </button>
                 {/* Dropdown links */}
                 {accountDropdownOpen && (
-                  <ul className="mt-4 ml-8 space-y-4 text-lg">
+                  <ul className="mt-4 space-y-4 text-lg">
                     <li>
                       <Link href="/moje-konto/moje-zamowienia" legacyBehavior>
                         <a
@@ -209,8 +209,13 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                             toggleMenu();
                             setAccountDropdownOpen(false);
                           }}
-                          className="block"
+                          className="flex items-center py-2 rounded-[25px] cursor-pointer hover:bg-gray-100 text-[18px]"
                         >
+                          <img
+                            src="/icons/cart.svg"
+                            alt="Moje zamówienia"
+                            className="h-6 mr-3"
+                          />
                           Moje zamówienia
                         </a>
                       </Link>
@@ -222,8 +227,13 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                             toggleMenu();
                             setAccountDropdownOpen(false);
                           }}
-                          className="block"
+                          className="flex items-center py-2 rounded-[25px] cursor-pointer hover:bg-gray-100 text-[18px]"
                         >
+                          <img
+                            src="/icons/kupione.svg"
+                            alt="Kupione produkty"
+                            className="h-6 mr-3"
+                          />
                           Kupione produkty
                         </a>
                       </Link>
@@ -235,8 +245,13 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                             toggleMenu();
                             setAccountDropdownOpen(false);
                           }}
-                          className="block"
+                          className="flex items-center py-2 rounded-[25px] cursor-pointer hover:bg-gray-100 text-[18px]"
                         >
+                          <img
+                            src="/icons/user.svg"
+                            alt="Moje dane"
+                            className="h-6 mr-3"
+                          />
                           Moje dane
                         </a>
                       </Link>
@@ -248,8 +263,13 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                             toggleMenu();
                             setAccountDropdownOpen(false);
                           }}
-                          className="block"
+                          className="flex items-center py-2 rounded-[25px] cursor-pointer hover:bg-gray-100 text-[18px]"
                         >
+                          <img
+                            src="/icons/home.svg"
+                            alt="Moje adresy"
+                            className="h-6 mr-3"
+                          />
                           Moje adresy
                         </a>
                       </Link>
@@ -261,11 +281,33 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                             toggleMenu();
                             setAccountDropdownOpen(false);
                           }}
-                          className="block"
+                          className="flex items-center py-2 rounded-[25px] cursor-pointer hover:bg-gray-100 text-[18px]"
                         >
+                          <img
+                            src="/icons/do-faktury.svg"
+                            alt="Dane do faktury"
+                            className="h-6 mr-3"
+                          />
                           Dane do faktury
                         </a>
                       </Link>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => {
+                          fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+                          toggleMenu();
+                          router.push('/logowanie');
+                        }}
+                        className="flex items-center py-2 rounded-[25px] cursor-pointer hover:bg-gray-100 text-[18px]"
+                      >
+                        <img
+                          src="/icons/logout-01.svg"
+                          alt="Wyloguj się"
+                          className="h-6 mr-3"
+                        />
+                        Wyloguj się
+                      </button>
                     </li>
                   </ul>
                 )}
