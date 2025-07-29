@@ -59,7 +59,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
             className="w-[80px] h-[80px] rounded-[16px] mr-4 object-cover"
           />
           <div className="flex-1">
-            <p className="font-bold text-[16px]">{item.name}</p>
+            <p className=" text-[16px]">{item.name}</p>
             <div className="mt-2 space-y-1">
               <div className="flex justify-between">
                 <span className="text-gray-700">Cena</span>
@@ -175,18 +175,18 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
                     className="w-[120px] h-[120px] rounded-md mr-4 object-cover"
                   />
                   <div>
-                    <p className="font-medium">{item.name}</p>
+                    <p className="font-bold">{item.name}</p>
                     {item.regular_price &&
                       item.price !== item.regular_price && (
-                        <p className="text-sm line-through text-gray-500">
+                        <p className="text-sm font-bold line-through text-gray-500">
                           {item.regular_price} zł
                         </p>
                       )}
                   </div>
                 </td>
-                <td className="py-3 px-4">{item.price} zł</td>
+                <td className="py-3  font-bold px-4">{item.price} zł</td>
                 <td className="py-3 px-4 text-center">{item.quantity}</td>
-                <td className="py-3 px-4 text-end">
+                <td className="py-3 font-bold px-4 text-end">
                   {(parseFloat(item.price) * item.quantity).toFixed(2)} zł
                 </td>
               </tr>

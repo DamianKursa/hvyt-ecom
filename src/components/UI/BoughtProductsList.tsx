@@ -178,7 +178,14 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
 
       {/* Snackbar Notification */}
       {snackbarMessage && (
-        <Snackbar message={snackbarMessage} type="success" visible={true} />
+        <div className="fixed bottom-4 left-4 z-50 bg-green-800 text-white rounded-full py-3 px-4 flex items-center">
+          <img
+            src="/icons/circle-check.svg"
+            alt="Success"
+            className="w-5 h-5 mr-2"
+          />
+          <span>{snackbarMessage}</span>
+        </div>
       )}
     </>
   );

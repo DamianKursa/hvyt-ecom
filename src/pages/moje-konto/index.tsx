@@ -135,7 +135,7 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
         </aside>
 
         {/* Main Content */}
-        <main className="w-full md:w-3/4 px-4 md:pl-4">
+        <main className="w-full md:w-4/4 pl-4 md:pl-4">
           {children || (
             <p className="text-gray-500">
               Wybierz sekcję z menu, aby zobaczyć szczegóły.
