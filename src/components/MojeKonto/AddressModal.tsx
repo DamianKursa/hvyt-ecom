@@ -31,7 +31,11 @@ const AddressModal: React.FC<AddressModalProps> = ({
     },
   );
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -71,52 +75,118 @@ const AddressModal: React.FC<AddressModalProps> = ({
 
         {/* Input Fields */}
         <div className="space-y-4">
-          <input
-            name="street"
-            value={formData.street}
-            onChange={handleChange}
-            placeholder="Nazwa ulicy"
-            className="w-full border-b border-black p-2 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
-          />
-          <div className="flex space-x-4">
+          <div className="relative">
             <input
-              name="buildingNumber"
-              value={formData.buildingNumber}
+              type="text"
+              name="street"
+              value={formData.street}
+              onFocus={() => setFocusedField('street')}
+              onBlur={() => setFocusedField(null)}
               onChange={handleChange}
-              placeholder="Nr budynku"
-              className="w-full border-b border-black p-2 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
+              required
+              className="w-full text-left border-b border-black focus:border-black px-2 py-2 bg-beige-light focus:outline-none font-light"
             />
+            <span
+              className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.street || focusedField === 'street' ? 'opacity-0' : 'opacity-100'
+                }`}
+            >
+              Nazwa ulicy <span className="text-red-500">*</span>
+            </span>
+          </div>
+          <div className="flex space-x-4">
+            <div className="relative w-full">
+              <input
+                type="text"
+                name="buildingNumber"
+                value={formData.buildingNumber}
+                onFocus={() => setFocusedField('buildingNumber')}
+                onBlur={() => setFocusedField(null)}
+                onChange={handleChange}
+                required
+                className="w-full text-left border-b border-black focus:border-black px-2 py-2 bg-beige-light focus:outline-none font-light"
+              />
+              <span
+                className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.buildingNumber || focusedField === 'buildingNumber'
+                  ? 'opacity-0'
+                  : 'opacity-100'
+                  }`}
+              >
+                Nr budynku <span className="text-red-500">*</span>
+              </span>
+            </div>
             <input
               name="apartmentNumber"
               value={formData.apartmentNumber}
               onChange={handleChange}
               placeholder="Nr lokalu"
-              className="w-full border-b border-black p-2 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
+              className="w-full border-b border-black py-2 px-6 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
             />
           </div>
           <div className="flex space-x-4">
-            <input
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              placeholder="Miasto"
-              className="w-full border-b border-black p-2 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
-            />
-            <input
-              name="postalCode"
-              value={formData.postalCode}
-              onChange={handleChange}
-              placeholder="Kod pocztowy"
-              className="w-full border-b border-black p-2 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
-            />
+            <div className="relative w-full">
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onFocus={() => setFocusedField('city')}
+                onBlur={() => setFocusedField(null)}
+                onChange={handleChange}
+                required
+                className="w-full text-left border-b border-black focus:border-black px-2 py-2 bg-beige-light focus:outline-none font-light"
+              />
+              <span
+                className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.city || focusedField === 'city' ? 'opacity-0' : 'opacity-100'
+                  }`}
+              >
+                Miasto <span className="text-red-500">*</span>
+              </span>
+            </div>
+            <div className="relative w-full">
+              <input
+                type="text"
+                name="postalCode"
+                value={formData.postalCode}
+                onFocus={() => setFocusedField('postalCode')}
+                onBlur={() => setFocusedField(null)}
+                onChange={handleChange}
+                required
+                className="w-full text-left border-b border-black focus:border-black px-2 py-2 bg-beige-light focus:outline-none font-light"
+              />
+              <span
+                className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.postalCode || focusedField === 'postalCode'
+                  ? 'opacity-0'
+                  : 'opacity-100'
+                  }`}
+              >
+                Kod pocztowy <span className="text-red-500">*</span>
+              </span>
+            </div>
           </div>
-          <input
-            name="country"
-            value={formData.country}
-            onChange={handleChange}
-            placeholder="Kraj / Region"
-            className="w-full border-b border-black p-2 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
-          />
+          <div className="relative">
+            <select
+              name="country"
+              value={formData.country}
+              onFocus={() => setFocusedField('country')}
+              onBlur={() => setFocusedField(null)}
+              onChange={handleChange}
+              required
+              className="appearance-none w-full text-left border-b border-black focus:border-black px-2 py-2 bg-beige-light focus:outline-none font-light"
+            >
+
+              <option value="Polska">Polska</option>
+            </select>
+            <span className="absolute right-2 top-2 pointer-events-none">
+              <img src="/icons/arrow-down.svg" alt="" className="w-4 h-4" />
+            </span>
+            <span
+              className={`absolute whitespace-nowrap left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.country || focusedField === 'country'
+                ? 'opacity-0'
+                : 'opacity-100'
+                }`}
+            >
+              Kraj / Region <span className="text-red-500">*</span>
+            </span>
+          </div>
         </div>
 
         {/* Save Button */}

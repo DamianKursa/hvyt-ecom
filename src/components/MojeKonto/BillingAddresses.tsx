@@ -49,11 +49,10 @@ const BillingAddresses: React.FC = () => {
     try {
       const formattedAddress = {
         ...newBillingData,
-        billing_address_2: `${newBillingData.buildingNumber || ''}${
-          newBillingData.apartmentNumber
-            ? `/${newBillingData.apartmentNumber}`
-            : ''
-        }`,
+        billing_address_2: `${newBillingData.buildingNumber || ''}${newBillingData.apartmentNumber
+          ? `/${newBillingData.apartmentNumber}`
+          : ''
+          }`,
       };
 
       const payload = {
@@ -108,32 +107,32 @@ const BillingAddresses: React.FC = () => {
   }
 
   return (
-    <div className="rounded-[25px] bg-white p-8">
-      <h2 className="text-2xl font-semibold text-[#661F30] mb-8">
+    <div className="rounded-[25px] bg-white px-4 md:p-8 shadow-sm">
+      <h2 className="text-2xl font-semibold p-4 md:p-0 md:mb-8 text-[#661F30]">
         Dane do faktury
       </h2>
 
-      <div className="border rounded-[25px]">
+      <div className="md:border rounded-[25px]">
         {error ? (
           <p className="text-red-500 p-4">{error}</p>
         ) : (
           <>
             {/* Individual Address Section */}
-            <div className="py-4 px-4 border-b border-[#E9E5DF] last:border-none">
+            <div className="py-4 border-b border-t md:border-t-0 border-[#E9E5DF] flex items-center justify-between px-4">
               {individualAddress ? (
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center w-full">
                   <div>
-                    <p className="font-semibold text-black mb-2">
+                    <p className="text-[18px] font-semibold mb-[32px]">
                       Dane do faktury - klient indywidualny
                     </p>
-                    <p>
+                    <p className="text-[18px]">
                       {individualAddress.firstName} {individualAddress.lastName}
                     </p>
-                    <p>
+                    <p className="text-[18px]">
                       {individualAddress.street},{' '}
                       {individualAddress.billing_address_2}
                     </p>
-                    <p>
+                    <p className="text-[18px]">
                       {individualAddress.city}, {individualAddress.postalCode}
                     </p>
                   </div>
@@ -149,14 +148,16 @@ const BillingAddresses: React.FC = () => {
                         apartmentNumber,
                       });
                     }}
-                    className="text-black border border-black px-4 py-2 rounded-full flex items-center"
+                    className="flex-shrink-0 text-black border border-black px-4 py-2 rounded-full flex items-center"
                   >
-                    Edytuj
+                    <span className="md:hidden">Edytuj</span>
+                    <span className="hidden md:inline">Edytuj dane</span>
+                    <img src="/icons/edit.svg" alt="Edytuj" className="w-4 h-4 ml-2" />
                   </button>
                 </div>
               ) : (
-                <div className="flex justify-between items-center">
-                  <p className="font-semibold text-black">
+                <div className="flex justify-between items-center w-full">
+                  <p className="text-[18px] font-semibold mb-[32px]">
                     Dane do faktury - klient indywidualny
                   </p>
                   <button
@@ -174,30 +175,32 @@ const BillingAddresses: React.FC = () => {
                         postalCode: '',
                       })
                     }
-                    className="text-white bg-black border border-black px-4 py-2 rounded-full flex items-center"
+                    className="flex-shrink-0 text-white bg-black border border-black px-4 py-2 rounded-full flex items-center"
                   >
-                    Dodaj dane
+                    <span className="md:hidden">Dodaj</span>
+                    <span className="hidden md:inline">Dodaj dane</span>
+                    <img src="/icons/edit.svg" alt="Dodaj" className="w-4 h-4 ml-2" />
                   </button>
                 </div>
               )}
             </div>
 
             {/* Company Address Section */}
-            <div className="py-4 px-4 border-b border-[#E9E5DF] last:border-none">
+            <div className="py-4 flex items-center border-b border-[#E9E5DF] md:border-b-0 justify-between px-4">
               {companyAddress ? (
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center w-full">
                   <div>
-                    <p className="font-semibold text-black mb-2">
+                    <p className="text-[18px] font-semibold mb-[32px]">
                       Dane do faktury - firma
                     </p>
-                    <p>
+                    <p className="text-[18px]">
                       {companyAddress.companyName}, NIP: {companyAddress.nip}
                     </p>
-                    <p>
+                    <p className="text-[18px]">
                       {companyAddress.street},{' '}
                       {companyAddress.billing_address_2}
                     </p>
-                    <p>
+                    <p className="text-[18px]">
                       {companyAddress.city}, {companyAddress.postalCode}
                     </p>
                   </div>
@@ -213,14 +216,16 @@ const BillingAddresses: React.FC = () => {
                         apartmentNumber,
                       });
                     }}
-                    className="text-black border border-black px-4 py-2 rounded-full flex items-center"
+                    className="flex-shrink-0 text-black border border-black px-4 py-2 rounded-full flex items-center"
                   >
-                    Edytuj
+                    <span className="md:hidden">Edytuj</span>
+                    <span className="hidden md:inline">Edytuj dane</span>
+                    <img src="/icons/edit.svg" alt="Edytuj" className="w-4 h-4 ml-2" />
                   </button>
                 </div>
               ) : (
-                <div className="flex justify-between items-center">
-                  <p className="font-semibold text-black">
+                <div className="flex justify-between items-center w-full">
+                  <p className="text-[18px] font-semibold mb-[32px]">
                     Dane do faktury - firma
                   </p>
                   <button
@@ -238,9 +243,11 @@ const BillingAddresses: React.FC = () => {
                         postalCode: '',
                       })
                     }
-                    className="text-white bg-black border border-black px-4 py-2 rounded-full flex items-center"
+                    className="flex-shrink-0 text-white bg-black border border-black px-4 py-2 rounded-full flex items-center"
                   >
-                    Dodaj dane
+                    <span className="md:hidden">Dodaj</span>
+                    <span className="hidden md:inline">Dodaj dane</span>
+                    <img src="/icons/edit.svg" alt="Dodaj" className="w-4 h-4 ml-2" />
                   </button>
                 </div>
               )}

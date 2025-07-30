@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import EditContactModal from './EditContactModal';
 import EditPasswordModal from './EditPasswordModal';
 
@@ -21,6 +22,20 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
   const [isEditContactModalOpen, setIsEditContactModalOpen] = useState(false);
   const [isEditPasswordModalOpen, setIsEditPasswordModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const router = useRouter();
+
+  const handleDeleteAccount = async () => {
+    if (!confirm('Czy na pewno chcesz usunąć konto?')) return;
+    try {
+      await fetch('/api/auth/delete-account', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      router.push('/logowanie');
+    } catch (error) {
+      console.error('Error deleting account:', error);
+    }
+  };
 
   const handleContactUpdate = async (updatedUser: {
     id: number;
@@ -43,17 +58,17 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
   };
 
   return (
-    <div className="rounded-[25px] bg-white p-8 shadow-sm">
-      <h2 className="text-2xl font-semibold mb-8 text-[#661F30]">Moje dane</h2>
-      <div className="border rounded-[25px]">
+    <div className="rounded-[25px] bg-white  md:p-8 shadow-sm">
+      <h2 className="text-2xl font-semibold p-4 md:p-0 md:mb-8 text-[#661F30]">Moje dane</h2>
+      <div className="md:border rounded-[25px]">
         {/* Contact Details */}
-        <div className="py-4 border-b border-gray-300 flex items-start justify-between px-4">
+        <div className="py-4 border-b border-t md:border-t-0 border-gray-300 flex items-start justify-between px-4">
           <div>
-            <p className="font-semibold mb-[32px]">Dane kontaktowe</p>
-            <p>
+            <p className="text-[18px] font-semibold mb-[32px]">Dane kontaktowe</p>
+            <p className="text-[18px]" >
               {user.firstName} {user.lastName}
             </p>
-            <p>{user.email}</p>
+            <p className="text-[18px]">{user.email}</p>
           </div>
           <button
             onClick={() => setIsEditContactModalOpen(true)}
@@ -67,10 +82,10 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
         </div>
 
         {/* Password */}
-        <div className="py-4 flex items-start justify-between px-4">
+        <div className="py-4 flex items-start border-b md:border-b-0 justify-between px-4">
           <div>
-            <p className="font-semibold mb-[32px]">Hasło</p>
-            <p>********</p>
+            <p className="text-[18px] font-semibold mb-[32px]">Hasło</p>
+            <p className="text-[18px]">********</p>
           </div>
           <button
             onClick={() => setIsEditPasswordModalOpen(true)}
@@ -84,9 +99,14 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
       </div>
 
       {/* Delete Account Section */}
-      <div className="mt-8 px-4">
-        <p className="font-semibold mb-[32px]">Usuń konto</p>
-        <button className="text-black underline font-medium">Usuń konto</button>
+      <div className="pb-12 md:pb-0 py-4 md:mt-8 px-4">
+        <p className=" text-[18px] font-semibold mb-[32px]">Usuń konto</p>
+        <button
+          onClick={handleDeleteAccount}
+          className="text-[18px] text-black underline font-medium"
+        >
+          Usuń konto
+        </button>
       </div>
 
       {/* Success Message */}
