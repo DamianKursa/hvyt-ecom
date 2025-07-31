@@ -13,6 +13,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
   const { applyCoupon, removeCoupon, cart } = useContext(CartContext);
   const [isOpen, setIsOpen] = useState(false);
   const [code, setCode] = useState(cart?.coupon?.code || '');
+  const [codeError, setCodeError] = useState<string>('');
   const [snackbar, setSnackbar] = useState<{
     message: string;
     type: 'success' | 'error';
@@ -25,13 +26,10 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
   const handleApplyCode = async () => {
     if (!code.trim()) {
-      setSnackbar({
-        message: 'Proszę wprowadzić kod rabatowy',
-        type: 'error',
-        visible: true,
-      });
+      setCodeError('Uzupełnij kod rabatowy');
       return;
     }
+    setCodeError('');
 
     setIsLoading(true);
     setSnackbar((prev) => ({ ...prev, visible: false }));
@@ -57,11 +55,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
       if (!response.ok || !data.valid) {
         console.log('Coupon debug:', data.debug);
-        setSnackbar({
-          message: data.message || 'Niepoprawny kod rabatowy',
-          type: 'error',
-          visible: true,
-        });
+        setCodeError(data.message || 'Niepoprawny kod rabatowy');
         return;
       }
 
@@ -81,6 +75,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         allowedCats, // 👈 this is the key bit
         // excludedCats, // 👈 uncomment if you want to support excludes
       });
+
+      setCodeError('');
 
       // adjust your local total
       setCartTotal((prev) => prev - discountApplied);
@@ -114,6 +110,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       type: 'success',
       visible: true,
     });
+    // Close the panel after removal
+    setIsOpen(false);
     setTimeout(
       () => setSnackbar((prev) => ({ ...prev, visible: false })),
       3000,
@@ -153,77 +151,83 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
   ]);
 
   return (
-    <div
-      className={`border ${isOpen
-          ? 'border-2 border-dark-pastel-red rounded-[24px] bg-beige-light'
-          : 'border-black rounded-[24px]'
-        } px-4 py-3 transition-all duration-300 ease-in-out mb-[33px]`}
-    >
-      {/* Dropdown Header */}
-      <button
-        className="flex justify-between items-center w-full text-lg font-medium text-neutral-darkest focus:outline-none"
-        onClick={() => setIsOpen((prev) => !prev)}
-        aria-expanded={isOpen}
-        aria-controls="discount-input-section"
+    <>
+      <div
+        className={`border border-[#DAD3C8] rounded-[24px] px-4 py-3 transition-all duration-300 ease-in-out mb-[33px] ${cart?.coupon ? 'bg-beige' : isOpen ? 'bg-white' : 'bg-beige'}`}
       >
-        <div className="flex items-center">
+        {/* Dropdown Header */}
+        <button
+          className="flex justify-between items-center w-full text-lg font-medium text-neutral-darkest focus:outline-none"
+          onClick={() => setIsOpen((prev) => !prev)}
+          aria-expanded={isOpen}
+          aria-controls="discount-input-section"
+        >
+          <div className="flex items-center">
+            <img
+              src="/icons/discount.svg"
+              alt="Discount Icon"
+              className="w-5 h-5 mr-2"
+            />
+            Posiadasz kod rabatowy?
+          </div>
           <img
-            src="/icons/discount.svg"
-            alt="Discount Icon"
-            className="w-5 h-5 mr-2"
+            src={`/icons/arrow-${isOpen ? 'up' : 'down'}.svg`}
+            alt="Toggle Icon"
+            className="w-4 h-4"
           />
-          Posiadasz kod rabatowy?
-        </div>
-        <img
-          src={`/icons/arrow-${isOpen ? 'up' : 'down'}.svg`}
-          alt="Toggle Icon"
-          className="w-4 h-4"
-        />
-      </button>
+        </button>
 
-      {/* Expanded Input Section */}
-      {isOpen && (
-        <div id="discount-input-section" className="mt-4">
-          {cart?.coupon ? (
-            <div className="flex justify-between items-center bg-gray-100 p-2 rounded-md">
-              <span className="text-neutral-darkest font-medium">
-                Kod: {cart.coupon.code}
-              </span>
-              <button
-                onClick={handleRemoveCode}
-                className="text-red-500 hover:underline text-sm"
-              >
-                Usuń kod
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center">
-              <input
-                id="discount-code"
-                type="text"
-                placeholder="Wpisz kod"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                className="flex-1 bg-transparent border-b border-neutral-light placeholder-black text-neutral-darkest focus:outline-none px-2"
-                disabled={isLoading}
-              />
-              <button
-                onClick={handleApplyCode}
-                className={`ml-4 px-4 py-2 border ${!code.trim()
-                    ? 'border-neutral-light text-neutral-light'
-                    : 'border-black text-black'
-                  } rounded-full focus:outline-none ${!code.trim() || isLoading
-                    ? 'opacity-50 cursor-not-allowed'
-                    : ''
-                  }`}
-                disabled={!code.trim() || isLoading}
-              >
-                {isLoading ? 'Ładowanie...' : 'Zapisz'}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+        {/* Expanded Input Section */}
+        {isOpen && (
+          <div id="discount-input-section" className="mt-4">
+            {cart?.coupon ? (
+              <div className="flex justify-between items-center p-2 rounded-md">
+                <span className="text-neutral-darkest font-medium">
+                  {cart.coupon.code}
+                </span>
+                <div className="flex items-center space-x-4">
+                  <button onClick={() => setIsOpen(true)} className="focus:outline-none">
+                    <img src="/icons/edit.svg" alt="Edit" className="w-5 h-5" />
+                  </button>
+                  <button onClick={handleRemoveCode} className="focus:outline-none">
+                    <img src="/icons/trash-black.svg" alt="Remove" className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex flex-row items-center gap-4">
+                  <input
+                    id="discount-code"
+                    type="text"
+                    placeholder="Wpisz kod"
+                    value={code}
+                    onChange={e => {
+                      setCode(e.target.value);
+                      if (codeError) setCodeError('');
+                    }}
+                    disabled={isLoading}
+                    className={`w-1/2 md:flex-1 border-b ${codeError ? 'border-[#A83232]' : 'border-neutral-light'} focus:border-black outline-none px-2 py-2`}
+                  />
+                  <button
+                    onClick={handleApplyCode}
+                    disabled={!code.trim() || isLoading}
+                    className={`w-1/2 md:w-auto md:ml-4 px-4 py-2 border ${(!code.trim() || isLoading) ? 'border-neutral-light text-neutral-light' : 'border-black text-black'} rounded-full focus:outline-none ${(!code.trim() || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {isLoading ? 'Ładowanie...' : 'Zapisz'}
+                  </button>
+                </div>
+                {codeError && (
+                  <div className="flex items-center text-[#A83232] text-sm mt-1">
+                    <img src="/icons/Warning_Circle_Warning.svg" alt="Warning" className="w-4 h-4 mr-2" />
+                    <span>{codeError}</span>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Inline Message for Success or Error */}
       {snackbar.visible && (
@@ -234,7 +238,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
           <span>{snackbar.message}</span>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
