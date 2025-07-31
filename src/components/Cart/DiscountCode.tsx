@@ -181,17 +181,19 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         {isOpen && (
           <div id="discount-input-section" className="mt-4">
             {cart?.coupon ? (
-              <div className="flex justify-between items-center p-2 rounded-md">
-                <span className="text-neutral-darkest font-medium">
-                  {cart.coupon.code}
-                </span>
-                <div className="flex items-center space-x-4">
-                  <button onClick={() => setIsOpen(true)} className="focus:outline-none">
-                    <img src="/icons/edit.svg" alt="Edit" className="w-5 h-5" />
-                  </button>
-                  <button onClick={handleRemoveCode} className="focus:outline-none">
-                    <img src="/icons/trash-black.svg" alt="Remove" className="w-5 h-5" />
-                  </button>
+              <div className="p-2 rounded-md space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-neutral-darkest font-medium">
+                    {cart.coupon.code}
+                  </span>
+                  <div className="flex items-center space-x-4">
+                    <button onClick={() => setIsOpen(true)} className="focus:outline-none">
+                      <img src="/icons/edit.svg" alt="Edit" className="w-5 h-5" />
+                    </button>
+                    <button onClick={handleRemoveCode} className="focus:outline-none">
+                      <img src="/icons/trash-black.svg" alt="Remove" className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -207,7 +209,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
                       if (codeError) setCodeError('');
                     }}
                     disabled={isLoading}
-                    className={`w-1/2 md:flex-1 border-b ${codeError ? 'border-[#A83232]' : 'border-neutral-light'} focus:border-black outline-none px-2 py-2`}
+                    className={`w-1/2 md:flex-1 border-b ${codeError ? 'border-[#A83232]' : 'border-neutral'} focus:border-black outline-none px-2 py-2`}
                   />
                   <button
                     onClick={handleApplyCode}
@@ -228,6 +230,15 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
           </div>
         )}
       </div>
+
+      {cart?.coupon && (
+        <div className="flex justify-between text-lg mb-6">
+          <span className="text-neutral-darkest font-medium">Wartość rabatu</span>
+          <span className="font-semibold text-neutral-darkest">
+            {cart.coupon.discountValue.toFixed(2)} zł
+          </span>
+        </div>
+      )}
 
       {/* Inline Message for Success or Error */}
       {snackbar.visible && (

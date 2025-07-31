@@ -64,21 +64,43 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       className={`${isCheckoutPage ? 'w-full mt-8 md:rounded-[24px]' : ' rounded-[24px] lg:w-4/12 mt-8'
         } bg-beige p-6  shadow-lg`}
     >
-      <h2 className="text-[32px] font-bold mb-6 text-neutral-darkest">
-        Podsumowanie
-      </h2>
+      {!isCheckoutPage && (
+        <h2 className="text-[32px] font-bold mb-6 text-neutral-darkest">
+          Podsumowanie
+        </h2>
+      )}
 
-      <div className="flex justify-between text-[20px] mb-6">
-        <span className="text-neutral-darkest font-bold">Razem produkty</span>
-        <span className="font-semibold text-neutral-darkest">
-          {formatPrice(totalProductsPrice)}
-        </span>
-      </div>
+      {isCheckoutPage ? (
+        <div className="flex justify-between text-[20px] mb-6">
+          <span className="text-neutral-darkest font-bold">Wartość produktów</span>
+          <span className="font-semibold text-neutral-darkest">
+            {formatPrice(totalProductsPrice)}
+          </span>
+        </div>
+      ) : (
+        <div className="flex justify-between text-[20px] mb-6">
+          <span className="text-neutral-darkest font-bold">Razem produkty</span>
+          <span className="font-semibold text-neutral-darkest">
+            {formatPrice(totalProductsPrice)}
+          </span>
+        </div>
+      )}
+
+      {totalProductsPrice > totalPrice && (
+        <div className="flex justify-between text-lg mb-6">
+          <span className="text-neutral-darkest font-medium">Wartość rabatu</span>
+          <span className="font-semibold text-neutral-darkest">
+            {formatPrice(totalProductsPrice - totalPrice)}
+          </span>
+        </div>
+      )}
+
+      <DiscountCode cartTotal={totalPrice} setCartTotal={setTotalPrice} />
 
       {isCheckoutPage && (
         <div className="flex justify-between text-lg mb-6">
           <span className="text-neutral-darkest font-medium">
-            Koszt dostawy
+            Wysyłka
           </span>
           <span className="font-semibold text-neutral-darkest">
             {loading ? (
@@ -91,8 +113,6 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           </span>
         </div>
       )}
-
-      <DiscountCode cartTotal={totalPrice} setCartTotal={setTotalPrice} />
 
       <div className="flex justify-between items-top mb-6">
         <div className="flex flex-col">
