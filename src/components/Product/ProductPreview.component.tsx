@@ -28,6 +28,7 @@ interface Product {
   sale_price?: string;
   date_on_sale_from?: string;
   date_on_sale_to?: string;
+  date_created?: string;
   slug: string;
   categorySlug?: string;
   images: { src: string }[];
@@ -154,6 +155,12 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const saleFrom = parseDate(product.date_on_sale_from);
   const saleTo = parseDate(product.date_on_sale_to);
   const now = new Date();
+
+  const createdDate = parseDate(product.date_created);
+  const isNewProduct = createdDate
+    ? now.getTime() - createdDate.getTime() <= 30 * 24 * 60 * 60 * 1000
+    : false;
+
   const isSaleActive =
     salePrice < regular &&
     (product.on_sale !== undefined
@@ -199,6 +206,14 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
           style={{ backgroundColor: '#661F30' /* same as your sale color */ }}
         >
           -{discountPct}%
+        </div>
+      )}
+      {isNewProduct && (
+        <div
+          className="absolute top-2 left-2 px-2 py-1 rounded-full text-sm font-bold z-20"
+          style={{ backgroundColor: '#217557', color: '#F0E0CF' }}
+        >
+          Nowość
         </div>
       )}
       {/* Wishlist Button */}
