@@ -27,7 +27,7 @@ const ZwrotyReklamacjePage = () => {
               <p className="mt-4">
                 Aby zwrot został zaakceptowany, upewnij się, że:
               </p>
-              <ul className="mt-4 list-disc list-inside">
+              <ul className="mt-4 list-disc list-inside ml-4">
                 <li>Produkt nie był używany i jest w stanie nienaruszonym.</li>
                 <li>Został zapakowany w oryginalne opakowanie.</li>
                 <li>Dołączono do niego wypełniony formularz zwrotu.</li>
@@ -35,9 +35,16 @@ const ZwrotyReklamacjePage = () => {
               <div className="mt-4">
                 <a
                   href="/downloads/formularz_zwrotu_HVYT.pdf"
-                  className="text-lg"
+                  className="underline inline-flex items-center px-4 py-2 "
                   aria-label="Formularz zwrotu"
                 >
+                  <Image
+                    src="/icons/download-single.svg"
+                    alt="Download Icon"
+                    width={20}
+                    height={20}
+                    className="mr-3"
+                  />
                   Formularz zwrotu
                 </a>
               </div>
@@ -102,7 +109,7 @@ const ZwrotyReklamacjePage = () => {
               <p className="mt-4">
                 Jeżeli otrzymany towar jest wadliwy lub niezgodny z zamówieniem:
               </p>
-              <ul className="mt-4 list-disc list-inside">
+              <ul className="mt-4 list-disc list-inside ml-4">
                 <li>
                   Skontaktuj się z naszym działem obsługi klienta, wysyłając
                   e-mail na adres: hello@hvyt.pl
