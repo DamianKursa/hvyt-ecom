@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import CustomDropdown from '@/components/UI/CustomDropdown.component';
 import { CartContext, Product as CartProduct } from '@/stores/CartProvider';
 import { Product } from '@/utils/functions/interfaces';
 import Snackbar from '../UI/Snackbar.component';
@@ -12,6 +13,16 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
 }) => {
   const { addCartItem } = useContext(CartContext);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | ''>('');
+  const sortingOptions = ['Najnowsze zakupy', 'Najstarsze zakupy'];
+  const sortedProducts =
+    sortOrder === ''
+      ? products
+      : [...products].sort((a, b) =>
+        sortOrder === 'newest'
+          ? Number(b.id) - Number(a.id)
+          : Number(a.id) - Number(b.id)
+      );
 
   const handleAddToCart = (product: Product) => {
     const price = parseFloat(product.price);
@@ -40,10 +51,10 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
   };
 
   // MOBILE CARD LAYOUT
-  const renderMobileCard = (product: Product) => {
+  const renderMobileCard = (product: Product, index: number) => {
     return (
       <div
-        key={product.id}
+        key={`${product.id}-${index}`}
         className="mb-6 border-b border-gray-200 last:border-b-0"
       >
         {/* Product Info Row */}
@@ -102,6 +113,29 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
 
   return (
     <>
+      <div className="flex items-center justify-between mb-4 px-6">
+        <h2 className="text-2xl font-semibold text-[#661F30]">
+          Kupione produkty
+        </h2>
+        <div className="w-1/3">
+          <CustomDropdown
+
+            className="h-12 bg-white flex items-center justify-center px-4 text-center"
+            options={sortingOptions}
+            selectedValue={
+              sortOrder === 'newest'
+                ? 'Najnowsze zakupy'
+                : sortOrder === 'oldest'
+                  ? 'Najstarsze zakupy'
+                  : null
+            }
+            placeholder="Sortowanie"
+            onChange={(value) =>
+              setSortOrder(value === 'Najnowsze zakupy' ? 'newest' : 'oldest')
+            }
+          />
+        </div>
+      </div>
       {/* DESKTOP TABLE VIEW */}
       <div className="hidden md:block rounded-[25px] overflow-hidden border border-gray-200">
         <table className="w-full table-auto border-collapse">
@@ -120,9 +154,9 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
+            {sortedProducts.map((product, index) => (
               <tr
-                key={product.id}
+                key={`${product.id}-${index}`}
                 className="border-b border-gray-200 last:border-b-0"
               >
                 <td className="py-4 px-6 flex items-center gap-4">
@@ -173,7 +207,7 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
 
       {/* MOBILE CARD VIEW */}
       <div className="block md:hidden">
-        {products.map((product) => renderMobileCard(product))}
+        {sortedProducts.map((product, index) => renderMobileCard(product, index))}
       </div>
 
       {/* Snackbar Notification */}
