@@ -232,9 +232,11 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       {/* Inline Message for Success or Error */}
       {snackbar.visible && (
         <div
-          className={`mt-4 px-4 py-2 rounded-lg flex items-center ${snackbar.type === 'success' ? 'bg-[#2A5E45]' : 'bg-red-500'
-            } text-white`}
+          className={`mt-4 mb-4 px-4 py-2 rounded-lg flex items-center ${snackbar.type === 'success' ? 'bg-[#2A5E45]' : 'bg-red-500'} text-white`}
         >
+          {snackbar.type === 'success' && (
+            <img src="/icons/circle-check.svg" alt="Success" className="w-4 h-4 mr-2" />
+          )}
           <span>{snackbar.message}</span>
         </div>
       )}
