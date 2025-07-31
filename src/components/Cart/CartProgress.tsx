@@ -21,6 +21,8 @@ const CartProgress: React.FC = () => {
     },
   ];
 
+  const activeIndex = steps.findIndex(step => router.pathname === step.path);
+
   return (
     <div className="flex mt-6 md:mt-0 flex-col gap-4 w-full">
       {/* Back Link: only show if not on the thank you page */}
@@ -41,7 +43,8 @@ const CartProgress: React.FC = () => {
       {/* Steps */}
       <div className="flex items-center w-full rounded-full border border-[#E0D6CD] bg-[#F8F5F1]">
         {steps.map((step, index) => {
-          const isActive = router.pathname === step.path;
+          const isActive = index === activeIndex;
+          const isCompleted = activeIndex > index;
 
           const mobileFlexClass = isCheckoutPage
             ? step.path === '/checkout'
@@ -52,15 +55,13 @@ const CartProgress: React.FC = () => {
           return (
             <div
               key={index}
-              className={`flex items-center justify-center py-4 px-4 gap-3 ${mobileFlexClass} md:flex-1 text-sm font-medium relative ${
-                isActive ? 'bg-[#E0D6CD] font-semibold' : 'bg-transparent'
-              } ${
-                index === 0
+              className={`flex items-center justify-center py-4 px-4 gap-3 ${mobileFlexClass} md:flex-1 text-sm font-medium relative ${isActive ? 'bg-[#E0D6CD] font-semibold' : 'bg-transparent'
+                } ${index === 0
                   ? 'rounded-l-full'
                   : index === steps.length - 1
                     ? 'rounded-r-full'
                     : ''
-              }`}
+                }`}
             >
               {/* Border between steps */}
               {index !== 0 && (
@@ -68,7 +69,11 @@ const CartProgress: React.FC = () => {
               )}
 
               {/* Icon */}
-              <img src={step.icon} alt={step.label} className="w-5 h-5" />
+              <img
+                src={isCompleted ? '/icons/check-black.svg' : step.icon}
+                alt={isCompleted ? 'Completed' : step.label}
+                className="w-5 h-5"
+              />
 
               {/* Label: on mobile, show only for active step; on md+ show always */}
               <span className={`${isActive ? 'block' : 'hidden'} md:block`}>
