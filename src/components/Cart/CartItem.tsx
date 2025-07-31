@@ -82,145 +82,151 @@ const CartItem: React.FC<CartItemProps> = ({
   return (
     <>
       {/* Desktop row */}
-      <div className="hidden md:flex items-center justify-between mb-6 border-b pb-4 last:border-none last:pb-0">
-        <div className="flex items-center">
-          <div className="w-[90px] h-[90px] relative rounded-[24px] overflow-hidden">
-            <Image
-              src={product.image as string}
-              alt={product.name}
-              fill
-              style={{ objectFit: 'cover' }}
-              className="rounded-md"
-            />
+      <div className="border-b border-[#DAD3C8] p-[5px]">
+        <div className="hidden md:flex items-center justify-between w-full">
+          <div className="flex items-center w-[55%]">
+            <div className="w-[90px] h-[90px] relative rounded-[24px] overflow-hidden">
+              <Image
+                src={product.image as string}
+                alt={product.name}
+                fill
+                style={{ objectFit: 'cover' }}
+                className="rounded-md"
+              />
+            </div>
+            <div className="ml-4">
+              <h3 className="text-base font-semibold text-neutral-darkest w-full break-words">
+                {product.name}
+              </h3>
+
+              {/* attributes */}
+              {product.attributes &&
+                Object.entries(product.attributes).map(([name, value]) => {
+                  if (!variationOptions[name]) return null;
+                  return (
+                    <div key={name} className="mt-3 flex flex-wrap items-center">
+                      <p className="font-light text-neutral-dark mr-4">
+                        {name.replace(/^Atrybut produktu:\s*/, '')}:{' '}
+                        <span className="font-light">
+                          {selectedVariation?.label ?? String(value)}
+                        </span>
+                      </p>
+                      <button
+                        className="font-light text-black underline flex items-center hover:text-gray-800 transition"
+                        onClick={() => setModalOpen(true)}
+                      >
+                        edytuj
+                        <img
+                          src="/icons/edit.svg"
+                          alt="Edit Icon"
+                          className="w-4 h-4 ml-1"
+                        />
+                      </button>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
-          <div className="ml-4">
-            <h3 className="text-base font-semibold text-neutral-darkest max-w-[200px] whitespace-normal break-words">
+
+          {onIncreaseQuantity && onDecreaseQuantity && (
+            <div className="w-1/5 flex justify-center">
+              <QuantityChanger
+                quantity={product.qty}
+                onIncrease={() => onIncreaseQuantity(product)}
+                onDecrease={() => onDecreaseQuantity(product)}
+              />
+            </div>
+          )}
+
+          <div className="w-1/5 flex flex-col items-end">
+            <p className="text-xl font-bold text-neutral-darkest">
+              {product.totalPrice.toFixed(2)} zł
+            </p>
+          </div>
+
+          {onRemoveItem && (
+            <div className="w-1/5 flex justify-center">
+              <button
+                className="text-red-500 hover:text-red-700"
+                onClick={() => onRemoveItem(product)}
+              >
+                <img src="/icons/trash.svg" alt="Remove Icon" className="w-6 h-6" />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile card */}
+        <div className="block md:hidden flex items-center justify-between w-full">
+          <div className="flex-shrink-0">
+            <div className="w-[75px] h-[75px] relative rounded-[12px] overflow-hidden">
+              <Image
+                src={product.image as string}
+                alt={product.name}
+                fill
+                style={{ objectFit: 'cover' }}
+                className="rounded-md"
+              />
+            </div>
+          </div>
+          <div className="flex-1 px-3">
+            <h3 className="text-sm font-semibold text-neutral-darkest">
               {product.name}
             </h3>
-
-            {/* attributes */}
-            {product.attributes &&
-              Object.entries(product.attributes).map(([name, value]) => {
-                if (!variationOptions[name]) return null;
-                return (
-                  <div key={name} className="mt-3 flex flex-wrap items-center">
-                    <p className="font-light text-neutral-dark mr-4">
-                      {name.replace(/^Atrybut produktu:\s*/, '')}:{' '}
-                      <span className="font-light">
-                        {selectedVariation?.label ?? String(value)}
-                      </span>
-                    </p>
-                    <button
-                      className="font-light text-black underline flex items-center hover:text-gray-800 transition"
-                      onClick={() => setModalOpen(true)}
-                    >
-                      edytuj
-                      <img
-                        src="/icons/edit.svg"
-                        alt="Edit Icon"
-                        className="w-4 h-4 ml-1"
-                      />
-                    </button>
-                  </div>
-                );
-              })}
+            <div className="mt-1">
+              <QuantityChanger
+                quantity={product.qty}
+                onIncrease={() =>
+                  onIncreaseQuantity && onIncreaseQuantity(product)
+                }
+                onDecrease={() =>
+                  onDecreaseQuantity && onDecreaseQuantity(product)
+                }
+                className={isKoszykPage ? 'w-[130px] p-0' : undefined}
+              />
+            </div>
+            <div className="mt-1">
+              {product.attributes &&
+                Object.entries(product.attributes).length > 0 && (
+                  <p className="text-xs text-neutral-dark">
+                    {Object.entries(product.attributes)[0][0].replace(
+                      /^Atrybut produktu:\s*/,
+                      '',
+                    )}
+                    : {selectedVariation?.label ??
+                      Object.entries(product.attributes)[0][1]}
+                  </p>
+                )}
+            </div>
           </div>
-        </div>
-
-        {onIncreaseQuantity && onDecreaseQuantity && (
-          <QuantityChanger
-            quantity={product.qty}
-            onIncrease={() => onIncreaseQuantity(product)}
-            onDecrease={() => onDecreaseQuantity(product)}
-          />
-        )}
-
-        <div className="flex flex-col items-end">
-          <p className="text-xl font-bold text-neutral-darkest">
-            {product.totalPrice.toFixed(2)} zł
-          </p>
-        </div>
-
-        {onRemoveItem && (
-          <button
-            className="text-red-500 hover:text-red-700 ml-4"
-            onClick={() => onRemoveItem(product)}
-          >
-            <img src="/icons/trash.svg" alt="Remove Icon" className="w-6 h-6" />
-          </button>
-        )}
-      </div>
-
-      {/* Mobile card */}
-      <div className="block md:hidden flex items-center justify-between mb-4 border-b pb-4">
-        <div className="flex-shrink-0">
-          <div className="w-[75px] h-[75px] relative rounded-[12px] overflow-hidden">
-            <Image
-              src={product.image as string}
-              alt={product.name}
-              fill
-              style={{ objectFit: 'cover' }}
-              className="rounded-md"
-            />
-          </div>
-        </div>
-        <div className="flex-1 px-3">
-          <h3 className="text-sm font-semibold text-neutral-darkest">
-            {product.name}
-          </h3>
-          <div className="mt-1">
-            <QuantityChanger
-              quantity={product.qty}
-              onIncrease={() =>
-                onIncreaseQuantity && onIncreaseQuantity(product)
-              }
-              onDecrease={() =>
-                onDecreaseQuantity && onDecreaseQuantity(product)
-              }
-              className={isKoszykPage ? 'w-[130px] p-0' : undefined}
-            />
-          </div>
-          <div className="mt-1">
-            {product.attributes &&
-              Object.entries(product.attributes).length > 0 && (
-                <p className="text-xs text-neutral-dark">
-                  {Object.entries(product.attributes)[0][0].replace(
-                    /^Atrybut produktu:\s*/,
-                    '',
-                  )}
-                  : {selectedVariation?.label ??
-                    Object.entries(product.attributes)[0][1]}
-                </p>
-              )}
-          </div>
-        </div>
-        <div className="flex flex-col items-end">
-          <p className="text-sm font-bold text-neutral-darkest">
-            {product.totalPrice.toFixed(2)} zł
-          </p>
-          <button
-            onClick={() => setModalOpen(true)}
-            className="text-xs text-black underline mt-1 flex items-center"
-          >
-            edytuj
-            <img
-              src="/icons/edit.svg"
-              alt="Edit Icon"
-              className="w-3 h-3 ml-1"
-            />
-          </button>
-          {onRemoveItem && (
+          <div className="flex flex-col items-end">
+            <p className="text-sm font-bold text-neutral-darkest">
+              {product.totalPrice.toFixed(2)} zł
+            </p>
             <button
-              className="text-red-500 hover:text-red-700 mt-6"
-              onClick={() => onRemoveItem(product)}
+              onClick={() => setModalOpen(true)}
+              className="text-xs text-black underline mt-1 flex items-center"
             >
+              edytuj
               <img
-                src="/icons/trash.svg"
-                alt="Remove Icon"
-                className="w-4 h-4"
+                src="/icons/edit.svg"
+                alt="Edit Icon"
+                className="w-3 h-3 ml-1"
               />
             </button>
-          )}
+            {onRemoveItem && (
+              <button
+                className="text-red-500 hover:text-red-700 mt-6"
+                onClick={() => onRemoveItem(product)}
+              >
+                <img
+                  src="/icons/trash.svg"
+                  alt="Remove Icon"
+                  className="w-4 h-4"
+                />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
