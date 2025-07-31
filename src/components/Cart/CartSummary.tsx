@@ -61,9 +61,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
   return (
     <aside
-      className={`${
-        isCheckoutPage ? 'w-full mt-8' : 'lg:w-4/12 mt-8'
-      } bg-beige p-6 rounded-[24px] shadow-lg`}
+      className={`${isCheckoutPage ? 'w-full mt-8 md:rounded-[24px]' : ' rounded-[24px] lg:w-4/12 mt-8'
+        } bg-beige p-6  shadow-lg`}
     >
       <h2 className="text-[32px] font-bold mb-6 text-neutral-darkest">
         Podsumowanie
@@ -118,9 +117,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       <button
         onClick={handleButtonClick}
         disabled={localLoading}
-        className={`w-full py-4 bg-black text-white text-lg font-light rounded-full hover:bg-neutral-dark transition-colors ${
-          localLoading ? 'opacity-50 cursor-not-allowed' : ''
-        }`}
+        className={`w-full py-4 bg-black text-white text-lg font-light rounded-full hover:bg-neutral-dark transition-colors ${localLoading ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
       >
         {localLoading
           ? 'Przetwarzanie...'
