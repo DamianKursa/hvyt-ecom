@@ -64,6 +64,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
 }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [needVATInvoice, setNeedVATInvoice] = useState<boolean>(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAddresses = async () => {
@@ -123,29 +124,49 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
     <div className=" p-0 md:p-[24px_16px] md:border md:border-beige-dark rounded-[24px] bg-white mt-8">
       {/* Billing Address */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-4">
-        <input
-          type="text"
-          required
-          placeholder="Nazwa ulicy*"
-          value={billingData.street}
-          onChange={(e) =>
-            setBillingData((prev) => ({ ...prev, street: e.target.value }))
-          }
-          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
-        <input
-          type="text"
-          required
-          placeholder="Nr budynku*"
-          value={billingData.buildingNumber}
-          onChange={(e) =>
-            setBillingData((prev) => ({
-              ...prev,
-              buildingNumber: e.target.value,
-            }))
-          }
-          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
+        <div className="relative w-full">
+          <input
+            type="text"
+            required
+            value={billingData.street}
+            onFocus={() => setFocusedField('street')}
+            onBlur={() => setFocusedField(null)}
+            onChange={(e) =>
+              setBillingData((prev) => ({ ...prev, street: e.target.value }))
+            }
+            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+          />
+          <span
+            className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${billingData.street || focusedField === 'street' ? 'opacity-0' : 'opacity-100'
+              }`}
+          >
+            Nazwa ulicy<span className="text-red-500">*</span>
+          </span>
+        </div>
+        <div className="relative w-full">
+          <input
+            type="text"
+            required
+            value={billingData.buildingNumber}
+            onFocus={() => setFocusedField('buildingNumber')}
+            onBlur={() => setFocusedField(null)}
+            onChange={(e) =>
+              setBillingData((prev) => ({
+                ...prev,
+                buildingNumber: e.target.value,
+              }))
+            }
+            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+          />
+          <span
+            className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${billingData.buildingNumber || focusedField === 'buildingNumber'
+              ? 'opacity-0'
+              : 'opacity-100'
+              }`}
+          >
+            Nr budynku<span className="text-red-500">*</span>
+          </span>
+        </div>
         <input
           type="text"
           placeholder="Nr lokalu"
@@ -156,41 +177,65 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
               apartmentNumber: e.target.value,
             }))
           }
-          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-[#969394]"
         />
-        <input
-          type="text"
-          placeholder="Miasto*"
-          required
-          value={billingData.city}
-          onChange={(e) =>
-            setBillingData((prev) => ({ ...prev, city: e.target.value }))
-          }
-          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
-        <input
-          type="text"
-          placeholder="Kod pocztowy*"
-          required
-          value={billingData.postalCode}
-          onChange={(e) =>
-            setBillingData((prev) => ({ ...prev, postalCode: e.target.value }))
-          }
-          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
-        <input
-          type="text"
-          placeholder="Kraj / Region*"
-          required
-          value={billingData.country}
-          onChange={(e) =>
-            setBillingData((prev) => ({
-              ...prev,
-              country: e.target.value,
-            }))
-          }
-          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
+        <div className="relative w-full">
+          <input
+            type="text"
+            required
+            value={billingData.city}
+            onFocus={() => setFocusedField('city')}
+            onBlur={() => setFocusedField(null)}
+            onChange={(e) =>
+              setBillingData((prev) => ({ ...prev, city: e.target.value }))
+            }
+            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+          />
+          <span
+            className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${billingData.city || focusedField === 'city' ? 'opacity-0' : 'opacity-100'
+              }`}
+          >
+            Miasto<span className="text-red-500">*</span>
+          </span>
+        </div>
+        <div className="relative w-full">
+          <input
+            type="text"
+            required
+            value={billingData.postalCode}
+            onFocus={() => setFocusedField('postalCode')}
+            onBlur={() => setFocusedField(null)}
+            onChange={(e) =>
+              setBillingData((prev) => ({ ...prev, postalCode: e.target.value }))
+            }
+            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+          />
+          <span
+            className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${billingData.postalCode || focusedField === 'postalCode' ? 'opacity-0' : 'opacity-100'
+              }`}
+          >
+            Kod pocztowy<span className="text-red-500">*</span>
+          </span>
+        </div>
+        <div className="relative w-full">
+          <select
+            required
+            value={billingData.country}
+            onFocus={() => setFocusedField('country')}
+            onBlur={() => setFocusedField(null)}
+            onChange={(e) =>
+              setBillingData((prev) => ({ ...prev, country: e.target.value }))
+            }
+            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none"
+          >
+            <option value="Polska">Polska</option>
+          </select>
+          <span
+            className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${billingData.country ? 'opacity-0' : 'opacity-100'}`}
+          >
+            Kraj / Region<span className="text-red-500">*</span>
+          </span>
+        </div>
       </div>
 
       {/* "Ship to a Different Address" */}
@@ -206,29 +251,49 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         <div className="mt-4">
           <h3 className="text-lg font-bold mb-4">Wpisz inny adres</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-4">
-            <input
-              type="text"
-              placeholder="Nazwa ulicy*"
-              required
-              value={shippingData.street}
-              onChange={(e) =>
-                setShippingData((prev) => ({ ...prev, street: e.target.value }))
-              }
-              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-            />
-            <input
-              type="text"
-              placeholder="Nr budynku*"
-              required
-              value={shippingData.buildingNumber}
-              onChange={(e) =>
-                setShippingData((prev) => ({
-                  ...prev,
-                  buildingNumber: e.target.value,
-                }))
-              }
-              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-            />
+            <div className="relative w-full">
+              <input
+                type="text"
+                required
+                value={shippingData.street}
+                onFocus={() => setFocusedField('street')}
+                onBlur={() => setFocusedField(null)}
+                onChange={(e) =>
+                  setShippingData((prev) => ({ ...prev, street: e.target.value }))
+                }
+                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+              />
+              <span
+                className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${shippingData.street || focusedField === 'street' ? 'opacity-0' : 'opacity-100'
+                  }`}
+              >
+                Nazwa ulicy<span className="text-red-500">*</span>
+              </span>
+            </div>
+            <div className="relative w-full">
+              <input
+                type="text"
+                required
+                value={shippingData.buildingNumber}
+                onFocus={() => setFocusedField('buildingNumber')}
+                onBlur={() => setFocusedField(null)}
+                onChange={(e) =>
+                  setShippingData((prev) => ({
+                    ...prev,
+                    buildingNumber: e.target.value,
+                  }))
+                }
+                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+              />
+              <span
+                className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${shippingData.buildingNumber || focusedField === 'buildingNumber'
+                  ? 'opacity-0'
+                  : 'opacity-100'
+                  }`}
+              >
+                Nr budynku<span className="text-red-500">*</span>
+              </span>
+            </div>
             <input
               type="text"
               placeholder="Nr lokalu"
@@ -239,58 +304,92 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                   apartmentNumber: e.target.value,
                 }))
               }
-              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
+              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-[#969394]"
             />
-            <input
-              type="text"
-              placeholder="Miasto*"
-              required
-              value={shippingData.city}
-              onChange={(e) =>
-                setShippingData((prev) => ({ ...prev, city: e.target.value }))
-              }
-              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-            />
-            <input
-              type="text"
-              placeholder="Kod pocztowy*"
-              required
-              value={shippingData.postalCode}
-              onChange={(e) =>
-                setShippingData((prev) => ({
-                  ...prev,
-                  postalCode: e.target.value,
-                }))
-              }
-              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-            />
-            <input
-              type="text"
-              placeholder="Kraj / Region*"
-              required
-              value={shippingData.country}
-              onChange={(e) =>
-                setShippingData((prev) => ({
-                  ...prev,
-                  country: e.target.value,
-                }))
-              }
-              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-            />
-            <textarea
-              placeholder="Dodatkowe informacje do zamówienia (opcjonalnie)"
-              value={shippingData.additionalInfo}
-              onChange={(e) =>
-                setShippingData((prev) => ({
-                  ...prev,
-                  additionalInfo: e.target.value,
-                }))
-              }
-              className="col-span-1 md:col-span-2 border border-[#969394] rounded-[8px] p-4 bg-white focus:outline-none placeholder:font-light placeholder:text-black mt-4"
-            />
+            <div className="relative w-full">
+              <input
+                type="text"
+                required
+                value={shippingData.city}
+                onFocus={() => setFocusedField('city')}
+                onBlur={() => setFocusedField(null)}
+                onChange={(e) =>
+                  setShippingData((prev) => ({ ...prev, city: e.target.value }))
+                }
+                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+              />
+              <span
+                className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${shippingData.city || focusedField === 'city' ? 'opacity-0' : 'opacity-100'
+                  }`}
+              >
+                Miasto<span className="text-red-500">*</span>
+              </span>
+            </div>
+            <div className="relative w-full">
+              <input
+                type="text"
+                required
+                value={shippingData.postalCode}
+                onFocus={() => setFocusedField('postalCode')}
+                onBlur={() => setFocusedField(null)}
+                onChange={(e) =>
+                  setShippingData((prev) => ({
+                    ...prev,
+                    postalCode: e.target.value,
+                  }))
+                }
+                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+              />
+              <span
+                className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${shippingData.postalCode || focusedField === 'postalCode' ? 'opacity-0' : 'opacity-100'
+                  }`}
+              >
+                Kod pocztowy<span className="text-red-500">*</span>
+              </span>
+            </div>
+            <div className="relative w-full">
+              <select
+                required
+                value={shippingData.country}
+                onFocus={() => setFocusedField('country')}
+                onBlur={() => setFocusedField(null)}
+                onChange={(e) =>
+                  setShippingData((prev) => ({
+                    ...prev,
+                    country: e.target.value,
+                  }))
+                }
+                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none"
+              >
+                <option value="Polska">Polska</option>
+              </select>
+              <span
+                className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${shippingData.country ? 'opacity-0' : 'opacity-100'
+                  }`}
+              >
+                Kraj / Region<span className="text-red-500">*</span>
+              </span>
+            </div>
           </div>
         </div>
       )}
+
+      {/* Additional order notes */}
+      <h3 className="text-[14px] font-bold mt-8 mb-2">
+        Dodatkowe informacje do zamówienia (opcjonalnie)
+      </h3>
+      <textarea
+        placeholder="Opis..."
+        value={shippingData.additionalInfo}
+        onChange={(e) =>
+          setShippingData((prev) => ({
+            ...prev,
+            additionalInfo: e.target.value,
+          }))
+        }
+        className="w-full border border-[#969394] rounded-[8px] p-4 bg-white focus:outline-none placeholder:font-light placeholder:text-black mb-4 mt-4"
+      />
+
     </div>
   );
 };

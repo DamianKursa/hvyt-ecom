@@ -42,6 +42,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
 }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -168,62 +169,134 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
 
       {/* Always Render Personal Data Fields */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <input
-          type="text"
-          required
-          value={formData.firstName}
-          placeholder="Imię*"
-          onChange={(e) => handleInputChange('firstName', e.target.value)}
-          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
-        <input
-          type="text"
-          required
-          value={formData.lastName}
-          placeholder="Nazwisko*"
-          onChange={(e) => handleInputChange('lastName', e.target.value)}
-          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
+        {/* First Name */}
+        <div className="relative w-full">
+          <input
+            type="text"
+            required
+            value={formData.firstName}
+            onFocus={() => setFocusedField('firstName')}
+            onBlur={() => setFocusedField(null)}
+            onChange={(e) => handleInputChange('firstName', e.target.value)}
+            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+          />
+          <span
+            className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.firstName || focusedField === 'firstName'
+                ? 'opacity-0'
+                : 'opacity-100'
+              }`}
+          >
+            Imię<span className="text-red-500">*</span>
+          </span>
+        </div>
+        {/* Last Name */}
+        <div className="relative w-full">
+          <input
+            type="text"
+            required
+            value={formData.lastName}
+            onFocus={() => setFocusedField('lastName')}
+            onBlur={() => setFocusedField(null)}
+            onChange={(e) => handleInputChange('lastName', e.target.value)}
+            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+          />
+          <span
+            className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.lastName || focusedField === 'lastName'
+                ? 'opacity-0'
+                : 'opacity-100'
+              }`}
+          >
+            Nazwisko<span className="text-red-500">*</span>
+          </span>
+        </div>
 
         {/* Conditionally Render Company Fields */}
         {customerType === 'company' && (
           <>
-            <input
-              type="text"
-              value={formData.company}
-              placeholder="Nazwa firmy*"
-              required
-              onChange={(e) => handleInputChange('company', e.target.value)}
-              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-            />
-            <input
-              type="text"
-              value={formData.vatNumber}
-              placeholder="NIP*"
-              required
-              onChange={(e) => handleInputChange('vatNumber', e.target.value)}
-              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-            />
+            {/* Company Name */}
+            <div className="relative w-full">
+              <input
+                type="text"
+                value={formData.company}
+                required
+                onFocus={() => setFocusedField('company')}
+                onBlur={() => setFocusedField(null)}
+                onChange={(e) => handleInputChange('company', e.target.value)}
+                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+              />
+              <span
+                className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.company || focusedField === 'company'
+                    ? 'opacity-0'
+                    : 'opacity-100'
+                  }`}
+              >
+                Nazwa firmy<span className="text-red-500">*</span>
+              </span>
+            </div>
+            {/* VAT Number */}
+            <div className="relative w-full">
+              <input
+                type="text"
+                value={formData.vatNumber}
+                required
+                onFocus={() => setFocusedField('vatNumber')}
+                onBlur={() => setFocusedField(null)}
+                onChange={(e) => handleInputChange('vatNumber', e.target.value)}
+                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+              />
+              <span
+                className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.vatNumber || focusedField === 'vatNumber'
+                    ? 'opacity-0'
+                    : 'opacity-100'
+                  }`}
+              >
+                NIP<span className="text-red-500">*</span>
+              </span>
+            </div>
           </>
         )}
 
         {/* Always Render Phone and Email */}
-        <input
-          type="text"
-          value={formData.phone}
-          required
-          placeholder="Numer telefonu*"
-          onChange={(e) => handleInputChange('phone', e.target.value)}
-          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
-        <input
-          type="email"
-          value={email}
-          placeholder="Adres e-mail*"
-          required
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-black"
-        />
+        {/* Phone */}
+        <div className="relative w-full">
+          <input
+            type="text"
+            value={formData.phone}
+            required
+            onFocus={() => setFocusedField('phone')}
+            onBlur={() => setFocusedField(null)}
+            onChange={(e) => handleInputChange('phone', e.target.value)}
+            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+          />
+          <span
+            className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.phone || focusedField === 'phone'
+                ? 'opacity-0'
+                : 'opacity-100'
+              }`}
+          >
+            Numer telefonu<span className="text-red-500">*</span>
+          </span>
+        </div>
+        {/* Email */}
+        <div className="relative w-full">
+          <input
+            type="email"
+            value={email}
+            required
+            onFocus={() => setFocusedField('email')}
+            onBlur={() => setFocusedField(null)}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+          />
+          <span
+            className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${email || focusedField === 'email'
+                ? 'opacity-0'
+                : 'opacity-100'
+              }`}
+          >
+            Adres e-mail<span className="text-red-500">*</span>
+          </span>
+        </div>
       </div>
 
       <div className="mt-4 flex items-center gap-2">
