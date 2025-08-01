@@ -73,7 +73,7 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
             {/* Input fields */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-black mb-1">
+                <label className="block text-sm font-medium text-black mb-1 pl-2">
                   Imię
                 </label>
                 <input
@@ -92,7 +92,7 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-black mb-1">
+                <label className="block text-sm font-medium text-black mb-1 pl-2">
                   Nazwisko
                 </label>
                 <input
@@ -111,7 +111,7 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-black mb-1">
+                <label className="block text-sm font-medium text-black mb-1 pl-2">
                   Email
                 </label>
                 <input
