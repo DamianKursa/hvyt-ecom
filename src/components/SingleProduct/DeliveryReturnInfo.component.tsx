@@ -21,7 +21,7 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
       alt: 'Return Policy',
     },
     {
-      icon: '/icons/kupowane-razem.svg',
+      icon: '/icons/galka.png',
       text: 'Sprawdź produkty w tym samym kolorze',
       alt: 'Frequently bought together',
       isInteractive: true,
@@ -66,7 +66,14 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
           className={`flex items-center p-4 space-x-4 w-full ${index < filteredItems.length - 1 ? 'border-b border-[#DAD3C8]' : ''
             }`}
         >
-          <Image src={item.icon} alt={item.alt} width={24} height={24} />
+          <div className="w-6 h-6 flex items-center justify-center">
+            <Image
+              src={item.icon}
+              alt={item.alt}
+              width={item.isInteractive ? 16 : 24}
+              height={item.isInteractive ? 16 : 24}
+            />
+          </div>
           <span className="text-black">
             {item.isInteractive ? (
               <>
