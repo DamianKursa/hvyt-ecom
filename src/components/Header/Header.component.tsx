@@ -107,16 +107,16 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
 
               {/* Center Navigation Links for Desktop */}
               {!isMobile && (
-                <div className="flex-none mx-auto max-w-[530px] w-full">
+                <div className="flex-none mx-auto ">
                   <div
-                    className="hidden md:flex md:items-center rounded-full justify-center h-[50px]"
+                    className="hidden md:flex md:items-center px-1 rounded-full justify-center h-[50px]"
                     style={{ backgroundColor: '#E9E5DFCC' }}
                   >
                     <ul className="flex items-center text-base w-full justify-center text-[16px] whitespace-nowrap">
                       <li>
                         <Link href="/kategoria/uchwyty-meblowe">
                           <span
-                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/uchwyty-meblowe')}`}
+                            className={`px-3 py-3 font-medium rounded-full transition-all ${getActiveClass('/kategoria/uchwyty-meblowe')}`}
                           >
                             Uchwyty
                           </span>
@@ -125,7 +125,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       <li>
                         <Link href="/kategoria/klamki">
                           <span
-                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/klamki')}`}
+                            className={`px-3 py-3 font-medium rounded-full transition-all ${getActiveClass('/kategoria/klamki')}`}
                           >
                             Klamki
                           </span>
@@ -134,7 +134,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       <li>
                         <Link href="/kategoria/wieszaki">
                           <span
-                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/wieszaki')}`}
+                            className={`px-3 py-3 font-medium rounded-full transition-all ${getActiveClass('/kategoria/wieszaki')}`}
                           >
                             Wieszaki
                           </span>
@@ -143,7 +143,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       <li>
                         <Link href="/kategoria/meble">
                           <span
-                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kategoria/meble')}`}
+                            className={`px-3 py-3 font-medium rounded-full transition-all ${getActiveClass('/kategoria/meble')}`}
                           >
                             Meble
                           </span>
@@ -152,7 +152,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       <li>
                         <Link href="/kolekcje">
                           <span
-                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/kolekcje')}`}
+                            className={`px-3 py-3 font-medium rounded-full transition-all ${getActiveClass('/kolekcje')}`}
                           >
                             Kolekcje
                           </span>
@@ -161,7 +161,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       <li>
                         <Link href="/o-nas">
                           <span
-                            className={`px-3 py-2 font-semibold rounded-full transition-all ${getActiveClass('/o-nas')}`}
+                            className={`px-3 py-3 font-medium rounded-full transition-all ${getActiveClass('/o-nas')}`}
                           >
                             O nas
                           </span>
