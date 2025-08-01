@@ -781,6 +781,7 @@ const ProductPage = () => {
                 <span>{validationError}</span>
               </div>
             )}
+            {/*
             <ColorSwitcher
               options={
                 product?.attributes?.find((attr) => attr.name === 'Kolor')
@@ -799,6 +800,7 @@ const ProductPage = () => {
                 Biały: '#fff',
               }}
             />
+            */}
             <div className="flex items-center gap-4">
               {product?.baselinker_variations?.[0]?.attributes?.length ? (
                 <>
