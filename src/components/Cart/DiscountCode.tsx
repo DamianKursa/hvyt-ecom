@@ -59,15 +59,21 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         return;
       }
 
-      const { discountApplied, discountType } = data;
+      // pull the category restrictions out of the API response
+      const {
+        discountApplied,
+        discountType,
+        allowedCats = [], // 👈 default to empty array
+        excludedCats = [], // 👈 optional, only if you care about excludes
+      } = data;
 
       // now store them on the coupon in context
       applyCoupon({
         code,
         discountValue: discountApplied,
         discountType,
-        allowedCats: data.allowedCats ?? [],
-        // excludedCats: data.excludedCats, // 👈 uncomment if you want to support excludes
+        allowedCats, // 👈 this is the key bit
+        // excludedCats, // 👈 uncomment if you want to support excludes
       });
 
       setCodeError('');
