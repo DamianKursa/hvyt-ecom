@@ -137,7 +137,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
             // Only show "no results" if a search has been attempted and query length >= 3
             hasSearched &&
             query.length >= 3 && (
-              <div className="mt-6 text-center text-black text-regular">
+              <div className="text-left text-black text-regular">
                 <p>
                   Niestety nie znaleziono żadnych wyników dla &quot;{query}
                   &quot;.
