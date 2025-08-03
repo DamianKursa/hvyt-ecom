@@ -34,7 +34,7 @@ const ZwrotyReklamacjePage = () => {
               </ul>
               <div className="mt-4">
                 <a
-                  href="/downloads/formularz_zwrotu_HVYT.pdf"
+                  href="/downloads/formularz_reklamacyjny_HVYT"
                   className="underline inline-flex items-center px-4 py-2 "
                   aria-label="Formularz zwrotu"
                 >
