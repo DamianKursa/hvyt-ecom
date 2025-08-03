@@ -29,6 +29,10 @@ const CollectionPage = () => {
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  // Reset to first page whenever the collection slug changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [slugString]);
   const [perPage, setPerPage] = useState<number>(12);
 
   // Utility to remove HTML tags (safe on both SSR and client)
