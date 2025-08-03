@@ -46,13 +46,11 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       setLocalLoading(true);
       try {
         await onCheckout();
+        // Keep the button disabled for 10 seconds on success
+        setTimeout(() => setLocalLoading(false), 10000);
       } catch (error) {
-        console.error('Error during checkout:', error);
-      } finally {
-        // Keep the button disabled for 10 seconds
-        setTimeout(() => {
-          setLocalLoading(false);
-        }, 10000);
+        // Re-enable immediately on error
+        setLocalLoading(false);
       }
     } else {
       router.push('/checkout');
