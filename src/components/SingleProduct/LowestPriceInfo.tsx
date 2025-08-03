@@ -107,7 +107,7 @@ const LowestPriceInfo: React.FC<LowestPriceInfoProps> = ({
   if (!isSaleActive) return null;
 
   return (
-    <p className="w-full text-[16px] text-[#969394] mt-1 mb-4">
+    <p className="w-full text-[16px] text-[#969394] mt-[-20px] mb-4">
       Najniższa cena w okresie 30 dni przed obniżką: {regularPrice.toFixed(2)}{' '}
       zł
     </p>
