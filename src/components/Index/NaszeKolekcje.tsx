@@ -96,7 +96,7 @@ const NaszeKolekcje = () => {
                 left={32}
                 gap={5}
               />
-              <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red bg-white z-10">
+              <div className="absolute bottom-4 left-4 px-4 py-2 rounded-full font-bold text-dark-pastel-red  z-10">
                 {kolekcja.title.rendered}
               </div>
             </Link>
