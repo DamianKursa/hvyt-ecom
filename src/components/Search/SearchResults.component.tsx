@@ -89,7 +89,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
         </div>
 
         {/* Search Button */}
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end">
           <button
             onClick={handleSearchSubmit}
             className="px-4 py-2 bg-black text-white rounded-full hover:bg-neutral-dark transition-colors"
