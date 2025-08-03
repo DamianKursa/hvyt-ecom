@@ -178,12 +178,12 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             onFocus={() => setFocusedField('firstName')}
             onBlur={() => setFocusedField(null)}
             onChange={(e) => handleInputChange('firstName', e.target.value)}
-            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+            className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
           />
           <span
-            className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.firstName || focusedField === 'firstName'
-                ? 'opacity-0'
-                : 'opacity-100'
+            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${formData.firstName || focusedField === 'firstName'
+              ? 'opacity-0'
+              : 'opacity-100'
               }`}
           >
             Imię<span className="text-red-500">*</span>
@@ -198,12 +198,12 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             onFocus={() => setFocusedField('lastName')}
             onBlur={() => setFocusedField(null)}
             onChange={(e) => handleInputChange('lastName', e.target.value)}
-            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+            className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
           />
           <span
-            className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.lastName || focusedField === 'lastName'
-                ? 'opacity-0'
-                : 'opacity-100'
+            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${formData.lastName || focusedField === 'lastName'
+              ? 'opacity-0'
+              : 'opacity-100'
               }`}
           >
             Nazwisko<span className="text-red-500">*</span>
@@ -222,12 +222,12 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
                 onFocus={() => setFocusedField('company')}
                 onBlur={() => setFocusedField(null)}
                 onChange={(e) => handleInputChange('company', e.target.value)}
-                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+                className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
               />
               <span
-                className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.company || focusedField === 'company'
-                    ? 'opacity-0'
-                    : 'opacity-100'
+                className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${formData.company || focusedField === 'company'
+                  ? 'opacity-0'
+                  : 'opacity-100'
                   }`}
               >
                 Nazwa firmy<span className="text-red-500">*</span>
@@ -242,12 +242,12 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
                 onFocus={() => setFocusedField('vatNumber')}
                 onBlur={() => setFocusedField(null)}
                 onChange={(e) => handleInputChange('vatNumber', e.target.value)}
-                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+                className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
               />
               <span
-                className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.vatNumber || focusedField === 'vatNumber'
-                    ? 'opacity-0'
-                    : 'opacity-100'
+                className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${formData.vatNumber || focusedField === 'vatNumber'
+                  ? 'opacity-0'
+                  : 'opacity-100'
                   }`}
               >
                 NIP<span className="text-red-500">*</span>
@@ -266,12 +266,12 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             onFocus={() => setFocusedField('phone')}
             onBlur={() => setFocusedField(null)}
             onChange={(e) => handleInputChange('phone', e.target.value)}
-            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+            className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
           />
           <span
-            className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.phone || focusedField === 'phone'
-                ? 'opacity-0'
-                : 'opacity-100'
+            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${formData.phone || focusedField === 'phone'
+              ? 'opacity-0'
+              : 'opacity-100'
               }`}
           >
             Numer telefonu<span className="text-red-500">*</span>
@@ -286,12 +286,12 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             onFocus={() => setFocusedField('email')}
             onBlur={() => setFocusedField(null)}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+            className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
           />
           <span
-            className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${email || focusedField === 'email'
-                ? 'opacity-0'
-                : 'opacity-100'
+            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${email || focusedField === 'email'
+              ? 'opacity-0'
+              : 'opacity-100'
               }`}
           >
             Adres e-mail<span className="text-red-500">*</span>

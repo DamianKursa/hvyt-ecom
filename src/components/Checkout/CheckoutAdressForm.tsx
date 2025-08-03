@@ -134,10 +134,10 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             onChange={(e) =>
               setBillingData((prev) => ({ ...prev, street: e.target.value }))
             }
-            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+            className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
           />
           <span
-            className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${billingData.street || focusedField === 'street' ? 'opacity-0' : 'opacity-100'
+            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${billingData.street || focusedField === 'street' ? 'opacity-0' : 'opacity-100'
               }`}
           >
             Nazwa ulicy<span className="text-red-500">*</span>
@@ -156,10 +156,10 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 buildingNumber: e.target.value,
               }))
             }
-            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+            className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
           />
           <span
-            className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${billingData.buildingNumber || focusedField === 'buildingNumber'
+            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${billingData.buildingNumber || focusedField === 'buildingNumber'
               ? 'opacity-0'
               : 'opacity-100'
               }`}
@@ -177,7 +177,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
               apartmentNumber: e.target.value,
             }))
           }
-          className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-[#969394]"
+          className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132] placeholder:font-light placeholder-opacity-100"
         />
         <div className="relative w-full">
           <input
@@ -189,10 +189,10 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             onChange={(e) =>
               setBillingData((prev) => ({ ...prev, city: e.target.value }))
             }
-            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+            className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
           />
           <span
-            className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${billingData.city || focusedField === 'city' ? 'opacity-0' : 'opacity-100'
+            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${billingData.city || focusedField === 'city' ? 'opacity-0' : 'opacity-100'
               }`}
           >
             Miasto<span className="text-red-500">*</span>
@@ -208,10 +208,10 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             onChange={(e) =>
               setBillingData((prev) => ({ ...prev, postalCode: e.target.value }))
             }
-            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+            className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
           />
           <span
-            className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${billingData.postalCode || focusedField === 'postalCode' ? 'opacity-0' : 'opacity-100'
+            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${billingData.postalCode || focusedField === 'postalCode' ? 'opacity-0' : 'opacity-100'
               }`}
           >
             Kod pocztowy<span className="text-red-500">*</span>
@@ -226,12 +226,15 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             onChange={(e) =>
               setBillingData((prev) => ({ ...prev, country: e.target.value }))
             }
-            className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none"
+            className="w-full text-[#363132] font-light border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
           >
             <option value="Polska">Polska</option>
           </select>
+          <svg xmlns="http://www.w3.org/2000/svg" className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#969394] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
           <span
-            className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${billingData.country ? 'opacity-0' : 'opacity-100'}`}
+            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${billingData.country ? 'opacity-0' : 'opacity-100'}`}
           >
             Kraj / Region<span className="text-red-500">*</span>
           </span>
@@ -261,10 +264,10 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 onChange={(e) =>
                   setShippingData((prev) => ({ ...prev, street: e.target.value }))
                 }
-                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+                className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
               />
               <span
-                className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${shippingData.street || focusedField === 'street' ? 'opacity-0' : 'opacity-100'
+                className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${shippingData.street || focusedField === 'street' ? 'opacity-0' : 'opacity-100'
                   }`}
               >
                 Nazwa ulicy<span className="text-red-500">*</span>
@@ -283,10 +286,10 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                     buildingNumber: e.target.value,
                   }))
                 }
-                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+                className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
               />
               <span
-                className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${shippingData.buildingNumber || focusedField === 'buildingNumber'
+                className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${shippingData.buildingNumber || focusedField === 'buildingNumber'
                   ? 'opacity-0'
                   : 'opacity-100'
                   }`}
@@ -304,7 +307,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                   apartmentNumber: e.target.value,
                 }))
               }
-              className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:font-light placeholder:text-[#969394]"
+              className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132] placeholder:font-light placeholder-opacity-100"
             />
             <div className="relative w-full">
               <input
@@ -316,10 +319,10 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 onChange={(e) =>
                   setShippingData((prev) => ({ ...prev, city: e.target.value }))
                 }
-                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+                className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
               />
               <span
-                className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${shippingData.city || focusedField === 'city' ? 'opacity-0' : 'opacity-100'
+                className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${shippingData.city || focusedField === 'city' ? 'opacity-0' : 'opacity-100'
                   }`}
               >
                 Miasto<span className="text-red-500">*</span>
@@ -338,10 +341,10 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                     postalCode: e.target.value,
                   }))
                 }
-                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none placeholder-transparent"
+                className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
               />
               <span
-                className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${shippingData.postalCode || focusedField === 'postalCode' ? 'opacity-0' : 'opacity-100'
+                className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${shippingData.postalCode || focusedField === 'postalCode' ? 'opacity-0' : 'opacity-100'
                   }`}
               >
                 Kod pocztowy<span className="text-red-500">*</span>
@@ -359,12 +362,15 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                     country: e.target.value,
                   }))
                 }
-                className="w-full border-b border-[#969394] p-2 bg-white focus:outline-none"
+                className="w-full font-light text-[#363132] border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
               >
                 <option value="Polska">Polska</option>
               </select>
+              <svg xmlns="http://www.w3.org/2000/svg" className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#969394] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
               <span
-                className={`absolute left-2 top-2 text-[#969394] font-light pointer-events-none transition-all duration-200 ${shippingData.country ? 'opacity-0' : 'opacity-100'
+                className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${shippingData.country ? 'opacity-0' : 'opacity-100'
                   }`}
               >
                 Kraj / Region<span className="text-red-500">*</span>
@@ -387,7 +393,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             additionalInfo: e.target.value,
           }))
         }
-        className="w-full border border-[#969394] rounded-[8px] p-4 bg-white focus:outline-none placeholder:font-light placeholder:text-black mb-4 mt-4"
+        className="w-full text-[#363132] border border-[#969394] rounded-[8px] p-4 bg-white focus:outline-none placeholder:text-[#363132] mb-4 mt-4"
       />
 
     </div>
