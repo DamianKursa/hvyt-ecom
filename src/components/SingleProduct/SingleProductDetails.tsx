@@ -34,6 +34,10 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
         icon.alt = 'Download';
         icon.classList.add('w-5', 'h-5', 'ml-2', 'inline-block');
         icon.setAttribute('data-icon', 'true');
+
+        // keep text and icon together as a single inline unit
+        link.classList.add('inline-flex', 'items-center', 'whitespace-nowrap');
+
         link.appendChild(icon);
       });
 
