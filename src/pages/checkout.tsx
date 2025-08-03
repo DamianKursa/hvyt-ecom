@@ -144,7 +144,8 @@ const Checkout: React.FC = () => {
       alert(
         '*Potwierdzam, że zapoznałam/em się z treścią Regulaminu i Polityki Prywatności oraz akceptuję ich postanowienia.',
       );
-      return;
+      setOrderDisabled(false);
+      throw new Error('Terms not accepted');
     }
     if (shippingMethod === 'paczkomaty_inpost' && !selectedLocker) {
       alert('Wybierz paczkomat przed złożeniem zamówienia.');
@@ -212,23 +213,23 @@ const Checkout: React.FC = () => {
 
     const shippingAddress = isShippingDifferent
       ? {
-          first_name: billingData.firstName,
-          last_name: billingData.lastName,
-          address_1: `${shippingData.street} ${shippingData.buildingNumber}`,
-          address_2: shippingData.apartmentNumber || '',
-          city: shippingData.city,
-          postcode: shippingData.postalCode,
-          country: mappedShippingCountry,
-        }
+        first_name: billingData.firstName,
+        last_name: billingData.lastName,
+        address_1: `${shippingData.street} ${shippingData.buildingNumber}`,
+        address_2: shippingData.apartmentNumber || '',
+        city: shippingData.city,
+        postcode: shippingData.postalCode,
+        country: mappedShippingCountry,
+      }
       : {
-          first_name: billingData.firstName,
-          last_name: billingData.lastName,
-          address_1: `${billingData.street} ${billingData.buildingNumber}`,
-          address_2: billingData.apartmentNumber || '',
-          city: billingData.city,
-          postcode: billingData.postalCode,
-          country: mappedBillingCountry,
-        };
+        first_name: billingData.firstName,
+        last_name: billingData.lastName,
+        address_1: `${billingData.street} ${billingData.buildingNumber}`,
+        address_2: billingData.apartmentNumber || '',
+        city: billingData.city,
+        postcode: billingData.postalCode,
+        country: mappedBillingCountry,
+      };
 
     // Prepare shipping meta data (if any)
     const shippingMetaData = [];
@@ -279,7 +280,7 @@ const Checkout: React.FC = () => {
         paymentMethod === 'pay_by_paynow_pl_pbl'
           ? 'paynow.pl - Online payments'
           : paymentMethod === 'przelewy24' ||
-              paymentMethod === 'p24-online-payments'
+            paymentMethod === 'p24-online-payments'
             ? 'Przelewy24'
             : shippingTitle,
       set_paid: false,
@@ -304,12 +305,12 @@ const Checkout: React.FC = () => {
       ],
       coupon_lines: cart?.coupon
         ? [
-            {
-              code: cart.coupon.code,
-              discount: cart.coupon.discountValue.toFixed(2),
-              discount_tax: '0.00',
-            },
-          ]
+          {
+            code: cart.coupon.code,
+            discount: cart.coupon.discountValue.toFixed(2),
+            discount_tax: '0.00',
+          },
+        ]
         : [],
 
       shipping: shippingAddress,
@@ -331,9 +332,9 @@ const Checkout: React.FC = () => {
           total: lineTotal,
           meta_data: product.attributes
             ? Object.entries(product.attributes).map(([key, value]) => ({
-                key,
-                value,
-              }))
+              key,
+              value,
+            }))
             : [],
         };
       }),
@@ -576,11 +577,10 @@ const Checkout: React.FC = () => {
                         className="hidden"
                       />
                       <span
-                        className={`w-5 h-5 flex items-center justify-center border rounded ${
-                          isTermsChecked
-                            ? 'bg-black text-white'
-                            : 'border-black'
-                        }`}
+                        className={`w-5 h-5 flex items-center justify-center border rounded ${isTermsChecked
+                          ? 'bg-black text-white'
+                          : 'border-black'
+                          }`}
                       >
                         {isTermsChecked && (
                           <img
