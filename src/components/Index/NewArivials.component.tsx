@@ -97,9 +97,12 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
 
   const animationTrigger = useInViewTrigger ? inView : false;
 
+  const sectionStyle = animationTrigger ? { marginTop: '200px' } : {};
+
   return (
     <section
       ref={combinedRef}
+      style={sectionStyle}
       className="container px-4 md:px-4 lg:px-4 2xl:px-0 mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] py-16"
     >
       {/* Mobile View */}
