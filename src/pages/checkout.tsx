@@ -590,7 +590,7 @@ const Checkout: React.FC = () => {
                         )}
                       </span>
                       <span className="text-sm leading-tight w-full">
-                        *Potwierdzam, że zapoznałam/em się z treścią{' '}
+                        <span className='text-red-500'>*</span>Potwierdzam, że zapoznałam/em się z treścią{' '}
                         <Link className="underline" href="/regulamin">
                           Regulaminu
                         </Link>{' '}
