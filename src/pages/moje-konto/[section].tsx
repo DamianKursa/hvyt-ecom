@@ -168,9 +168,7 @@ const SectionPage: React.FC = () => {
     if (section === 'moje-zamowienia') {
       return (
         <div className="rounded-[25px] bg-white p-4 md:p-8 shadow-sm">
-          <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
-            Moje zamówienia
-          </h2>
+
           {content && Array.isArray(content) && (
             <OrderTable
               content={content as Order[]}
@@ -184,9 +182,6 @@ const SectionPage: React.FC = () => {
     if (section === 'kupione-produkty') {
       return (
         <div className="rounded-[25px] bg-white p-4 md:p-8 shadow-sm">
-          <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
-            Kupione Produkty
-          </h2>
           {content && Array.isArray(content) && (
             <BoughtProductsList products={content as Product[]} />
           )}

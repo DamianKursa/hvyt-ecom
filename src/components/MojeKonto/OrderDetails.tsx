@@ -47,36 +47,33 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
   // Mobile: Single item card
   const renderMobileItem = (item: any) => {
     return (
-      <div key={item.product_id} className="border-b border-gray-200 pb-4 mb-4">
-        <div className="flex">
-          <img
-            src={
-              typeof item.image === 'object'
-                ? item.image.src
-                : item.image || '/placeholder.jpg'
-            }
-            alt={item.name}
-            className="w-[80px] h-[80px] rounded-[16px] mr-4 object-cover"
-          />
-          <div className="flex-1">
-            <p className=" text-[16px]">{item.name}</p>
-            <div className="mt-2 space-y-1">
-              <div className="flex justify-between">
-                <span className="text-gray-700">Cena</span>
-                <span className="text-gray-900 font-bold">{item.price} zł</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-700">Ilość</span>
-                <span className="text-gray-900 font-light">
-                  {item.quantity}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-700">Suma</span>
-                <span className="text-gray-900 font-bold">
-                  {(parseFloat(item.price) * item.quantity).toFixed(2)} zł
-                </span>
-              </div>
+      <div key={item.product_id} className="flex gap-4 py-4 border-t last:border-none">
+        <img
+          src={
+            typeof item.image === 'object'
+              ? item.image.src
+              : item.image || '/placeholder.jpg'
+          }
+          alt={item.name}
+          className="w-[80px] h-[80px] rounded-[16px] object-cover"
+        />
+        <div className="flex-1">
+          <p className="text-[16px] font-semibold text-[#0E0B0C]">{item.name}</p>
+
+          <div className="mt-3 space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span className="font-bold text-[#5D5759]">Cena:</span>
+              <span className="font-light text-[#0E0B0C]">{item.price} zł</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-bold text-[#5D5759]">Ilość:</span>
+              <span className="font-light text-[#0E0B0C]">{item.quantity}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="font-bold text-[#5D5759]">Suma:</span>
+              <span className="font-light justify-left text-[#0E0B0C]">
+                {(parseFloat(item.price) * item.quantity).toFixed(2)} zł
+              </span>
             </div>
           </div>
         </div>
@@ -241,46 +238,64 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
       </div>
 
       {/* MOBILE LAYOUT */}
-      <div className="block md:hidden">
-        {/* Mobile Header */}
-        <h2 className="text-[20px] text-dark-pastel-red font-bold mb-4">
-          Moje zamówienie
-        </h2>
+      <div className="block md:hidden bg-[#F8F5F1] rounded-[24px]">
+        <div className="bg-white rounded-[24px] space-y-6">
+          {/* Mobile Header */}
+          <h2 className=" text-[20px] text-dark-pastel-red font-bold">
+            Moje zamówienie
+          </h2>
 
-        {/* Order Items (Mobile Cards) */}
-        {order.line_items.map((item) => renderMobileItem(item))}
+          {/* Order Items (Mobile Cards) */}
+          {order.line_items.map((item) => renderMobileItem(item))}
 
-        {/* Payment Method (Optional) */}
-        <div className="border-b border-gray-200 pb-4 mb-4">
-          <p className="text-lg font-light text-[#857C7F]">Metoda płatności</p>
-          <p className="text-black font-light">
-            {order.payment_method || 'Brak danych'}
-          </p>
-        </div>
+          {/* Summary */}
+          <div className='border-t pt-4'>
+            <h3 className="text-base font-semibold text-[#5D5759] mb-2">
+              Podsumowanie:
+            </h3>
+            <div className="grid grid-cols-2 text-sm gap-y-1">
+              <span className="text-[#0E0B0C]">Cena produktów:</span>
+              <span className="text-right text-[#363132]">
+                {order.subtotal || calculatedSubtotal} zł
+              </span>
 
-        {/* Total */}
-        <div className="border-b border-gray-200 pb-4 mb-4">
-          <p className="text-lg font-light text-[#857C7F]">Razem</p>
-          <p className="text-black font-light">{order.total} zł</p>
-        </div>
+              <span className="text-[#0E0B0C]">Wysyłka:</span>
+              <span className="text-right text-[#363132]">
+                {order.shipping_total || '0.00'} zł
+              </span>
 
-        {/* Shipping Address */}
-        <div className="border-b border-gray-200 pb-4 mb-4">
-          <p className="text-lg font-light text-[#857C7F]">Dane do wysyłki</p>
-          {renderShippingAddressMobile()}
-        </div>
+              <span className="text-[#0E0B0C] text-[12px]">Podatek (PL&nbsp;VAT&nbsp;23&nbsp;%):</span>
+              <span className="text-right text-[#363132]">
+                {order.tax || calculatedTax} zł
+              </span>
 
-        {/* Billing Address (Optional) */}
-        <div className="border-b border-gray-200 pb-4 mb-4">
-          <p className="text-lg font-light text-[#857C7F]">Dane do faktury</p>
-          {renderBillingAddressMobile()}
-        </div>
+              <span className="font-bold text-[#661F30] mt-2 bg-[#EBE5DF] rounded-l-full pl-3 py-1">
+                Razem
+              </span>
+              <span className="font-bold text-right mt-2 text-[#661F30] bg-[#EBE5DF] rounded-r-full pr-3 py-1">
+                {order.total} zł
+              </span>
+            </div>
+          </div>
 
-        {/* Action Button (Mobile) */}
-        <div className="mt-4 text-right">
-          <button className="bg-black w-full text-white py-3 px-4 rounded-full">
-            Ponów zamówienie
-          </button>
+          {/* Shipping Address */}
+          <div>
+            <h3 className="text-base font-semibold text-[#5D5759] mb-2">Adres wysyłki:</h3>
+            {renderShippingAddressMobile()}
+          </div>
+
+          {/* Billing Address */}
+          <div>
+            <h3 className="text-base font-semibold text-[#5D5759] mb-2">Dane do faktury:</h3>
+            {renderBillingAddressMobile()}
+          </div>
+
+          {/* Action Button (Mobile) */}
+          <div className="mt-4 text-right">
+            <button className="bg-dark-pastel-red w-full text-white py-3 px-4 rounded-full font-semibold">
+              Ponów zamówienie
+            </button>
+          </div>
         </div>
       </div>
     </div>
