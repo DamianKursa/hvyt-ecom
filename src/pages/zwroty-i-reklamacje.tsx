@@ -34,7 +34,7 @@ const ZwrotyReklamacjePage = () => {
               </ul>
               <div className="mt-4">
                 <a
-                  href="https://wp.hvyt.pl/wp-content/uploads/2025/08/formularz-reklamacyjny-HVYT.pdf"
+                  href="https://wp.hvyt.pl/wp-content/uploads/2025/08/formularz_zwrotu_HVYT.pdf"
                   className="underline inline-flex items-center px-4 py-2 "
                   aria-label="Formularz zwrotu"
                 >
@@ -119,7 +119,7 @@ const ZwrotyReklamacjePage = () => {
                   produktu.
                 </li>
                 <li>
-                  Wypełnij formularz reklamacyjny i dołącz go do wiadomości.
+                  Wypełnij <a className="underline" href='https://wp.hvyt.pl/wp-content/uploads/2025/08/formularz-reklamacyjny-HVYT.pdf'>formularz reklamacyjny</a> i dołącz go do wiadomości.
                 </li>
               </ul>
               <p className="mt-4">
