@@ -546,7 +546,7 @@ const Checkout: React.FC = () => {
               <h2 className="text-2xl font-bold mb-6 text-dark-pastel-red">
                 Dostawa i płatność
               </h2>
-              <div className="md:border rounded-[24px] px-0 md:px-[16px] py-[24px]">
+              <div className="border-[#DAD3C8] md:border  rounded-[24px] px-0 md:px-[16px] py-[24px]">
                 <Shipping
                   shippingMethod={shippingMethod}
                   setShippingMethod={setShippingMethod}
@@ -577,8 +577,8 @@ const Checkout: React.FC = () => {
                       />
                       <span
                         className={`w-5 h-5 flex items-center justify-center border rounded ${isTermsChecked
-                            ? 'bg-black text-white'
-                            : 'border-black'
+                          ? 'bg-black text-white'
+                          : 'border-black'
                           }`}
                       >
                         {isTermsChecked && (
