@@ -50,7 +50,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
       {/* Trigger Button */}
       <button
         className={`w-full ${isProductPage ? 'px-[20px] py-3' : 'p-[7px_16px]'
-          } text-[16px] font-bold flex justify-between items-center
+          } text-[16px] font-bold flex md:justify-between items-center
         border
         ${isOpen
             ? 'border-dark-pastel-red border-b-0 rounded-t-[24px]'
@@ -66,7 +66,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
         <img
           src={isOpen ? '/icons/arrow-up.svg' : '/icons/arrow-down.svg'}
           alt="Toggle"
-          className="w-4 h-4"
+          className=" ml-2 md:ml-0 w-4 h-4"
         />
       </button>
 
@@ -74,8 +74,8 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
       {isOpen && (
         <div
           className={`${isCartPage
-              ? 'relative block w-full'
-              : 'absolute top-full left-0 w-full'
+            ? 'relative block w-full'
+            : 'absolute top-full left-0 w-full'
             } bg-beige-light border border-dark-pastel-red border-t-0 rounded-b-[24px] z-50`}
           role="listbox"
         >
