@@ -740,19 +740,6 @@ const ProductPage = () => {
                 return (
                   <>
                     {/* ─── Replace that block with this ─── */}
-                    {isSaleActive && (
-                      <span
-                        className="absolute top-2 right-2 px-2 font-semibold rounded-full"
-                        style={{
-                          backgroundColor: '#661F30',
-                          color: '#fff',
-                          fontSize: '18px',
-                        }}
-                      >
-                        -{discountPct}%
-                      </span>
-                    )}
-
                     {isSaleActive ? (
                       <>
                         <span className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
@@ -760,6 +747,16 @@ const ProductPage = () => {
                         </span>
                         <span className="text-[16px] text-[#969394] line-through ml-2">
                           {regularPrice.toFixed(2)} zł
+                        </span>
+                        <span
+                          className="px-2 font-semibold rounded-full ml-2"
+                          style={{
+                            backgroundColor: '#661F30',
+                            color: '#fff',
+                            fontSize: '18px',
+                          }}
+                        >
+                          -{discountPct}%
                         </span>
                       </>
                     ) : (
