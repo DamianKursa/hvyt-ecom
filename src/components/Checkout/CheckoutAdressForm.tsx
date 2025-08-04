@@ -66,11 +66,100 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   const [needVATInvoice, setNeedVATInvoice] = useState<boolean>(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
+  // user‑saved addresses fetched from API
+  const [savedAddresses, setSavedAddresses] = useState<Array<{
+    street: string;
+    buildingNumber: string;
+    apartmentNumber: string;
+    city: string;
+    postalCode: string;
+    country: string;
+    additionalInfo?: string;
+  }>>([]);
+
+  /**
+   * Some addresses coming from the API embed the building and apartment
+   * numbers inside the `street` string (e.g. "Jasnaqa, 2223e/4211wsa").
+   * This helper splits them out so we always have explicit fields.
+   */
+  const normaliseAddress = (addr: any) => {
+    let street = addr.street || '';
+    let buildingNumber = addr.buildingNumber || '';
+    let apartmentNumber = addr.apartmentNumber || '';
+
+    // WordPress stores building/apartment in address_line_2
+    if (!buildingNumber && addr.address_line_2) {
+      const [bn, apt] = addr.address_line_2.split('/');
+      buildingNumber = (bn || '').trim();
+      apartmentNumber = (apt || '').trim();
+    }
+
+    // If the API didn't give us building / apartment separately, try to parse
+    // them from the street string. Common patterns observed:
+    //  1. "StreetName, 123/45"
+    //  2. "StreetName 123/45"
+    //  3. "StreetName 123"
+    if (!buildingNumber && street) {
+      // Split at comma first
+      const commaParts = street.split(',');
+      if (commaParts.length > 1) {
+        street = commaParts[0].trim();
+        const rest = commaParts.slice(1).join(',').trim();
+        const slashParts = rest.split('/');
+        buildingNumber = slashParts[0].trim();
+        if (slashParts.length > 1) {
+          apartmentNumber = slashParts[1].trim();
+        }
+      } else {
+        // No comma, try last token as building number
+        const words = street.trim().split(' ');
+        if (words.length > 1) {
+          const last = words.pop() as string;
+          buildingNumber = last.trim();
+          street = words.join(' ');
+        }
+      }
+    }
+
+    // If buildingNumber still contains a '/', split out apartment part
+    if (buildingNumber.includes('/') && !apartmentNumber) {
+      const [bn, apt] = buildingNumber.split('/');
+      buildingNumber = bn.trim();
+      apartmentNumber = apt.trim();
+    }
+
+    return {
+      street,
+      buildingNumber,
+      apartmentNumber,
+      city: addr.city || '',
+      postalCode: addr.postalCode || '',
+      country: addr.country || 'Polska',
+      additionalInfo: addr.additionalInfo || '',
+    };
+  };
+
+  // controls visibility of the suggestion dropdown
+  const [showAddressSuggestions, setShowAddressSuggestions] = useState<boolean>(false);
+
+  const handlePickSavedAddress = (addr: typeof savedAddresses[number]) => {
+    setBillingData(prev => ({
+      ...prev,
+      street: addr.street,
+      buildingNumber: addr.buildingNumber,
+      apartmentNumber: addr.apartmentNumber,
+      city: addr.city,
+      postalCode: addr.postalCode,
+      country: addr.country,
+    }));
+    setShowAddressSuggestions(false);
+  };
+
   useEffect(() => {
     const fetchAddresses = async () => {
       setLoading(true);
       try {
-        const response = await fetch('/api/moje-konto/user-addresses', {
+        const response = await fetch('/api/moje-konto/adresy', {
           method: 'GET',
           credentials: 'include',
         });
@@ -82,28 +171,32 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         const data = await response.json();
         console.log('Fetched User Addresses:', data);
 
+        setSavedAddresses(
+          data.slice(0, 3).map(normaliseAddress)
+        );
+
         if (data.length > 0) {
-          const billingAddress = data[0];
+          const billingAddress = normaliseAddress(data[0]);
           setBillingData((prev) => ({
             ...prev,
-            street: billingAddress.street || '',
-            buildingNumber: billingAddress.buildingNumber || '',
-            apartmentNumber: billingAddress.apartmentNumber || '',
-            city: billingAddress.city || '',
-            postalCode: billingAddress.postalCode || '',
-            country: billingAddress.country || 'Polska',
+            street: billingAddress.street,
+            buildingNumber: billingAddress.buildingNumber,
+            apartmentNumber: billingAddress.apartmentNumber,
+            city: billingAddress.city,
+            postalCode: billingAddress.postalCode,
+            country: billingAddress.country,
           }));
         }
         if (data.length > 1) {
-          const shippingAddress = data[1];
+          const shippingAddress = normaliseAddress(data[1]);
           setShippingData({
-            street: shippingAddress.street || '',
-            buildingNumber: shippingAddress.buildingNumber || '',
-            apartmentNumber: shippingAddress.apartmentNumber || '',
-            city: shippingAddress.city || '',
-            postalCode: shippingAddress.postalCode || '',
-            country: shippingAddress.country || 'Polska',
-            additionalInfo: shippingAddress.additionalInfo || '',
+            street: shippingAddress.street,
+            buildingNumber: shippingAddress.buildingNumber,
+            apartmentNumber: shippingAddress.apartmentNumber,
+            city: shippingAddress.city,
+            postalCode: shippingAddress.postalCode,
+            country: shippingAddress.country,
+            additionalInfo: shippingAddress.additionalInfo,
           });
         }
       } catch (err) {
@@ -115,6 +208,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
 
     fetchAddresses();
   }, [setBillingData, setShippingData]);
+
 
   if (loading) {
     return <p>Ładowanie adresów...</p>;
@@ -129,11 +223,15 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             type="text"
             required
             value={billingData.street}
-            onFocus={() => setFocusedField('street')}
+            onFocus={() => {
+              setFocusedField('street');
+              setShowAddressSuggestions(true);
+            }}
             onBlur={() => setFocusedField(null)}
-            onChange={(e) =>
-              setBillingData((prev) => ({ ...prev, street: e.target.value }))
-            }
+            onChange={(e) => {
+              setBillingData(prev => ({ ...prev, street: e.target.value }));
+              setShowAddressSuggestions(true);
+            }}
             className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
           />
           <span
@@ -142,6 +240,19 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           >
             Nazwa ulicy<span className="text-red-500">*</span>
           </span>
+          {showAddressSuggestions && savedAddresses.length > 0 && (
+            <div className="absolute top-full left-0 w-full bg-white border border-dark-pastel-red rounded-[24px] mt-2 z-50 max-h-60 overflow-y-auto shadow">
+              {savedAddresses.map((a) => (
+                <div
+                  key={`${a.street}-${a.buildingNumber}`}
+                  className="px-4 py-2 cursor-pointer hover:bg-beige-light"
+                  onMouseDown={() => handlePickSavedAddress(a)}
+                >
+                  {`${a.street} ${a.buildingNumber}`}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         <div className="relative w-full">
           <input
