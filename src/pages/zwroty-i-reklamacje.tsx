@@ -34,7 +34,7 @@ const ZwrotyReklamacjePage = () => {
               </ul>
               <div className="mt-4">
                 <a
-                  href="/downloads/formularz_reklamacyjny_HVYT"
+                  href="https://wp.hvyt.pl/wp-content/uploads/2025/08/formularz-reklamacyjny-HVYT.pdf"
                   className="underline inline-flex items-center px-4 py-2 "
                   aria-label="Formularz zwrotu"
                 >
