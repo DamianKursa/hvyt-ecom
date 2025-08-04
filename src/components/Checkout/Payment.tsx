@@ -20,13 +20,7 @@ const Payment: React.FC<PaymentProps> = ({
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  // Icon paths for payment methods
-  const paymentIcons: Record<string, string> = {
-    pay_by_paynow_pl_pbl: '/icons/paynow.png',
-    faktura_proforma: '/icons/download-single.svg', // new icon
-    bacs: '/icons/download-single.svg',             // WooCommerce bank-transfer alias
-    cod: '/icons/wallet.svg',
-  };
+
   // Shipping method mapping (adjust if needed)
   const shippingMethodMapping: Record<string, string> = {
     '1': 'kurier_gls',
@@ -73,12 +67,9 @@ const Payment: React.FC<PaymentProps> = ({
       return paymentMethods.filter((method) => method.id === 'cod');
     }
 
-    // Otherwise, allow both PayNow and Faktura Proforma
+    // Otherwise, return only the PayNow method
     return paymentMethods.filter(
-      (method) =>
-        method.id === 'pay_by_paynow_pl_pbl' ||
-        method.id === 'faktura_proforma' ||
-        method.id === 'bacs', // Faktura Proforma (Przelew bankowy)
+      (method) => method.id === 'pay_by_paynow_pl_pbl',
     );
   };
 
@@ -113,40 +104,25 @@ const Payment: React.FC<PaymentProps> = ({
           {availableMethods.map((method) => (
             <label
               key={method.id}
-              className={`grid grid-cols-[60%_20%_20%] sm:grid-cols-3 items-center py-[16px] border-b ${paymentMethod === method.id
-                ? 'border-dark-pastel-red'
-                : 'border-beige-dark'
+              className={`flex items-center py-[16px] border-b ${paymentMethod === method.id
+                  ? 'border-dark-pastel-red'
+                  : 'border-beige-dark'
                 }`}
             >
-              {/* Radio button and title */}
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  value={method.id}
-                  checked={paymentMethod === method.id}
-                  onChange={() => setPaymentMethod(method.id)}
-                  className="hidden"
-                />
-                <span
-                  className={`w-5 h-5 rounded-full ${paymentMethod === method.id
+              <input
+                type="radio"
+                value={method.id}
+                checked={paymentMethod === method.id}
+                onChange={() => setPaymentMethod(method.id)}
+                className="hidden"
+              />
+              <span
+                className={`w-5 h-5 rounded-full ${paymentMethod === method.id
                     ? 'border-4 border-dark-pastel-red'
                     : 'border-2 border-gray-400'
-                    }`}
-                />
-                <span className="ml-2 truncate">{method.title}</span>
-              </div>
-
-              {/* Placeholder column for cost (to match shipping grid) */}
-              <div className="w-full"></div>
-
-              {/* Payment method icon */}
-              <div className="flex items-center justify-center w-full">
-                <img
-                  src={paymentIcons[method.id] || '/icons/default.svg'}
-                  alt={`${method.title} icon`}
-                  className="sm:w-[55px] h-8 "
-                />
-              </div>
+                  }`}
+              ></span>
+              <span className="ml-2">{method.title}</span>
             </label>
           ))}
         </div>

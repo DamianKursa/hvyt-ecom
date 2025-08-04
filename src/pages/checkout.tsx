@@ -144,8 +144,7 @@ const Checkout: React.FC = () => {
       alert(
         '*Potwierdzam, że zapoznałam/em się z treścią Regulaminu i Polityki Prywatności oraz akceptuję ich postanowienia.',
       );
-      setOrderDisabled(false);
-      throw new Error('Terms not accepted');
+      return;
     }
     if (shippingMethod === 'paczkomaty_inpost' && !selectedLocker) {
       alert('Wybierz paczkomat przed złożeniem zamówienia.');
@@ -578,8 +577,8 @@ const Checkout: React.FC = () => {
                       />
                       <span
                         className={`w-5 h-5 flex items-center justify-center border rounded ${isTermsChecked
-                          ? 'bg-black text-white'
-                          : 'border-black'
+                            ? 'bg-black text-white'
+                            : 'border-black'
                           }`}
                       >
                         {isTermsChecked && (
