@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import CustomDropdown from '@/components/UI/CustomDropdown.component';
 import { Order } from '@/utils/functions/interfaces';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -47,6 +48,18 @@ const getPaymentStatusLabel = (paymentStatus: string) => {
 };
 
 const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
+  const [sortOpen, setSortOpen] = useState(false);
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | ''>('');
+  const sortedContent =
+    sortOrder === ''
+      ? content
+      : [...content].sort((a, b) => {
+        const da = new Date(a.date_created).getTime();
+        const db = new Date(b.date_created).getTime();
+        return sortOrder === 'newest' ? db - da : da - db;
+      });
+  const sortingOptions = ['Najnowsze zamówienia', 'Najstarsze zamówienia'];
+
   if (!content || content.length === 0) {
     return (
       <div className="mt-[64px] md:mt-0 rounded-[25px]  bg-white p-4 flex flex-col items-center justify-center">
@@ -87,6 +100,31 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
     <>
       {/* DESKTOP TABLE VIEW */}
       <div className="hidden md:block">
+        <div className="flex items-center justify-between mb-4 px-4">
+          <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
+            Moje zamówienia
+          </h2>
+          <div className="w-1/3">
+            <CustomDropdown
+              className={`${sortOrder ? 'border border-dark-pastel-red text-dark-pastel-red' : ''} h-12 bg-white flex items-center justify-center px-4 text-center`}
+              options={sortingOptions}
+              selectedValue={
+                sortOrder
+                  ? sortOrder === 'newest'
+                    ? 'Najnowsze zamówienia'
+                    : 'Najstarsze zamówienia'
+                  : null
+              }
+              placeholder="Sortowanie"
+              onChange={(value) =>
+                setSortOrder(
+                  value === 'Najnowsze zamówienia' ? 'newest' : 'oldest'
+                )
+              }
+              isProductPage={false}
+            />
+          </div>
+        </div>
         <table className="w-full table-auto rounded-[25px] overflow-hidden">
           <thead className="bg-beige">
             <tr>
@@ -107,7 +145,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
             </tr>
           </thead>
           <tbody className="border border-gray-200 rounded-[25px]">
-            {content.map((order) => {
+            {sortedContent.map((order) => {
               const { label: orderLabel, className: orderClassName } =
                 getOrderStatusLabel(order.status);
               const paymentLabel = getPaymentStatusLabel(order.payment_status);
