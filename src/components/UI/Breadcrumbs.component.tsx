@@ -26,20 +26,42 @@ const Breadcrumbs: React.FC = () => {
     return null;
   }
 
+  // Build breadcrumbs for home, category, or product pages
   const cleanPath = asPath.split('?')[0];
+  const rawSegments = cleanPath.split('/').filter(Boolean);
 
-  // Split the clean path into segments and filter out empty values
-  const pathSegments = cleanPath.split('/').filter((segment) => segment);
-  const breadcrumbItems = pathSegments.map((segment, index) => {
-    const href = '/' + pathSegments.slice(0, index + 1).join('/');
-    const title = segment
-      .replace(/-/g, ' ')
-      .replace(/^\w/, (c) => c.toUpperCase());
-    return { href, title };
-  });
+  // Helper to turn slug into human-friendly title
+  const slugToTitle = (slug: string) =>
+    slug.replace(/-/g, ' ').replace(/^\w/, c => c.toUpperCase());
 
-  // Add the home page as the first breadcrumb item
-  breadcrumbItems.unshift({ href: '/', title: 'Hvyt' });
+  // Always start with Home
+  const breadcrumbItems: { href: string; title: string }[] = [
+    { href: '/', title: 'Hvyt' },
+  ];
+
+  // Category page: /kategoria/[slug]
+  if (rawSegments[0] === 'kategoria' && rawSegments[1]) {
+    breadcrumbItems.push({
+      href: `/kategoria/${rawSegments[1]}`,
+      title: slugToTitle(rawSegments[1]),
+    });
+  }
+  // Product page: /produkt/[slug]
+  else if (rawSegments[0] === 'produkt' && rawSegments[1]) {
+    // If you want the category crumb above product, add logic here to fetch the category slug
+    // For now, show only product title
+    breadcrumbItems.push({
+      href: `/produkt/${rawSegments[1]}`,
+      title: slugToTitle(rawSegments[1]),
+    });
+  }
+  // Fallback for other nested pages
+  else if (rawSegments.length > 0) {
+    rawSegments.forEach((segment, index) => {
+      const href = '/' + rawSegments.slice(0, index + 1).join('/');
+      breadcrumbItems.push({ href, title: slugToTitle(segment) });
+    });
+  }
 
   return (
     <nav
