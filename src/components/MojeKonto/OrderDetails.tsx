@@ -20,7 +20,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
     const { shipping, billing } = order;
 
     return (
-      <div className="grid pl-6 grid-cols-2 mt-8">
+      <div className="grid grid-cols-2 mt-8">
         <div>
           <h3 className="font-light text-[16px] pl-6">Adres wysyłki:</h3>
         </div>
@@ -47,7 +47,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
   // Mobile: Single item card
   const renderMobileItem = (item: any) => {
     return (
-      <div key={item.product_id} className="flex gap-4 py-4 border-t last:border-none">
+      <div key={item.product_id} className="flex gap-4 py-4 border-t border-[#DAD3C8] last:border-none">
         <img
           src={
             typeof item.image === 'object'
@@ -249,7 +249,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
           {order.line_items.map((item) => renderMobileItem(item))}
 
           {/* Summary */}
-          <div className='border-t pt-4'>
+          <div className='border-[#DAD3C8] border-t pt-4'>
             <h3 className="text-base font-semibold text-[#5D5759] mb-2">
               Podsumowanie:
             </h3>

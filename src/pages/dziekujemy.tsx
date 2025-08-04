@@ -45,24 +45,24 @@ const Dziekujemy = () => {
             ? fetchedOrder.line_items
             : Array.isArray(fetchedOrder.items)
               ? fetchedOrder.items.map((item: any) => {
-                  const qty = item.quantity || 1;
-                  const originalUnitPrice = item.price;
-                  const originalLineTotal = parseFloat(originalUnitPrice) * qty;
-                  const discountedLineTotal = item.total
-                    ? parseFloat(item.total)
-                    : originalLineTotal;
-                  const discountAmount =
-                    originalLineTotal - discountedLineTotal;
-                  return {
-                    product_id: item.product_id,
-                    name: item.name,
-                    quantity: qty,
-                    price: originalUnitPrice,
-                    discount: discountAmount.toFixed(2),
-                    total: discountedLineTotal.toFixed(2),
-                    image: item.image || '/placeholder.jpg',
-                  };
-                })
+                const qty = item.quantity || 1;
+                const originalUnitPrice = item.price;
+                const originalLineTotal = parseFloat(originalUnitPrice) * qty;
+                const discountedLineTotal = item.total
+                  ? parseFloat(item.total)
+                  : originalLineTotal;
+                const discountAmount =
+                  originalLineTotal - discountedLineTotal;
+                return {
+                  product_id: item.product_id,
+                  name: item.name,
+                  quantity: qty,
+                  price: originalUnitPrice,
+                  discount: discountAmount.toFixed(2),
+                  total: discountedLineTotal.toFixed(2),
+                  image: item.image || '/placeholder.jpg',
+                };
+              })
               : [],
           shipping: {
             ...fetchedOrder.shipping,
