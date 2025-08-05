@@ -12,6 +12,7 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
   const [error, setError] = useState('');
   const router = useRouter();
   const { setUser } = useUserContext();
+  const { redirect } = router.query as { redirect?: string };
 
   const stripHtmlTags = (html: string): string => {
     return html.replace(/<[^>]*>?/gm, '');
@@ -32,7 +33,7 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
-        router.push('/moje-konto/moje-zamowienia');
+        router.push(redirect && redirect.length > 0 ? redirect : '/moje-konto/moje-zamowienia');
       } else {
         const data = await response.json();
         const cleanedMessage =
@@ -64,11 +65,10 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
           required
         />
         <span
-          className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${
-            formData.username || focusedField === 'username'
+          className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.username || focusedField === 'username'
               ? 'opacity-0'
               : 'opacity-100'
-          }`}
+            }`}
         >
           Adres email<span className="text-red-500">*</span>
         </span>
@@ -87,11 +87,10 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
           required
         />
         <span
-          className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${
-            formData.password || focusedField === 'password'
+          className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.password || focusedField === 'password'
               ? 'opacity-0'
               : 'opacity-100'
-          }`}
+            }`}
         >
           Hasło<span className="text-red-500">*</span>
         </span>

@@ -505,7 +505,7 @@ const Checkout: React.FC = () => {
               </h2>
               {!user && (
                 <Link
-                  href="/logowanie"
+                  href={`/logowanie?redirect=${encodeURIComponent(router.asPath)}`}
                   className="text-black underline md:border md:border-black md:px-4 md:py-2 rounded-full flex items-center text-sm mt-0 mb-4 md:mb-0 md:mt-0"
                 >
                   Masz już konto? Zaloguj się
