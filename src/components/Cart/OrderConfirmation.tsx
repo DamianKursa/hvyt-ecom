@@ -97,7 +97,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                   {order.shipping.first_name} {order.shipping.last_name}
                 </p>
                 {order.shipping.company && <p>{order.shipping.company}</p>}
-                <p>{order.shipping.address_1 || (order.shipping as any)?.address || 'Brak adresu'}</p>
+                <p>{order.shipping.address_1}</p>
                 {order.shipping.address_2 && <p>{order.shipping.address_2}</p>}
                 <p>
                   {order.shipping.postcode} {order.shipping.city}
@@ -120,7 +120,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                     {order.billing.first_name} {order.billing.last_name}
                   </p>
                   {order.billing.company && <p>{order.billing.company}</p>}
-                  <p>{order.billing.address_1 || (order.billing as any)?.address || 'Brak adresu'}</p>
+                  <p>{order.billing.address_1}</p>
                   {order.billing.address_2 && <p>{order.billing.address_2}</p>}
                   <p>
                     {order.billing.city} {order.billing.postcode}
@@ -220,7 +220,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                   {order.shipping.first_name} {order.shipping.last_name}
                 </p>
                 {order.shipping.company && <p>{order.shipping.company}</p>}
-                <p>{order.shipping.address_1 || (order.shipping as any)?.address || 'Brak adresu'}</p>
+                <p>{order.shipping.address_1}</p>
                 {order.shipping.address_2 && <p>{order.shipping.address_2}</p>}
                 <p>
                   {order.shipping.city} {order.shipping.postcode}
@@ -243,7 +243,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                   {order.billing.first_name} {order.billing.last_name}
                 </p>
                 {order.billing.company && <p>{order.billing.company}</p>}
-                <p>{order.billing.address_1 || (order.billing as any)?.address || 'Brak adresu'}</p>
+                <p>{order.billing.address_1}</p>
                 {order.billing.address_2 && <p>{order.billing.address_2}</p>}
                 <p>
                   {order.billing.city} {order.billing.postcode}
