@@ -62,6 +62,7 @@ export interface Order {
     email: string;
     company?: string;
     address_1?: string;
+    address_2?: string;
     city?: string;
     postcode?: string;
     country?: string;
