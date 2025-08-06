@@ -152,8 +152,21 @@ export const fetchProductsWithFilters = async (
   try {
     const response = await CustomAPI.get('/filtered-products', { params });
 
+    const mapped = (response.data.products || []).map((p: any) => ({
+      ...p,
+      // ensure date_created exists so the "Nowość" badge logic works
+      date_created:
+        p.date_created ||
+        p.date_gmt ||
+        p.date_created_gmt ||
+        p.date ||
+        p.created_date ||
+        p.created_at ||
+        null,
+    }));
+
     return {
-      products: response.data.products || [],
+      products: mapped,
       totalProducts: response.data.total || 0,
     };
   } catch (error) {
@@ -189,6 +202,14 @@ export const fetchSortedProducts = async (
         slug: product.permalink.split('/').filter(Boolean).pop(),
         images: [{ src: product.image }],
         variations: [],
+        date_created:
+          product.date_created ||
+          product.date_gmt ||
+          product.date_created_gmt ||
+          product.date ||
+          product.created_date ||
+          product.created_at ||
+          null,
       })),
       totalProducts: response.data.total || 0,
     };

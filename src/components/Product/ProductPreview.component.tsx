@@ -156,7 +156,14 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const saleTo = parseDate(product.date_on_sale_to);
   const now = new Date();
 
-  const createdDate = parseDate(product.date_created);
+  const createdDate = parseDate(
+    product.date_created ||
+    (product as any).date_created_gmt ||
+    (product as any).date ||
+    (product as any).created_date ||
+    (product as any).created_at ||
+    null,
+  );
   const isNewProduct = createdDate
     ? now.getTime() - createdDate.getTime() <= 30 * 24 * 60 * 60 * 1000
     : false;
