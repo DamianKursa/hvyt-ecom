@@ -1,18 +1,18 @@
-<svg width="207" height="34" viewBox="0 0 207 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="3" y="2" width="15" height="15" fill="#DAD3C8"/>
-<rect x="18" y="2" width="15" height="15" fill="#DAD3C8"/>
-<rect x="33" y="2" width="15" height="15" fill="#DAD3C8"/>
-<rect x="18" y="17" width="15" height="15" fill="#DAD3C8"/>
-<rect x="60" y="2" width="15" height="15" fill="#DAD3C8"/>
-<rect x="75" y="2" width="15" height="15" fill="#DAD3C8"/>
-<rect x="90" y="2" width="15" height="15" fill="#DAD3C8"/>
-<rect x="105" y="2" width="15" height="15" fill="#DAD3C8"/>
-<rect x="120" y="2" width="15" height="15" fill="#DAD3C8"/>
-<rect x="60" y="17" width="15" height="15" fill="#DAD3C8"/>
-<rect x="120" y="17" width="15" height="15" fill="#DAD3C8"/>
-<rect x="147" y="2" width="15" height="15" fill="#DAD3C8"/>
-<rect x="162" y="2" width="15" height="15" fill="#DAD3C8"/>
-<rect x="147" y="17" width="15" height="15" fill="#DAD3C8"/>
-<rect x="204" y="2" width="15" height="15" transform="rotate(90 204 2)" fill="#DAD3C8"/>
-<rect x="204" y="17" width="15" height="15" transform="rotate(90 204 17)" fill="#DAD3C8"/>
+<svg width="208" height="34" viewBox="0 0 208 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M18.5 2H3.5V17H18.5V2Z" fill="#661F30"/>
+<path d="M33.5 2H18.5V17H33.5V2Z" fill="#661F30"/>
+<path d="M48.5 2H33.5V17H48.5V2Z" fill="#661F30"/>
+<path d="M33.5 17H18.5V32H33.5V17Z" fill="#661F30"/>
+<path d="M75.5 2H60.5V17H75.5V2Z" fill="#661F30"/>
+<path d="M90.5 2H75.5V17H90.5V2Z" fill="#661F30"/>
+<path d="M105.5 2H90.5V17H105.5V2Z" fill="#661F30"/>
+<path d="M120.5 2H105.5V17H120.5V2Z" fill="#661F30"/>
+<path d="M135.5 2H120.5V17H135.5V2Z" fill="#661F30"/>
+<path d="M75.5 17H60.5V32H75.5V17Z" fill="#661F30"/>
+<path d="M135.5 17H120.5V32H135.5V17Z" fill="#661F30"/>
+<path d="M162.5 2H147.5V17H162.5V2Z" fill="#661F30"/>
+<path d="M177.5 2H162.5V17H177.5V2Z" fill="#661F30"/>
+<path d="M162.5 17H147.5V32H162.5V17Z" fill="#661F30"/>
+<path d="M204.5 17V2L189.5 2V17H204.5Z" fill="#661F30"/>
+<path d="M204.5 32V17H189.5V32H204.5Z" fill="#661F30"/>
 </svg>
