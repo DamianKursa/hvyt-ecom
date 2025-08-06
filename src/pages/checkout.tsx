@@ -147,30 +147,36 @@ const Checkout: React.FC = () => {
       alert(
         '*Potwierdzam, że zapoznałam/em się z treścią Regulaminu i Polityki Prywatności oraz akceptuję ich postanowienia.',
       );
-      return;
+      setOrderDisabled(false);
+      throw new Error('Validation error');
     }
     if (shippingMethod === 'paczkomaty_inpost' && !selectedLocker) {
       alert('Wybierz paczkomat przed złożeniem zamówienia.');
-      return;
+      setOrderDisabled(false);
+      throw new Error('Validation error');
     }
 
     if (shippingMethod === 'punkty_gls' && !selectedGlsPoint) {
       alert('Wybierz punkt GLS przed złożeniem zamówienia.');
-      return;
+      setOrderDisabled(false);
+      throw new Error('Validation error');
     }
     if (!cart || cart.products.length === 0) {
       alert('Koszyk jest pusty!');
-      return;
+      setOrderDisabled(false);
+      throw new Error('Validation error');
     }
 
     if (!shippingMethod) {
       alert('Wybierz metodę dostawy.');
-      return;
+      setOrderDisabled(false);
+      throw new Error('Validation error');
     }
 
     if (!paymentMethod) {
       alert('Wybierz metodę płatności.');
-      return;
+      setOrderDisabled(false);
+      throw new Error('Validation error');
     }
 
     const missingFields = [];
@@ -190,7 +196,8 @@ const Checkout: React.FC = () => {
           .map((field) => `\n• ${field}`)
           .join('')}`,
       );
-      return;
+      setOrderDisabled(false);
+      throw new Error('Validation error');
     }
 
     // If user is not logged in and the "create account" checkbox is ticked, register the user first.
