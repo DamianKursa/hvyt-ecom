@@ -7,11 +7,18 @@ interface CreateAccountProps {
 const CreateAccount: React.FC<CreateAccountProps> = ({ onSave }) => {
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setPassword(value);
     onSave({ password: value });
+
+    if (value.length < 8) {
+      setPasswordError('Hasło musi mieć co najmniej 8 znaków.');
+    } else {
+      setPasswordError('');
+    }
   };
 
   return (
@@ -27,7 +34,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onSave }) => {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={handlePasswordChange}
-              className="w-full border-b border-black p-2 focus:outline-none placeholder:font-light placeholder:text-black bg-transparent"
+              className={`w-full border-b ${passwordError ? 'border-red-500' : 'border-black'} p-2 focus:outline-none placeholder:font-light placeholder:text-black bg-transparent`}
               placeholder="Hasło"
               required
             />
@@ -37,6 +44,9 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onSave }) => {
               className="absolute right-2 top-3 w-5 h-5 cursor-pointer"
               onClick={() => setShowPassword(!showPassword)}
             />
+            {passwordError && (
+              <p className="text-red-500 text-xs mt-1">{passwordError}</p>
+            )}
           </div>
         </div>
       </div>

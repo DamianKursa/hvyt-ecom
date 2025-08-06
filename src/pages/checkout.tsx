@@ -15,6 +15,7 @@ import { CartContext } from '@/stores/CartProvider';
 import { ExternalIdContext } from '@/context/ExternalIdContext';
 import { useUserContext } from '@/context/UserContext';
 import { pushGTMEvent } from '@/utils/gtm';
+import CreateAccount from '@/components/UI/CreateAccount';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -38,6 +39,7 @@ const Checkout: React.FC = () => {
   const [isTermsChecked, setIsTermsChecked] = useState<boolean>(false);
   const [orderDisabled, setOrderDisabled] = useState(false);
   const [selectedGlsPoint, setSelectedGlsPoint] = useState<any>(null);
+  const [createAccount, setCreateAccount] = useState<boolean>(false);
 
   const [billingData, setBillingData] = useState({
     firstName: '',
@@ -190,20 +192,24 @@ const Checkout: React.FC = () => {
       return;
     }
 
-    // If user is not logged in and a password is provided, create an account.
-    if (!user && password) {
-      try {
-        const registerResponse = await axios.post('/api/auth/register', {
-          first_name: billingData.firstName,
-          last_name: billingData.lastName,
-          email,
-          password,
-        });
-        console.log('Account created:', registerResponse.data);
-      } catch (err) {
-        console.error('Error creating account:', err);
-        alert('Błąd przy tworzeniu konta. Spróbuj ponownie.');
-        return;
+    // If user is not logged in and the "create account" checkbox is ticked, register the user first.
+    if (!user && createAccount) {
+      if (!password || password.length < 8) {
+        // Invalid or missing password – skip account creation quietly
+        console.log('Skipped account creation: password too short or missing');
+      } else {
+        try {
+          await axios.post('/api/auth/register', {
+            first_name: billingData.firstName,
+            last_name: billingData.lastName,
+            email,
+            password,
+          });
+          console.log('Account created successfully');
+        } catch (err) {
+          // Log only—do not interrupt checkout flow
+          console.error('Account creation failed:', err);
+        }
       }
     }
     // Map country names to codes
@@ -529,6 +535,37 @@ const Checkout: React.FC = () => {
               user={user}
               setBillingData={setBillingData}
             />
+            {!user && (
+              <>
+                {/* Create account opt‑in */}
+                <div className="mt-6">
+                  <label className="flex items-center gap-3 text-sm cursor-pointer w-full">
+                    <input
+                      type="checkbox"
+                      checked={createAccount}
+                      onChange={() => setCreateAccount((prev) => !prev)}
+                      className="hidden"
+                    />
+                    <span
+                      className={`w-5 h-5 flex items-center justify-center border rounded ${createAccount ? 'bg-black text-white' : 'border-black'
+                        }`}
+                    >
+                      {createAccount && (
+                        <img src="/icons/check.svg" alt="check" className="w-4 h-4" />
+                      )}
+                    </span>
+                    <span className="text-sm leading-tight w-full">
+                      Stwórz konto
+                    </span>
+                  </label>
+                </div>
+
+                {/* Password field (re‑uses existing component) */}
+                {createAccount && (
+                  <CreateAccount onSave={({ password }) => setPassword(password)} />
+                )}
+              </>
+            )}
             <div className="mt-8">
               <h2 className="text-2xl font-bold mb-6 text-dark-pastel-red">
                 Adres
