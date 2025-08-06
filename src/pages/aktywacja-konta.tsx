@@ -8,7 +8,7 @@ const ActivationPage: React.FC = () => {
 
   return (
     <Layout title="Potwierdź email">
-      <div className="min-h-screen bg-[#F5F5F2] flex items-center justify-center px-4 py-8">
+      <div className="bg-[#F5F5F2] flex items-center justify-center px-4 py-8">
         <div className="w-[1000px] md:mt-0 rounded-[25px] bg-white p-8 shadow-sm">
           <div className="max-w-[600px] w-full flex flex-col items-center justify-center mx-auto">
             <h1 className="text-[18px] md:text-[28px] font-semibold mb-4 text-black">
