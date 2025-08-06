@@ -52,6 +52,9 @@ export interface CheckoutAddressFormProps {
   >;
   isShippingDifferent: boolean;
   setIsShippingDifferent: React.Dispatch<React.SetStateAction<boolean>>;
+  saveAddress: boolean;
+  setSaveAddress: React.Dispatch<React.SetStateAction<boolean>>;
+  user: any;
 }
 
 const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
@@ -61,6 +64,9 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   setBillingData,
   isShippingDifferent,
   setIsShippingDifferent,
+  saveAddress,
+  setSaveAddress,
+  user,
 }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [needVATInvoice, setNeedVATInvoice] = useState<boolean>(false);
@@ -208,6 +214,14 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
 
     fetchAddresses();
   }, [setBillingData, setShippingData]);
+
+  // Hide/disable the checkbox when the user already has 3 saved addresses
+  useEffect(() => {
+    if (savedAddresses.length >= 3 && saveAddress) {
+      // uncheck if it was previously selected
+      setSaveAddress(false);
+    }
+  }, [savedAddresses.length, saveAddress, setSaveAddress]);
 
 
   if (loading) {
@@ -491,6 +505,16 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         </div>
       )}
 
+      {/* Save address checkbox (visible for logged‑in users only and if user has fewer than 3 addresses) */}
+      {user && savedAddresses.length < 3 && (
+        <div className="mt-8">
+          <Checkbox
+            checked={saveAddress}
+            onChange={() => setSaveAddress(prev => !prev)}
+            label="Zapisz ten adres w moim koncie"
+          />
+        </div>
+      )}
       {/* Additional order notes */}
       <h3 className="text-[14px] font-bold mt-8 mb-2">
         Dodatkowe informacje do zamówienia (opcjonalnie)

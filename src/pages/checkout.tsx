@@ -40,6 +40,7 @@ const Checkout: React.FC = () => {
   const [orderDisabled, setOrderDisabled] = useState(false);
   const [selectedGlsPoint, setSelectedGlsPoint] = useState<any>(null);
   const [createAccount, setCreateAccount] = useState<boolean>(false);
+  const [saveAddress, setSaveAddress] = useState<boolean>(false);
 
   const [billingData, setBillingData] = useState({
     firstName: '',
@@ -367,6 +368,32 @@ const Checkout: React.FC = () => {
       });
       const createdOrder = response.data;
 
+      // ── Fire‑and‑forget address save (never blocks checkout) ───────────────
+      if (user && saveAddress) {
+        const addressToSave = isShippingDifferent ? shippingData : billingData;
+
+        axios
+          .post(
+            '/api/moje-konto/adresy',
+            {
+              action: 'add',
+              address: addressToSave,
+            },
+            {
+              headers: { 'Content-Type': 'application/json' },
+              withCredentials: true, // send auth cookies
+            },
+          )
+          .then(() => {
+            console.log('Address saved to account');
+          })
+          .catch((err) => {
+            // Log error for Vercel diagnostics, but NEVER block the order flow
+            console.error('Error saving address:', err);
+          });
+      }
+      // ── end fire‑and‑forget address save ───────────────────────────────────
+
       pushGTMEvent('purchase', {
         transaction_id: createdOrder.id,
         value: cart.totalProductsPrice,
@@ -577,6 +604,9 @@ const Checkout: React.FC = () => {
                 setShippingData={setShippingData}
                 isShippingDifferent={isShippingDifferent}
                 setIsShippingDifferent={setIsShippingDifferent}
+                saveAddress={saveAddress}
+                setSaveAddress={setSaveAddress}
+                user={user}
               />
             </div>
             <div className="mt-8">
