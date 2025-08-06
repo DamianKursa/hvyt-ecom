@@ -1,5 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Order } from '@/utils/functions/interfaces';
+
+import { useRouter } from 'next/router';
+import { CartContext } from '@/stores/CartProvider';
 
 interface OrderDetailsProps {
   order: Order;
@@ -14,6 +17,40 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
     (parseFloat(order.subtotal || calculatedSubtotal) * 23) /
     100
   ).toFixed(2);
+
+  const router = useRouter();
+  const { addCartItem } = React.useContext(CartContext);
+
+  const [repeatOpen, setRepeatOpen] = useState(false);
+
+  const handleConfirmRepeat = () => {
+    if (!order?.line_items?.length) {
+      console.error('Brak danych produktów do ponowienia zamówienia');
+      setRepeatOpen(false);
+      return;
+    }
+
+    order.line_items.forEach((item: any) => {
+      const price = item.current_price ?? item.price ?? 0;
+      addCartItem({
+        cartKey:
+          String(item.product_id) + String(item.variation_id || '') + '-repeat',
+        name: item.name,
+        qty: item.quantity,
+        price,
+        totalPrice: price * item.quantity,
+        image:
+          typeof item.image === 'object'
+            ? item.image.src
+            : item.image ?? '/fallback-image.jpg',
+        productId: item.product_id,
+        variationId: item.variation_id,
+      });
+    });
+
+    setRepeatOpen(false);
+    router.push('/koszyk');
+  };
 
   // Desktop: Shipping address
   const renderShippingAddressDesktop = () => {
@@ -231,7 +268,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
 
         {/* Action Button */}
         <div className="mt-6 text-right">
-          <button className="bg-black text-white py-3 px-4 rounded-full">
+          <button
+            onClick={() => setRepeatOpen(true)}
+            className="bg-black text-white py-3 px-4 rounded-full"
+          >
             Ponów zamówienie
           </button>
         </div>
@@ -292,12 +332,49 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
 
           {/* Action Button (Mobile) */}
           <div className="mt-4 text-right">
-            <button className="bg-dark-pastel-red w-full text-white py-3 px-4 rounded-full font-semibold">
+            <button
+              onClick={() => setRepeatOpen(true)}
+              className="bg-dark-pastel-red w-full text-white py-3 px-4 rounded-full font-semibold"
+            >
               Ponów zamówienie
             </button>
           </div>
         </div>
       </div>
+      {repeatOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#36313266]">
+          <div className="bg-[#F8F5F3] rounded-[25px] w-11/12 md:w-[600px] p-8 relative">
+            <button
+              className="absolute right-5 top-5 text-2xl"
+              aria-label="Zamknij"
+              onClick={() => setRepeatOpen(false)}
+            >
+              ×
+            </button>
+            <h2 className="text-[24px] md:text-[28px] font-bold mb-6">
+              Ponów zamówienie
+            </h2>
+            <p className="text-[16px] mb-10 leading-snug">
+              Produkty zostaną dodane do koszyka z&nbsp;uwzględnieniem ich aktualnych
+              cen. Czy chcesz kontynuować?
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setRepeatOpen(false)}
+                className="flex-1 border border-black rounded-full py-3 text-center"
+              >
+                Anuluj
+              </button>
+              <button
+                onClick={handleConfirmRepeat}
+                className="flex-1 bg-black text-white rounded-full py-3 text-center"
+              >
+                Kontynuuj
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
