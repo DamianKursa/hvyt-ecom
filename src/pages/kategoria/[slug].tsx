@@ -229,6 +229,7 @@ const CategoryPage = ({
     );
   };
 
+
   const updateUrlWithFilters = (filters: { name: string; value: string }[]) => {
     const query: Record<string, string | string[]> = { slug: slug || '' };
     filters.forEach((filter) => {
@@ -438,6 +439,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     { params: { slug: 'klamki' } },
     { params: { slug: 'wieszaki' } },
     { params: { slug: 'meble' } },
+    { params: { slug: 'sale' } },
   ];
 
   return {
