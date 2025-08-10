@@ -7,8 +7,45 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [latestKolekcja, setLatestKolekcja] = useState<any>(null);
+  const [topClicked, setTopClicked] = useState<any[]>([]);
+  useEffect(() => {
+    async function fetchTop() {
+      try {
+        const base = process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://wp.hvyt.pl';
+        const res = await fetch(`${base}/wp-json/hvyt/v1/top-clicked-products`);
+        if (res.ok) {
+          const data = await res.json();
+          setTopClicked(Array.isArray(data) ? data : []);
+        }
+      } catch (e) {
+        console.error('Failed to load top clicked products', e);
+      }
+    }
+    fetchTop();
+  }, []);
   const [hasSearched, setHasSearched] = useState(false);
 
+  const logSearchClick = (productId: number) => {
+    try {
+      const url = `${process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://wp.hvyt.pl'}/wp-json/hvyt/v1/log-search-click`;
+      const payload = JSON.stringify({ productId });
+      if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+        const blob = new Blob([payload], { type: 'application/json' });
+        (navigator as any).sendBeacon(url, blob);
+      } else {
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          // helps the request survive page navigation in some browsers
+          // @ts-ignore
+          keepalive: true,
+        }).catch(() => { });
+      }
+    } catch {
+      // no-op
+    }
+  };
   useEffect(() => {
     // Disable scrolling when modal is open
     document.body.style.overflow = 'hidden';
@@ -116,7 +153,10 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
                   >
                     <div
                       className="flex flex-col items-start text-start cursor-pointer"
-                      onClick={onClose}
+                      onClick={() => {
+                        logSearchClick(product.id);
+                        onClose();
+                      }}
                     >
                       <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
                         <Image
@@ -150,7 +190,39 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
           )}
 
           {/* Static Section */}
-          <div className="mt-6 flex w-full">
+          <div className="mt-6 flex w-full gap-6">
+            {/* Top clicked products (before Kolekcje), same card style */}
+            {topClicked && topClicked.length > 0 && (
+              <div className="w-3/10">
+                <h3 className="text-sm font-semibold mb-2">Najczęściej wyszukiwane</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  {topClicked.slice(0, 3).map((p) => (
+                    <Link href={`/produkt/${p.slug}`} key={p.id} passHref>
+                      <div
+                        className="flex flex-col items-start text-start cursor-pointer"
+                        onClick={() => {
+                          logSearchClick(p.id);
+                          onClose();
+                        }}
+                      >
+                        <div className="w-[140px] h-[140px] bg-gray-200 rounded-lg mb-2">
+                          <Image
+                            height={140}
+                            width={140}
+                            src={p.image}
+                            alt={p.name}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        </div>
+                        <p className="text-sm font-medium">{p.name}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Kolekcje */}
             <div className="w-3/10">
               <h3 className="text-sm font-semibold mb-2">Co nowego?</h3>
               {latestKolekcja && (
