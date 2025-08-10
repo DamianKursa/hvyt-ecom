@@ -14,10 +14,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       const response = await axios.get(
         `${process.env.WORDPRESS_API_URL}/wp-json/custom-api/v1/billing-addresses`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` }, params: req.query }
       );
       return res.status(200).json(response.data);
     } catch (error: any) {
+      console.error('Billing addresses API error (GET):', error?.response?.data || error?.message);
       return res.status(500).json({ error: 'Failed to fetch billing addresses' });
     }
   }
@@ -38,11 +39,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
+          params: req.query,
         }
       );
 
       return res.status(200).json(response.data);
     } catch (error: any) {
+      console.error('Billing addresses API error (POST):', error?.response?.data || error?.message);
       return res.status(500).json({ error: 'Failed to save billing address' });
     }
   }

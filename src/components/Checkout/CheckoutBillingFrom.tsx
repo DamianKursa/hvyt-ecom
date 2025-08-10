@@ -102,6 +102,10 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             setEmail(address.email);
           }
         }
+        else {
+          if (user?.user_email) setEmail(user.user_email);
+          else if (user?.email) setEmail(user.email);
+        }
       } catch (err) {
         console.error('Error fetching billing address:', err);
       } finally {
@@ -111,6 +115,19 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
 
     fetchBillingAddress();
   }, [customerType, setBillingData, setEmail]);
+
+  // Prefill email on mount if still empty and user is present (and react if user or email changes)
+  useEffect(() => {
+    if (user && (!email || email.trim() === '')) {
+      const fromUser = (user.user_email || user.email || '').trim();
+      if (fromUser) setEmail(fromUser);
+    }
+  }, [user, email, setEmail]);
+
+  // Always propagate email into billing data when it changes
+  useEffect(() => {
+    setBillingData((prev) => ({ ...prev, email }));
+  }, [email, setBillingData]);
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     const updatedFormData = { ...formData, [field]: value };
@@ -281,7 +298,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
         <div className="relative w-full">
           <input
             type="email"
-            value={email}
+            value={email || ''}
             required
             onFocus={() => setFocusedField('email')}
             onBlur={() => setFocusedField(null)}
@@ -289,10 +306,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
           />
           <span
-            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${email || focusedField === 'email'
-              ? 'opacity-0'
-              : 'opacity-100'
-              }`}
+            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${(email) || focusedField === 'email' ? 'opacity-0' : 'opacity-100'}`}
           >
             Adres e-mail<span className="text-red-500">*</span>
           </span>
