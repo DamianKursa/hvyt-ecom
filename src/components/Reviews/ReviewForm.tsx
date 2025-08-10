@@ -15,9 +15,34 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
   });
   const [error, setError] = useState<string>('');
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [attachmentError, setAttachmentError] = useState<string>('');
 
   const handleStarClick = (rating: number) => {
     setFormData({ ...formData, rating });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setAttachmentError('');
+
+    if (!files.length) {
+      setAttachments([]);
+      return;
+    }
+
+    const current = [...attachments];
+    for (const file of files) {
+      if (current.length >= 5) break; // max 5
+      const isImage = file.type.startsWith('image/');
+      const isSmall = file.size <= 1024 * 1024; // 1MB
+      if (!isImage) { setAttachmentError('Dozwolone są tylko pliki graficzne.'); continue; }
+      if (!isSmall) { setAttachmentError('Maksymalny rozmiar pliku to 1MB.'); continue; }
+      current.push(file);
+    }
+    setAttachments(current.slice(0, 5));
+    // reset input so same files can be re-selected
+    e.currentTarget.value = '';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,18 +60,33 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
     setFieldErrors({});
 
     try {
-      const res = await fetch('/api/reviews', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productId,
-          name: formData.name,
-          email: formData.email,
-          content: formData.content,
-          rating: formData.rating,
-          status: 'hold',
-        }),
-      });
+      const hasFiles = attachments.length > 0;
+      let res: Response;
+      if (!hasFiles) {
+        // Keep existing JSON flow when no images selected
+        res = await fetch('/api/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId,
+            name: formData.name,
+            email: formData.email,
+            content: formData.content,
+            rating: formData.rating,
+            status: 'hold',
+          }),
+        });
+      } else {
+        // Send multipart when images are attached
+        const form = new FormData();
+        form.append('productId', String(productId));
+        form.append('name', formData.name);
+        form.append('email', formData.email);
+        form.append('content', formData.content);
+        form.append('rating', String(formData.rating));
+        attachments.forEach((file) => form.append('attachments', file));
+        res = await fetch('/api/reviews', { method: 'POST', body: form });
+      }
       if (!res.ok) {
         throw new Error('Error submitting review');
       }
@@ -137,7 +177,32 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
           <span>{fieldErrors.content}</span>
         </div>
       )}
-      {/* Removed file attachment section */}
+      {/* Załączniki (opcjonalne) */}
+      <div className="mt-2">
+        <label className="block text-sm mb-2">Dodaj załączniki (max 5, jpg/png, max 1MB każdy)</label>
+        <div className="flex items-center gap-4">
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileChange}
+            className="text-sm"
+          />
+        </div>
+        {attachmentError && (
+          <div className="flex items-center text-[#A83232] text-sm mt-1">
+            <img src="/icons/Warning_Circle_Warning.svg" alt="Warning" className="w-4 h-4 mr-2" />
+            <span>{attachmentError}</span>
+          </div>
+        )}
+      </div>
+      {attachments.length > 0 && (
+        <div className="flex flex-wrap gap-2 text-sm text-neutral-darkest mt-2">
+          {attachments.map((file, idx) => (
+            <img key={idx} src={URL.createObjectURL(file)} alt={`Podgląd ${idx + 1}`} className="w-14 h-14 object-cover rounded-md" />
+          ))}
+        </div>
+      )}
       {/* Styled Checkbox */}
       <div className="mt-6">
         <label className="flex items-center gap-2 text-sm">

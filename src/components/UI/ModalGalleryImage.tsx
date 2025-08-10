@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import Image from 'next/image';
+import React, { useEffect, useState } from 'react';
 
 interface ModalImageGalleryProps {
   images: string[];
@@ -18,32 +17,45 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
   const canGoNext = currentIndex < images.length - 1;
   const showArrows = images.length > 1;
 
-  const handleNext = () => {
-    if (canGoNext) {
-      setCurrentIndex((prevIndex) => prevIndex + 1);
-    }
-  };
+  const handleNext = () => canGoNext && setCurrentIndex((i) => i + 1);
+  const handlePrevious = () => canGoPrev && setCurrentIndex((i) => i - 1);
 
-  const handlePrevious = () => {
-    if (canGoPrev) {
-      setCurrentIndex((prevIndex) => prevIndex - 1);
-    }
+  // ESC + arrows + body scroll lock
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowRight' && canGoNext) setCurrentIndex((i) => i + 1);
+      if (e.key === 'ArrowLeft' && canGoPrev) setCurrentIndex((i) => i - 1);
+    };
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = overflow;
+    };
+  }, [canGoNext, canGoPrev, onClose]);
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) onClose();
   };
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ backgroundColor: 'rgba(46, 23, 18, 0.5)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
+      onMouseDown={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image gallery modal"
     >
       <div
-        className="relative bg-white rounded-lg shadow-lg mx-4 md:mx-0 md:px-0 flex items-center justify-center overflow-auto"
-        style={
-          {
-            // Allow vertical scroll if the image exceeds viewport height
-          }
-        }
+        className="
+          relative inline-block bg-white rounded-[25px] overflow-hidden shadow-lg mx-4
+          p-0
+          max-w-[90vw] max-h-[90vh]
+        "
       >
-        {/* Close button */}
+        {/* Close */}
         <button
           className="absolute top-4 right-4 text-black text-2xl hover:text-gray-700 z-10"
           onClick={onClose}
@@ -52,38 +64,28 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
           &times;
         </button>
 
-        {/* Image Display */}
-        <div
-          className="relative flex items-center justify-center"
-          style={{
-            maxHeight: '100vh', // Modal height should fit within the viewport height
-            overflow: 'hidden', // Prevent any overflow
-          }}
-        >
-          <Image
+        {/* Image (CSS only: natural size, capped by 90vw/90vh, object-contain) */}
+        <div className="flex items-center justify-center">
+          <img
+            key={images[currentIndex]} // retrigger CSS transition on change
             src={images[currentIndex]}
-            alt={`Image ${currentIndex + 1}`}
-            layout="responsive" // Preserve the image's original aspect ratio
-            width={1440} // Provide a reasonable width for large images
-            height={0} // Match the image's aspect ratio (or adjust for your image)
-            style={{
-              width: 'auto', // Let the width scale proportionally
-              height: '100%', // Scale height to fit the modal container
-              maxWidth: '100%', // Prevent the image from exceeding the modal width
-              maxHeight: '100%', // Prevent the image from exceeding the modal height
-              objectFit: 'cover', // Ensure no cropping
-            }}
-            priority
+            alt={`Image ${currentIndex + 1} of ${images.length}`}
+            className="
+              block
+              w-auto h-auto
+              max-w-[90vw] max-h-[90vh]
+              object-contain
+              transition-opacity duration-300 ease-in-out
+              opacity-100
+            "
+            draggable={false}
           />
         </div>
 
         {showArrows && (
-          // Previous button
           <button
             onClick={handlePrevious}
-            className={`absolute left-8 top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-lg ${canGoPrev
-                ? 'bg-black text-white'
-                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+            className={`absolute left-4 md:left-6 top-1/2 -translate-y-1/2 p-3 rounded-full shadow-lg ${canGoPrev ? 'bg-black text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
               } z-10`}
             disabled={!canGoPrev}
             aria-label="Previous Image"
@@ -93,12 +95,9 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
         )}
 
         {showArrows && (
-          // Next button
           <button
             onClick={handleNext}
-            className={`absolute right-8 top-1/2 transform -translate-y-1/2 p-3 rounded-full shadow-lg ${canGoNext
-                ? 'bg-black text-white'
-                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+            className={`absolute right-4 md:right-6 top-1/2 -translate-y-1/2 p-3 rounded-full shadow-lg ${canGoNext ? 'bg-black text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
               } z-10`}
             disabled={!canGoNext}
             aria-label="Next Image"
