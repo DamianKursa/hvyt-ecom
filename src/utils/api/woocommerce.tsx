@@ -237,20 +237,50 @@ export const fetchProductsByAttribute = async (kolekcja: string) => {
 
 export const fetchCrossSellProducts = async (productId: string) => {
   try {
-    const productResponse = await WooCommerceAPI.get(`/products/${productId}`);
+    // 1) Get product and its cross_sell_ids
+    const productResponse = await WooCommerceAPI.get(`/products/${productId}`, {
+      params: { ts: Date.now() }, // bust caches
+    });
     const productData = productResponse.data;
-    const crossSellIds = (productData.cross_sell_ids || []).slice(0, 6);
+    const crossSellIds: number[] = (productData.cross_sell_ids || []).filter(Boolean);
 
-    if (crossSellIds.length === 0) {
+    if (!crossSellIds.length) {
       return { products: [] };
     }
 
+    // 2) Fetch those products, preserving order from include
     const response = await WooCommerceAPI.get('/products', {
-      params: { include: crossSellIds.join(','), per_page: 6 },
+      params: {
+        include: crossSellIds.join(','),
+        per_page: Math.min(20, crossSellIds.length),
+        status: 'publish',            // only published
+        orderby: 'include',           // preserve provided order
+        ts: Date.now(),               // bust caches
+      },
       timeout: 5000,
     });
 
-    return { products: response.data };
+    let items: any[] = Array.isArray(response.data) ? response.data : [];
+
+    // 3) Filter out hidden/out‑of‑stock if desired
+    items = items.filter((p) => (
+      (p?.catalog_visibility ?? 'visible') !== 'hidden' &&
+      (p?.status ?? 'publish') === 'publish'
+    ));
+
+    // 4) Sort back to the order of crossSellIds (some gateways re-order anyway)
+    const orderMap = new Map(crossSellIds.map((id, idx) => [String(id), idx]));
+    items.sort((a, b) => (orderMap.get(String(a.id)) ?? 0) - (orderMap.get(String(b.id)) ?? 0));
+
+    // 5) Ensure each product has at least a fallback image (so no broken tile)
+    items = items.map((p) => ({
+      ...p,
+      images: (Array.isArray(p.images) && p.images.length > 0)
+        ? p.images
+        : [{ src: '/fallback-image.jpg' }],
+    }));
+
+    return { products: items };
   } catch (error) {
     console.error('Error fetching cross-sell products:', error);
     return { products: [] };
