@@ -6,7 +6,8 @@ interface PriceSliderProps {
   maxPrice: number;
   currentRange: [number, number];
   onPriceChange: (range: [number, number]) => void;
-  disabled?: boolean; // Optional prop if you need to disable the slider or button externally
+  disabled?: boolean;
+  categorySlug?: string; // Optional prop if you need to disable the slider or button externally
 }
 
 const PriceSlider: React.FC<PriceSliderProps> = ({
@@ -14,8 +15,10 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   maxPrice,
   currentRange,
   onPriceChange,
+  categorySlug,
   disabled = false,
 }) => {
+
   const [range, setRange] = useState<[number, number]>(currentRange);
 
   useEffect(() => {
@@ -46,31 +49,33 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   return (
     <div className="px-2 py-2 price-slider">
       {/* React Slider */}
-      {/* @ts-ignore */}
-      <ReactSlider
-        className="horizontal-slider"
-        thumbClassName="slider-thumb"
-        renderTrack={(props, state) => {
-          const backgroundColor =
-            state.index === 0 || state.index === 2 ? '#e0e0e0' : '#661f30';
-                  {/* @ts-ignore */}
-          return <div
-              {...props}
-              className="horizontal-slider-track"
-              style={{
-                ...props.style,
-                background: backgroundColor,
-              }}
-            />
-          
-        }}
-        min={minPrice}
-        max={maxPrice}
-        step={1}
-        value={range}
-        onChange={handleSliderChange}
-        // We remove onAfterChange so that onPriceChange isn't called on every slider change
-      />
+      {categorySlug !== 'meble' && (
+        // @ts-ignore
+        <ReactSlider
+          className="horizontal-slider"
+          thumbClassName="slider-thumb"
+          renderTrack={(props, state) => {
+            const backgroundColor =
+              state.index === 0 || state.index === 2 ? '#e0e0e0' : '#661f30';
+            // @ts-ignore
+            return (
+              <div
+                {...props}
+                className="horizontal-slider-track"
+                style={{
+                  ...props.style,
+                  background: backgroundColor,
+                }}
+              />
+            );
+          }}
+          min={minPrice}
+          max={maxPrice}
+          step={1}
+          value={range}
+          onChange={handleSliderChange}
+        />
+      )}
 
       {/* Input Fields for Prices */}
       <div className="flex justify-between mt-4 gap-4">

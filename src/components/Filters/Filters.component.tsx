@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import SkeletonFilter from '../Skeletons/SkeletonFilter.component';
 import Snackbar from '../UI/Snackbar.component';
 import PriceSlider from '@/components/UI/PriceSlider';
+import { useRouter } from 'next/router';
 
 interface FilterOption {
   name: string;
@@ -22,6 +23,7 @@ interface FiltersProps {
   setTotalProducts: (total: number) => void;
   filterOrder?: string[];
   initialAttributes?: FilterAttribute[];
+  categorySlug?: string;
 }
 
 const Filters: React.FC<FiltersProps> = ({
@@ -32,7 +34,12 @@ const Filters: React.FC<FiltersProps> = ({
   setTotalProducts,
   filterOrder = [],
   initialAttributes = [],
+  categorySlug,
 }) => {
+  const router = useRouter();
+  const slugFromRouter = Array.isArray(router.query.slug) ? router.query.slug[0] : (router.query.slug as string | undefined);
+  const slug = categorySlug ?? slugFromRouter;
+
   const [attributes, setAttributes] =
     useState<FilterAttribute[]>(initialAttributes);
   const [loading, setLoading] = useState(initialAttributes.length === 0);
@@ -54,10 +61,10 @@ const Filters: React.FC<FiltersProps> = ({
       const orderedAttributes =
         filterOrder.length > 0
           ? filterOrder
-              .map((order) =>
-                initialAttributes.find((attr) => attr.name === order),
-              )
-              .filter((attr): attr is FilterAttribute => !!attr)
+            .map((order) =>
+              initialAttributes.find((attr) => attr.name === order),
+            )
+            .filter((attr): attr is FilterAttribute => !!attr)
           : initialAttributes;
 
       setAttributes(orderedAttributes);
@@ -88,10 +95,10 @@ const Filters: React.FC<FiltersProps> = ({
         const orderedAttributes =
           filterOrder.length > 0
             ? filterOrder
-                .map((order) =>
-                  fetchedAttributes.find((attr) => attr.name === order),
-                )
-                .filter((attr): attr is FilterAttribute => !!attr)
+              .map((order) =>
+                fetchedAttributes.find((attr) => attr.name === order),
+              )
+              .filter((attr): attr is FilterAttribute => !!attr)
             : fetchedAttributes;
         setAttributes(orderedAttributes);
         setPriceRange([0, 500]);
@@ -126,9 +133,9 @@ const Filters: React.FC<FiltersProps> = ({
     const updatedFilters = checked
       ? [...activeFilters, { name: attributeSlug, value: optionSlug }]
       : activeFilters.filter(
-          (filter) =>
-            !(filter.name === attributeSlug && filter.value === optionSlug),
-        );
+        (filter) =>
+          !(filter.name === attributeSlug && filter.value === optionSlug),
+      );
 
     onFilterChange(updatedFilters);
 
@@ -299,9 +306,8 @@ const Filters: React.FC<FiltersProps> = ({
                       />
                       <label
                         htmlFor={`${attribute.slug}-${option.slug}`}
-                        className={`flex items-center cursor-pointer w-5 h-5 border border-black rounded ${
-                          isChecked ? 'bg-black' : ''
-                        }`}
+                        className={`flex items-center cursor-pointer w-5 h-5 border border-black rounded ${isChecked ? 'bg-black' : ''
+                          }`}
                       >
                         {isChecked && (
                           <img
@@ -349,9 +355,10 @@ const Filters: React.FC<FiltersProps> = ({
           {expandedFilters['price'] && (
             <PriceSlider
               minPrice={0}
-              maxPrice={300}
+              maxPrice={500}
               currentRange={priceRange}
               onPriceChange={handlePriceChange}
+              categorySlug={slug}
             />
           )}
         </div>
