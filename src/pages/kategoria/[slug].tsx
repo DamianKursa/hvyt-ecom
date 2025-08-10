@@ -320,6 +320,7 @@ const CategoryPage = ({
                 setTotalProducts={() => { }}
                 filterOrder={filterOrder[slug || ''] || []}
                 initialAttributes={initialAttributes}
+                categorySlug={slug as string}
               />
             </div>
           )}
