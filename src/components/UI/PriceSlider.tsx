@@ -54,18 +54,14 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
         <ReactSlider
           className="horizontal-slider"
           thumbClassName="slider-thumb"
-          renderTrack={(props, state) => {
-            const backgroundColor =
-              state.index === 0 || state.index === 2 ? '#e0e0e0' : '#661f30';
-            // @ts-ignore
+          renderTrack={(trackProps: any, state: { index: number }) => {
+            const backgroundColor = state.index === 0 || state.index === 2 ? '#e0e0e0' : '#661f30';
+            const { style, ...rest } = trackProps || {};
             return (
               <div
-                {...props}
+                {...(rest as any)}
                 className="horizontal-slider-track"
-                style={{
-                  ...props.style,
-                  background: backgroundColor,
-                }}
+                style={{ ...(style || {}), background: backgroundColor }}
               />
             );
           }}
