@@ -20,6 +20,20 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
   const isMobile = useIsMobile();
+
+  const [isTabletOrBelow, setIsTabletOrBelow] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 1024px)');
+    const update = () => setIsTabletOrBelow(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+
+  // Treat tablets like mobile for menu/layout decisions
+  const isCompact = isMobile || isTabletOrBelow;
+
   const isHomePage = router.pathname === '/';
   const isKoszykPage = router.pathname === '/koszyk';
   const isOnasPage = router.pathname === '/o-nas';
@@ -80,7 +94,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   return (
     <>
       {/* Mobile Menu Component */}
-      {isMobile && menuOpen && (
+      {isCompact && menuOpen && (
         <MobileMenu
           menuOpen={menuOpen}
           isLoggedIn={!!user}
@@ -106,7 +120,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               </div>
 
               {/* Center Navigation Links for Desktop */}
-              {!isMobile && (
+              {!isCompact && (
                 <div className="flex-none mx-auto ">
                   <div
                     className="hidden md:flex md:items-center px-1 rounded-full justify-center h-[50px]"
@@ -178,7 +192,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                   className="flex items-center space-x-4 px-6 py-2 rounded-full h-[50px]"
                   style={{ backgroundColor: '#E9E5DFCC' }}
                 >
-                  {isMobile ? (
+                  {isCompact ? (
                     <div className="flex items-center space-x-4">
                       <button onClick={toggleSearch}>
                         <img
