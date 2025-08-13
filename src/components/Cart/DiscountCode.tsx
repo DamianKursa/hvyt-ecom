@@ -265,9 +265,9 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
       {cart?.coupon?.discountValue != null && (
         <div className="flex justify-between items-center">
-          <span className="text-neutral-darkest font-medium">Wartość rabatu</span>
+          <span className="text-neutral-darkest font-medium text-[18px]">Wartość rabatu</span>
           <span className="font-semibold text-neutral-darkest">
-            {Number(cart.coupon.discountValue).toFixed(2)} zł
+            - {Number(cart.coupon.discountValue).toFixed(2).replace('.', ',')} zł
           </span>
         </div>
       )}

@@ -114,7 +114,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
       <div className="flex justify-between items-top mb-6">
         <div className="flex flex-col">
-          <span className="text-base text-neutral-darkest font-bold">Suma</span>
+          <span className=" text-neutral-darkest font-medium text-[18px]">Suma</span>
         </div>
         <span className="text-2xl font-bold text-dark-pastel-red">
           {loading ? (
