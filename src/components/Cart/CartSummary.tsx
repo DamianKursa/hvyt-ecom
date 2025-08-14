@@ -15,6 +15,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   shippingPrice = 0,
   onCheckout,
   isCheckoutPage = false,
+  disabled = false,
 }) => {
   const [totalPrice, setTotalPrice] = useState(totalProductsPrice);
   const [loading, setLoading] = useState(false);
@@ -39,17 +40,15 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     price.toFixed(2).replace('.', ',') + ' zł';
 
   const handleButtonClick = async () => {
+    if (disabled) return; // twarda blokada, gdy koszyk niepoprawny
+
     if (isCheckoutPage) {
-      // Prevent multiple clicks if already processing
       if (localLoading) return;
-      // Disable the button immediately
       setLocalLoading(true);
       try {
         await onCheckout();
-        // Keep the button disabled for 10 seconds on success
         setTimeout(() => setLocalLoading(false), 10000);
       } catch (error) {
-        // Re-enable immediately on error
         setLocalLoading(false);
       }
     } else {
@@ -134,9 +133,11 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
       <button
         onClick={handleButtonClick}
-        disabled={localLoading}
-        className={`w-full py-4 bg-black text-white text-lg font-light rounded-full hover:bg-neutral-dark transition-colors ${localLoading ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
+        disabled={localLoading || disabled}
+        aria-disabled={disabled}
+        className={`w-full py-4 text-white text-lg font-light rounded-full transition-colors
+    ${disabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-neutral-dark'}
+    ${localLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         {localLoading
           ? 'Przetwarzanie...'
@@ -144,6 +145,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             ? 'Zamawiam i Płacę'
             : 'Przejdź do kasy'}
       </button>
+
 
       <style jsx>{`
         .loader-pulse {

@@ -12,7 +12,47 @@ const Koszyk: React.FC = () => {
   const { cart, updateCartItem, removeCartItem } = useContext(CartContext);
   const [mounted, setMounted] = useState(false);
   const [variationMessage, setVariationMessage] = useState<string | null>(null);
+  const [cartErrorMessage, setCartErrorMessage] = useState<string | null>(null);
 
+  // Helpers to compute real stock for the currently selected variant (based on cart item attributes)
+  const normalize = (s: unknown) =>
+    typeof s === 'string' ? s.replace(/[\s-]+/g, '').toLowerCase() : '';
+
+  const computeAvailableStock = (p: Product): number => {
+    const variations = (((p as any).baselinker_variations) || []) as Array<any>;
+    const hasVariations = Array.isArray(variations) && variations.length > 0;
+
+    if (hasVariations) {
+      const selectedAttrs = ((((p as any).attributes) || {}) as Record<string, string>);
+
+      const matched = variations.find(v =>
+        Array.isArray(v.attributes) &&
+        v.attributes.every((a: any) => normalize(selectedAttrs[a.name]) === normalize(a.option))
+      );
+
+      if (matched) {
+        const sq = (matched as any).stock_quantity;
+        if (sq !== null && sq !== '' && !Number.isNaN(Number(sq))) {
+          return Number(sq);
+        }
+      }
+
+      const productSQ = (p as any).stock_quantity;
+      if (productSQ !== undefined && productSQ !== null && productSQ !== '' && !Number.isNaN(Number(productSQ))) {
+        return Number(productSQ);
+      }
+
+      return variations.reduce((sum: number, v: any) => {
+        const q = v?.stock_quantity;
+        return sum + (q !== null && q !== '' && !Number.isNaN(Number(q)) ? Number(q) : 0);
+      }, 0);
+    }
+
+    const simpleSQ = (p as any).stock_quantity;
+    return simpleSQ !== undefined && simpleSQ !== null && simpleSQ !== '' && !Number.isNaN(Number(simpleSQ))
+      ? Number(simpleSQ)
+      : 0;
+  };
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -30,18 +70,47 @@ const Koszyk: React.FC = () => {
     }
   }, [cart]);
 
+  // --- Compute invalid items and update error banner accordingly ---
+  const invalidItems = React.useMemo(() => {
+    if (!cart || !cart.products) return [] as Product[];
+    return cart.products.filter((p: Product) => {
+      const currentStock = computeAvailableStock(p);
+      return currentStock <= 0 || p.qty > currentStock;
+    });
+  }, [cart]);
+
+  useEffect(() => {
+    if (invalidItems.length > 0) {
+      const names = invalidItems.map((p: Product) => `„${p.name}”`).join(', ');
+      setCartErrorMessage(`Niektóre pozycje są niedostępne lub przekraczają stan: ${names}. Zmień wariant lub ilość, aby kontynuować.`);
+    } else if (cartErrorMessage) {
+      setCartErrorMessage(null);
+    }
+  }, [invalidItems]);
+
   if (!mounted) return <div>Loading...</div>;
 
   const handleIncreaseQuantity = (product: Product) => {
-    if (product.availableStock && product.qty >= product.availableStock) {
-      console.log(`Reached maximum stock for ${product.name}`);
+    const currentStock = computeAvailableStock(product);
+
+    if (currentStock <= 0) {
+      setCartErrorMessage(`Wariant wybrany dla "${product.name}" jest niedostępny. Zmień wariant, aby kontynuować.`);
       return;
     }
+
+    if (product.qty >= currentStock) {
+      console.log(`Reached maximum stock for ${product.name}`);
+      setCartErrorMessage(`Nie można dodać więcej niż ${currentStock} szt. dla "${product.name}".`);
+      return;
+    }
+
+    if (cartErrorMessage) setCartErrorMessage(null);
     updateCartItem(product.cartKey, product.qty + 1);
   };
 
   const handleDecreaseQuantity = (product: Product) => {
     if (product.qty > 1) {
+      if (cartErrorMessage) setCartErrorMessage(null);
       updateCartItem(product.cartKey, product.qty - 1);
     }
   };
@@ -61,6 +130,21 @@ const Koszyk: React.FC = () => {
   };
 
   const handleCheckout = () => {
+    if (!cart || !cart.products) return;
+    if (invalidItems.length > 0) {
+      // Error banner is already set in the effect above; just hard-block here.
+      return;
+    }
+
+    pushGTMEvent('begin_checkout', {
+      items: cart.products.map((product: Product) => ({
+        item_id: product.productId,
+        item_name: product.name,
+        price: product.price,
+        quantity: product.qty,
+      })),
+    });
+
     console.log('Proceeding to checkout...');
   };
 
@@ -110,17 +194,25 @@ const Koszyk: React.FC = () => {
                 <span>{variationMessage}</span>
               </div>
             )}
+            {cartErrorMessage && (
+              <div className="bg-red-600 text-white rounded-full py-3 px-4 mt-6 mb-6">
+                {cartErrorMessage}
+              </div>
+            )}
             <div className="flex flex-col lg:flex-row gap-8">
               <CartItems
                 onIncreaseQuantity={handleIncreaseQuantity}
                 onDecreaseQuantity={handleDecreaseQuantity}
                 onRemoveItem={handleRemoveItem}
-                onVariationChange={(name: string) => setVariationMessage(`Rozstaw produktu ${name} został zmieniony`)
-                }
+                onVariationChange={(name: string) => {
+                  setVariationMessage(`Rozstaw produktu ${name} został zmieniony`);
+                  setCartErrorMessage(null);
+                }}
               />
               <CartSummary
                 totalProductsPrice={cart?.totalProductsPrice || 0}
                 onCheckout={handleCheckout}
+                disabled={invalidItems.length > 0}
               />
             </div>
           </div>
