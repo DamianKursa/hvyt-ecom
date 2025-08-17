@@ -20,6 +20,7 @@ const SectionPage: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
+    phone: ''
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +47,7 @@ const SectionPage: React.FC = () => {
               firstName: userData.firstName || 'N/A',
               lastName: userData.lastName || 'N/A',
               email: userData.email || 'N/A',
+              phone: userData.phone || 'N/A',
             });
             setContent(null);
           } else {
@@ -109,6 +111,7 @@ const SectionPage: React.FC = () => {
     firstName: string;
     lastName: string;
     email: string;
+    phone: string;
   }) => {
     try {
       if (!updatedUser.id) {
@@ -136,6 +139,7 @@ const SectionPage: React.FC = () => {
         firstName: updatedUser.firstName,
         lastName: updatedUser.lastName,
         email: updatedUser.email,
+        phone: updatedUser.phone
       });
     } catch (error: any) {
       console.error('Error updating user:', error.message);

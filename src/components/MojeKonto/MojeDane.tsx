@@ -9,12 +9,14 @@ interface MojeDaneProps {
     firstName: string;
     lastName: string;
     email: string;
+    phone: string;
   };
   onUpdate: (updatedUser: {
     id: number;
     firstName: string;
     lastName: string;
     email: string;
+    phone: string;
   }) => Promise<void>;
 }
 
@@ -42,9 +44,12 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
     firstName: string;
     lastName: string;
     email: string;
+    phone: string;
   }) => {
     try {
       await onUpdate(updatedUser);
+      // Refresh the page data so props reflect the saved changes (no local state needed)
+      router.replace(router.asPath);
       setSuccessMessage('Twoje dane kontaktowe zostały zmienione.');
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch (error) {
@@ -69,6 +74,7 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
               {user.firstName} {user.lastName}
             </p>
             <p className="text-[18px]">{user.email}</p>
+            <p className="text-[18px]">{user.phone}</p>
           </div>
           <button
             onClick={() => setIsEditContactModalOpen(true)}

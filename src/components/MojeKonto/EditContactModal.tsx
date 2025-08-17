@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 
 interface EditContactModalProps {
@@ -7,12 +7,14 @@ interface EditContactModalProps {
     firstName: string;
     lastName: string;
     email: string;
+    phone: string;
   };
   onUpdate: (updatedUser: {
     id: number;
     firstName: string;
     lastName: string;
     email: string;
+    phone: string;
   }) => Promise<void>;
   onClose: () => void;
 }
@@ -27,12 +29,23 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
+      phone: user.phone || '',
     },
   });
+
+  useEffect(() => {
+    methods.reset({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone || '',
+    });
+  }, [user, methods]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: { firstName: string; lastName: string; email: string; phone: string }) => {
     try {
       setLoading(true);
       await onUpdate({ ...user, ...data });
@@ -129,6 +142,29 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
                 {methods.formState.errors.email && (
                   <p className="text-red-500 text-sm">
                     {methods.formState.errors.email.message}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-black mb-1 pl-2">
+                  Telefon
+                </label>
+                <input
+                  {...methods.register('phone', {
+                    required: 'To pole jest wymagane',
+                    pattern: {
+                      value: /^\+?[0-9\s-]{7,15}$/,
+                      message: 'Podaj poprawny numer telefonu',
+                    },
+                  })}
+                  type="tel"
+                  inputMode="tel"
+                  placeholder="Telefon"
+                  className="w-full border-b border-black p-2 bg-beige-light focus:outline-none"
+                />
+                {methods.formState.errors.phone && (
+                  <p className="text-red-500 text-sm">
+                    {methods.formState.errors.phone.message as string}
                   </p>
                 )}
               </div>

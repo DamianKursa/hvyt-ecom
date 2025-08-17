@@ -34,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       apiEndpoint = 'orders';
       break;
     case 'moje-dane':
-      apiEndpoint = 'custom-api/v1/user-data'; 
+      apiEndpoint = 'custom-api/v1/user-data';
       break;
     case 'moje-adresy':
     case 'dane-do-faktury':
@@ -70,23 +70,52 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (section === 'moje-dane') {
       if (req.method === 'GET') {
         try {
-          const response = await axios.get(`${process.env.WORDPRESS_API_URL}/wp-json/${apiEndpoint}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          // Fetch base user data and WooCommerce customer profile in parallel.
+          // Phone is commonly stored as billing.phone in WooCommerce.
+          const [userRes, wcRes] = await Promise.all([
+            axios.get(`${process.env.WORDPRESS_API_URL}/wp-json/${apiEndpoint}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            axios
+              .get(`${process.env.WORDPRESS_API_URL}/wp-json/wc/v3/customers/me`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+              .catch(() => ({ data: null })),
+          ]);
 
-          const userData = response.data;
+          const userData: any = userRes.data || {};
+          const wcCustomer: any = wcRes?.data || {};
+
+          const firstName =
+            userData.firstName ?? userData.first_name ?? wcCustomer.first_name ?? '';
+          const lastName =
+            userData.lastName ?? userData.last_name ?? wcCustomer.last_name ?? '';
+          const email = userData.email ?? wcCustomer.email ?? '';
+
+          const phone =
+            (typeof userData?.phone === 'string' && userData.phone.trim() !== ''
+              ? userData.phone
+              : undefined) ??
+            wcCustomer?.billing?.phone ??
+            userData?.billing?.phone ??
+            userData?.billing_phone ??
+            userData?.meta?.billing_phone ??
+            userData?.phone_number ??
+            '';
+
           return res.status(200).json({
-            id: userData.id || customerId,
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            email: userData.email,
+            id: userData.id || wcCustomer.id || customerId,
+            firstName,
+            lastName,
+            email,
+            phone,
           });
         } catch (error: any) {
           console.error('Error fetching user data:', error.response?.data || error.message);
           return res.status(500).json({ error: 'Failed to fetch user data' });
         }
       } else if (req.method === 'POST') {
-        const { firstName, lastName, email } = req.body;
+        const { firstName, lastName, email, phone } = req.body;
 
         if (!firstName || !lastName || !email) {
           return res.status(400).json({ error: 'Missing required fields' });
@@ -95,7 +124,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         try {
           const updateResponse = await axios.put(
             `${process.env.WORDPRESS_API_URL}/wp-json/${apiEndpoint}/${customerId}`, // Use decoded ID
-            { firstName, lastName, email },
+            { firstName, lastName, email, phone },
             {
               headers: {
                 Authorization: `Bearer ${token}`,
