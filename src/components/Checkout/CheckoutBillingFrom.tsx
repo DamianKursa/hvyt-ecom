@@ -280,9 +280,34 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             type="text"
             value={formData.phone}
             required
+            inputMode="numeric"
+            autoComplete="tel"
+            pattern="[0-9]*"
             onFocus={() => setFocusedField('phone')}
             onBlur={() => setFocusedField(null)}
-            onChange={(e) => handleInputChange('phone', e.target.value)}
+            onKeyDown={(e) => {
+              const allowedKeys = [
+                'Backspace', 'Delete', 'Tab', 'Enter', 'ArrowLeft', 'ArrowRight', 'Home', 'End'
+              ];
+              const isCtrlCmd = e.ctrlKey || e.metaKey;
+              const k = e.key;
+              const isShortcut = isCtrlCmd && ['a', 'c', 'v', 'x'].includes(k.toLowerCase());
+              const isDigit = /\d/.test(k);
+              if (!isDigit && !allowedKeys.includes(k) && !isShortcut) {
+                e.preventDefault();
+              }
+            }}
+            onPaste={(e) => {
+              const text = (e.clipboardData || (window as any).clipboardData).getData('text');
+              const onlyNums = text.replace(/\D/g, '');
+              e.preventDefault();
+              handleInputChange('phone', (formData.phone + onlyNums));
+            }}
+            onDrop={(e) => { e.preventDefault(); }}
+            onChange={(e) => {
+              const onlyNums = e.target.value.replace(/\D/g, '');
+              handleInputChange('phone', onlyNums);
+            }}
             className="w-full text-[#363132] border-b border-[#969394] p-2 bg-white focus:outline-none placeholder:text-[#363132]"
           />
           <span
