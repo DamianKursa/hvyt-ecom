@@ -18,6 +18,10 @@ const Koszyk: React.FC = () => {
   const normalize = (s: unknown) =>
     typeof s === 'string' ? s.replace(/[\s-]+/g, '').toLowerCase() : '';
 
+  const isInStock = (product: any) => {
+    return product.stock_status === 'instock';
+  };
+
   const computeAvailableStock = (p: Product): number => {
     const variations = (((p as any).baselinker_variations) || []) as Array<any>;
     const hasVariations = Array.isArray(variations) && variations.length > 0;
@@ -48,10 +52,9 @@ const Koszyk: React.FC = () => {
       }, 0);
     }
 
-    const simpleSQ = (p as any).stock_quantity;
-    return simpleSQ !== undefined && simpleSQ !== null && simpleSQ !== '' && !Number.isNaN(Number(simpleSQ))
-      ? Number(simpleSQ)
-      : 0;
+    // SIMPLE PRODUCT: strictly use stock_quantity
+    const simpleSQ = (p as any).availableStock ?? (p as any).stock_quantity;
+    return Number(simpleSQ ?? 0);
   };
   useEffect(() => {
     setMounted(true);
@@ -94,7 +97,12 @@ const Koszyk: React.FC = () => {
     const currentStock = computeAvailableStock(product);
 
     if (currentStock <= 0) {
-      setCartErrorMessage(`Wariant wybrany dla "${product.name}" jest niedostępny. Zmień wariant, aby kontynuować.`);
+      const hasVariations = Array.isArray(((product as any).baselinker_variations) || []) && ((product as any).baselinker_variations || []).length > 0;
+      if (hasVariations) {
+        setCartErrorMessage(`Wariant wybrany dla "${product.name}" jest niedostępny. Zmień wariant, aby kontynuować.`);
+      } else {
+        setCartErrorMessage(`Produkt "${product.name}" jest niedostępny.`);
+      }
       return;
     }
 

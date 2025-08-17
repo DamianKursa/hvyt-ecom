@@ -138,6 +138,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
           ...product,
           attributes: product.attributes || {},
           variationOptions: product.variationOptions || {},
+          availableStock: typeof product.availableStock !== 'undefined' ? product.availableStock : Number((product as any).stock_quantity ?? 0),
         });
       }
 
