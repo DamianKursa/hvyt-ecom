@@ -37,6 +37,10 @@ interface Product {
     nodes: {
       price: string;
       on_sale?: boolean;
+      regular_price?: string;
+      sale_price?: string;
+      date_on_sale_from?: string;
+      date_on_sale_to?: string;
     }[];
   };
   attributes?: Array<{ name: string; options?: string[]; option?: string }>;
@@ -133,6 +137,19 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const secondImage = product.images?.[1]?.src || firstImage;
 
   // ─── derive prices safely ───
+  const anyVariationOnSale = product.variations?.nodes?.some(v => v?.on_sale) || false;
+
+  const variationRegulars = product.variations?.nodes
+    ?.map(v => safeParse((v as any).regular_price))
+    .filter(p => p > 0) || [];
+
+  const variationSales = product.variations?.nodes
+    ?.map(v => safeParse((v as any).sale_price))
+    .filter(p => p > 0) || [];
+
+  const minVariationRegular = variationRegulars.length > 0 ? Math.min(...variationRegulars) : NaN;
+  const minVariationSale = variationSales.length > 0 ? Math.min(...variationSales) : NaN;
+
   const variationPrices = product.variations?.nodes
     ?.map((v) => safeParse(v.price))
     .filter((p) => p > 0) || [];
@@ -141,13 +158,12 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
     ? Math.min(...variationPrices)
     : safeParse(product.price);
 
-  // prefer explicit regular_price, else basePrice
-  const regular = product.regular_price != null && product.regular_price !== ''
+  // Defaults based on product-level fields
+  let resolvedRegular = product.regular_price != null && product.regular_price !== ''
     ? safeParse(product.regular_price)
     : basePrice;
 
-  // prefer explicit sale_price, else basePrice
-  const salePrice = product.sale_price != null && product.sale_price !== ''
+  let resolvedSale = product.sale_price != null && product.sale_price !== ''
     ? safeParse(product.sale_price)
     : basePrice;
 
@@ -168,19 +184,35 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
     ? now.getTime() - createdDate.getTime() <= 30 * 24 * 60 * 60 * 1000
     : false;
 
-  const isSaleActive =
-    salePrice < regular &&
-    (product.on_sale !== undefined
-      ? product.on_sale
-      : ((!saleFrom || now >= saleFrom) && (!saleTo || now <= saleTo)));
+  // Prefer variation-level prices when they indicate a discount, even if `on_sale` flags are missing
+  if (!Number.isNaN(minVariationSale) && !Number.isNaN(minVariationRegular) && minVariationSale < minVariationRegular) {
+    resolvedSale = minVariationSale;
+    resolvedRegular = minVariationRegular;
+  } else if (anyVariationOnSale) {
+    // We know some variation is on sale but we don't have both prices; fall back gracefully
+    resolvedSale = Math.min(resolvedSale, basePrice);
+    resolvedRegular = Math.max(resolvedRegular, basePrice);
+  }
 
-  const discountPct = isSaleActive
-    ? Math.round(((regular - salePrice) / regular) * 100)
+  const hasNodeVariations = !!product.variations?.nodes && product.variations.nodes.length > 0;
+  const hasIdVariations = Array.isArray((product as any).variations) && (product as any).variations.length > 0;
+  const isVariableProduct = hasNodeVariations || hasIdVariations;
+
+  const productPrice = isVariableProduct
+    ? `od ${basePrice.toFixed(2)} zł`
+    : `${safeParse(product.price).toFixed(2)} zł`;
+
+  const hasNumericDiscount = resolvedSale < resolvedRegular;
+  const dateWindowOk = (!saleFrom || now >= saleFrom) && (!saleTo || now <= saleTo);
+  const varNumericDiscount = (!Number.isNaN(minVariationSale) && !Number.isNaN(minVariationRegular) && minVariationSale < minVariationRegular);
+  const saleFlag = (product.on_sale === true) || anyVariationOnSale || varNumericDiscount;
+
+  // Mark sale active when flagged, even if we can't compute numeric discount yet
+  const isSaleActive = saleFlag && (product.on_sale === undefined ? dateWindowOk : product.on_sale);
+
+  const discountPct = hasNumericDiscount && resolvedRegular > 0
+    ? Math.round(((resolvedRegular - resolvedSale) / resolvedRegular) * 100)
     : 0;
-
-  const productPrice = product?.variations?.nodes?.length
-    ? `od ${parseFloat(product.variations.nodes[0].price || '0').toFixed(2)} zł`
-    : `${parseFloat(product.price || '0').toFixed(2)} zł`;
 
   const fullName = product.name;
   const imageSize = isSmall ? 250 : 350;
@@ -207,12 +239,12 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* — discount badge top-left — */}
-      {isSaleActive && discountPct > 0 && (
+      {isSaleActive && (
         <div
           className="absolute top-2 left-2 px-2 py-1 rounded-full text-white text-sm font-bold z-20"
           style={{ backgroundColor: '#661F30' /* same as your sale color */ }}
         >
-          -{discountPct}%
+          {discountPct > 0 ? `-${discountPct}%` : 'Promocja'}
         </div>
       )}
       {isNewProduct && (
@@ -318,23 +350,25 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
           {fullName}
         </h3>
         <div className="mt-1 flex items-baseline">
-          {/* — date-gated price display — */}
-          <div className="mt-1 flex items-baseline">
-            {!isSaleActive ? (
-              <span className="text-base font-bold text-neutral-darkest">
-                {regular.toFixed(2)} zł
+          {/* — price display with fallback for variable products without numeric regular/sale — */}
+          {!isSaleActive ? (
+            <span className="text-base font-bold text-neutral-darkest">
+              {productPrice}
+            </span>
+          ) : discountPct > 0 ? (
+            <>
+              <span className="text-gray-500 line-through mr-2">
+                {resolvedRegular.toFixed(2)} zł
               </span>
-            ) : (
-              <>
-                <span className="text-gray-500 line-through mr-2">
-                  {regular.toFixed(2)} zł
-                </span>
-                <span className="text-base font-bold text-dark-pastel-red">
-                  {salePrice.toFixed(2)} zł
-                </span>
-              </>
-            )}
-          </div>
+              <span className="text-base font-bold text-dark-pastel-red">
+                {resolvedSale.toFixed(2)} zł
+              </span>
+            </>
+          ) : (
+            <span className="text-base font-bold text-dark-pastel-red">
+              {productPrice}
+            </span>
+          )}
         </div>
       </div>
 
