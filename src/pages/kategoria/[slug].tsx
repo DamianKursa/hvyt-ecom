@@ -160,7 +160,7 @@ const CategoryPage = ({
       )}&page=${currentPage}&perPage=12`;
     } else if (sortingOption !== 'Sortowanie') {
       const sortingMap: Record<string, { orderby: string; order: string }> = {
-        Bestsellers: { orderby: 'popularity', order: 'asc' },
+        Bestsellers: { orderby: 'popularity', order: 'desc' },
         'Najnowsze produkty': { orderby: 'date', order: 'desc' },
         'Najwyższa cena': { orderby: 'price', order: 'desc' },
         'Najniższa cena': { orderby: 'price', order: 'asc' },

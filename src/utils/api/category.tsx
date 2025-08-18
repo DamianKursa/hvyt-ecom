@@ -68,7 +68,7 @@ export const fetchProductsByCategoryId = async (
       'price-asc': { orderby: 'price', order: 'asc' },
       'price-desc': { orderby: 'price', order: 'desc' },
       newest: { orderby: 'date', order: 'desc' },
-      bestsellers: { orderby: 'popularity' },
+      bestsellers: { orderby: 'popularity', order: 'desc' },
     };
 
     const sortingParams =
@@ -202,6 +202,7 @@ export const fetchSortedProducts = async (
         slug: product.permalink.split('/').filter(Boolean).pop(),
         images: [{ src: product.image }],
         variations: [],
+        total_sales: Number(product.total_sales) || 0,
         date_created:
           product.date_created ||
           product.date_gmt ||
