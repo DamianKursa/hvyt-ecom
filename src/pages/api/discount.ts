@@ -16,10 +16,50 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  const { code, cartTotal } = req.body;
+  const { code, cartTotal, hasSaleItems, items } = req.body;
 
   if (!code) {
     return res.status(400).json({ valid: false, message: 'Wprowadź kod rabatowy.' });
+  }
+
+  // Block coupons when any product in the cart is on sale (frontend sends this flag)
+  if (hasSaleItems === true) {
+    return res.status(400).json({
+      valid: false,
+      message: 'Kod nie działa na produkty z promocji.',
+      debug: 'blocked_by_sale_items',
+    });
+  }
+
+  // Extra server-side verification: check actual WooCommerce products
+  try {
+    const ids = Array.isArray(items)
+      ? items.map((it: any) => Number(it?.id)).filter((n: number) => Number.isFinite(n))
+      : [];
+
+    if (ids.length > 0) {
+      const productsRes = await WooCommerceAPI.get('/products', {
+        params: { include: ids, per_page: ids.length },
+      });
+
+      const anyOnSale = Array.isArray(productsRes.data) && productsRes.data.some((p: any) => {
+        if (p?.on_sale === true) return true;
+        const rp = Number(p?.regular_price);
+        const sp = Number(p?.sale_price);
+        return Number.isFinite(sp) && sp > 0 && (!Number.isFinite(rp) || sp < rp);
+      });
+
+      if (anyOnSale) {
+        return res.status(400).json({
+          valid: false,
+          message: 'Kod nie działa na produkty z promocji.',
+          debug: 'blocked_by_sale_items_server',
+        });
+      }
+    }
+  } catch (e) {
+    // Log only; don't block coupon if verification fails
+    console.warn('Sale verification skipped:', (e as any)?.message || e);
   }
 
   try {

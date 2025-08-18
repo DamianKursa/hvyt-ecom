@@ -1,6 +1,13 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { CartContext } from '@/stores/CartProvider';
 
+const toNum = (v: any): number => {
+  if (v === null || v === undefined) return NaN;
+  const s = String(v).replace(/\s|\u00A0|zł|PLN/gi, '').replace(',', '.');
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+};
+
 interface DiscountCodeProps {
   cartTotal: number;
   setCartTotal: React.Dispatch<React.SetStateAction<number>>;
@@ -24,6 +31,33 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
   const coupon = cart?.coupon;
   const allowedCats: number[] = coupon?.allowedCats ?? [];
 
+  // Helper: detect if cart has discounted items (on_sale flag or price < regular_price)
+  const hasDiscountedItems = React.useCallback(() => {
+    if (!cart?.products?.length) return false;
+    return cart.products.some((p: any) => {
+      const price = toNum(p.price);
+      const reg = toNum(p.regular_price);
+      const salePrice = toNum(p.sale_price ?? 0);
+      if (p.on_sale === true || p.on_sale === 'true') return true;
+      // Treat sale_price>0 as discounted even if regular_price is missing
+      if (Number.isFinite(salePrice) && salePrice > 0 && (!Number.isFinite(reg) || salePrice < reg)) return true;
+      if (Number.isFinite(price) && Number.isFinite(reg) && price < reg) return true;
+      return false;
+    });
+  }, [cart?.products]);
+
+  useEffect(() => {
+    if (!cart?.coupon) return;
+    if (hasDiscountedItems()) {
+      removeCoupon();
+      setCode('');
+      setCartTotal(cart.totalProductsPrice);
+      setSnackbar({ message: 'Kod nie działa na produkty z promocji — usunięto.', type: 'error', visible: true });
+      const t = setTimeout(() => setSnackbar(prev => ({ ...prev, visible: false })), 3000);
+      return () => clearTimeout(t);
+    }
+  }, [cart?.products]);
+
   const handleApplyCode = async () => {
     if (!code.trim()) {
       setCodeError('Uzupełnij kod rabatowy');
@@ -34,6 +68,15 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     setIsLoading(true);
     setSnackbar((prev) => ({ ...prev, visible: false }));
 
+    // Early guard: do not allow coupons on promotional items
+    if (hasDiscountedItems()) {
+      const msg = 'Kod nie działa na produkty z promocji.';
+      setCodeError(msg);
+      setSnackbar({ message: msg, type: 'error', visible: true });
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/discount', {
         method: 'POST',
@@ -41,6 +84,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         body: JSON.stringify({
           code: code.trim(),
           cartTotal,
+          hasSaleItems: hasDiscountedItems(),
           items: cart!.products.map((item) => ({
             id: item.productId,
             price: item.price,
@@ -55,7 +99,12 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
       if (!response.ok || !data.valid) {
         console.log('Coupon debug:', data.debug);
-        setCodeError(data.message || 'Niepoprawny kod rabatowy');
+        const discounted = hasDiscountedItems();
+        const msg = discounted
+          ? 'Kod nie działa na produkty z promocji.'
+          : (data.message || 'Niepoprawny kod rabatowy');
+        setCodeError(msg);
+        setSnackbar({ message: msg, type: 'error', visible: true });
         return;
       }
 
@@ -86,6 +135,20 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         }, 0)
         : Number(cartTotal);
 
+      // If all (eligible) items are discounted, stop and show message
+      const nonSaleSubtotal = cart!.products.reduce((sum, p: any) => {
+        const price = Number(p.price);
+        const reg = Number(p.regular_price ?? price);
+        const salePrice = Number(p.sale_price ?? 0);
+        const isOnSale = p.on_sale === true || (salePrice > 0 && salePrice < reg) || price < reg;
+        return isOnSale ? sum : sum + price * Number(p.qty);
+      }, 0);
+      if (nonSaleSubtotal <= 0 && hasDiscountedItems()) {
+        const msg = 'Kod nie działa na produkty z promocji.';
+        setCodeError(msg);
+        return;
+      }
+
       // Compute actually applied discount amount
       const appliedDiscount = discountType === 'percent'
         ? (eligibleSubtotal * Number(discountValue)) / 100
@@ -93,6 +156,12 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
       // Clamp to not exceed eligible subtotal
       const appliedDiscountClamped = Math.max(0, Math.min(appliedDiscount, eligibleSubtotal));
+
+      if (appliedDiscountClamped <= 0 && hasDiscountedItems()) {
+        const msg = 'Kod nie działa na produkty z promocji.';
+        setCodeError(msg);
+        return;
+      }
 
       // Store applied amount in context so UI can show it directly
       applyCoupon({
@@ -245,8 +314,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
                   />
                   <button
                     onClick={handleApplyCode}
-                    disabled={!code.trim() || isLoading}
-                    className={`w-1/2 md:w-auto md:ml-4 px-4 py-2 border ${(!code.trim() || isLoading) ? 'border-neutral-light text-neutral-light' : 'border-black text-black'} rounded-full focus:outline-none ${(!code.trim() || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={!code.trim() || isLoading || hasDiscountedItems()}
+                    className={`w-1/2 md:w-auto md:ml-4 px-4 py-2 border ${(!code.trim() || isLoading || hasDiscountedItems()) ? 'border-neutral-light text-neutral-light' : 'border-black text-black'} rounded-full focus:outline-none ${(!code.trim() || isLoading || hasDiscountedItems()) ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {isLoading ? 'Ładowanie...' : 'Zapisz'}
                   </button>
@@ -255,6 +324,12 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
                   <div className="flex items-center text-[#A83232] text-sm mt-1">
                     <img src="/icons/Warning_Circle_Warning.svg" alt="Warning" className="w-4 h-4 mr-2" />
                     <span>{codeError}</span>
+                  </div>
+                )}
+                {hasDiscountedItems() && !codeError && (
+                  <div className="flex items-center text-[#A83232] text-sm mt-1">
+                    <img src="/icons/Warning_Circle_Warning.svg" alt="Warning" className="w-4 h-4 mr-2" />
+                    <span>Kod nie działa na produkty z promocji.</span>
                   </div>
                 )}
               </>
@@ -272,14 +347,12 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         </div>
       )}
 
-      {/* Inline Message for Success or Error */}
-      {snackbar.visible && (
+      {/* Inline Message for Success only */}
+      {snackbar.visible && snackbar.type === 'success' && (
         <div
-          className={`mt-4 mb-4 px-4 py-2 rounded-lg flex items-center ${snackbar.type === 'success' ? 'bg-[#2A5E45]' : 'bg-red-500'} text-white`}
+          className="mt-4 mb-4 px-4 py-2 rounded-lg flex items-center bg-[#2A5E45] text-white"
         >
-          {snackbar.type === 'success' && (
-            <img src="/icons/circle-check.svg" alt="Success" className="w-4 h-4 mr-2" />
-          )}
+          <img src="/icons/circle-check.svg" alt="Success" className="w-4 h-4 mr-2" />
           <span>{snackbar.message}</span>
         </div>
       )}

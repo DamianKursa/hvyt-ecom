@@ -11,6 +11,11 @@ export interface Product {
   name: string;
   qty: number;
   price: number;
+  regular_price?: number | string;
+  sale_price?: number | string;
+  on_sale?: boolean;
+  stock_status?: 'instock' | 'outofstock' | string;
+  manage_stock?: boolean;
   totalPrice: number;
   image: string;
   productId: number;
@@ -138,6 +143,20 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
           ...product,
           attributes: product.attributes || {},
           variationOptions: product.variationOptions || {},
+          // Persist sale/pricing flags for coupon logic
+          regular_price: (product as any).regular_price,
+          sale_price: (product as any).sale_price ?? undefined,
+          on_sale:
+            (product as any).on_sale ?? (() => {
+              const toNum = (v: any) => {
+                const s = String(v ?? '').replace(/\s|\u00A0|zł|PLN/gi, '').replace(',', '.');
+                const n = Number(s);
+                return Number.isFinite(n) ? n : NaN;
+              };
+              const rp = toNum((product as any).regular_price ?? product.price);
+              const sp = toNum((product as any).sale_price ?? 0);
+              return Number.isFinite(rp) && Number.isFinite(sp) && sp > 0 && sp < rp;
+            })(),
           availableStock: typeof product.availableStock !== 'undefined' ? product.availableStock : Number((product as any).stock_quantity ?? 0),
         });
       }
@@ -197,6 +216,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
           chosen.image?.src ||
           oldItem.image ||
           '/fallback-image.jpg',
+        regular_price: oldItem.regular_price,
+        sale_price: oldItem.sale_price,
+        on_sale: oldItem.on_sale,
         availableStock: Number(chosen.stock_quantity ?? 0),
         attributes: {
           ...oldItem.attributes,
