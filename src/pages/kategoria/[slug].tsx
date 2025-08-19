@@ -69,6 +69,7 @@ const ignoredParams = new Set([
   'mc_cid',
   'mc_eid',
   'UNIQID',
+  'page',
 ]);
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -115,6 +116,7 @@ const CategoryPage = ({
     const updateFiltersFromQuery = () => {
       const queryFilters: { name: string; value: string }[] = [];
       let sortFromQuery = 'Sortowanie';
+      const pageFromQuery = Number(router.query.page ?? 1);
       Object.keys(router.query).forEach((key) => {
         if (ignoredParams.has(key)) return;
         if (key === 'sort') {
@@ -132,7 +134,7 @@ const CategoryPage = ({
       if (sortFromQuery !== 'Sortowanie') {
         setSortingOption(sortFromQuery);
       }
-      setCurrentPage(1);
+      setCurrentPage(Number.isFinite(pageFromQuery) && pageFromQuery > 0 ? pageFromQuery : 1);
     };
 
     if (router.isReady) {
@@ -247,13 +249,22 @@ const CategoryPage = ({
         query[filter.name] = [filter.value];
       }
     });
-    router.push({ pathname: router.pathname, query }, undefined, {
+    router.push({ pathname: router.pathname, query: { ...query, page: '1' } }, undefined, {
       shallow: true,
     });
   };
 
   const onPageChange = (page: number) => {
     setCurrentPage(page);
+    // push page into URL so browser back/forward navigates pages correctly
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, slug: slug || '', page: String(page) },
+      },
+      undefined,
+      { shallow: true },
+    );
   };
 
   if (error) {
