@@ -316,15 +316,32 @@ const Checkout: React.FC = () => {
           value: customerType === 'company' ? billingData.vatNumber : '',
         },
       ],
-      coupon_lines: cart?.coupon
-        ? [
-          {
-            code: cart.coupon.code,
-            discount: cart.coupon.discountValue.toFixed(2),
-            discount_tax: '0.00',
-          },
-        ]
-        : [],
+      coupon_lines:
+        Array.isArray((cart as any)?.applied_coupons || (cart as any)?.appliedCoupons)
+          ? ((cart as any).applied_coupons || (cart as any).appliedCoupons).map((c: any) => {
+            const code = typeof c === 'string' ? c : c?.code;
+            const discountValue = typeof c === 'object' ? Number(c?.discountValue) : NaN;
+            const line: any = { code: String(code) };
+            // Only send discount fields when an actual positive discount exists
+            if (!isNaN(discountValue) && discountValue > 0) {
+              line.discount = discountValue.toFixed(2);
+              line.discount_tax = '0.00';
+            }
+            return line;
+          })
+          : (cart as any)?.coupon && (cart as any)?.coupon.code
+            ? (() => {
+              const code = String((cart as any).coupon.code);
+              const discountValue = Number(((cart as any).coupon as any).discountValue);
+              const line: any = { code };
+              // For free-shipping only coupons (e.g., 'comeback') discount may be 0/undefined → send only the code
+              if (!isNaN(discountValue) && discountValue > 0) {
+                line.discount = discountValue.toFixed(2);
+                line.discount_tax = '0.00';
+              }
+              return [line];
+            })()
+            : [],
 
       shipping: shippingAddress,
       shipping_lines: [

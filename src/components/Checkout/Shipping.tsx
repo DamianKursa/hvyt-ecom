@@ -90,6 +90,55 @@ const getField = (obj: any, field: string): string => {
   );
 };
 
+/**
+ * Helper: Check if a specific coupon code is applied in the cart or client context.
+ */
+const hasCoupon = (cart: any, code: string): boolean => {
+  const target = code.toLowerCase().trim();
+  const pools: any[] = [];
+  if (Array.isArray(cart?.coupons)) pools.push(...cart.coupons);
+  if (Array.isArray(cart?.appliedCoupons)) pools.push(...cart.appliedCoupons);
+  if (Array.isArray(cart?.applied_coupons)) pools.push(...cart.applied_coupons);
+  if (Array.isArray(cart?.couponLines)) pools.push(...cart.couponLines);
+
+  // CartContext often keeps a single coupon object/string
+  const single = cart?.coupon;
+  if (single) {
+    const s = typeof single === 'string' ? single : (single.code || single.coupon_code || '');
+    if (typeof s === 'string' && s.toLowerCase().trim() === target) return true;
+  }
+
+  const fromCart = pools.some((c: any) => {
+    if (typeof c === 'string') return c.toLowerCase().trim() === target;
+    if (typeof c?.code === 'string') return c.code.toLowerCase().trim() === target;
+    if (typeof c?.coupon_code === 'string') return c.coupon_code.toLowerCase().trim() === target;
+    return false;
+  });
+  if (fromCart) return true;
+  try {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlCoupon = (params.get('coupon') || params.get('discount') || '').toLowerCase().trim();
+      if (urlCoupon === target) return true;
+      const lsKeys = ['coupon', 'coupon_code', 'appliedCoupon', 'appliedCoupons', 'applied_coupons'];
+      for (const k of lsKeys) {
+        const v = (window.localStorage?.getItem(k) || window.sessionStorage?.getItem(k) || '').toLowerCase();
+        if (!v) continue;
+        if (v === target) return true;
+        if (v.includes(',')) {
+          const parts = v.split(',').map((s) => s.trim());
+          if (parts.includes(target)) return true;
+        }
+      }
+      const cookie = document.cookie?.toLowerCase() || '';
+      if (cookie.includes(`coupon=${target}`) || cookie.includes(`coupon_code=${target}`) || cookie.includes(`applied_coupons=${target}`)) {
+        return true;
+      }
+    }
+  } catch { }
+  return false;
+};
+
 const Shipping: React.FC<ShippingProps> = ({
   shippingMethod,
   setShippingMethod,
@@ -135,6 +184,9 @@ const Shipping: React.FC<ShippingProps> = ({
         }
         const data = await response.json();
 
+        // Treat coupon "comeback" as free-shipping trigger
+        const hasFreeShipCoupon = hasCoupon(cart, 'comeback');
+
         // Define restricted IDs
         const restrictedIds = [
           '7543167',
@@ -165,40 +217,41 @@ const Shipping: React.FC<ShippingProps> = ({
             if (method.title.toLowerCase().includes('flexible shipping')) {
               return false;
             }
-            // Filter out 'darmowa' if cartTotal < 300
+            // Filter out 'darmowa' if cartTotal < 300 and no free-shipping coupon
             if (
               method.title.toLowerCase().includes('darmowa') &&
-              cartTotal < 300
+              cartTotal < 300 &&
+              !hasFreeShipCoupon
             ) {
               return false;
             }
             return true;
           });
 
-          // If cartTotal >= 300, keep only certain methods
-          if (cartTotal >= 300) {
+          // If cartTotal >= 300 or has free shipping coupon, show only a specific set and make appropriate ones free
+          if (cartTotal >= 300 || hasFreeShipCoupon) {
+            const allowed = new Set([
+              'kurier gls pobranie',
+              'kurier gls - darmowa wysyłka',
+              'darmowa dostawa',
+              'paczkomaty inpost',
+              'punkty gls',
+            ]);
+            // keep only the allowed methods
             filteredMethods = filteredMethods.filter((method) =>
-              [
-                'darmowa dostawa',
-                'kurier gls - darmowa wysyłka',
-                'paczkomaty inpost',
-                'punkty gls',
-                'kurier gls pobranie',
-              ].includes(method.title.toLowerCase()),
+              allowed.has(method.title.toLowerCase()),
             );
-            // If 'darmowa dostawa' not present, add it
-            if (
-              !filteredMethods.some(
-                (method) => method.title.toLowerCase() === 'darmowa dostawa',
-              )
-            ) {
-              filteredMethods.push({
-                id: 'free_shipping',
-                title: 'Darmowa Dostawa',
-                cost: null,
-                enabled: true,
-              });
-            }
+            // make the non-COD ones free
+            filteredMethods = filteredMethods.map((method) => {
+              const t = method.title.toLowerCase();
+              const makeFree = (
+                t === 'kurier gls - darmowa wysyłka' ||
+                t === 'darmowa dostawa' ||
+                t === 'paczkomaty inpost' ||
+                t === 'punkty gls'
+              );
+              return makeFree ? { ...method, cost: null } : method; // keep COD cost intact
+            });
           }
 
           // Conditionally add Paczkomaty InPost
@@ -211,7 +264,7 @@ const Shipping: React.FC<ShippingProps> = ({
             filteredMethods.push({
               id: 'paczkomaty_inpost',
               title: 'Paczkomaty InPost',
-              cost: cartTotal >= 300 ? null : 15,
+              cost: cartTotal >= 300 || hasFreeShipCoupon ? null : 15,
               enabled: true,
             });
           }
@@ -226,7 +279,7 @@ const Shipping: React.FC<ShippingProps> = ({
             filteredMethods.push({
               id: 'punkty_gls',
               title: 'Punkty GLS',
-              cost: cartTotal >= 300 ? null : 15,
+              cost: cartTotal >= 300 || hasFreeShipCoupon ? null : 15,
               enabled: true,
             });
           }
@@ -439,11 +492,10 @@ const Shipping: React.FC<ShippingProps> = ({
           {zone.methods.map((method) => (
             <div key={method.id}>
               <label
-                className={`grid grid-cols-[60%_20%_20%] sm:grid-cols-3 items-center py-[16px] border-b ${
-                  shippingMethod === method.id
-                    ? 'border-dark-pastel-red'
-                    : 'border-beige-dark'
-                }`}
+                className={`grid grid-cols-[60%_20%_20%] sm:grid-cols-3 items-center py-[16px] border-b ${shippingMethod === method.id
+                  ? 'border-dark-pastel-red'
+                  : 'border-beige-dark'
+                  }`}
               >
                 {/* First Column: Shipping Name */}
                 <div className="flex items-center gap-4 w-full">
@@ -456,11 +508,10 @@ const Shipping: React.FC<ShippingProps> = ({
                     disabled={loading}
                   />
                   <span
-                    className={`w-5 h-5 rounded-full ${
-                      shippingMethod === method.id
-                        ? 'border-4 border-dark-pastel-red'
-                        : 'border-2 border-gray-400'
-                    }`}
+                    className={`w-5 h-5 rounded-full ${shippingMethod === method.id
+                      ? 'border-4 border-dark-pastel-red'
+                      : 'border-2 border-gray-400'
+                      }`}
                   ></span>
                   <span className="truncate">{method.title}</span>
                 </div>

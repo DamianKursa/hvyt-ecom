@@ -2,10 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios, { AxiosError } from 'axios';
 
 const WooCommerceAPI = axios.create({
-  baseURL: process.env.REST_API, 
+  baseURL: process.env.REST_API,
   auth: {
-    username: process.env.WC_CONSUMER_KEY || '', 
-    password: process.env.WC_CONSUMER_SECRET || '', 
+    username: process.env.WC_CONSUMER_KEY || '',
+    password: process.env.WC_CONSUMER_SECRET || '',
   },
 });
 
@@ -61,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 
   if (!orderData.payment_method || !orderData.billing || !orderData.shipping || !orderData.shipping_lines || !orderData.line_items) {
-  
+
     return res.status(400).json({ error: 'Missing required order data' });
   }
 
@@ -82,7 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     res.status(200).json({
       id: createdOrder.id,
-      order_key: createdOrder.order_key, 
+      order_key: createdOrder.order_key,
       payment_url: createdOrder.payment_url || null,
       status: createdOrder.status,
       total: createdOrder.total,
@@ -90,12 +90,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       customer_id: createdOrder.customer_id || null,
     });
   } catch (err: unknown) {
-    const error = err as AxiosError;
-
-
+    const error = err as AxiosError<any>;
+    const status = error.response?.status || 500;
+    const data = error.response?.data;
+    console.error('❌ Woo create order failed:', { status, data, message: error.message });
     res.status(500).json({
       error: 'Failed to create order',
-      details: error.response?.data || error.message,
+      details: data || error.message,
     });
   }
 }
