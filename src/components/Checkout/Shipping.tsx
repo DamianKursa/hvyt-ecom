@@ -135,7 +135,10 @@ const hasCoupon = (cart: any, code: string): boolean => {
         return true;
       }
     }
-  } catch { }
+  } catch (e) {
+    // Access to window/sessionStorage/cookies can fail (SSR, privacy settings). Intentionally ignore and fall back to no coupon found.
+    void e;
+  }
   return false;
 };
 
