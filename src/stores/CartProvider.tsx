@@ -74,6 +74,11 @@ interface CartContextProps {
   ) => void;
   applyCoupon: (coupon: Coupon) => void;
   removeCoupon: () => void;
+  updateCartItemPrice: (
+    cartKey: string,
+    newUnitPrice: number,
+    extras?: { regular_price?: number | string; sale_price?: number | string; on_sale?: boolean }
+  ) => void;
 }
 
 export const CartContext = createContext<CartContextProps>({
@@ -85,6 +90,7 @@ export const CartContext = createContext<CartContextProps>({
   updateCartVariation: () => { },
   applyCoupon: () => { },
   removeCoupon: () => { },
+  updateCartItemPrice: () => { },
 });
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
@@ -231,6 +237,28 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       return recalculateCartTotals(updatedCart);
     });
   };
+
+  const updateCartItemPrice = (
+    cartKey: string,
+    newUnitPrice: number,
+    extras?: { regular_price?: number | string; sale_price?: number | string; on_sale?: boolean }
+  ) => {
+    setCart(prevCart => {
+      const updatedCart = { ...prevCart };
+      const product = updatedCart.products.find(item => item.cartKey === cartKey);
+      if (product) {
+        product.price = newUnitPrice;
+        product.totalPrice = newUnitPrice * product.qty;
+        if (extras) {
+          if (typeof extras.regular_price !== 'undefined') product.regular_price = extras.regular_price;
+          if (typeof extras.sale_price !== 'undefined') product.sale_price = extras.sale_price;
+          if (typeof extras.on_sale !== 'undefined') product.on_sale = extras.on_sale as any;
+        }
+      }
+      return recalculateCartTotals(updatedCart);
+    });
+  };
+
   const removeCartItem = (cartKey: string) => {
     setCart((prevCart) => {
       const remaining = prevCart.products.filter((p) => p.cartKey !== cartKey);
@@ -287,6 +315,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         updateCartVariation,
         applyCoupon,
         removeCoupon,
+        updateCartItemPrice,
       }}
     >
       {children}

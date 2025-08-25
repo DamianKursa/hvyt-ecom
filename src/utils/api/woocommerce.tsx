@@ -53,6 +53,38 @@ export const fetchProductBySlug = async (slug: string) => {
   }
 };
 
+export const fetchProductById = async (id: number | string) => {
+  try {
+    const response = await WooCommerceAPI.get(`/products/${id}`, {
+      params: { ts: Date.now() },
+      timeout: 5000,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching product by id:', error);
+    throw error;
+  }
+};
+
+export const fetchVariationById = async (
+  productId: number | string,
+  variationId: number | string
+) => {
+  try {
+    const response = await WooCommerceAPI.get(
+      `/products/${productId}/variations/${variationId}`,
+      {
+        params: { ts: Date.now() },
+        timeout: 5000,
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching variation by id:', error);
+    throw error;
+  }
+};
+
 // Fetch media by ID
 export const fetchMediaById = async (mediaId: number) => {
   try {

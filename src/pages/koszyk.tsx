@@ -7,9 +7,10 @@ import CartSummary from '@/components/Cart/CartSummary';
 import Link from 'next/link';
 import Bestsellers from '@/components/Index/Bestsellers.component';
 import { pushGTMEvent } from '@/utils/gtm';
+import axios from 'axios';
 
 const Koszyk: React.FC = () => {
-  const { cart, updateCartItem, removeCartItem } = useContext(CartContext);
+  const { cart, updateCartItem, removeCartItem, updateCartItemPrice } = useContext(CartContext);
   const [mounted, setMounted] = useState(false);
   const [variationMessage, setVariationMessage] = useState<string | null>(null);
   const [cartErrorMessage, setCartErrorMessage] = useState<string | null>(null);
@@ -56,6 +57,51 @@ const Koszyk: React.FC = () => {
     const simpleSQ = (p as any).availableStock ?? (p as any).stock_quantity;
     return Number(simpleSQ ?? 0);
   };
+
+  const toNum = (v: any) => {
+    if (typeof v === 'number') return v;
+    const s = String(v ?? '').replace(/[^\d.,-]/g, '').replace(',', '.');
+    const n = Number(s);
+    return Number.isFinite(n) ? n : NaN;
+  };
+
+  const syncCartPricesFromServer = async (): Promise<void> => {
+    if (!cart || !Array.isArray(cart.products) || cart.products.length === 0) return;
+
+    const items = cart.products.map((p: Product) => ({
+      cartKey: p.cartKey,
+      productId: (p as any).productId ?? p.productId,
+      variationId: (p as any).variationId ?? undefined,
+      slug: (p as any).slug ?? undefined,
+    }));
+
+    try {
+      const resp = await axios.post('/api/woocommerce?action=batchFetchPrices', { items });
+      const updates = Array.isArray(resp.data?.updates) ? resp.data.updates : [];
+      updates.forEach((u: any) => {
+        const target = cart.products.find((x: Product) => x.cartKey === u.cartKey);
+        if (!target) return;
+        const serverPrice = toNum(u?.price ?? u?.sale_price ?? u?.regular_price);
+        if (!Number.isFinite(serverPrice)) return;
+        if (Math.abs(serverPrice - target.price) > 0.009) {
+          updateCartItemPrice(u.cartKey, serverPrice, {
+            regular_price: u?.regular_price,
+            sale_price: u?.sale_price,
+            on_sale: !!u?.on_sale,
+          });
+        }
+      });
+    } catch (e) {
+      console.error('Silent batch price sync failed', e);
+    }
+  };
+
+  useEffect(() => {
+    // silently refresh prices when user enters the cart or when items change
+    syncCartPricesFromServer();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart?.products?.length]);
+
   useEffect(() => {
     setMounted(true);
   }, []);
