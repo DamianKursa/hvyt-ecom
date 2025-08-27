@@ -140,7 +140,7 @@ const CartItem: React.FC<CartItemProps> = ({
 
           <div className="w-1/5 flex flex-col items-end">
             <p className="text-xl font-bold text-neutral-darkest">
-              {product.totalPrice.toFixed(2)} zł
+              {product.totalPrice.toFixed(2).replace('.', ',')} zł
             </p>
           </div>
 
@@ -201,7 +201,7 @@ const CartItem: React.FC<CartItemProps> = ({
           </div>
           <div className="flex flex-col items-end">
             <p className="text-sm font-bold text-neutral-darkest">
-              {product.totalPrice.toFixed(2)} zł
+              {product.totalPrice.toFixed(2).replace('.', ',')} zł
             </p>
             <button
               onClick={() => setModalOpen(true)}
