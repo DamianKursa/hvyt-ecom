@@ -601,19 +601,14 @@ const ProductPage = () => {
 
   const galleryImages = useMemo(
     () =>
-      selectedVariation?.image?.sourceUrl
-        ? [
-          {
-            id: selectedVariation.id,
-            sourceUrl: selectedVariation.image.sourceUrl || '',
-          },
-        ]
-        : product?.images?.map((img, index) => ({
-          id: `image-${index}`,
-          sourceUrl: img.src || '',
-        })) || [{ id: 'default-id', sourceUrl: product?.image || '' }],
-    [selectedVariation, product],
+      product?.images?.map((img, index) => ({
+        id: `image-${index}`,
+        sourceUrl: img.src || '',
+      })) || [{ id: 'default-id', sourceUrl: product?.image || '' }],
+    [product],
   );
+
+  const primaryFirstImage = selectedVariation?.image?.sourceUrl || undefined;
 
   if (loading) {
     return (
@@ -658,10 +653,10 @@ const ProductPage = () => {
         <div className="flex flex-wrap lg:flex-nowrap gap-6">
           <div className="order-1 w-full lg:order-1 lg:w-8/12">
             <div className="block lg:hidden min-h-[300px]">
-              {product && <SingleProductGallery images={galleryImages} />}
+              {product && <SingleProductGallery images={galleryImages} primaryImage={primaryFirstImage} />}
             </div>
             <div className="hidden lg:block">
-              {product && <SingleProductGallery images={galleryImages} />}
+              {product && <SingleProductGallery images={galleryImages} primaryImage={primaryFirstImage} />}
               {product && <SingleProductDetails product={product} />}
             </div>
           </div>

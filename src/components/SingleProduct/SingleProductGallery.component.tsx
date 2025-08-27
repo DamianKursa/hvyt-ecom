@@ -10,11 +10,20 @@ interface ImageType {
 
 interface SingleProductGalleryProps {
   images: ImageType[];
+  primaryImage?: string;
 }
 
 const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
   images,
+  primaryImage,
 }) => {
+  const displayImages = React.useMemo(() => {
+    if (!images || images.length === 0) return images;
+    if (!primaryImage) return images;
+    const out = images.slice();
+    out[0] = { ...out[0], sourceUrl: primaryImage };
+    return out;
+  }, [images, primaryImage]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
@@ -32,10 +41,10 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
     setIsModalOpen(false);
   };
 
-  const firstImage = images[0] || null;
-  const twoImagesRow = images.length > 2 ? images.slice(1, 3) : images.slice(1);
-  const fullWidthImageThird = images.length > 3 ? images[3] : null;
-  const remainingImages = images.length > 4 ? images.slice(4) : [];
+  const firstImage = displayImages[0] || null;
+  const twoImagesRow = displayImages.length > 2 ? displayImages.slice(1, 3) : displayImages.slice(1);
+  const fullWidthImageThird = displayImages.length > 3 ? displayImages[3] : null;
+  const remainingImages = displayImages.length > 4 ? displayImages.slice(4) : [];
   const showToggle = remainingImages.length > 0;
 
   return (
@@ -43,12 +52,12 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
       {/* Mobile View: Responsive Slider */}
       <div className="md:hidden my-8 max-w-full">
         <ResponsiveSlider
-          items={images}
+          items={displayImages}
           renderItem={(image) => (
             <div
               key={image.id}
               className="relative w-full h-[330px] overflow-hidden cursor-pointer"
-              onClick={() => openModal(images.indexOf(image))}
+              onClick={() => openModal(displayImages.indexOf(image))}
             >
               <Image
                 src={image.sourceUrl}
@@ -85,9 +94,8 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
         {/* Two Square Images Row */}
         {twoImagesRow.length > 0 && (
           <div
-            className={`grid ${
-              twoImagesRow.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
-            } gap-2 mb-4`}
+            className={`grid ${twoImagesRow.length === 1 ? 'grid-cols-1' : 'grid-cols-2'
+              } gap-2 mb-4`}
           >
             {twoImagesRow.map((image, index) => (
               <div
@@ -129,9 +137,8 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
         <div className="relative">
           {remainingImages.length > 0 && (
             <div
-              className={`relative w-full ${
-                isExpanded ? 'h-[540px]' : 'h-[250px]'
-              } overflow-hidden mb-4 transition-all duration-500 cursor-pointer`}
+              className={`relative w-full ${isExpanded ? 'h-[540px]' : 'h-[250px]'
+                } overflow-hidden mb-4 transition-all duration-500 cursor-pointer`}
               onClick={() => openModal(4)}
             >
               <Image
@@ -172,9 +179,8 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
 
           {/* Additional images (Modal Enabled) */}
           <div
-            className={`grid grid-cols-2 gap-2 mb-4 transition-opacity duration-500 ${
-              isExpanded ? '' : 'max-h-[0px] overflow-hidden'
-            }`}
+            className={`grid grid-cols-2 gap-2 mb-4 transition-opacity duration-500 ${isExpanded ? '' : 'max-h-[0px] overflow-hidden'
+              }`}
           >
             {remainingImages.slice(1).map((image, index) => (
               <div
@@ -210,7 +216,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
       {/* Render the ModalImageGallery if modal is open */}
       {isModalOpen && (
         <ModalImageGallery
-          images={images.map((image) => image.sourceUrl)}
+          images={displayImages.map((image) => image.sourceUrl)}
           selectedImageIndex={selectedImageIndex}
           onClose={closeModal}
         />
