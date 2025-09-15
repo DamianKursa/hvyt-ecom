@@ -5,6 +5,7 @@ export default function Document(): JSX.Element {
   return (
     <Html lang="pl-PL">
       <Head>
+        <meta name="p:domain_verify" content="dc185cd01a5d788baa1b5e3db0cd26a2" />
         {/* Meta Tags */}
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
