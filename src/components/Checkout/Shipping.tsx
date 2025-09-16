@@ -188,7 +188,7 @@ const Shipping: React.FC<ShippingProps> = ({
         const data = await response.json();
 
         // Treat coupon "comeback" as free-shipping trigger
-        const hasFreeShipCoupon = hasCoupon(cart, 'comeback');
+        const hasFreeShipCoupon = hasCoupon(cart, 'comeback') || hasCoupon(cart, 'cudodostawa');
 
         // Define restricted IDs
         const restrictedIds = [
