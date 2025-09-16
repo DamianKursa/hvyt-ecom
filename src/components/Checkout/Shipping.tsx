@@ -214,7 +214,8 @@ const Shipping: React.FC<ShippingProps> = ({
           '7564107',
           '7564114',
           '7564116',
-          '7564118'
+          '7564118',
+          '7535654'
         ];
         const cartContainsRestricted =
           cart?.products?.some(
