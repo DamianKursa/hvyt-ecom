@@ -103,7 +103,7 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
     <section
       ref={combinedRef}
       style={sectionStyle}
-      className="container px-4 md:px-4 lg:px-4 2xl:px-0 mx-auto max-w-grid-desktop mt-0 lg:mt-[115px] py-16"
+      className="container px-4 md:px-4 lg:px-4 2xl:px-0 mx-auto max-w-grid-desktop mt-0  py-16"
     >
       {/* Mobile View */}
       <div className="px-[16px] flex flex-col items-start mb-8 md:hidden">

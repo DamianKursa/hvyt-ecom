@@ -10,6 +10,7 @@ import PasujemyWszedzie from '@/components/Index/Pasujemy.component';
 import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
 import Instagram from '@/components/Index/Instagram';
 import Head from 'next/head';
+import WybierzHvyt from '@/components/Index/WybierzHvyt';
 
 const Index: NextPage = () => {
   const maintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true';
@@ -62,67 +63,24 @@ const Index: NextPage = () => {
       <Hero
         secondButtonText="Zobacz gałki"
         secondButtonLink="/kategoria/uchwyty-meblowe?pa_rodzaj=galki&pa_rodzaj=t-bary"
-        title="Wybierz<br/> swój HVYT"
-        description="Od eleganckich, nowoczesnych wzorów uchwytów meblowych po ponadczasowe klasyki. Sprawdź jak nasze Hvyt’y mogą odmienić Twoje wnętrze."
-        buttonText="Zobacz uchwyty"
-        buttonLink="/kategoria/uchwyty-meblowe"
+        title="Tworzymy meble, które żyją razem z Tobą."
+        description="Wnętrza to nie tylko ściany i metry. To codzienność. Kawa wypita w biegu, pilot schowany pod poduszką, pies, który postanowił coś zbroić."
+        buttonText="Zobacz meble"
+        buttonLink="/meble"
         imageSrc="/images/strona-główna.png"
         imageAlt="Hvyt Hero Image"
         bgColor="linear-gradient(0deg, #E4D6B1 0%, #E6D8B5 100%)"
-        staticBoxes={[
-          { index: 2, bgColor: '#F5F5AD' },
-          { index: 5, bgColor: '#F5F5AD' },
-          { index: 4, bgColor: '#F5F5AD' },
-          { index: 6, bgColor: '#F5F5AD' },
-          { index: 8, bgColor: '#F5F5AD' },
-          { index: 10, bgColor: '#F5F5AD' },
-          { index: 11, bgColor: '#F5F5AD' },
-        ]}
-        animationSteps={[
-          {
-            step: 1,
-            animatedBoxes: [
-              {
-                index: 6,
-                bgColor: '#F5F5AD',
-                animationType: 'slidingToTransparent',
-              },
-              { index: 7, bgColor: '#F5F5AD', animationType: 'slidingToBg' },
-            ],
-            overlayRotation: 80,
-          },
-          {
-            step: 2,
-            animatedBoxes: [],
-            overlayRotation: 0,
-          },
-          {
-            step: 3,
-            animatedBoxes: [
-              {
-                index: 4,
-                bgColor: '#F5F5AD',
-                animationType: 'slidingToTransparent',
-              },
-              {
-                index: 10,
-                bgColor: '#F5F5AD',
-                animationType: 'slidingToTransparent',
-              },
-            ],
-            overlayRotation: 50,
-          },
-          {
-            step: 4,
-            animatedBoxes: [
-              {
-                index: 2,
-                bgColor: '#F5F5AD',
-                animationType: 'slidingTopToBottom',
-              },
-            ],
-            overlayRotation: 70,
-          },
+        videoSrc="/videos/baner.mp4"
+        posterSrc="/images/obraz.png"
+        nextPeekPx={80}
+      // offsetTopPx={64} // <- ustaw, jeśli masz fixed header i chcesz odjąć jego wysokość
+      />
+      <WybierzHvyt
+        items={[
+          { src: '/images/new-arrivals-1.png', mobileSrc: '/images/new-arrivals-1.png', alt: 'HVYT 1' },
+          { src: '/images/new-arrivals-2.png', mobileSrc: '/images/new-arrivals-2.png', alt: 'HVYT 2' },
+          { src: '/images/new-arrivals-3.png', mobileSrc: '/images/new-arrivals-3.png', alt: 'HVYT 3' },
+          { src: '/images/new-arrivals-4.png', mobileSrc: '/images/new-arrivals-4.png', alt: 'HVYT 4' },
         ]}
       />
       <NewArrivals />

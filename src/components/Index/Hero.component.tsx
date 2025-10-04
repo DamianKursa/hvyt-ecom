@@ -1,17 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
-
-interface BoxConfig {
-  index: number;
-  bgColor: string;
-  animationType?: 'slidingToTransparent' | 'slidingToBg' | 'slidingTopToBottom';
-}
-
-interface AnimationStep {
-  step: number;
-  animatedBoxes: BoxConfig[];
-  overlayRotation?: number;
-}
 
 interface HeroProps {
   title: string;
@@ -23,8 +11,12 @@ interface HeroProps {
   imageSrc: string;
   imageAlt: string;
   bgColor: string;
-  staticBoxes: BoxConfig[];
-  animationSteps: AnimationStep[];
+  /** Optional background video for the hero. When provided, box animations and the rotated overlay image are disabled. */
+  videoSrc?: string;
+  /** Optional poster image (e.g. obraz.png) shown before the video loads or on devices that block autoplay. */
+  posterSrc?: string;
+  /** Pixels of the next section to peek below the hero height (LV-style). Defaults to 80. */
+  nextPeekPx?: number;
 }
 
 const Hero: React.FC<HeroProps> = ({
@@ -37,194 +29,74 @@ const Hero: React.FC<HeroProps> = ({
   imageSrc,
   imageAlt,
   bgColor,
-  staticBoxes,
-  animationSteps,
+  videoSrc,
+  posterSrc,
+  nextPeekPx,
 }) => {
-  const boxesRef = useRef<(HTMLDivElement | null)[]>([]);
-  // Initialize overlayRotation to 80 degrees (desktop default)
-  const [overlayRotation, setOverlayRotation] = useState(80);
-
-  useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-
-    if (!isMobile) {
-      // Set static backgrounds for desktop
-      staticBoxes.forEach(({ index, bgColor }) => {
-        const box = boxesRef.current[index];
-        if (box) {
-          const slidingBg = box.querySelector<HTMLElement>('.sliding-bg');
-          if (slidingBg) {
-            slidingBg.style.background = bgColor;
-          }
-        }
-      });
-
-      // Animate boxes in steps and control overlay rotation with delay
-      animationSteps.forEach(({ step, animatedBoxes, overlayRotation }) => {
-        setTimeout(() => {
-          if (typeof overlayRotation !== 'undefined') {
-            setOverlayRotation(overlayRotation);
-          }
-          animatedBoxes.forEach(({ index, bgColor, animationType }) => {
-            const box = boxesRef.current[index];
-            if (box) {
-              const slidingBg = box.querySelector<HTMLElement>('.sliding-bg');
-              if (slidingBg) {
-                if (animationType === 'slidingToTransparent') {
-                  slidingBg.style.background = `linear-gradient(to right, ${bgColor} 100%, transparent 0%)`;
-                  slidingBg.style.animation = `slidingToTransparent 1s ease-in-out forwards`;
-                } else if (animationType === 'slidingToBg') {
-                  slidingBg.style.background = `linear-gradient(to right, ${bgColor} 100%, transparent 0%)`;
-                  slidingBg.style.animation = `slidingToBg 1s ease-in-out forwards`;
-                } else if (animationType === 'slidingTopToBottom') {
-                  slidingBg.style.background = `linear-gradient(to bottom, ${bgColor} 100%, transparent 0%)`;
-                  slidingBg.style.animation = `slidingTopToBottom 1s ease-in-out forwards`;
-                }
-              }
-            }
-          });
-        }, step * 500);
-      });
-    } else {
-      // On mobile, set overlay rotation to 90deg.
-      setOverlayRotation(-90);
-    }
-  }, [staticBoxes, animationSteps]);
+  const peekPx = typeof nextPeekPx === 'number' ? nextPeekPx : 80;
 
   return (
     <section
       id="hero"
-      className="relative flex items-center w-full min-h-[795px] overflow-hidden px-4 md:px-0"
+      className="relative w-full overflow-hidden px-0"
       style={{
         background: bgColor,
+        height: `calc(90dvh - ${peekPx}px)`,
+        minHeight: 560,
       }}
     >
-      <div className="container mx-auto max-w-grid-desktop h-full flex justify-between items-center">
-        {/* Grid of boxes */}
-        <div className="absolute right-0 top-0 grid grid-cols-3 grid-rows-4 gap-0 justify-end items-center overflow-hidden">
-          {Array.from({ length: 12 }).map((_, idx) => (
-            <div
-              key={idx}
-              ref={(el) => {
-                boxesRef.current[idx] = el;
-              }}
-              className="w-[200px] h-[200px] relative overflow-hidden"
+      {videoSrc && (
+        <video
+          className="absolute inset-0 w-full h-full object-cover z-0"
+          src={videoSrc}
+          poster={posterSrc}
+          autoPlay
+          muted
+          playsInline
+          loop
+          preload="auto"
+          controls={false}
+        />
+      )}
+      {/* Bottom-anchored content */}
+      <div className="absolute inset-x-0 bottom-0 z-20">
+        <div className="container mx-auto px-4 md:px-6 pb-10 text-center">
+          <h1
+            className={`text-[14px] md:text-[20px] font-semibold leading-snug mb-2 ${videoSrc ? 'text-neutral-white' : 'text-dark-pastel-red'}`}
+            dangerouslySetInnerHTML={{ __html: title }}
+          ></h1>
+          <p
+            className={`max-w-[600px] mx-auto text-[12px] md:text-[14px] font-light mb-4 ${videoSrc ? 'text-neutral-white opacity-80' : 'text-neutral-darkest'}`}
+            dangerouslySetInnerHTML={{ __html: description }}
+          ></p>
+          <div className="flex justify-center gap-3 flex-wrap mt-2">
+            <a
+              className="inline-block min-w-[140px] font-light px-4 py-2 text-sm md:text-base leading-relaxed text-neutral-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors"
+              href={buttonLink}
             >
-              <div className="sliding-bg"></div>
-            </div>
-          ))}
-        </div>
-
-        {/* Overlay Image (desktop and mobile, centered) */}
-        <div
-          className="absolute mt-[-300px] md:mt-0 inset-0 flex justify-center items-center"
-          style={{
-            transformOrigin: 'center center',
-            transform: `rotate(${overlayRotation}deg)`,
-            transition: 'transform 1s ease-in-out',
-          }}
-        >
-          <div className="overlay-scale">
-            <Image
-              src={imageSrc}
-              alt={imageAlt}
-              width={1270}
-              height={698}
-              priority
-            />
-          </div>
-        </div>
-
-        {/* Hero Content */}
-        <div className="container relative z-10 mx-auto">
-          <div className="mt-[250px] md:mt-0 flex flex-col items-start justify-center w-full tracking-wide lg:w-1/2">
-            <h1
-              className="text-[40px] md:text-[64px] font-bold leading-tight text-dark-pastel-red mb-4"
-              dangerouslySetInnerHTML={{ __html: title }}
-            ></h1>
-            <p
-              className="max-w-[433px] md:text-[18px] font-light  text-neutral-darkest mb-6"
-              dangerouslySetInnerHTML={{ __html: description }}
-            ></p>
-
-            <div className="flex space-x-4">
-              <a
-                className="inline-block min-w-[162px] font-light px-6 py-3  md:text-lg leading-relaxed text-neutral-white bg-black rounded-full hover:bg-dark-pastel-red transition-colors"
-                href={buttonLink}
-              >
-                {buttonText}
-              </a>
-              <a
-                className="inline-block px-6 py-3 font-light md:text-lg border border-black text-black rounded-full hover:border-dark-pastel-red hover:bg-transparent hover:text-dark-pastel-red transition-colors"
-                href={secondButtonLink || '#'}
-              >
-                {secondButtonText || 'Zobacz gałki'}
-              </a>
-            </div>
+              {buttonText}
+            </a>
           </div>
         </div>
       </div>
 
       {/* Second Mobile-Only Overlay at Bottom Right */}
-      <div className="absolute bottom-0 right-0 block md:hidden">
-        <Image
-          src="/images/bg-mobile-hero.svg"
-          alt={`${imageAlt} Mobile Overlay`}
-          width={300}
-          height={200}
-          priority
-        />
-      </div>
+      {!videoSrc && (
+        <div className="absolute bottom-0 right-0 block md:hidden">
+          <Image
+            src="/images/bg-mobile-hero.svg"
+            alt={`${imageAlt} Mobile Overlay`}
+            width={300}
+            height={200}
+            priority
+          />
+        </div>
+      )}
 
       <style jsx>{`
         @media (min-width: 768px) {
-          @keyframes slidingToTransparent {
-            0% {
-              left: 0%;
-            }
-            100% {
-              left: 100%;
-            }
-          }
-
-          @keyframes slidingToBg {
-            0% {
-              left: -100%;
-            }
-            100% {
-              left: 0%;
-            }
-          }
-
-          @keyframes slidingTopToBottom {
-            0% {
-              top: 0%;
-            }
-            100% {
-              top: 100%;
-            }
-          }
-
-          @keyframes scaleAnimation {
-            0% {
-              transform: scale(0.6);
-            }
-            100% {
-              transform: scale(0.8);
-            }
-          }
-
-          .sliding-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-          }
-
-          /* The overlay-scale class applies a continuous scale animation */
-          .overlay-scale {
-            animation: scaleAnimation 20s ease-in-out forwards alternate;
+          :global(video) {
+            pointer-events: none;
           }
         }
       `}</style>
