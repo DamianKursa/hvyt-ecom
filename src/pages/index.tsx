@@ -66,7 +66,7 @@ const Index: NextPage = () => {
         title="Tworzymy meble, które żyją razem z Tobą."
         description="Wnętrza to nie tylko ściany i metry. To codzienność. Kawa wypita w biegu, pilot schowany pod poduszką, pies, który postanowił coś zbroić."
         buttonText="Zobacz meble"
-        buttonLink="/meble"
+        buttonLink="/kategoria/meble"
         imageSrc="/images/strona-główna.png"
         imageAlt="Hvyt Hero Image"
         bgColor="linear-gradient(0deg, #E4D6B1 0%, #E6D8B5 100%)"
