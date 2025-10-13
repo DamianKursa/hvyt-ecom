@@ -27,6 +27,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     visible: boolean;
   }>({ message: '', type: 'success', visible: false });
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const coupon = cart?.coupon;
   const allowedCats: number[] = coupon?.allowedCats ?? [];
@@ -57,6 +58,17 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       return () => clearTimeout(t);
     }
   }, [cart?.products]);
+
+  // Start editing: restore totals, clear coupon, open input with current code
+  const handleStartEditing = () => {
+    const back = Number(cart?.coupon?.discountValue ?? 0);
+    if (back) setCartTotal((prev) => Math.max(prev + back, 0));
+    setCode(cart?.coupon?.code || '');
+    setCodeError('');
+    removeCoupon();
+    setIsEditing(true);
+    setIsOpen(true);
+  };
 
   const handleApplyCode = async () => {
     if (!code.trim()) {
@@ -170,6 +182,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         discountType,
         allowedCats,
       });
+      setIsEditing(false);
 
       setCodeError('');
 
@@ -213,6 +226,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     });
     // Close the panel after removal
     setIsOpen(false);
+    setIsEditing(false);
     setTimeout(
       () => setSnackbar((prev) => ({ ...prev, visible: false })),
       3000,
@@ -259,7 +273,13 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         {/* Dropdown Header */}
         <button
           className="flex justify-between items-center w-full text-lg font-medium text-neutral-darkest focus:outline-none"
-          onClick={() => setIsOpen((prev) => !prev)}
+          onClick={() =>
+            setIsOpen((prev) => {
+              const next = !prev;
+              if (!next) setIsEditing(false);
+              return next;
+            })
+          }
           aria-expanded={isOpen}
           aria-controls="discount-input-section"
         >
@@ -281,14 +301,14 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         {/* Expanded Input Section */}
         {isOpen && (
           <div id="discount-input-section" className="mt-4">
-            {cart?.coupon ? (
+            {(cart?.coupon && !isEditing) ? (
               <div className="p-2 rounded-md space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-neutral-darkest font-medium">
                     {cart.coupon.code}
                   </span>
                   <div className="flex items-center space-x-4">
-                    <button onClick={() => setIsOpen(true)} className="focus:outline-none">
+                    <button onClick={handleStartEditing} className="focus:outline-none">
                       <img src="/icons/edit.svg" alt="Edit" className="w-5 h-5" />
                     </button>
                     <button onClick={handleRemoveCode} className="focus:outline-none">
