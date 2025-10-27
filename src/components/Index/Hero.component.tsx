@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 interface HeroProps {
@@ -19,6 +19,11 @@ interface HeroProps {
   nextPeekPx?: number;
 }
 
+type NetworkInformation = {
+  saveData?: boolean;
+  effectiveType?: string;
+};
+
 const Hero: React.FC<HeroProps> = ({
   title,
   description,
@@ -34,10 +39,54 @@ const Hero: React.FC<HeroProps> = ({
   nextPeekPx,
 }) => {
   const peekPx = typeof nextPeekPx === 'number' ? nextPeekPx : 80;
+  const heroRef = useRef<HTMLElement | null>(null);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+
+  useEffect(() => {
+    if (!videoSrc || typeof window === 'undefined') {
+      return;
+    }
+
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const connection = (navigator as Navigator & { connection?: NetworkInformation }).connection;
+    const slowNetwork =
+      typeof connection?.effectiveType === 'string' &&
+      /(^2g$|^slow-2g$)/.test(connection.effectiveType);
+    const shouldSkipVideo =
+      motionQuery.matches || connection?.saveData || slowNetwork;
+
+    if (shouldSkipVideo) {
+      setShouldLoadVideo(false);
+      return;
+    }
+
+    const node = heroRef.current;
+    if (!node) {
+      setShouldLoadVideo(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoadVideo(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(node);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [videoSrc]);
 
   return (
     <section
       id="hero"
+      ref={heroRef}
       className="relative w-full overflow-hidden px-0"
       style={{
         background: bgColor,
@@ -45,7 +94,7 @@ const Hero: React.FC<HeroProps> = ({
         minHeight: 560,
       }}
     >
-      {videoSrc && (
+      {videoSrc && shouldLoadVideo && (
         <video
           className="absolute inset-0 w-full h-full object-cover z-0"
           src={videoSrc}
@@ -54,7 +103,7 @@ const Hero: React.FC<HeroProps> = ({
           muted
           playsInline
           loop
-          preload="auto"
+          preload="metadata"
           controls={false}
         />
       )}
@@ -81,7 +130,7 @@ const Hero: React.FC<HeroProps> = ({
       </div>
 
       {/* Second Mobile-Only Overlay at Bottom Right */}
-      {!videoSrc && (
+      {!videoSrc || !shouldLoadVideo ? (
         <div className="absolute bottom-0 right-0 block md:hidden">
           <Image
             src="/images/bg-mobile-hero.svg"
@@ -91,7 +140,7 @@ const Hero: React.FC<HeroProps> = ({
             priority
           />
         </div>
-      )}
+      ) : null}
 
       <style jsx>{`
         @media (min-width: 768px) {

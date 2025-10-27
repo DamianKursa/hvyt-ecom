@@ -70,7 +70,7 @@ const Index: NextPage = () => {
         imageSrc="/images/strona-główna.png"
         imageAlt="Hvyt Hero Image"
         bgColor="linear-gradient(0deg, #E4D6B1 0%, #E6D8B5 100%)"
-        videoSrc="/videos/baner.mp4"
+        videoSrc="https://wp.hvyt.pl/wp-content/uploads/2025/10/baner.mp4"
         posterSrc="/images/obraz.png"
         nextPeekPx={80}
       // offsetTopPx={64} // <- ustaw, jeśli masz fixed header i chcesz odjąć jego wysokość
