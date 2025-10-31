@@ -77,10 +77,10 @@ const Index: NextPage = () => {
       />
       <WybierzHvyt
         items={[
-          { src: '/images/new-arrivals-1.png', mobileSrc: '/images/new-arrivals-1.png', alt: 'HVYT 1' },
-          { src: '/images/new-arrivals-2.png', mobileSrc: '/images/new-arrivals-2.png', alt: 'HVYT 2' },
-          { src: '/images/new-arrivals-3.png', mobileSrc: '/images/new-arrivals-3.png', alt: 'HVYT 3' },
-          { src: '/images/new-arrivals-4.png', mobileSrc: '/images/new-arrivals-4.png', alt: 'HVYT 4' },
+          { src: '/images/wybierz-swoj-HVYT-2.webp', mobileSrc: '/images/wybierz-swoj-HVYT-1.webp', alt: 'HVYT 2' },
+          { src: '/images/wybierz-swoj-HVYT-1.webp', mobileSrc: '/images/wybierz-swoj-HVYT-2.webp', alt: 'HVYT 1' },
+          { src: '/images/wybierz-swoj-HVYT-3.webp', mobileSrc: '/images/wybierz-swoj-HVYT-3.webp', alt: 'HVYT 3' },
+          { src: '/images/wybierz-swoj-HVYT-4.webp', mobileSrc: '/images/wybierz-swoj-HVYT-4.webp', alt: 'HVYT 4' },
         ]}
       />
       <NewArrivals />

@@ -183,8 +183,7 @@ const WybierzHvyt: React.FC<WybierzHvytProps> = ({ items, useInViewTrigger = fal
                         className="absolute z-20 left-0 p-4"
                     >
                         <h2 className="font-size-h2 font-bold text-neutral-darkest">
-                            Wybierz<br />
-                            swój HVYT
+                            Wybierz swój HVYT
                         </h2>
                         <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
                             Od eleganckich, nowoczesnych wzorów uchwytów meblowych po ponadczasowe klasyki. Sprawdź jak nasze Hvyt’y mogą odmienić Twoje wnętrze.
