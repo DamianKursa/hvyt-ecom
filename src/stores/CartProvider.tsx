@@ -1,5 +1,5 @@
 // CartProvider.tsx
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
 
 export interface Category {
   id: number;
@@ -51,6 +51,13 @@ export interface Coupon {
   discountValue: number;
   discountType?: 'percent' | 'fixed';
   allowedCats?: number[];
+  allowedProductIds?: number[];
+  applicableProductIds?: number[];
+  eligibleProductIds?: number[];
+  excludedCats?: number[];
+  excludedProductIds?: number[];
+  excludeSaleItems?: boolean;
+  excludeCategoriesOnSale?: number[];
 }
 
 export interface Cart {
@@ -81,6 +88,37 @@ interface CartContextProps {
   ) => void;
 }
 
+const STORAGE_KEY = 'woocommerce-cart';
+
+const createEmptyCart = (): Cart => ({
+  products: [],
+  totalProductsCount: 0,
+  totalProductsPrice: 0,
+});
+
+const parseCartFromStorage = (value: string | null): Cart | null => {
+  if (!value) return null;
+  try {
+    const parsed = JSON.parse(value);
+    if (!parsed || typeof parsed !== 'object') {
+      return null;
+    }
+    const products = Array.isArray(parsed.products) ? parsed.products : [];
+    const coupon =
+      parsed.coupon && typeof parsed.coupon === 'object' ? parsed.coupon : undefined;
+
+    return {
+      products,
+      totalProductsCount: Number(parsed.totalProductsCount) || 0,
+      totalProductsPrice: Number(parsed.totalProductsPrice) || 0,
+      coupon,
+    };
+  } catch (error) {
+    console.warn('Failed to parse cart from storage:', error);
+    return null;
+  }
+};
+
 export const CartContext = createContext<CartContextProps>({
   cart: { products: [], totalProductsCount: 0, totalProductsPrice: 0 },
   addCartItem: () => { },
@@ -96,25 +134,9 @@ export const CartContext = createContext<CartContextProps>({
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [cart, setCart] = useState<Cart>({
-    products: [],
-    totalProductsCount: 0,
-    totalProductsPrice: 0,
-  });
+  const [cart, setCart] = useState<Cart>(() => createEmptyCart());
 
-  useEffect(() => {
-    const storedCart = localStorage.getItem('woocommerce-cart');
-    if (storedCart) {
-      setCart(JSON.parse(storedCart));
-    }
-  }, []);
-
-  // Save cart to localStorage
-  useEffect(() => {
-    localStorage.setItem('woocommerce-cart', JSON.stringify(cart));
-  }, [cart]);
-
-  const recalculateCartTotals = (updatedCart: Cart): Cart => {
+  const recalculateCartTotals = useCallback((updatedCart: Cart): Cart => {
     const totalProductsPrice = updatedCart.products.reduce(
       (total, product) => total + product.totalPrice,
       0,
@@ -132,7 +154,37 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         totalPriceWithDiscount >= 0 ? totalPriceWithDiscount : 0,
       totalProductsCount,
     };
-  };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const storedCart = localStorage.getItem(STORAGE_KEY);
+    if (storedCart) {
+      const parsed = parseCartFromStorage(storedCart);
+      if (parsed) {
+        setCart(recalculateCartTotals(parsed));
+      }
+    }
+  }, [recalculateCartTotals]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== STORAGE_KEY) return;
+      const parsed = parseCartFromStorage(event.newValue);
+      setCart(parsed ? recalculateCartTotals(parsed) : createEmptyCart());
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [recalculateCartTotals]);
+
+  // Save cart to localStorage
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+  }, [cart]);
 
   const addCartItem = (product: Product) => {
     setCart((prevCart) => {
@@ -272,6 +324,18 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
           newCoupon = undefined;
         }
       }
+      if (
+        newCoupon &&
+        newCoupon.allowedProductIds &&
+        newCoupon.allowedProductIds.length
+      ) {
+        const stillHasAllowedProduct = remaining.some((p) =>
+          newCoupon!.allowedProductIds!.includes(p.productId),
+        );
+        if (!stillHasAllowedProduct) {
+          newCoupon = undefined;
+        }
+      }
 
       const updatedCart = {
         ...prevCart,
@@ -283,11 +347,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const clearCart = () => {
-    setCart({
-      products: [],
-      totalProductsCount: 0,
-      totalProductsPrice: 0,
-    });
+    setCart(createEmptyCart());
   };
 
   const applyCoupon = (coupon: Coupon) => {

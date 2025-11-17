@@ -142,6 +142,27 @@ const hasCoupon = (cart: any, code: string): boolean => {
   return false;
 };
 
+const EMMA_ZADBANO_PRODUCT_IDS = new Set([
+  '7563916',
+  '7564076',
+  '7564079',
+]);
+
+const buildZadbanoMethods = (): ShippingMethod[] => [
+  {
+    id: 'zadbano_bez_wniesienia',
+    title: 'Zadbano (bez wniesienia)',
+    cost: 0,
+    enabled: true,
+  },
+  {
+    id: 'zadbano_z_wniesieniem',
+    title: 'Zadbano z wniesieniem',
+    cost: 99,
+    enabled: true,
+  },
+];
+
 const Shipping: React.FC<ShippingProps> = ({
   shippingMethod,
   setShippingMethod,
@@ -172,6 +193,8 @@ const Shipping: React.FC<ShippingProps> = ({
     'darmowa dostawa': '/icons/free-shipping.svg',
     'kurier gls pobranie': '/icons/GLS_Logo_2021.svg',
     'punkty gls': '/icons/GLS_Logo_2021.svg',
+    'zadbano (bez wniesienia)': '/icons/truck.svg',
+    'zadbano z wniesieniem': '/icons/truck.svg',
   };
 
   // ─── FETCH SHIPPING METHODS ──────────────────────────────────────────────
@@ -180,6 +203,30 @@ const Shipping: React.FC<ShippingProps> = ({
       try {
         setLoading(true);
         setError(null);
+
+        const hasEmmaZadbano = cart?.products?.some((product: any) => {
+          const productId = String(product?.productId ?? '');
+          const variationId = product?.variationId
+            ? String(product.variationId)
+            : null;
+          return (
+            EMMA_ZADBANO_PRODUCT_IDS.has(productId) ||
+            (variationId ? EMMA_ZADBANO_PRODUCT_IDS.has(variationId) : false)
+          );
+        });
+
+        if (hasEmmaZadbano) {
+          const zadbanoMethods = buildZadbanoMethods();
+          setShippingZones([{ zoneName: 'Zadbano', methods: zadbanoMethods }]);
+          const defaultMethod = zadbanoMethods[0];
+          if (defaultMethod) {
+            setShippingMethod(defaultMethod.id);
+            setShippingTitle(defaultMethod.title);
+            setShippingPrice(Number(defaultMethod.cost) || 0);
+          }
+          setLoading(false);
+          return;
+        }
 
         const response = await fetch('/api/shipping');
         if (!response.ok) {

@@ -8,6 +8,187 @@ const toNum = (v: any): number => {
   return Number.isFinite(n) ? n : NaN;
 };
 
+type CouponRules = {
+  allowedCats: number[];
+  allowedProductIds: number[];
+  applicableProductIds: number[];
+  eligibleProductIds: number[];
+  excludedCats: number[];
+  excludedProductIds: number[];
+  excludeSaleItems: boolean;
+  excludeCategoriesOnSale: number[];
+};
+
+const normalizeNumberArray = (input: any): number[] => {
+  if (!Array.isArray(input)) return [];
+
+  return Array.from(
+    new Set(
+      input
+        .map((value) => {
+          if (typeof value === 'number') return value;
+          if (typeof value === 'string') {
+            const parsed = Number(value);
+            return Number.isFinite(parsed) ? parsed : NaN;
+          }
+          if (value && typeof value === 'object') {
+            const maybe =
+              (value as any).id ??
+              (value as any).term_id ??
+              (value as any).value ??
+              (value as any).slug ??
+              value;
+            if (typeof maybe === 'number') {
+              return maybe;
+            }
+            if (typeof maybe === 'string') {
+              const parsed = Number(maybe);
+              return Number.isFinite(parsed) ? parsed : NaN;
+            }
+          }
+          return NaN;
+        })
+        .filter((n): n is number => Number.isFinite(n)),
+    ),
+  );
+};
+
+const getProductCategoryIds = (product: any): number[] => {
+  if (!product || !Array.isArray(product.categories)) return [];
+  return normalizeNumberArray(
+    product.categories.map((cat: any) => {
+      if (typeof cat === 'number') return cat;
+      if (cat && typeof cat === 'object') {
+        return cat.id ?? cat.term_id ?? cat.value ?? cat.slug ?? cat;
+      }
+      return cat;
+    }),
+  );
+};
+
+const isProductOnSale = (product: any): boolean => {
+  if (!product) return false;
+  if (product.on_sale === true || product.on_sale === 'true') return true;
+
+  const price = toNum(product.price);
+  const regular = toNum(product.regular_price ?? product.price);
+  const salePrice = toNum(product.sale_price);
+
+  if (Number.isFinite(salePrice) && salePrice > 0) {
+    if (!Number.isFinite(regular)) return true;
+    if (salePrice < (regular as number)) return true;
+  }
+  if (Number.isFinite(price) && Number.isFinite(regular) && price < regular) {
+    return true;
+  }
+  return false;
+};
+
+const matchesCouponRules = (
+  product: any,
+  rules: CouponRules,
+  options: { ignoreSale?: boolean } = {},
+): boolean => {
+  if (!product) return false;
+  const pid = Number(product.productId ?? product.id);
+  if (!Number.isFinite(pid)) return false;
+
+  const {
+    allowedCats,
+    allowedProductIds,
+    applicableProductIds,
+    excludedCats,
+    excludedProductIds,
+    excludeSaleItems,
+    excludeCategoriesOnSale,
+  } = rules;
+
+  if (excludedProductIds.length && excludedProductIds.includes(pid)) {
+    return false;
+  }
+
+  if (allowedProductIds.length && !allowedProductIds.includes(pid)) {
+    return false;
+  }
+
+  if (
+    applicableProductIds.length &&
+    !applicableProductIds.includes(pid) &&
+    allowedProductIds.length === 0 &&
+    allowedCats.length === 0
+  ) {
+    return false;
+  }
+
+  const categoryIds = getProductCategoryIds(product);
+
+  if (excludedCats.length && categoryIds.some((id) => excludedCats.includes(id))) {
+    return false;
+  }
+
+  if (allowedCats.length && !categoryIds.some((id) => allowedCats.includes(id))) {
+    return false;
+  }
+
+  if (!options.ignoreSale) {
+    const sale = isProductOnSale(product);
+    if (excludeSaleItems && sale) {
+      return false;
+    }
+    if (
+      excludeCategoriesOnSale.length &&
+      sale &&
+      categoryIds.some((id) => excludeCategoriesOnSale.includes(id))
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+const filterEligibleProducts = (
+  products: any[] | undefined,
+  rules: CouponRules,
+  options: { ignoreSale?: boolean } = {},
+) => {
+  if (!Array.isArray(products)) return [];
+  return products.filter((product) => matchesCouponRules(product, rules, options));
+};
+
+const buildRulesFromCouponData = (data: any): CouponRules => {
+  const allowedCats = normalizeNumberArray(data?.allowedCats ?? data?.allowed_categories ?? []);
+  const allowedProductIds = normalizeNumberArray(
+    data?.allowedProductIds ?? data?.allowed_products ?? [],
+  );
+  const applicableProductIds = normalizeNumberArray(
+    data?.applicableProductIds ??
+      (allowedProductIds.length ? allowedProductIds : data?.eligibleProductIds ?? []),
+  );
+  const eligibleProductIds = normalizeNumberArray(data?.eligibleProductIds ?? []);
+  const excludedCats = normalizeNumberArray(data?.excludedCats ?? []);
+  const excludedProductIds = normalizeNumberArray(data?.excludedProductIds ?? []);
+  const excludeSaleItems = Boolean(
+    data?.excludeSaleItems ?? data?.exclude_sale_items ?? false,
+  );
+  const excludeCategoriesOnSale = normalizeNumberArray(
+    data?.excludeCategoriesOnSale ??
+      data?.exclude_categories_on_sale ??
+      [],
+  );
+
+  return {
+    allowedCats,
+    allowedProductIds,
+    applicableProductIds,
+    eligibleProductIds,
+    excludedCats,
+    excludedProductIds,
+    excludeSaleItems,
+    excludeCategoriesOnSale,
+  };
+};
+
 interface DiscountCodeProps {
   cartTotal: number;
   setCartTotal: React.Dispatch<React.SetStateAction<number>>;
@@ -30,34 +211,59 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
   const [isEditing, setIsEditing] = useState(false);
 
   const coupon = cart?.coupon;
-  const allowedCats: number[] = coupon?.allowedCats ?? [];
+  const couponRules = React.useMemo(
+    () => (coupon ? buildRulesFromCouponData(coupon) : buildRulesFromCouponData({})),
+    [coupon],
+  );
 
-  // Helper: detect if cart has discounted items (on_sale flag or price < regular_price)
-  const hasDiscountedItems = React.useCallback(() => {
-    if (!cart?.products?.length) return false;
-    return cart.products.some((p: any) => {
-      const price = toNum(p.price);
-      const reg = toNum(p.regular_price);
-      const salePrice = toNum(p.sale_price ?? 0);
-      if (p.on_sale === true || p.on_sale === 'true') return true;
-      // Treat sale_price>0 as discounted even if regular_price is missing
-      if (Number.isFinite(salePrice) && salePrice > 0 && (!Number.isFinite(reg) || salePrice < reg)) return true;
-      if (Number.isFinite(price) && Number.isFinite(reg) && price < reg) return true;
-      return false;
-    });
-  }, [cart?.products]);
+  const productsMatchingRules = React.useMemo(
+    () =>
+      coupon ? filterEligibleProducts(cart?.products, couponRules) : [],
+    [cart?.products, coupon, couponRules],
+  );
+
+  const productsMatchingRulesIgnoringSale = React.useMemo(
+    () =>
+      coupon
+        ? filterEligibleProducts(cart?.products, couponRules, { ignoreSale: true })
+        : [],
+    [cart?.products, coupon, couponRules],
+  );
 
   useEffect(() => {
     if (!cart?.coupon) return;
-    if (hasDiscountedItems()) {
-      removeCoupon();
-      setCode('');
-      setCartTotal(cart.totalProductsPrice);
-      setSnackbar({ message: 'Kod nie działa na produkty z promocji — usunięto.', type: 'error', visible: true });
-      const t = setTimeout(() => setSnackbar(prev => ({ ...prev, visible: false })), 3000);
-      return () => clearTimeout(t);
-    }
-  }, [cart?.products]);
+    if (productsMatchingRules.length > 0) return;
+
+    removeCoupon();
+    setCode('');
+    setCartTotal(cart.totalProductsPrice);
+
+    const hadMatchesIgnoringSale = productsMatchingRulesIgnoringSale.length > 0;
+    const saleRestrictionActive =
+      couponRules.excludeSaleItems ||
+      (couponRules.excludeCategoriesOnSale?.length ?? 0) > 0;
+    const message =
+      saleRestrictionActive && hadMatchesIgnoringSale
+        ? 'Kod nie działa na produkty z promocji — usunięto.'
+        : 'Kod rabatowy usunięty – brak produktów spełniających warunki';
+
+    setSnackbar({ message, type: 'error', visible: true });
+    const timeout = setTimeout(
+      () => setSnackbar((prev) => ({ ...prev, visible: false })),
+      3000,
+    );
+
+    return () => clearTimeout(timeout);
+  }, [
+    cart?.coupon,
+    cart?.products,
+    cart?.totalProductsPrice,
+    couponRules,
+    productsMatchingRules.length,
+    productsMatchingRulesIgnoringSale.length,
+    removeCoupon,
+    setCartTotal,
+  ]);
 
   // Start editing: restore totals, clear coupon, open input with current code
   const handleStartEditing = () => {
@@ -77,26 +283,18 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     }
     setCodeError('');
 
+    const sanitizedCode = code.trim();
+
     setIsLoading(true);
     setSnackbar((prev) => ({ ...prev, visible: false }));
-
-    // Early guard: do not allow coupons on promotional items
-    if (hasDiscountedItems()) {
-      const msg = 'Kod nie działa na produkty z promocji.';
-      setCodeError(msg);
-      setSnackbar({ message: msg, type: 'error', visible: true });
-      setIsLoading(false);
-      return;
-    }
 
     try {
       const response = await fetch('/api/discount', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          code: code.trim(),
+          code: sanitizedCode,
           cartTotal,
-          hasSaleItems: hasDiscountedItems(),
           items: cart!.products.map((item) => ({
             id: item.productId,
             price: item.price,
@@ -111,76 +309,88 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
       if (!response.ok || !data.valid) {
         console.log('Coupon debug:', data.debug);
-        const discounted = hasDiscountedItems();
-        const msg = discounted
-          ? 'Kod nie działa na produkty z promocji.'
-          : (data.message || 'Niepoprawny kod rabatowy');
+        const msg =
+          data?.debug === 'only_sale_products_in_scope'
+            ? 'Kod nie działa na produkty z promocji.'
+            : data.message || 'Niepoprawny kod rabatowy';
         setCodeError(msg);
         setSnackbar({ message: msg, type: 'error', visible: true });
         return;
       }
 
-      // pull the category restrictions out of the API response
-      const {
-        discountValue,
-        discountType,
-        allowedCats = [], // 👈 default to empty array
-      } = data;
+      const { discountValue, discountType } = data;
+      const rulesFromApi = buildRulesFromCouponData(data);
 
-      // Normalize category ids from API (strings or numbers → numbers)
-      const allowedCatIds: number[] = (allowedCats as any[])
-        .map((id) => Number(id))
-        .filter((n) => Number.isFinite(n));
+      const eligibleProducts = filterEligibleProducts(
+        cart!.products,
+        rulesFromApi,
+      );
+      const eligibleProductsIgnoringSale = filterEligibleProducts(
+        cart!.products,
+        rulesFromApi,
+        { ignoreSale: true },
+      );
 
-      // Determine subtotal eligible for discount (respect category restrictions if present)
-      const eligibleSubtotal = allowedCatIds.length > 0
-        ? cart!.products.reduce((sum, p) => {
-          const rawCats: any[] = (p as any).categories || [];
-          // Support both shapes: [number] or [{ id, name }]
-          const catIds: number[] = rawCats
-            .map((c) => (typeof c === 'number' ? c : c?.id))
-            .map((id) => Number(id))
-            .filter((n) => Number.isFinite(n));
+      const saleRestrictionActive =
+        rulesFromApi.excludeSaleItems ||
+        (rulesFromApi.excludeCategoriesOnSale?.length ?? 0) > 0;
+      const saleOnly =
+        saleRestrictionActive &&
+        eligibleProductsIgnoringSale.length > eligibleProducts.length;
+      const noMatchMessage = saleOnly
+        ? 'Kod nie działa na produkty z promocji.'
+        : 'Brak produktów spełniających warunki kodu.';
 
-          const inAllowed = catIds.some((id) => allowedCatIds.includes(id));
-          return inAllowed ? sum + Number(p.price) * Number(p.qty) : sum;
-        }, 0)
-        : Number(cartTotal);
+      if (!eligibleProducts.length) {
+        setCodeError(noMatchMessage);
+        setSnackbar({ message: noMatchMessage, type: 'error', visible: true });
+        return;
+      }
 
-      // If all (eligible) items are discounted, stop and show message
-      const nonSaleSubtotal = cart!.products.reduce((sum, p: any) => {
+      const eligibleSubtotal = eligibleProducts.reduce((sum, p: any) => {
         const price = Number(p.price);
-        const reg = Number(p.regular_price ?? price);
-        const salePrice = Number(p.sale_price ?? 0);
-        const isOnSale = p.on_sale === true || (salePrice > 0 && salePrice < reg) || price < reg;
-        return isOnSale ? sum : sum + price * Number(p.qty);
+        const qty = Number(p.qty);
+        if (!Number.isFinite(price) || !Number.isFinite(qty)) {
+          return sum;
+        }
+        return sum + price * qty;
       }, 0);
-      if (nonSaleSubtotal <= 0 && hasDiscountedItems()) {
-        const msg = 'Kod nie działa na produkty z promocji.';
-        setCodeError(msg);
+
+      if (!Number.isFinite(eligibleSubtotal) || eligibleSubtotal <= 0) {
+        setCodeError(noMatchMessage);
+        setSnackbar({ message: noMatchMessage, type: 'error', visible: true });
         return;
       }
 
-      // Compute actually applied discount amount
-      const appliedDiscount = discountType === 'percent'
-        ? (eligibleSubtotal * Number(discountValue)) / 100
-        : Number(discountValue);
+      const numericDiscount = Number(discountValue);
+      const appliedDiscount =
+        discountType === 'percent'
+          ? (eligibleSubtotal * numericDiscount) / 100
+          : numericDiscount;
 
-      // Clamp to not exceed eligible subtotal
-      const appliedDiscountClamped = Math.max(0, Math.min(appliedDiscount, eligibleSubtotal));
+      const appliedDiscountClamped = Math.max(
+        0,
+        Math.min(appliedDiscount, eligibleSubtotal),
+      );
 
-      if (appliedDiscountClamped <= 0 && hasDiscountedItems()) {
-        const msg = 'Kod nie działa na produkty z promocji.';
-        setCodeError(msg);
+      if (!Number.isFinite(appliedDiscountClamped) || appliedDiscountClamped <= 0) {
+        setCodeError(noMatchMessage);
+        setSnackbar({ message: noMatchMessage, type: 'error', visible: true });
         return;
       }
 
-      // Store applied amount in context so UI can show it directly
       applyCoupon({
-        code,
+        code: sanitizedCode,
         discountValue: appliedDiscountClamped,
         discountType,
-        allowedCats,
+        allowedCats: rulesFromApi.allowedCats,
+        allowedProductIds: rulesFromApi.allowedProductIds,
+        applicableProductIds: rulesFromApi.applicableProductIds,
+        eligibleProductIds: rulesFromApi.eligibleProductIds,
+        excludedCats: rulesFromApi.excludedCats,
+        excludedProductIds: rulesFromApi.excludedProductIds,
+        excludeSaleItems: rulesFromApi.excludeSaleItems,
+        excludeCategoriesOnSale: rulesFromApi.excludeCategoriesOnSale,
       });
       setIsEditing(false);
 
@@ -189,8 +399,23 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       // Update local total (defensively keep it ≥ 0)
       setCartTotal((prev) => Math.max(prev - appliedDiscountClamped, 0));
 
+      const limitedDiscount =
+        eligibleProducts.length < (cart?.products?.length ?? 0);
+      const eligibleNames = eligibleProducts
+        .map((p: any) => p.name)
+        .filter(Boolean);
+      const formattedNames =
+        eligibleNames.length > 0
+          ? eligibleNames.slice(0, 3).join(', ') +
+            (eligibleNames.length > 3 ? '…' : '')
+          : '';
+      const successMessage =
+        limitedDiscount && formattedNames
+          ? `Kod rabatowy został dodany - rabat naliczono dla: ${formattedNames}.`
+          : 'Kod rabatowy został dodany';
+
       setSnackbar({
-        message: 'Kod rabatowy został dodany',
+        message: successMessage,
         type: 'success',
         visible: true,
       });
@@ -232,39 +457,6 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       3000,
     );
   };
-  useEffect(() => {
-    // 1) Guard: if there's no cart or no coupon, bail out
-    if (!cart?.coupon) return;
-
-    // 2) Only consider category‐restricted coupons
-    const allowedCats = cart.coupon.allowedCats || [];
-    if (allowedCats.length === 0) return;
-
-    // 3) Check if any product still matches one of those categories
-    const stillHas = cart.products.some((p) =>
-      p.categories?.some((cat) => allowedCats.includes(cat.id)),
-    );
-
-    // 4) If not, clear the coupon
-    if (!stillHas) {
-      removeCoupon();
-      setCode('');
-      setCartTotal(cart.totalProductsPrice);
-      setSnackbar({
-        message: 'Kod rabatowy usunięty – brak produktów z wymaganej kategorii',
-        type: 'error',
-        visible: true,
-      });
-      setTimeout(
-        () => setSnackbar((prev) => ({ ...prev, visible: false })),
-        3000,
-      );
-    }
-  }, [
-    // 5) DEP: only watch cart?.products
-    cart?.products,
-  ]);
-
   return (
     <>
       <div
@@ -334,8 +526,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
                   />
                   <button
                     onClick={handleApplyCode}
-                    disabled={!code.trim() || isLoading || hasDiscountedItems()}
-                    className={`w-1/2 md:w-auto md:ml-4 px-4 py-2 border ${(!code.trim() || isLoading || hasDiscountedItems()) ? 'border-neutral-light text-neutral-light' : 'border-black text-black'} rounded-full focus:outline-none ${(!code.trim() || isLoading || hasDiscountedItems()) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    disabled={!code.trim() || isLoading}
+                    className={`w-1/2 md:w-auto md:ml-4 px-4 py-2 border ${(!code.trim() || isLoading) ? 'border-neutral-light text-neutral-light' : 'border-black text-black'} rounded-full focus:outline-none ${(!code.trim() || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {isLoading ? 'Ładowanie...' : 'Zapisz'}
                   </button>
@@ -344,12 +536,6 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
                   <div className="flex items-center text-[#A83232] text-sm mt-1">
                     <img src="/icons/Warning_Circle_Warning.svg" alt="Warning" className="w-4 h-4 mr-2" />
                     <span>{codeError}</span>
-                  </div>
-                )}
-                {hasDiscountedItems() && !codeError && (
-                  <div className="flex items-center text-[#A83232] text-sm mt-1">
-                    <img src="/icons/Warning_Circle_Warning.svg" alt="Warning" className="w-4 h-4 mr-2" />
-                    <span>Kod nie działa na produkty z promocji.</span>
                   </div>
                 )}
               </>
