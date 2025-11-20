@@ -101,6 +101,7 @@ const matchesCouponRules = (
     excludedProductIds,
     excludeSaleItems,
     excludeCategoriesOnSale,
+    eligibleProductIds,
   } = rules;
 
   if (excludedProductIds.length && excludedProductIds.includes(pid)) {
@@ -108,6 +109,10 @@ const matchesCouponRules = (
   }
 
   if (allowedProductIds.length && !allowedProductIds.includes(pid)) {
+    return false;
+  }
+
+  if (!options.ignoreSale && eligibleProductIds.length && !eligibleProductIds.includes(pid)) {
     return false;
   }
 
