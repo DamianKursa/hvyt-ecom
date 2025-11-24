@@ -487,6 +487,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const isPercentage = coupon.discount_type === 'percent';
     const discountValue = parseFloat(coupon.amount || '0');
+    const freeShipping = Boolean(coupon.free_shipping);
 
     return res.status(200).json({
       valid: true,
@@ -502,6 +503,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       excludedProductIds,
       excludeSaleItems,
       excludeCategoriesOnSale: specialExcludeCategoriesOnSale,
+      freeShipping,
     });
   } catch (error) {
     console.error('Error validating discount code:', error);

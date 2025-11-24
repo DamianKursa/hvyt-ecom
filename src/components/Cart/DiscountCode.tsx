@@ -323,7 +323,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         return;
       }
 
-      const { discountValue, discountType } = data;
+      const { discountValue, discountType, freeShipping } = data;
       const rulesFromApi = buildRulesFromCouponData(data);
 
       const eligibleProducts = filterEligibleProducts(
@@ -378,7 +378,10 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         Math.min(appliedDiscount, eligibleSubtotal),
       );
 
-      if (!Number.isFinite(appliedDiscountClamped) || appliedDiscountClamped <= 0) {
+      const isFreeShippingOnly =
+        freeShipping === true && (!Number.isFinite(appliedDiscountClamped) || appliedDiscountClamped <= 0);
+
+      if (!isFreeShippingOnly && (!Number.isFinite(appliedDiscountClamped) || appliedDiscountClamped <= 0)) {
         setCodeError(noMatchMessage);
         setSnackbar({ message: noMatchMessage, type: 'error', visible: true });
         return;
@@ -396,13 +399,16 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         excludedProductIds: rulesFromApi.excludedProductIds,
         excludeSaleItems: rulesFromApi.excludeSaleItems,
         excludeCategoriesOnSale: rulesFromApi.excludeCategoriesOnSale,
+        freeShipping: Boolean(freeShipping),
       });
       setIsEditing(false);
 
       setCodeError('');
 
       // Update local total (defensively keep it ≥ 0)
-      setCartTotal((prev) => Math.max(prev - appliedDiscountClamped, 0));
+      if (!isFreeShippingOnly) {
+        setCartTotal((prev) => Math.max(prev - appliedDiscountClamped, 0));
+      }
 
       const limitedDiscount =
         eligibleProducts.length < (cart?.products?.length ?? 0);
@@ -415,9 +421,11 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
             (eligibleNames.length > 3 ? '…' : '')
           : '';
       const successMessage =
-        limitedDiscount && formattedNames
-          ? `Kod rabatowy został dodany - rabat naliczono dla: ${formattedNames}.`
-          : 'Kod rabatowy został dodany';
+        isFreeShippingOnly
+          ? 'Kod rabatowy został dodany – darmowa wysyłka.'
+          : limitedDiscount && formattedNames
+            ? `Kod rabatowy został dodany - rabat naliczono dla: ${formattedNames}.`
+            : 'Kod rabatowy został dodany';
 
       setSnackbar({
         message: successMessage,
