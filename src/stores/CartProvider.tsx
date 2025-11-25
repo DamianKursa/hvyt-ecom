@@ -50,6 +50,7 @@ export interface Coupon {
   code: string;
   discountValue: number;
   discountType?: 'percent' | 'fixed';
+   freeShipping?: boolean;
   allowedCats?: number[];
   allowedProductIds?: number[];
   applicableProductIds?: number[];
