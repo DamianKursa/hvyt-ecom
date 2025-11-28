@@ -63,15 +63,13 @@ const Index: NextPage = () => {
       <Hero
         secondButtonText="Zobacz gałki"
         secondButtonLink="/kategoria/uchwyty-meblowe?pa_rodzaj=galki&pa_rodzaj=t-bary"
-        title="Tworzymy meble, które żyją razem z Tobą."
-        description="Wnętrza to nie tylko ściany i metry. To codzienność. Kawa wypita w biegu, pilot schowany pod poduszką, pies, który postanowił coś zbroić."
+        title=""
+        description=""
         buttonText="Zobacz meble"
         buttonLink="/kategoria/meble"
-        imageSrc="/images/strona-główna.png"
+        imageSrc="/images/banner-hero.png"
         imageAlt="Hvyt Hero Image"
         bgColor="linear-gradient(0deg, #E4D6B1 0%, #E6D8B5 100%)"
-        videoSrc="https://wp.hvyt.pl/wp-content/uploads/2025/10/baner.mp4"
-        posterSrc="/images/obraz.png"
         nextPeekPx={80}
       // offsetTopPx={64} // <- ustaw, jeśli masz fixed header i chcesz odjąć jego wysokość
       />

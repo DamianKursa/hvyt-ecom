@@ -94,7 +94,7 @@ const Hero: React.FC<HeroProps> = ({
         minHeight: 560,
       }}
     >
-      {videoSrc && shouldLoadVideo && (
+      {videoSrc && shouldLoadVideo ? (
         <video
           className="absolute inset-0 w-full h-full object-cover z-0"
           src={videoSrc}
@@ -105,6 +105,14 @@ const Hero: React.FC<HeroProps> = ({
           loop
           preload="metadata"
           controls={false}
+        />
+      ) : (
+        <Image
+          src={imageSrc}
+          alt={imageAlt}
+          fill
+          className="object-cover z-0"
+          priority
         />
       )}
       {/* Bottom-anchored content */}
