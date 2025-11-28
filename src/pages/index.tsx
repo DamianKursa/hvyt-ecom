@@ -68,6 +68,7 @@ const Index: NextPage = () => {
         buttonText="Zobacz meble"
         buttonLink="/kategoria/meble"
         imageSrc="/images/banner-hero.png"
+        mobileImageSrc="/images/MOBILE-HVYT-BF.png"
         imageAlt="Hvyt Hero Image"
         bgColor="linear-gradient(0deg, #E4D6B1 0%, #E6D8B5 100%)"
         nextPeekPx={80}
