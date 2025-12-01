@@ -9,8 +9,6 @@ interface HeroProps {
   secondButtonText?: string;
   secondButtonLink?: string;
   imageSrc: string;
-  /** Optional mobile-specific image. When provided, shown on screens < 768px */
-  mobileImageSrc?: string;
   imageAlt: string;
   bgColor: string;
   /** Optional background video for the hero. When provided, box animations and the rotated overlay image are disabled. */
@@ -34,7 +32,6 @@ const Hero: React.FC<HeroProps> = ({
   secondButtonText,
   secondButtonLink,
   imageSrc,
-  mobileImageSrc,
   imageAlt,
   bgColor,
   videoSrc,
@@ -97,7 +94,7 @@ const Hero: React.FC<HeroProps> = ({
         minHeight: 560,
       }}
     >
-      {videoSrc && shouldLoadVideo ? (
+      {videoSrc && shouldLoadVideo && (
         <video
           className="absolute inset-0 w-full h-full object-cover z-0"
           src={videoSrc}
@@ -109,27 +106,6 @@ const Hero: React.FC<HeroProps> = ({
           preload="metadata"
           controls={false}
         />
-      ) : (
-        <>
-          {/* Desktop image */}
-          <Image
-            src={imageSrc}
-            alt={imageAlt}
-            fill
-            className={`object-cover z-0 ${mobileImageSrc ? 'hidden md:block' : ''}`}
-            priority
-          />
-          {/* Mobile image */}
-          {mobileImageSrc && (
-            <Image
-              src={mobileImageSrc}
-              alt={imageAlt}
-              fill
-              className="object-cover z-0 block md:hidden"
-              priority
-            />
-          )}
-        </>
       )}
       {/* Bottom-anchored content */}
       <div className="absolute inset-x-0 bottom-0 z-20">
