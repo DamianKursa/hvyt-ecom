@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 // Product IDs that should show custom delivery text
 const CUSTOM_DELIVERY_PRODUCT_IDS = new Set([
-  '7563916',
+  '7564076',
   '7575924'
 ]);
 
