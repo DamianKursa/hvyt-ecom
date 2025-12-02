@@ -980,6 +980,7 @@ const ProductPage = () => {
                   : product && (product as any).stock_status
               }
               isMeble={isMeble}
+              productId={product?.id}
             />
           </div>
         </div>

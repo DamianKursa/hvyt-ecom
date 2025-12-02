@@ -1,11 +1,20 @@
 import React from 'react';
 import Image from 'next/image';
 
+// Product IDs that should show custom delivery text
+const CUSTOM_DELIVERY_PRODUCT_IDS = new Set([
+  '7563916',
+  '7564076',
+  '7564079',
+  '7575924',
+]);
+
 interface DeliveryReturnInfoProps {
   onScrollToSection?: () => void;
   stock?: number | null;
   stockStatus?: string;
   isMeble?: boolean;
+  productId?: string | number;
 }
 
 const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
@@ -13,7 +22,11 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
   stock,
   stockStatus,
   isMeble,
+  productId,
 }) => {
+  const isCustomDeliveryProduct = productId
+    ? CUSTOM_DELIVERY_PRODUCT_IDS.has(String(productId))
+    : false;
   const items = [
     {
       icon: '/icons/zwrot.svg',
@@ -52,10 +65,10 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
           <span className="text-black font-medium">
             {typeof stock === 'number' && stock > 0
               ? stock >= 50
-                ? 'Ponad 50 szt. na stanie. Wysyłka w 24h!'
-                : `Tylko ${stock} szt. na stanie. Wysyłka w 24h!`
+                ? `Ponad 50 szt. na stanie. ${isCustomDeliveryProduct ? 'Wysyłka po 15.01' : 'Wysyłka w 24h!'}`
+                : `Tylko ${stock} szt. na stanie. ${isCustomDeliveryProduct ? 'Wysyłka po 15.01' : 'Wysyłka w 24h!'}`
               : stockStatus === 'instock'
-                ? 'Na stanie. Wysyłka w 24h!'
+                ? `Na stanie. ${isCustomDeliveryProduct ? 'Wysyłka po 15.01' : 'Wysyłka w 24h!'}`
                 : null}
           </span>
         </div>
