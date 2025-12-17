@@ -36,25 +36,74 @@ const CartItem: React.FC<CartItemProps> = ({
   const [selectedVariation, setSelectedVariation] = useState<SelVar | null>(
     null,
   );
+  /** Track multi-attribute selections */
+  const [multiAttrSelections, setMultiAttrSelections] = useState<{ [attrName: string]: string }>({});
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  /** ③ Build a map { attributeName → [ {option, price, id} ] } */
+  /** Check if product has multiple attributes per variation */
+  const isMultiAttribute = React.useMemo(() => {
+    if (!product.baselinker_variations?.length) return false;
+    return product.baselinker_variations[0].attributes.length > 1;
+  }, [product.baselinker_variations]);
+
+  /** ③ Build a map { attributeName → [ {option, price, id} ] } - with deduplication for multi-attr */
   const variationOptions = React.useMemo(() => {
     if (!product.baselinker_variations) return {};
     const map: {
       [attrName: string]: { option: string; price: number; id: number }[];
     } = {};
-    product.baselinker_variations.forEach((v) => {
-      v.attributes.forEach((attr) => {
-        if (!map[attr.name]) map[attr.name] = [];
-        map[attr.name].push({
-          option: attr.option,
-          price: v.price,
-          id: v.id,
+
+    if (isMultiAttribute) {
+      // For multi-attribute products, extract unique options per attribute
+      product.baselinker_variations.forEach((v) => {
+        v.attributes.forEach((attr) => {
+          if (!map[attr.name]) map[attr.name] = [];
+          // Check if this option already exists for this attribute
+          const exists = map[attr.name].some((o) => o.option === attr.option);
+          if (!exists) {
+            map[attr.name].push({
+              option: attr.option,
+              price: v.price,
+              id: v.id,
+            });
+          }
         });
       });
-    });
+    } else {
+      // Original logic for single-attribute products
+      product.baselinker_variations.forEach((v) => {
+        v.attributes.forEach((attr) => {
+          if (!map[attr.name]) map[attr.name] = [];
+          map[attr.name].push({
+            option: attr.option,
+            price: v.price,
+            id: v.id,
+          });
+        });
+      });
+    }
     return map;
+  }, [product.baselinker_variations, isMultiAttribute]);
+
+  /** Initialize multi-attribute selections from current product attributes */
+  React.useEffect(() => {
+    if (isMultiAttribute && product.attributes && isModalOpen) {
+      setMultiAttrSelections({ ...product.attributes });
+    }
+  }, [isMultiAttribute, product.attributes, isModalOpen]);
+
+  /** Find the matching variation ID based on all selected attributes */
+  const findMatchingVariationId = React.useCallback((selections: { [attrName: string]: string }): number | null => {
+    if (!product.baselinker_variations) return null;
+
+    const matchingVariation = product.baselinker_variations.find((v) => {
+      return v.attributes.every((attr) => {
+        const selectedValue = selections[attr.name];
+        return selectedValue === attr.option;
+      });
+    });
+
+    return matchingVariation?.id ?? null;
   }, [product.baselinker_variations]);
 
   /** ④ Called when user clicks “Zapisz” in the modal */
@@ -262,20 +311,31 @@ const CartItem: React.FC<CartItemProps> = ({
                 <AttributeSwitcher
                   isCartPage
                   attributeName={attrName}
-                  options={options.map(
-                    (opt) => `${opt.option} | ${opt.price.toFixed(2)} zł`,
-                  )}
+                  options={
+                    isMultiAttribute
+                      ? options.map((opt) => opt.option)
+                      : options.map((opt) => `${opt.option} | ${opt.price.toFixed(2)} zł`)
+                  }
                   selectedValue={
-                    (selectedVariation?.label ??
-                      product.attributes?.[attrName]) ?? null     // ← guarantees string | null
+                    isMultiAttribute
+                      ? (multiAttrSelections[attrName] ?? product.attributes?.[attrName]) ?? null
+                      : (selectedVariation?.label ?? product.attributes?.[attrName]) ?? null
                   }
                   onAttributeChange={(attribute, newValue) => {
-                    const bare = newValue.split(' | ')[0];
-                    const varId =
-                      variationOptions[attribute]?.find(
-                        (o) => o.option === bare,
-                      )?.id ?? 0;
-                    setSelectedVariation({ label: bare, id: varId });
+                    if (isMultiAttribute) {
+                      const bare = newValue.split(' | ')[0];
+                      setMultiAttrSelections((prev) => ({
+                        ...prev,
+                        [attribute]: bare,
+                      }));
+                    } else {
+                      const bare = newValue.split(' | ')[0];
+                      const varId =
+                        variationOptions[attribute]?.find(
+                          (o) => o.option === bare,
+                        )?.id ?? 0;
+                      setSelectedVariation({ label: bare, id: varId });
+                    }
                   }}
                 />
               </div>
@@ -289,13 +349,28 @@ const CartItem: React.FC<CartItemProps> = ({
                 Anuluj
               </button>
               <button
-                className={`w-1/2 py-3 text-white rounded-full text-base font-light transition ${selectedVariation
-                  ? 'bg-[#1C1C1C] hover:bg-black cursor-pointer'
-                  : 'bg-[#B2B0B1] cursor-not-allowed'
+                className={`w-1/2 py-3 text-white rounded-full text-base font-light transition ${(isMultiAttribute ? Object.keys(multiAttrSelections).length > 0 : selectedVariation)
+                    ? 'bg-[#1C1C1C] hover:bg-black cursor-pointer'
+                    : 'bg-[#B2B0B1] cursor-not-allowed'
                   }`}
-                disabled={!selectedVariation}
+                disabled={isMultiAttribute ? Object.keys(multiAttrSelections).length === 0 : !selectedVariation}
                 onClick={() => {
-                  if (selectedVariation) {
+                  if (isMultiAttribute) {
+                    // For multi-attribute products: find the variation matching all selections
+                    const matchingVarId = findMatchingVariationId(multiAttrSelections);
+                    if (matchingVarId) {
+                      const firstAttr = Object.keys(variationOptions)[0];
+                      handleSaveVariation(
+                        firstAttr,
+                        multiAttrSelections[firstAttr] || '',
+                        matchingVarId,
+                      );
+                      setModalOpen(false);
+                      if (onVariationChange) {
+                        onVariationChange(product.name);
+                      }
+                    }
+                  } else if (selectedVariation) {
                     const firstAttr = Object.keys(variationOptions)[0];
                     handleSaveVariation(
                       firstAttr,

@@ -93,7 +93,7 @@ const ProductPage = () => {
   } = state;
 
   // Helper: removes every space and hyphen, then lower-cases
-  const normalize = (s: string) => s.replace(/[\s-]+/g, '').toLowerCase();
+  const normalize = (s: string | undefined | null) => (s ?? '').replace(/[\s-]+/g, '').toLowerCase();
 
   const seoTitle =
     product?.yoast_head_json?.title ||

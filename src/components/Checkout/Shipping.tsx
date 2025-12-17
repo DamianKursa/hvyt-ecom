@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 
 interface ShippingMethod {
   id: string;
+  method_id?: string;
   title: string;
   cost: string | number | null; // Handle different types of cost
   enabled: boolean;
@@ -151,12 +152,14 @@ const EMMA_ZADBANO_PRODUCT_IDS = new Set([
 const buildZadbanoMethods = (): ShippingMethod[] => [
   {
     id: 'zadbano_bez_wniesienia',
+    method_id: 'free_shipping',
     title: 'Zadbano (bez wniesienia)',
     cost: 0,
     enabled: true,
   },
   {
     id: 'zadbano_z_wniesieniem',
+    method_id: 'flat_rate',
     title: 'Zadbano z wniesieniem',
     cost: 99,
     enabled: true,
@@ -234,8 +237,14 @@ const Shipping: React.FC<ShippingProps> = ({
         }
         const data = await response.json();
 
-        // Treat coupon "comeback" as free-shipping trigger
-        const hasFreeShipCoupon = hasCoupon(cart, 'comeback') || hasCoupon(cart, 'cudodostawa');
+        // Check if coupon has free shipping enabled OR specific coupons are applied
+        const hasFreeShipCoupon =
+          cart?.coupon?.freeShipping === true ||
+          hasCoupon(cart, 'comeback') ||
+          hasCoupon(cart, 'cudodostawa');
+
+        console.log('DEBUG Shipping - cart.coupon:', cart?.coupon);
+        console.log('DEBUG Shipping - hasFreeShipCoupon:', hasFreeShipCoupon);
 
         // Define restricted IDs
         const restrictedIds = [
@@ -293,6 +302,7 @@ const Shipping: React.FC<ShippingProps> = ({
           // If cartTotal >= 300 or has free shipping coupon, show only a specific set and make appropriate ones free
           if (cartTotal >= 300 || hasFreeShipCoupon) {
             const allowed = new Set([
+              'kurier gls',
               'kurier gls pobranie',
               'kurier gls - darmowa wysyłka',
               'darmowa dostawa',
@@ -306,12 +316,9 @@ const Shipping: React.FC<ShippingProps> = ({
             // make the non-COD ones free
             filteredMethods = filteredMethods.map((method) => {
               const t = method.title.toLowerCase();
-              const makeFree = (
-                t === 'kurier gls - darmowa wysyłka' ||
-                t === 'darmowa dostawa' ||
-                t === 'paczkomaty inpost' ||
-                t === 'punkty gls'
-              );
+              // Make all non-COD methods free (COD = pobranie)
+              const isCOD = t.includes('pobranie');
+              const makeFree = !isCOD;
               return makeFree ? { ...method, cost: null } : method; // keep COD cost intact
             });
           }
