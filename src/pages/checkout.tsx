@@ -91,7 +91,13 @@ const Checkout: React.FC = () => {
         if (shippingZones.length > 0) {
           const defaultMethod = shippingZones[0].methods[0];
           setShippingMethod(defaultMethod.id);
-          setShippingPrice(Number(defaultMethod.cost) || 0);
+          // Calculate cart total for free shipping check
+          const currentCartTotal = cart?.products?.reduce((sum: number, product: any) => {
+            return sum + ((product.price || 0) * (product.qty || 1));
+          }, 0) || 0;
+          // Free shipping for orders >= 300 zł (non-COD methods)
+          const isFreeShipping = currentCartTotal >= 300 && !defaultMethod.title?.toLowerCase().includes('pobranie');
+          setShippingPrice(isFreeShipping ? 0 : (Number(defaultMethod.cost) || 0));
           setShippingTitle(defaultMethod.title);
         }
       } catch (error) {
@@ -101,7 +107,7 @@ const Checkout: React.FC = () => {
     };
 
     fetchShippingMethods();
-  }, []);
+  }, [cart]);
 
   useEffect(() => {
     const fetchShippingTitle = async () => {
@@ -115,7 +121,13 @@ const Checkout: React.FC = () => {
 
         if (selectedMethod) {
           setShippingTitle(selectedMethod.title);
-          setShippingPrice(Number(selectedMethod.cost) || 0);
+          // Calculate cart total for free shipping check
+          const currentCartTotal = cart?.products?.reduce((sum: number, product: any) => {
+            return sum + ((product.price || 0) * (product.qty || 1));
+          }, 0) || 0;
+          // Free shipping for orders >= 300 zł (non-COD methods)
+          const isFreeShipping = currentCartTotal >= 300 && !selectedMethod.title?.toLowerCase().includes('pobranie');
+          setShippingPrice(isFreeShipping ? 0 : (Number(selectedMethod.cost) || 0));
         }
       } catch (error) {
         console.error('Error updating shipping title:', error);
@@ -123,7 +135,7 @@ const Checkout: React.FC = () => {
     };
 
     if (shippingMethod) fetchShippingTitle();
-  }, [shippingMethod]);
+  }, [shippingMethod, cart]);
 
   useEffect(() => {
     if (cart && cart.products && cart.products.length > 0) {

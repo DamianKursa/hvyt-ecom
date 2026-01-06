@@ -369,6 +369,19 @@ const Shipping: React.FC<ShippingProps> = ({
         console.log('updatedZones:', updatedZones);
 
         setShippingZones(updatedZones);
+
+        // Update the price of currently selected shipping method if it changed
+        if (shippingMethod) {
+          for (const zone of updatedZones) {
+            const selectedMethod = zone.methods.find(m => m.id === shippingMethod);
+            if (selectedMethod) {
+              const newPrice = Number(selectedMethod.cost) || 0;
+              console.log('Updating selected method price:', shippingMethod, 'to', newPrice);
+              setShippingPrice(newPrice);
+              break;
+            }
+          }
+        }
       } catch (err) {
         console.error('Błąd podczas pobierania metod dostawy:', err);
         setError(
