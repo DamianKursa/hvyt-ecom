@@ -147,6 +147,7 @@ const EMMA_ZADBANO_PRODUCT_IDS = new Set([
   '7563916',
   '7564076',
   '7564079',
+  '7575924'
 ]);
 
 const buildZadbanoMethods = (): ShippingMethod[] => [
