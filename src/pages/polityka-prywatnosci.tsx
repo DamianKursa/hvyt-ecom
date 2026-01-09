@@ -476,7 +476,7 @@ const PolitykaPrywatnosci = () => {
               stwierdzonych przez niego naruszeniach zasad bezpieczeństwa
               związanych z korzystaniem ze Sklepu internetowego mailowo na
               adres: <a href="mailto:hello@hvyt.pl">hello@hvyt.pl</a>
-              hello@hvyt.pl lub telefonicznie: +48 606 513 790 697, codziennie w
+              hello@hvyt.pl lub telefonicznie: +48 513 790 697, codziennie w
               Dni robocze od poniedziałku do piątku w godzinach: 9:00 – 17:00
               (opłata za połączenie wg taryfy operatora, z którego usług
               korzysta Użytkownik Sklepu internetowego).
