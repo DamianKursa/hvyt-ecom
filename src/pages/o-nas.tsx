@@ -6,16 +6,24 @@ import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component';
 import HeroOnas from '@/components/Onas/HeroOnas.component';
 import Head from 'next/head';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { getSiteUrl } from '@/utils/i18n/config';
 
-const OnasPage = () => {
+const OnasPage = (): JSX.Element => {
+  const { t, getPath, config } = useI18n();
+  
   return (
-    <Layout title="Hvyt | O nas">
+    <Layout title={t.aboutUs.pageTitle} description={t.aboutUs.metaDescription}>
       <Head>
+        <meta name="description" content={t.aboutUs.metaDescription} />
         <link
           id="meta-canonical"
           rel="canonical"
-          href={`${process.env.NEXT_PUBLIC_SITE_URL}/o-nas`}
+          href={`${config.siteUrl}${getPath('/o-nas')}`}
         />
+        <link rel="alternate" hrefLang="pl" href={`${getSiteUrl('pl')}/o-nas`} />
+        <link rel="alternate" hrefLang="en" href={`${getSiteUrl('en')}/about-us`} />
+        <link rel="alternate" hrefLang="x-default" href={`${getSiteUrl('pl')}/o-nas`} />
       </Head>
       <HeroOnas />
       {/* Slider Section */}
@@ -24,10 +32,10 @@ const OnasPage = () => {
           <Slider />
           <div className='md:hidden'>
             <Link
-              href="/kontakt"
+              href={getPath('/kontakt')}
               className="text-center block w-full md:w-auto px-6 py-3 mt-6 md:mt-0 text-black text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
             >
-              Kontakt →
+              {t.aboutUs.contactButton}
             </Link>
           </div>
         </div>

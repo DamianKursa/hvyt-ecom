@@ -24,13 +24,11 @@ const nextConfig = {
         hostname: 'hvyt.pl',
         pathname: '/**',
       },
-      // Add pattern for images on wp.hvyt.pl if needed (adjust the path if necessary)
       {
         protocol: 'https',
         hostname: 'wp.hvyt.pl',
         pathname: '/wp-content/uploads/**',
       },
-      // Instagram & Facebook CDN domains
       {
         protocol: 'https',
         hostname: '**.cdninstagram.com',
@@ -43,6 +41,12 @@ const nextConfig = {
       },
     ],
   },
+  i18n: {
+    locales: ['pl', 'en'],
+    defaultLocale: 'pl',
+    localeDetection: false,
+  },
+  
   async redirects() {
     return [
       {
@@ -55,15 +59,10 @@ const nextConfig = {
   
   async rewrites() {
     return [
-      // Preserve Next.js internals
       { source: '/_next/:path*', destination: '/_next/:path*' },
       { source: '/api/:path*', destination: '/api/:path*' },
       { source: '/static/:path*', destination: '/static/:path*' },
-
-      // Serve Next.js homepage
       { source: '/', destination: '/' },
-
-      // Explicit Next.js routes (folders & files)
       { source: '/auth/:path*', destination: '/auth/:path*' },
       { source: '/moje-konto/:path*', destination: '/moje-konto/:path*' },
       { source: '/orders/:path*', destination: '/orders/:path*' },
@@ -88,6 +87,8 @@ const nextConfig = {
       { source: '/koszyk/:path*', destination: '/koszyk/:path*' },
       { source: '/logowanie/:path*', destination: '/logowanie/:path*' },
       { source: '/o-nas/:path*', destination: '/o-nas/:path*' },
+      { source: '/about-us/:path*', destination: '/o-nas/:path*' },
+      { source: '/en/about-us/:path*', destination: '/o-nas/:path*' },
       { source: '/polityka-prywatnosci/:path*', destination: '/polityka-prywatnosci/:path*' },
       { source: '/potwierdzenie-email/:path*', destination: '/potwierdzenie-email/:path*' },
       { source: '/regulamin/:path*', destination: '/regulamin/:path*' },
@@ -110,7 +111,6 @@ const nextConfig = {
         destination: 'https://wp.hvyt.pl/',
       },
 
-      // Catch-all: Any route not matched above is proxied to WordPress.
       {
         source: '/:path((?!_next|api|static|wp-json|wp-admin|auth|moje-konto|orders|posts|blog|kategoria|kolekcje|category|contact|create-order|payment-webhooks|payment|reviews|shipping|waiting-list|woocommerce|checkout|dostawa|dziekujemy|hvyt-objects|kase|koszyk|logowanie|o-nas|polityka-prywatnosci|potwierdzenie-email|regulamin|ulubione|wspolpraca|wygodne-zwroty|zapomniane-haslo|zwroty-i-reklamacje|produkt).+)',
         destination: 'https://wp.hvyt.pl/:path*',

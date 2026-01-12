@@ -9,7 +9,7 @@ const WooCommerceAPI = axios.create({
 });
 
 const CustomAPI = axios.create({
-  baseURL: 'https://wp.hvyt.pl/wp-json/custom/v1',
+  baseURL: `${process.env.WORDPRESS_API_URL || 'https://wp.hvyt.pl'}/wp-json/custom/v1`,
 });
 
 interface Attribute {

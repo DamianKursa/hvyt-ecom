@@ -1,7 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const HeroOnas = () => {
+  const { t, language } = useI18n();
   const staticBoxes = [
     { index: 2, bgColor: '#F5F5AD' },
     { index: 5, bgColor: '#F5F5AD' },
@@ -17,7 +19,9 @@ const HeroOnas = () => {
       id="hero-o-nas"
       className="relative flex pt-[125px] md:items-center w-full min-h-[795px] mx-auto overflow-hidden px-4 md:px-0 bg-right bg-cover"
       style={{
-        backgroundImage: 'url("/images/o-nas-hero-bg.png")',
+        backgroundImage: language === 'en' 
+          ? 'url("/images/o-nas-hero-bg.png")' 
+          : 'url("/images/o-nas-hero-bg.png")',
         backgroundSize: 'cover',
         backgroundPosition: 'center center',
       }}
@@ -55,24 +59,19 @@ const HeroOnas = () => {
             <h1
               className="text-[40px] md:text-6xl font-bold leading-tight text-dark-pastel-red mb-4"
               dangerouslySetInnerHTML={{
-                __html: 'Mała firma,<br /> wielka oferta',
+                __html: t.aboutUs.heroTitle,
               }}
             ></h1>
 
             {/* Mobile Description (without forced <br />) */}
             <p className="block md:hidden text-lg leading-relaxed text-neutral-darkest mb-6">
-              HVYT powstał z miłości do designu i dodatków. Wierzymy, że to
-              właśnie one są odpowiedzialne za indywidualny charakter każdego
-              wnętrza. Sami jesteśmy całkiem zakręceni, dlatego nasza nazwa to
-              alternatywny zapis słowa „chwyt“. Staramy się aby nasza oferta
-              była różnorodna i każdy mógł znaleźć coś dla siebie.
+              {t.aboutUs.heroDescriptionMobile}
             </p>
             {/* Desktop Description */}
             <p
               className="hidden md:block text-lg leading-relaxed text-neutral-darkest mb-6"
               dangerouslySetInnerHTML={{
-                __html:
-                  'HVYT powstał z miłości do designu i dodatków.<br /> Wierzymy, że to właśnie one są odpowiedzialne<br /> za indywidualny charakter każdego wnętrza.<br /> Sami jesteśmy całkiem zakręceni, dlatego nasza<br /> nazwa to alternatywny zapis słowa „chwyt„.<br /><br /> Staramy się aby nasza oferta była<br /> różnorodna i każdy mógł znaleźć coś dla siebie.',
+                __html: t.aboutUs.heroDescriptionDesktop,
               }}
             ></p>
           </div>

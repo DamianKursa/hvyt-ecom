@@ -9,6 +9,7 @@ import UserDropdown from './UserDropdown';
 import { useUserContext } from '@/context/UserContext';
 import { CartContext } from '@/stores/CartProvider'
 import { useWishlist } from '@/context/WhishlistContext';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface IHeaderProps {
   title?: string;
@@ -44,8 +45,66 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const { wishlist } = useWishlist();
   const favoriteCount = wishlist.length;
   const count = cart?.totalProductsCount ?? 0
+  const { language, getPath, t } = useI18n();
+  const [alternateLangPath, setAlternateLangPath] = useState<string | null>(null);
   let dropdownTimeout: ReturnType<typeof setTimeout>;
-
+  
+  // Get alternate language path for product pages
+  useEffect(() => {
+    const updateAlternateLangPath = async () => {
+      // Check if we're on a product page
+      const isProductPage = router.pathname === '/produkt/[slug]' || router.pathname === '/product/[slug]';
+      if (!isProductPage) {
+        setAlternateLangPath(null);
+        return;
+      }
+      
+      // Get current URL path (without query/hash)
+      const currentPath = router.asPath.split('?')[0].split('#')[0];
+      
+      // Skip if path contains literal [slug] (SSR/hydration issue)
+      if (currentPath.includes('[slug]')) {
+        return;
+      }
+      
+      const targetLang = language === 'pl' ? 'en' : 'pl';
+      
+      try {
+        // Use WordPress endpoint that accepts full URL and returns translated URL
+        const wpApiUrl = process.env.NEXT_PUBLIC_WP_REST_API || '';
+        let wpBaseUrl = wpApiUrl.replace('/wp-json/wp/v2', '');
+        wpBaseUrl = wpBaseUrl.replace(/\/$/, '');
+        
+        if (wpBaseUrl) {
+          const endpointUrl = `${wpBaseUrl}/wp-json/custom/v1/translate-url?url=${encodeURIComponent(currentPath)}&to=${targetLang}`;
+          const response = await fetch(endpointUrl);
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.url) {
+              console.log('[Header] ✅ Got translated URL:', data.url);
+              setAlternateLangPath(data.url);
+              return;
+            }
+          } else if (response.status === 404) {
+            console.log('[Header] ⚠️ Translation not found');
+          } else {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('[Header] ❌ WordPress endpoint error:', response.status, errorData);
+          }
+        }
+      } catch (error: any) {
+        console.error('[Header] ❌ Error getting translated URL:', error.message);
+      }
+      
+      // Fallback: use getPath
+      const fallbackPath = getPath(currentPath, targetLang);
+      console.log('[Header] ⚠️ Using fallback path:', fallbackPath);
+      setAlternateLangPath(fallbackPath);
+    };
+    
+    updateAlternateLangPath();
+  }, [router.asPath, router.pathname, language, getPath]);
   useEffect(() => {
     if (title) {
       document.title = title;
@@ -84,15 +143,39 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
     }, 200);
   }, []);
 
-  const getActiveClass = (path: string) =>
-    router.asPath === path
+  const getActiveClass = (path: string) => {
+    const currentPath = router.asPath.split('?')[0].split('#')[0];
+    const pathsToCheck = [
+      path,
+      getPath(path),
+      getPath(path, language === 'pl' ? 'en' : 'pl')
+    ];
+    const getSlug = (p: string) => p.replace(/^\/+|\/+$/g, '').replace(/^en\//, '').split('/').pop() || '';
+    const currentSlug = getSlug(currentPath);
+    const isActive = pathsToCheck.some(p => 
+      currentPath === p || 
+      currentPath.startsWith(p + '/') || 
+      getSlug(p) === currentSlug
+    );
+    return isActive
       ? 'bg-white text-[#661F30]'
       : 'hover:bg-[#DAD3C8] text-neutral-darkest';
+  };
 
   const iconClass = 'w-6 h-6';
 
   return (
     <>
+      {/* DEBUG - usuń po testach
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-0 left-0 bg-black text-white p-2 text-xs z-[9999] max-w-xs">
+          <div>Lang: {language}</div>
+          <div>Path: {router.asPath}</div>
+          <div>Handles: {t.links.categories.handles}</div>
+          <div>About: {t.links.pages.about}</div>
+        </div>
+      )}
+       */}
       {/* Mobile Menu Component */}
       {isCompact && menuOpen && (
         <MobileMenu
@@ -128,58 +211,99 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                   >
                     <ul className="flex items-center  text-base w-full justify-center text-[16px] whitespace-nowrap">
                       <li>
-                        <Link href="/kategoria/uchwyty-meblowe">
+                        <Link href={getPath('/kategoria/uchwyty-meblowe')}>
                           <span
                             className={`px-3 py-3 font-bold  rounded-full transition-all ${getActiveClass('/kategoria/uchwyty-meblowe')}`}
                           >
-                            Uchwyty
+                            {t.links.categories.handles}
                           </span>
                         </Link>
                       </li>
                       <li>
-                        <Link href="/kategoria/klamki">
+                        <Link href={getPath('/kategoria/klamki')}>
                           <span
                             className={`px-3 py-3 font-bold rounded-full transition-all ${getActiveClass('/kategoria/klamki')}`}
                           >
-                            Klamki
+                            {t.links.categories.doorHandles}
                           </span>
                         </Link>
                       </li>
                       <li>
-                        <Link href="/kategoria/wieszaki">
+                        <Link href={getPath('/kategoria/wieszaki')}>
                           <span
                             className={`px-3 py-3 font-bold rounded-full transition-all ${getActiveClass('/kategoria/wieszaki')}`}
                           >
-                            Wieszaki
+                            {t.links.categories.wallHooks}
                           </span>
                         </Link>
                       </li>
                       <li>
-                        <Link href="/kategoria/meble">
+                        <Link href={getPath('/kategoria/meble')}>
                           <span
                             className={`px-3 py-3 font-bold rounded-full transition-all ${getActiveClass('/kategoria/meble')}`}
                           >
-                            Meble
+                            {t.links.categories.furniture}
                           </span>
                         </Link>
                       </li>
                       <li>
-                        <Link href="/kolekcje">
+                        <Link href={getPath('/kolekcje')}>
                           <span
                             className={`px-3 py-3 font-bold rounded-full transition-all ${getActiveClass('/kolekcje')}`}
                           >
-                            Kolekcje
+                            {t.links.categories.collections}
                           </span>
                         </Link>
                       </li>
                       <li>
-                        <Link href="/o-nas">
+                        <Link href={getPath('/o-nas')}>
                           <span
                             className={`px-3 py-3 font-bold rounded-full transition-all ${getActiveClass('/o-nas')}`}
                           >
-                            O nas
+                            {t.links.pages.about}
                           </span>
                         </Link>
+                      </li>
+                      <li className="ml-2 flex items-center gap-1">
+                        {language === 'pl' ? (
+                          <span className="px-3 py-3 font-bold rounded-full bg-white text-[#661F30]">
+                            PL
+                          </span>
+                        ) : (
+                          <a
+                            href={alternateLangPath || getPath(router.asPath, 'pl')}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              const newPath = alternateLangPath || getPath(router.asPath, 'pl');
+                              window.location.href = newPath;
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <span className="px-3 py-3 font-bold rounded-full transition-all hover:bg-[#DAD3C8] text-neutral-darkest">
+                              PL
+                            </span>
+                          </a>
+                        )}
+                        <span className="text-neutral-darkest">/</span>
+                        {language === 'en' ? (
+                          <span className="px-3 py-3 font-bold rounded-full bg-white text-[#661F30]">
+                            EN
+                          </span>
+                        ) : (
+                          <a
+                            href={alternateLangPath || getPath(router.asPath, 'en')}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              const newPath = alternateLangPath || getPath(router.asPath, 'en');
+                              window.location.href = newPath;
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <span className="px-3 py-3 font-bold rounded-full transition-all hover:bg-[#DAD3C8] text-neutral-darkest">
+                              EN
+                            </span>
+                          </a>
+                        )}
                       </li>
                     </ul>
                   </div>

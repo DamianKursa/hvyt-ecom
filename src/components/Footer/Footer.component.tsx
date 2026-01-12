@@ -3,10 +3,13 @@ import { useRouter } from 'next/router';
 import { useForm, FormProvider } from 'react-hook-form';
 import { InputField } from '../Input/InputField.component';
 import SocialIcons from '../UI/SocialIcons';
-import { normalizeString } from '@/utils/functions/functions';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { getCategoryPath } from '@/utils/i18n/routing';
 
 const Footer = () => {
   const router = useRouter();
+  const { t, getPath, isEn } = useI18n();
+  
   const isSpecialPage =
     router.pathname.startsWith('/produkt') ||
     router.pathname.startsWith('/kategoria');
@@ -26,12 +29,13 @@ const Footer = () => {
     console.log('Newsletter form data:', data);
   };
 
-  const categoryLinks: { [key: string]: string } = {
-    Uchwyty: 'uchwyty-meblowe',
-    Klamki: 'klamki',
-    Wieszaki: 'wieszaki',
-    Gałki: 'galki',
-  };
+  // Category links mapping
+  const categoryLinks = [
+    { key: 'Uchwyty', label: t.links.categories.handles },
+    { key: 'Klamki', label: t.links.categories.doorHandles },
+    { key: 'Wieszaki', label: t.links.categories.wallHooks },
+    { key: 'Gałki', label: t.links.categories.knobs },
+  ];
 
   return (
     <footer
@@ -55,23 +59,23 @@ const Footer = () => {
             {[
               {
                 src: '/icons/delivery.svg',
-                title: 'Darmowa dostawa',
-                desc: 'Dla zamówień powyżej 300 zł',
+                title: t.serviceInfo.freeShipping.title,
+                desc: t.serviceInfo.freeShipping.desc,
               },
               {
                 src: '/icons/clock.svg',
-                title: 'Wysyłka w 24h',
-                desc: 'W dni robocze',
+                title: t.serviceInfo.shipping24h.title,
+                desc: t.serviceInfo.shipping24h.desc,
               },
               {
                 src: '/icons/return.svg',
-                title: '30 dni na zwrot',
-                desc: 'Od dnia otrzymania przesyłki',
+                title: t.serviceInfo.return30.title,
+                desc: t.serviceInfo.return30.desc,
               },
               {
                 src: '/icons/lightning.svg',
-                title: 'Błyskawiczne wsparcie',
-                desc: 'Przez formularz i social media',
+                title: t.serviceInfo.support.title,
+                desc: t.serviceInfo.support.desc,
               },
             ].map((item, index) => (
               <div key={index} className="text-left">
@@ -93,7 +97,7 @@ const Footer = () => {
             {/* Company Info */}
             <div className="grid grid-cols-2 lg:grid-cols-1">
               <div>
-                <h4 className="text-lg font-semibold">Dane firmowe:</h4>
+                <h4 className="text-lg font-semibold">{t.company.title}</h4>
                 <p className="text-regular font-light">
                   HVYT by Marta Wontorczyk
                 </p>
@@ -101,8 +105,8 @@ const Footer = () => {
                 <p className="text-regular font-light">REGON: 384282914</p>
               </div>
               <div>
-                <h4 className="text-lg font-semibold lg:mt-[24px]">Kontakt:</h4>
-                <p className="text-regular font-light">hello@hvyt.pl</p>
+                <h4 className="text-lg font-semibold lg:mt-[24px]">{t.company.contact}</h4>
+                <p className="text-regular font-light">{t.company.email}</p>
               </div>
             </div>
 
@@ -110,45 +114,49 @@ const Footer = () => {
             <div className="grid grid-cols-2 lg:grid-cols-2 lg:cols-span-1">
               <div>
                 <ul className="space-y-2">
-                  {[
-                    'Uchwyty',
-                    'Klamki',
-                    'Wieszaki',
-                    'Gałki',
-                    'Kolekcje',
-                    'Blog',
-                  ].map((link, index) => {
-                    const href = categoryLinks[link]
-                      ? `/kategoria/${categoryLinks[link]}`
-                      : `/${normalizeString(link)}`;
-                    return (
-                      <li key={index}>
-                        <Link
-                          href={href}
-                          className="underline text-black text-[16px] font-light"
-                        >
-                          {link}
-                        </Link>
-                      </li>
-                    );
-                  })}
+                  {categoryLinks.map((link, index) => (
+                    <li key={index}>
+                      <Link
+                        href={getCategoryPath(link.key)}
+                        className="underline text-black text-[16px] font-light"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                  <li>
+                    <Link
+                      href={getPath('/kolekcje')}
+                      className="underline text-black text-[16px] font-light"
+                    >
+                      {t.links.categories.collections}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href={getPath('/blog')}
+                      className="underline text-black text-[16px] font-light"
+                    >
+                      {t.links.categories.blog}
+                    </Link>
+                  </li>
                 </ul>
               </div>
               <div>
                 <ul className="space-y-2">
                   {[
-                    'O nas',
-                    'Kontakt',
-                    'Współpraca',
-                    'Dostawa',
-                    'Zwroty i reklamacje',
+                    { key: 'about', label: t.links.pages.about, path: '/o-nas' },
+                    { key: 'contact', label: t.links.pages.contact, path: '/kontakt' },
+                    { key: 'cooperation', label: t.links.pages.cooperation, path: '/wspolpraca' },
+                    { key: 'delivery', label: t.links.pages.delivery, path: '/dostawa' },
+                    { key: 'returns', label: t.links.pages.returns, path: '/zwroty-i-reklamacje' },
                   ].map((link, index) => (
                     <li key={index}>
                       <Link
-                        href={`/${normalizeString(link)}`}
+                        href={getPath(link.path)}
                         className="underline text-[16px] text-black font-light"
                       >
-                        {link}
+                        {link.label}
                       </Link>
                     </li>
                   ))}
@@ -160,8 +168,7 @@ const Footer = () => {
           {/* Newsletter Section */}
           <div className="bg-beige-light rounded-xl p-[24px]">
             <h4 className="text-regular font-semibold mb-4">
-              Zapisz się do newslettera, aby być na bieżąco z nowościami i
-              promocjami.
+              {t.newsletter.title}
             </h4>
 
             {/* Mobile Version */}
@@ -173,21 +180,20 @@ const Footer = () => {
                 >
                   <div className="flex-grow">
                     <InputField
-                      inputLabel="Podaj swój adres e-mail"
+                      inputLabel={t.newsletter.placeholder}
                       inputName="email"
                       customValidation={{ required: true }}
                       errors={errors}
                     />
                   </div>
                   <p className="text-neutral-darkest text-extra-small font-light mt-4">
-                    Subskrybując, wyrażasz zgodę na naszą Politykę prywatności i
-                    na otrzymywanie aktualizacji <br /> od naszej firmy.
+                    {t.newsletter.consent}
                   </p>
                   <button
                     type="submit"
                     className="mt-4 w-full px-6 py-3 bg-black text-neutral-white rounded-full font-light hover:bg-neutral-dark transition-all"
                   >
-                    Zapisz się
+                    {t.newsletter.button}
                   </button>
                 </form>
               </FormProvider>
@@ -202,7 +208,7 @@ const Footer = () => {
                 >
                   <div className="flex-grow">
                     <InputField
-                      inputLabel="Podaj swój adres e-mail"
+                      inputLabel={t.newsletter.placeholder}
                       inputName="email"
                       customValidation={{ required: true }}
                       errors={errors}
@@ -212,12 +218,11 @@ const Footer = () => {
                     type="submit"
                     className="ml-4 px-6 py-3 bg-black text-neutral-white rounded-full font-light hover:bg-neutral-dark transition-all"
                   >
-                    Zapisz się
+                    {t.newsletter.button}
                   </button>
                 </form>
                 <p className="text-neutral-darkest text-extra-small font-light mt-4">
-                  Subskrybując, wyrażasz zgodę na naszą Politykę prywatności i
-                  na otrzymywanie aktualizacji od naszej firmy.
+                  {t.newsletter.consent}
                 </p>
               </FormProvider>
             </div>
@@ -227,7 +232,7 @@ const Footer = () => {
         {/* Partners Section */}
         <div className="grid grid-cols-2 lg:grid-cols-12 gap-8 py-[32px] border-t border-beige-dark">
           <div className="col-span-2 lg:col-span-3">
-            <h4 className="text-lg font-semibold mb-4">Nasi partnerzy:</h4>
+            <h4 className="text-lg font-semibold mb-4">{t.partners.title}</h4>
             <div className="flex items-center space-x-4">
               <Link href="#">
                 <img
@@ -246,7 +251,7 @@ const Footer = () => {
             </div>
           </div>
           <div className="col-span-2 lg:col-span-6">
-            <h4 className="text-lg font-semibold mb-4">Metody płatności:</h4>
+            <h4 className="text-lg font-semibold mb-4">{t.partners.paymentMethods}</h4>
             <div className="flex items-center space-x-4">
               {['blik', 'przelewy', 'visa', 'mastercard'].map(
                 (payment, index) => (
@@ -266,14 +271,14 @@ const Footer = () => {
         {/* Legal Section */}
         <div className="py-[32px] flex justify-between grid grid-cols-1 lg:grid-cols-2 border-t border-beige-dark">
           <p className="mt-[24px] text-regular text-black font-light">
-            &copy; HVYT. Wszystkie prawa zastrzeżone.
+            {t.legal.copyright}
           </p>
           <div className="gap-4 flex flex-col order-first lg:order-last lg:flex-row lg:justify-end text-regular text-black font-light underline">
-            <Link href="/regulamin" className="underline lg:mx-2">
-              Regulamin
+            <Link href={getPath('/regulamin')} className="underline lg:mx-2">
+              {t.legal.terms}
             </Link>
-            <Link href="/polityka-prywatnosci" className="underline lg:mx-2">
-              Polityka prywatności
+            <Link href={getPath('/polityka-prywatnosci')} className="underline lg:mx-2">
+              {t.legal.privacy}
             </Link>
           </div>
         </div>
