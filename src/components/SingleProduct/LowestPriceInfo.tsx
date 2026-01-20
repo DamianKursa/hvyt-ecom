@@ -1,3 +1,5 @@
+import { getCurrency, Language } from '@/utils/i18n/config';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 /**
@@ -52,6 +54,9 @@ const LowestPriceInfo: React.FC<LowestPriceInfoProps> = ({
       : 0;
 
   const variations = product.baselinker_variations ?? [];
+
+  const router = useRouter();
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
 
   let salePrice = 0;
   let regularPrice = 0;
@@ -109,7 +114,7 @@ const LowestPriceInfo: React.FC<LowestPriceInfoProps> = ({
   return (
     <p className="w-full text-[16px] text-[#969394] mt-[-20px] mb-4">
       Najniższa cena w okresie 30 dni przed obniżką: {regularPrice.toFixed(2)}{' '}
-      zł
+      {currency.symbol}
     </p>
   );
 };

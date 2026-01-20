@@ -43,6 +43,7 @@ export const fetchProductBySlug = async (slug: string) => {
     const response = await WooCommerceAPI.get('/products', {
       params: {
         slug,
+        // lang: 'en'
       },
     });
 
@@ -55,10 +56,15 @@ export const fetchProductBySlug = async (slug: string) => {
 
 export const fetchProductById = async (id: number | string) => {
   try {
+    console.log('fetching by id', id, WooCommerceAPI);
+    
     const response = await WooCommerceAPI.get(`/products/${id}`, {
       params: { ts: Date.now() },
       timeout: 5000,
     });
+
+    console.log('fetched product ', response.data);
+    
     return response.data;
   } catch (error) {
     console.error('Error fetching product by id:', error);

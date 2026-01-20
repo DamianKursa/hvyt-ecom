@@ -3,12 +3,16 @@ import { Order } from '@/utils/functions/interfaces';
 
 import { useRouter } from 'next/router';
 import { CartContext } from '@/stores/CartProvider';
+import { getCurrency, Language } from '@/utils/i18n/config';
 
 interface OrderDetailsProps {
   order: Order;
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
+  const router = useRouter();
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
+
   const calculatedSubtotal = order.line_items
     .reduce((sum, item) => sum + parseFloat(item.price) * item.quantity, 0)
     .toFixed(2);
@@ -18,7 +22,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
     100
   ).toFixed(2);
 
-  const router = useRouter();
   const { addCartItem } = React.useContext(CartContext);
 
   const [repeatOpen, setRepeatOpen] = useState(false);
@@ -100,7 +103,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
           <div className="mt-3 space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="font-bold text-[#5D5759]">Cena:</span>
-              <span className="font-light text-[#0E0B0C]">{item.price} zł</span>
+              <span className="font-light text-[#0E0B0C]">{item.price} {currency.symbol}</span>
             </div>
             <div className="flex justify-between">
               <span className="font-bold text-[#5D5759]">Ilość:</span>
@@ -109,7 +112,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
             <div className="flex justify-between">
               <span className="font-bold text-[#5D5759]">Suma:</span>
               <span className="font-light justify-left text-[#0E0B0C]">
-                {(parseFloat(item.price) * item.quantity).toFixed(2)} zł
+                {(parseFloat(item.price) * item.quantity).toFixed(2)} {currency.symbol}
               </span>
             </div>
           </div>
@@ -213,15 +216,15 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
                     {item.regular_price &&
                       item.price !== item.regular_price && (
                         <p className="text-sm font-bold line-through text-gray-500">
-                          {item.regular_price} zł
+                          {item.regular_price} {currency.symbol}
                         </p>
                       )}
                   </div>
                 </td>
-                <td className="py-3  font-bold px-4">{item.price} zł</td>
+                <td className="py-3  font-bold px-4">{item.price} {currency.symbol}</td>
                 <td className="py-3 px-4 text-center">{item.quantity}</td>
                 <td className="py-3 font-bold px-4 text-end">
-                  {(parseFloat(item.price) * item.quantity).toFixed(2)} zł
+                  {(parseFloat(item.price) * item.quantity).toFixed(2)} {currency.symbol}
                 </td>
               </tr>
             ))}
@@ -251,12 +254,12 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
               {/* Prices */}
               <div className="space-y-6">
                 <p className="mb-1 px-4">
-                  {order.subtotal || calculatedSubtotal} zł
+                  {order.subtotal || calculatedSubtotal} {currency.symbol}
                 </p>
-                <p className="mb-1 px-4">{order.shipping_total || '0.00'} zł</p>
-                <p className="mb-1 px-4">{order.tax || calculatedTax} zł</p>
+                <p className="mb-1 px-4">{order.shipping_total || '0.00'} {currency.symbol}</p>
+                <p className="mb-1 px-4">{order.tax || calculatedTax} {currency.symbol}</p>
                 <p className="rounded-tr-[24px] rounded-br-[24px] px-4 bg-beige font-bold text-lg text-[#661F30]">
-                  {order.total} zł
+                  {order.total} {currency.symbol}
                 </p>
               </div>
             </div>
@@ -296,24 +299,24 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
             <div className="grid grid-cols-2 text-sm gap-y-1">
               <span className="text-[#0E0B0C]">Cena produktów:</span>
               <span className="text-right text-[#363132]">
-                {order.subtotal || calculatedSubtotal} zł
+                {order.subtotal || calculatedSubtotal} {currency.symbol}
               </span>
 
               <span className="text-[#0E0B0C]">Wysyłka:</span>
               <span className="text-right text-[#363132]">
-                {order.shipping_total || '0.00'} zł
+                {order.shipping_total || '0.00'} {currency.symbol}
               </span>
 
               <span className="text-[#0E0B0C] text-[12px]">Podatek (PL&nbsp;VAT&nbsp;23&nbsp;%):</span>
               <span className="text-right text-[#363132]">
-                {order.tax || calculatedTax} zł
+                {order.tax || calculatedTax} {currency.symbol}
               </span>
 
               <span className="font-bold text-[#661F30] mt-2 bg-[#EBE5DF] rounded-l-full pl-3 py-1">
                 Razem
               </span>
               <span className="font-bold text-right mt-2 text-[#661F30] bg-[#EBE5DF] rounded-r-full pr-3 py-1">
-                {order.total} zł
+                {order.total} {currency.symbol}
               </span>
             </div>
           </div>

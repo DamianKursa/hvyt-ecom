@@ -1,3 +1,5 @@
+import { getCurrency, Language } from '@/utils/i18n/config';
+import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 import ReactSlider from 'react-slider';
 
@@ -20,6 +22,9 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
 }) => {
 
   const [range, setRange] = useState<[number, number]>(currentRange);
+  
+  const router = useRouter();
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
 
   useEffect(() => {
     // Update local state if currentRange prop changes
@@ -85,7 +90,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
             className="border border-gray-300 rounded-full px-8 py-2 w-full text-center bg-transparent"
             disabled={disabled}
           />
-          <span className="absolute right-3 text-gray-500">zł</span>
+          <span className="absolute right-3 text-gray-500">{currency.symbol}</span>
         </div>
         <div className="relative flex items-center">
           <input
@@ -97,7 +102,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
             className="border border-gray-300 rounded-full px-8 py-2 w-full text-center bg-transparent"
             disabled={disabled}
           />
-          <span className="absolute right-3 text-gray-500">zł</span>
+          <span className="absolute right-3 text-gray-500">{currency.symbol}</span>
         </div>
       </div>
 

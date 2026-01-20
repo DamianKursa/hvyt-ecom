@@ -1,4 +1,6 @@
 // CartProvider.tsx
+import { getCurrency, Language } from '@/utils/i18n/config';
+import { useRouter } from 'next/router';
 import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
 
 export interface Category {
@@ -136,6 +138,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [cart, setCart] = useState<Cart>(() => createEmptyCart());
+
+  const router = useRouter();
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
 
   const recalculateCartTotals = useCallback((updatedCart: Cart): Cart => {
     const totalProductsPrice = updatedCart.products.reduce(

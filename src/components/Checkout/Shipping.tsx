@@ -1,3 +1,5 @@
+import { getCurrency, Language } from '@/utils/i18n/config';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState, useRef } from 'react';
 
 interface ShippingMethod {
@@ -199,6 +201,9 @@ const Shipping: React.FC<ShippingProps> = ({
     'zadbano (bez wniesienia)': '/icons/truck.svg',
     'zadbano z wniesieniem': '/icons/truck.svg',
   };
+
+  const router = useRouter();
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
 
   // ─── FETCH SHIPPING METHODS ──────────────────────────────────────────────
   useEffect(() => {
@@ -588,7 +593,7 @@ const Shipping: React.FC<ShippingProps> = ({
                 {/* Second Column: Price */}
                 <span className="text-sm text-gray-700 text-center w-full">
                   {method.cost
-                    ? `${parseFloat(String(method.cost)).toFixed(2)} zł`
+                    ? `${parseFloat(String(method.cost)).toFixed(2)} ${currency.symbol}`
                     : 'Darmowa'}
                 </span>
 

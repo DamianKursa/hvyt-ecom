@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import DiscountCode from '@/components/Cart/DiscountCode';
+import { getCurrency, Language } from '@/utils/i18n/config';
 
 interface CartSummaryProps {
   totalProductsPrice: number;
@@ -23,6 +24,8 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   const [localLoading, setLocalLoading] = useState(false);
   const router = useRouter();
 
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
+
   useEffect(() => {
     setLoading(true);
     const timeout = setTimeout(() => {
@@ -37,7 +40,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   }, [totalProductsPrice, shippingPrice, isCheckoutPage]);
 
   const formatPrice = (price: number) =>
-    price.toFixed(2).replace('.', ',') + ' zł';
+    price.toFixed(2).replace('.', ',') + ` ${currency.symbol}`;
 
   const handleButtonClick = async () => {
     if (disabled) return; // twarda blokada, gdy koszyk niepoprawny

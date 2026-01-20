@@ -26,6 +26,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import Head from 'next/head';
 import LowestPriceInfo from '@/components/SingleProduct/LowestPriceInfo';
 import { pushGTMEvent } from '@/utils/gtm';
+import { getCurrency, Language } from '@/utils/i18n/config';
 
 const NajczęściejKupowaneRazem = dynamic(
   () => import('@/components/Product/CrossSell'),
@@ -71,7 +72,8 @@ interface NotifyFormData {
 }
 
 const ProductPage = () => {
-  const { query } = useRouter();
+  const router = useRouter();
+  const query = router.query;
   const slug = query.slug as string;
   const { state, dispatch } = useProductState();
   const { addCartItem } = React.useContext(CartContext);
@@ -91,6 +93,8 @@ const ProductPage = () => {
     showModal,
     snackbar,
   } = state;
+
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
 
   // Helper: removes every space and hyphen, then lower-cases
   const normalize = (s: string | undefined | null) => (s ?? '').replace(/[\s-]+/g, '').toLowerCase();
@@ -134,17 +138,20 @@ const ProductPage = () => {
   // Fetch product data on slug change
 
   useEffect(() => {
+  
     const fetchData = async () => {
       if (!slug) return;
       try {
         dispatch({ type: 'SET_LOADING', payload: true });
         const res = await fetch(
-          `/api/product?slug=${encodeURIComponent(slug)}`,
+          // `/api/product?slug=${encodeURIComponent(slug)}&lang=${router.locale}`,
+          `/api/multilang-product?id=7574575&slug=${encodeURIComponent(slug)}&lang=${router.locale}`,
         );
         if (!res.ok) {
           throw new Error('No product found');
         }
         const productData = await res.json();
+        
         if (!productData) {
           dispatch({ type: 'SET_ERROR', payload: 'No product found' });
           dispatch({
@@ -154,8 +161,10 @@ const ProductPage = () => {
           return;
         }
 
-        console.log('🔍 fetched productData:', productData);
-        dispatch({ type: 'SET_PRODUCT', payload: productData });
+        const locale = router.locale || 'pl';
+
+        // set translated product or pl as fallback 
+        dispatch({ type: 'SET_PRODUCT', payload: productData[locale] ? productData[locale] : productData['pl'] });
 
         // ─────────────── LOOK UP VARIANT BY URL PARAM ───────────────
         const queryAttrKey = Object.keys(query).find(k => k.startsWith('attribute_pa_'));
@@ -252,7 +261,7 @@ const ProductPage = () => {
     };
 
     fetchData();
-  }, [slug, dispatch]);
+  }, [router.query, dispatch]);
 
   useEffect(() => {
     if (product) {
@@ -738,10 +747,10 @@ const ProductPage = () => {
                     {isSaleActive ? (
                       <>
                         <span className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
-                          {salePrice.toFixed(2)} zł
+                          {salePrice.toFixed(2)} {currency.symbol}
                         </span>
                         <span className="text-[16px] text-[#969394] line-through ml-2">
-                          {regularPrice.toFixed(2)} zł
+                          {regularPrice.toFixed(2)} {currency.symbol}
                         </span>
                         <span
                           className="px-2 font-semibold rounded-full ml-2"
@@ -756,7 +765,7 @@ const ProductPage = () => {
                       </>
                     ) : (
                       <span className="text-[24px] md:text-[28px] font-bold text-dark-pastel-red">
-                        {regularPrice.toFixed(2)} zł
+                        {regularPrice.toFixed(2)} {currency.symbol}
                       </span>
                     )}
                   </>

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useWishlist } from '@/context/WhishlistContext';
+import { useRouter } from 'next/router';
+import { getCurrency, Language } from '@/utils/i18n/config';
 
 /** Ensures we never get NaN from parseFloat */
 const safeParse = (v: unknown): number => {
@@ -128,6 +130,10 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   isSmall = false,
   alwaysShowIcons = false,
 }) => {
+
+  const router = useRouter();
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
+
   const [isLoading, setIsLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
@@ -199,8 +205,8 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const isVariableProduct = hasNodeVariations || hasIdVariations;
 
   const productPrice = isVariableProduct
-    ? `od ${basePrice.toFixed(2)} zł`
-    : `${safeParse(product.price).toFixed(2)} zł`;
+    ? `od ${basePrice.toFixed(2)} ${currency.symbol}`
+    : `${safeParse(product.price).toFixed(2)} ${currency.symbol}`;
 
   const hasNumericDiscount = resolvedSale < resolvedRegular;
   const dateWindowOk = (!saleFrom || now >= saleFrom) && (!saleTo || now <= saleTo);
@@ -358,10 +364,10 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
           ) : discountPct > 0 ? (
             <>
               <span className="text-gray-500 line-through mr-2">
-                {resolvedRegular.toFixed(2)} zł
+                {resolvedRegular.toFixed(2)} {currency.symbol}
               </span>
               <span className="text-base font-bold text-dark-pastel-red">
-                {resolvedSale.toFixed(2)} zł
+                {resolvedSale.toFixed(2)} {currency.symbol}
               </span>
             </>
           ) : (

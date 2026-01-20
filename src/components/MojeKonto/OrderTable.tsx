@@ -3,6 +3,8 @@ import CustomDropdown from '@/components/UI/CustomDropdown.component';
 import { Order } from '@/utils/functions/interfaces';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { getCurrency, Language } from '@/utils/i18n/config';
 
 interface OrderTableProps {
   content: Order[];
@@ -48,6 +50,10 @@ const getPaymentStatusLabel = (paymentStatus: string) => {
 };
 
 const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
+
+  const router = useRouter();
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
+
   const [sortOpen, setSortOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | ''>('');
   const sortedContent =
@@ -165,7 +171,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
                     </span>
                   </td>
                   <td className="py-3 text-black font-light px-4">
-                    {order.total} zł
+                    {order.total} {currency.symbol}
                   </td>
                   <td className="py-3 px-4">
                     {onViewDetails ? (
@@ -223,7 +229,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
               </div>
               <div className="flex items-center justify-between mb-2 mx-4">
                 <span>Suma</span>
-                <span>{order.total} zł</span>
+                <span>{order.total} {currency.symbol}</span>
               </div>
               <div className="flex justify-center mb-4">
                 {onViewDetails ? (

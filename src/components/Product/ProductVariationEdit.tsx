@@ -1,3 +1,5 @@
+import { getCurrency, Language } from '@/utils/i18n/config';
+import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
 
 interface ProductVariationEditProps {
@@ -18,6 +20,9 @@ const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
   const [options, setOptions] = useState<{ option: string; price: number }[]>(
     [],
   );
+
+  const router = useRouter();
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
 
   useEffect(() => {
     if (isModalOpen) {
@@ -78,7 +83,7 @@ const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
               >
                 {options.map((opt) => (
                   <option key={opt.option} value={opt.option}>
-                    {opt.option} ({opt.price.toFixed(2)} zł)
+                    {opt.option} ({opt.price.toFixed(2)} {currency.symbol})
                   </option>
                 ))}
               </select>

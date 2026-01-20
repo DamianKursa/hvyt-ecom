@@ -1,8 +1,12 @@
 import React, { useContext } from 'react';
 import { CartContext, Product } from '@/stores/CartProvider';
+import { useRouter } from 'next/router';
+import { getCurrency, Language } from '@/utils/i18n/config';
 
 const OrderItems: React.FC = () => {
   const { cart } = useContext(CartContext);
+  const router = useRouter();
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
 
   if (!cart || cart.products.length === 0) {
     return <p>Twój koszyk jest pusty.</p>;
@@ -34,7 +38,7 @@ const OrderItems: React.FC = () => {
                 </h3>
                 {/* Product Price */}
                 <p className="text-sm font-bold text-neutral-darkest">
-                  {product.totalPrice.toFixed(2)} zł
+                  {product.totalPrice.toFixed(2)} {currency.symbol}
                 </p>
               </div>
               {/* Product Quantity */}

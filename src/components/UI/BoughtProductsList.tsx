@@ -3,6 +3,8 @@ import CustomDropdown from '@/components/UI/CustomDropdown.component';
 import { CartContext, Product as CartProduct } from '@/stores/CartProvider';
 import { Product } from '@/utils/functions/interfaces';
 import Snackbar from '../UI/Snackbar.component';
+import { useRouter } from 'next/router';
+import { getCurrency, Language } from '@/utils/i18n/config';
 
 interface BoughtProductsListProps {
   products: Product[];
@@ -23,6 +25,9 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
           ? Number(b.id) - Number(a.id)
           : Number(a.id) - Number(b.id)
       );
+
+  const router = useRouter();
+  const currency = getCurrency(router?.locale as Language ?? 'pl');      
 
   const handleAddToCart = (product: Product) => {
     const price = parseFloat(product.price);
@@ -88,7 +93,7 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
         {/* Aktualna cena */}
         <div className="flex items-center justify-between  mb-2">
           <span className="text-gray-700">Aktualna cena:</span>
-          <span className="text-black font-medium">{product.price} zł</span>
+          <span className="text-black font-medium">{product.price} {currency.symbol}</span>
         </div>
 
         {/* Add to Cart Button */}
@@ -182,7 +187,7 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
                   {new Date().toLocaleDateString()}
                 </td>
                 <td className="py-4 text-center align-middle">
-                  <p>{product.price} zł</p>
+                  <p>{product.price} {currency.symbol}</p>
                 </td>
                 <td className="py-4 px-6 text-center align-middle">
                   <button

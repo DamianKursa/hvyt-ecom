@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { CartContext, Product } from '@/stores/CartProvider';
 import QuantityChanger from '@/components/UI/QuantityChanger';
 import AttributeSwitcher from '@/components/UI/AttributeSwitcher.component';
+import { getCurrency, Language } from '@/utils/i18n/config';
 
 interface CartItemProps {
   product: Product;
@@ -28,6 +29,8 @@ const CartItem: React.FC<CartItemProps> = ({
 }) => {
   const router = useRouter();
   const isKoszykPage = router.pathname === '/koszyk';
+
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
 
   /** ② Provider now expects (cartKey, attrName, newValue, newVariationId) */
   const { updateCartVariation } = React.useContext(CartContext);
@@ -189,7 +192,7 @@ const CartItem: React.FC<CartItemProps> = ({
 
           <div className="w-1/5 flex flex-col items-end">
             <p className="text-xl font-bold text-neutral-darkest">
-              {product.totalPrice.toFixed(2).replace('.', ',')} zł
+              {product.totalPrice.toFixed(2).replace('.', ',')} {currency.symbol}
             </p>
           </div>
 
@@ -250,7 +253,7 @@ const CartItem: React.FC<CartItemProps> = ({
           </div>
           <div className="flex flex-col items-end">
             <p className="text-sm font-bold text-neutral-darkest">
-              {product.totalPrice.toFixed(2).replace('.', ',')} zł
+              {product.totalPrice.toFixed(2).replace('.', ',')} {currency.symbol}
             </p>
             <button
               onClick={() => setModalOpen(true)}
@@ -314,7 +317,7 @@ const CartItem: React.FC<CartItemProps> = ({
                   options={
                     isMultiAttribute
                       ? options.map((opt) => opt.option)
-                      : options.map((opt) => `${opt.option} | ${opt.price.toFixed(2)} zł`)
+                      : options.map((opt) => `${opt.option} | ${opt.price.toFixed(2)} ${currency.symbol}`)
                   }
                   selectedValue={
                     isMultiAttribute

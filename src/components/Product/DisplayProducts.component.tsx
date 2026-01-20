@@ -1,6 +1,8 @@
 // components/Product/DisplayProducts.tsx
 import React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { getCurrency, Language } from '@/utils/i18n/config';
 
 
 interface Image {
@@ -35,32 +37,37 @@ interface DisplayProductsProps {
   products: Product[];
 }
 
-const DisplayProducts: React.FC<DisplayProductsProps> = ({ products }) => (
-  <div className="grid grid-cols-3 gap-8">
-    {products.map((product) => (
-      <div key={product.id} className="product-item p-4 border rounded-lg">
-        <Link href={`/produkt/${product.slug}`}>
-        
-            <img
-              src={product.image?.sourceUrl || '/images/placeholder.png'}
-              alt={product.name}
-              className="w-full h-48 object-cover rounded-lg mb-4"
-            />
-          
-        </Link>
-        <Link href={`/produkt/${product.slug}`}>
+const DisplayProducts: React.FC<DisplayProductsProps> = ({ products }) => {
+      const router = useRouter();
+    const currency = getCurrency(router?.locale as Language ?? 'pl');
+    
+    return (
+      <div className="grid grid-cols-3 gap-8">
+        {products.map((product) => (
+          <div key={product.id} className="product-item p-4 border rounded-lg">
+            <Link href={`/produkt/${product.slug}`}>
+            
+                <img
+                  src={product.image?.sourceUrl || '/images/placeholder.png'}
+                  alt={product.name}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+              
+            </Link>
+            <Link href={`/produkt/${product.slug}`}>
 
-            <h2 className="text-xl font-semibold">{product.name}</h2>
-        </Link>
-        <p className="text-lg">
-          {product.onSale
-            ? product.salePrice || product.price
-            : product.price}{' '}
-          zł
-        </p>
+                <h2 className="text-xl font-semibold">{product.name}</h2>
+            </Link>
+            <p className="text-lg">
+              {product.onSale
+                ? product.salePrice || product.price
+                : product.price}{' '}
+              {currency.symbol}
+            </p>
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
-);
+    );
+}
 
 export default DisplayProducts;

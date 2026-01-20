@@ -1,5 +1,7 @@
 import React from 'react';
 import CustomDropdown from '@/components/UI/CustomDropdown.component';
+import { useRouter } from 'next/router';
+import { getCurrency, Language } from '@/utils/i18n/config';
 
 interface AttributeSwitcherProps {
   attributeName: string;
@@ -20,10 +22,13 @@ const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
 }) => {
   const cleanedAttributeName = attributeName.replace(/^Atrybut produktu: /, '');
 
+  const router = useRouter();
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
+
   // Map options to display with prices if available
   const displayOptions = options.map((option) => {
     const price = pricesMap[option];
-    return price ? `${option} | ${price} zł` : option;
+    return price ? `${option} | ${price} ${currency.symbol}` : option;
   });
 
   return (

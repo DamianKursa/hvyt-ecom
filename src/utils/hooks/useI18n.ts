@@ -49,7 +49,7 @@ export const useI18n = (): UseI18nReturn => {
     
     // Fallback to environment or default
     return getCurrentLanguage();
-  }, [router.pathname, router.asPath]);
+  }, [router.locale]);
   
   const config = useMemo(() => getI18nConfig(language), [language]);
   const t = useMemo(() => getTranslations(language), [language]);

@@ -48,6 +48,11 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   const { language, getPath, t } = useI18n();
   const [alternateLangPath, setAlternateLangPath] = useState<string | null>(null);
   let dropdownTimeout: ReturnType<typeof setTimeout>;
+  console.log('lang', router.locale);
+
+  useEffect(() => {
+
+  }, [router.query]);
   
   // Get alternate language path for product pages
   useEffect(() => {
@@ -61,6 +66,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
       
       // Get current URL path (without query/hash)
       const currentPath = router.asPath.split('?')[0].split('#')[0];
+      const productSlug = router.query.slug as string;
       
       // Skip if path contains literal [slug] (SSR/hydration issue)
       if (currentPath.includes('[slug]')) {
@@ -76,7 +82,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
         wpBaseUrl = wpBaseUrl.replace(/\/$/, '');
         
         if (wpBaseUrl) {
-          const endpointUrl = `${wpBaseUrl}/wp-json/custom/v1/translate-url?url=${encodeURIComponent(currentPath)}&to=${targetLang}`;
+          const endpointUrl = `${wpBaseUrl}/wp-json/custom/v1/translate-url?url=${encodeURIComponent(productSlug)}&to=${targetLang}`;
           const response = await fetch(endpointUrl);
           
           if (response.ok) {
@@ -151,6 +157,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
       getPath(path, language === 'pl' ? 'en' : 'pl')
     ];
     const getSlug = (p: string) => p.replace(/^\/+|\/+$/g, '').replace(/^en\//, '').split('/').pop() || '';
+    
     const currentSlug = getSlug(currentPath);
     const isActive = pathsToCheck.some(p => 
       currentPath === p || 
@@ -265,7 +272,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                         </Link>
                       </li>
                       <li className="ml-2 flex items-center gap-1">
-                        {language === 'pl' ? (
+                        {router?.locale === 'pl' ? (
                           <span className="px-3 py-3 font-bold rounded-full bg-white text-[#661F30]">
                             PL
                           </span>
@@ -274,8 +281,9 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                             href={alternateLangPath || getPath(router.asPath, 'pl')}
                             onClick={(e) => {
                               e.preventDefault();
-                              const newPath = alternateLangPath || getPath(router.asPath, 'pl');
-                              window.location.href = newPath;
+                              // const newPath = alternateLangPath || getPath(router.asPath, 'pl');
+                              // window.location.href = newPath;
+                              router.push(router.pathname, router.asPath, {locale: 'pl'});
                             }}
                             className="cursor-pointer"
                           >
@@ -285,7 +293,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           </a>
                         )}
                         <span className="text-neutral-darkest">/</span>
-                        {language === 'en' ? (
+                        {router?.locale === 'en' ? (
                           <span className="px-3 py-3 font-bold rounded-full bg-white text-[#661F30]">
                             EN
                           </span>
@@ -294,8 +302,9 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                             href={alternateLangPath || getPath(router.asPath, 'en')}
                             onClick={(e) => {
                               e.preventDefault();
-                              const newPath = alternateLangPath || getPath(router.asPath, 'en');
-                              window.location.href = newPath;
+                              // const newPath = alternateLangPath || getPath(router.asPath, 'en');
+                              // window.location.href = newPath;
+                              router.push(router.pathname, router.asPath, {locale: 'en'});
                             }}
                             className="cursor-pointer"
                           >

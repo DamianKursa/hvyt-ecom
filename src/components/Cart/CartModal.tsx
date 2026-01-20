@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { CartContext } from '@/stores/CartProvider';
 import ProductPreview from '@/components/Product/ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
+import { getCurrency, Language } from '@/utils/i18n/config';
 
 interface RecommendedProduct {
   id: string;
@@ -37,6 +38,8 @@ const CartModal: React.FC<CartModalProps> = ({
 
   const totalItemCount = cart?.totalProductsCount || 0;
   const totalPrice = cart?.totalProductsPrice.toFixed(2) || '0.00';
+
+  const currency = getCurrency(router?.locale as Language ?? 'pl');
 
   return (
     <div className="fixed inset-0 bg-[#363132] bg-opacity-50 flex items-center justify-center z-50">
@@ -81,7 +84,7 @@ const CartModal: React.FC<CartModalProps> = ({
           <span className="text-regular font-light text-black">
             Suma produktów w koszyku:
           </span>
-          <span className="text-regular font-light">{totalPrice}zł</span>
+          <span className="text-regular font-light">{totalPrice}{currency.symbol}</span>
         </div>
 
         {/* Action Buttons */}
