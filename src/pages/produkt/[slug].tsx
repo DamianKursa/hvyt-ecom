@@ -27,6 +27,7 @@ import Head from 'next/head';
 import LowestPriceInfo from '@/components/SingleProduct/LowestPriceInfo';
 import { pushGTMEvent } from '@/utils/gtm';
 import { getCurrency, Language } from '@/utils/i18n/config';
+import { WooProductIds } from '@/types/woocommerce';
 
 const NajczęściejKupowaneRazem = dynamic(
   () => import('@/components/Product/CrossSell'),
@@ -143,13 +144,54 @@ const ProductPage = () => {
       if (!slug) return;
       try {
         dispatch({ type: 'SET_LOADING', payload: true });
+
+        // get product slugs and ids for all languages
+        const productIdRes = await fetch(`/api/product?idbyslug=${encodeURIComponent(slug)}`);
+        
+        if (!productIdRes.ok) {
+          throw new Error('No product id found');
+        }
+        const productIdData : WooProductIds = await productIdRes.json();
+
+        let productId = null;
+
+        // verify current slug matches current locale, else redirect to correct lang version
+        if(router?.locale && typeof router.locale === 'string') {
+          
+          const locale = router.locale as string;
+
+          if(typeof productIdData.slugs[locale] !== 'undefined') {
+            if(slug !== productIdData.slugs[locale]) {
+              router.push(`/produkt/${productIdData.slugs[locale]}`);
+              return;
+            } 
+          } else {
+            router.push('/404');
+            return
+          }
+
+          if(productIdData.ids[locale]) {
+            productId = productIdData.ids[locale];
+          } else {
+            router.push('/404');
+            return;
+          }
+        }
+        
+        if(!productId) {
+          // throw new Error('No product id for current lang found');
+          router.push('/404');
+          return;
+        }
+        
         const res = await fetch(
-          // `/api/product?slug=${encodeURIComponent(slug)}&lang=${router.locale}`,
-          `/api/multilang-product?id=7574575&slug=${encodeURIComponent(slug)}&lang=${router.locale}`,
+          `/api/product?id=${productId}`,
         );
+
         if (!res.ok) {
           throw new Error('No product found');
         }
+
         const productData = await res.json();
         
         if (!productData) {
@@ -161,10 +203,11 @@ const ProductPage = () => {
           return;
         }
 
-        const locale = router.locale || 'pl';
+        // const locale = router.locale || 'pl';
 
         // set translated product or pl as fallback 
-        dispatch({ type: 'SET_PRODUCT', payload: productData[locale] ? productData[locale] : productData['pl'] });
+        dispatch({ type: 'SET_PRODUCT', payload: productData });
+        // dispatch({ type: 'SET_PRODUCT', payload: productData[locale] ? productData[locale] : productData['pl'] });
 
         // ─────────────── LOOK UP VARIANT BY URL PARAM ───────────────
         const queryAttrKey = Object.keys(query).find(k => k.startsWith('attribute_pa_'));
