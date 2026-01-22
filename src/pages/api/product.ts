@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
   
-  const { slug, idbyslug, id } = req.query;
+  const { slug, idbyslug, id, lang } = req.query;
 
   // PRODUCT BY SLUG
   if( (slug && typeof slug === 'string') || (id && typeof id === 'string') ) {
@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       // Fetch full product data from WooCommerce
       let productData;
       if( id && typeof id === 'string') {
-        productData = await fetchProductById(id);
+        productData = await fetchProductById(id, lang as string);
       } else if(slug && typeof slug === 'string') {
         productData = await fetchProductBySlug(slug);
       }
@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
 
       // Attempt to retrieve cached static data
-      const cacheKey = `staticProductData:${slug || id}`;
+      const cacheKey = `staticProductData:${slug + '-' + id}`;
       let cachedStaticData = await getCache(cacheKey);
       if (!cachedStaticData) {
         // Cache static data if not available

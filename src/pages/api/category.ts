@@ -60,7 +60,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json(result);
 
     } else if (action === 'fetchProductsWithFilters') {
-      const { categoryId, filters, page, perPage } = req.query;
+      const { categoryId, filters, page, perPage, lang } = req.query;
       if (!categoryId || !filters) {
         return res.status(400).json({ error: 'categoryId and filters parameters are required' });
       }
@@ -73,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       } catch (e) {
         return res.status(400).json({ error: 'Invalid filters parameter. Must be valid JSON.' });
       }
-      const result = await fetchProductsWithFilters(catId, parsedFilters, pageNum, perPageNum);
+      const result = await fetchProductsWithFilters(catId, parsedFilters, pageNum, perPageNum, lang as string);
       return res.status(200).json(result);
 
     } else if (action === 'fetchSortedProducts') {

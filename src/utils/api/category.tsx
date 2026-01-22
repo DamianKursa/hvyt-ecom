@@ -122,6 +122,7 @@ export const fetchProductsWithFilters = async (
   filters: { name: string; value: string }[],
   page = 1,
   perPage = 12,
+  lang = 'pl',
 ) => {
   if (!filters || filters.length === 0) {
     throw new Error(
@@ -133,6 +134,7 @@ export const fetchProductsWithFilters = async (
     category: categoryId,
     page,
     per_page: perPage,
+    lang
   };
 
   filters.forEach((filter) => {
@@ -151,6 +153,8 @@ export const fetchProductsWithFilters = async (
 
   try {
     const response = await CustomAPI.get('/filtered-products', { params });
+    console.log('filters', response);
+    
 
     const mapped = (response.data.products || []).map((p: any) => ({
       ...p,

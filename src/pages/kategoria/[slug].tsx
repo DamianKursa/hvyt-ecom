@@ -157,7 +157,7 @@ const CategoryPage = ({
   // Build dynamic SWR key based on filters, sorting, and page
   const buildApiEndpoint = () => {
     if (activeFilters.length > 0) {
-      return `/api/category?action=fetchProductsWithFilters&categoryId=${category.id}&filters=${encodeURIComponent(
+      return `/api/category?action=fetchProductsWithFilters&categoryId=${category.id}&lang=${router?.locale}&filters=${encodeURIComponent(
         JSON.stringify(activeFilters),
       )}&page=${currentPage}&perPage=12`;
     } else if (sortingOption !== 'Sortowanie') {

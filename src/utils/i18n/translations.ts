@@ -5,7 +5,11 @@
 
 import { Language } from './config';
 
-export interface FooterTranslations {
+export interface Translations {
+  slugs: {
+    category: string,
+    product: string,
+  },
   serviceInfo: {
     freeShipping: { title: string; desc: string };
     shipping24h: { title: string; desc: string };
@@ -60,8 +64,12 @@ export interface FooterTranslations {
   };
 }
 
-const translations: Record<Language, FooterTranslations> = {
+const translations: Record<Language, Translations> = {
   pl: {
+    slugs: {
+      category: 'kategoria',
+      product: 'produkt',
+    },
     serviceInfo: {
       freeShipping: {
         title: 'Darmowa dostawa',
@@ -128,6 +136,10 @@ const translations: Record<Language, FooterTranslations> = {
     },
   },
   en: {
+    slugs: {
+      category: 'category',
+      product: 'product',
+    },
     serviceInfo: {
       freeShipping: {
         title: 'Free shipping',
@@ -195,7 +207,7 @@ const translations: Record<Language, FooterTranslations> = {
   },
 };
 
-export const getTranslations = (lang: Language): FooterTranslations => {
+export const getTranslations = (lang: Language): Translations => {
   return translations[lang] || translations.pl;
 };
 

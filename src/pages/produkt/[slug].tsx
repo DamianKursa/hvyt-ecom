@@ -28,6 +28,7 @@ import LowestPriceInfo from '@/components/SingleProduct/LowestPriceInfo';
 import { pushGTMEvent } from '@/utils/gtm';
 import { getCurrency, Language } from '@/utils/i18n/config';
 import { WooProductIds } from '@/types/woocommerce';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const NajczęściejKupowaneRazem = dynamic(
   () => import('@/components/Product/CrossSell'),
@@ -76,6 +77,7 @@ const ProductPage = () => {
   const router = useRouter();
   const query = router.query;
   const slug = query.slug as string;
+  const { t } = useI18n();
   const { state, dispatch } = useProductState();
   const { addCartItem } = React.useContext(CartContext);
   const frequentlyBoughtTogetherRef = useRef<HTMLDivElement>(null);
@@ -134,7 +136,8 @@ const ProductPage = () => {
     !!notifyEmailValue && /\S+@\S+\.\S+/.test(notifyEmailValue);
 
   const { products: crossSellProducts, loading: crossSellLoading } =
-    useCrossSellProducts(product ? product.id.toString() : null);
+    useCrossSellProducts(product ?  '0' : null);
+console.log('currentprod', product);
 
   // Fetch product data on slug change
 
@@ -160,9 +163,9 @@ const ProductPage = () => {
           
           const locale = router.locale as string;
 
-          if(typeof productIdData.slugs[locale] !== 'undefined') {
+          if(typeof productIdData.slugs[locale] !== 'undefined') {            
             if(slug !== productIdData.slugs[locale]) {
-              router.push(`/produkt/${productIdData.slugs[locale]}`);
+              router.push(`/${t.slugs.product}/${productIdData.slugs[locale]}`);
               return;
             } 
           } else {
@@ -185,7 +188,7 @@ const ProductPage = () => {
         }
         
         const res = await fetch(
-          `/api/product?id=${productId}`,
+          `/api/product?id=${productId}&lang=${router?.locale}`,
         );
 
         if (!res.ok) {

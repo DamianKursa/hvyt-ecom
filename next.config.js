@@ -59,6 +59,8 @@ const nextConfig = {
   
   async rewrites() {
     return [
+      { source: '/category/:path*', destination: '/kategoria/:path*' },
+      { source: '/product/:path*', destination: '/produkt/:path*' },
       { source: '/_next/:path*', destination: '/_next/:path*' },
       { source: '/api/:path*', destination: '/api/:path*' },
       { source: '/static/:path*', destination: '/static/:path*' },
@@ -70,7 +72,6 @@ const nextConfig = {
       { source: '/blog/:path*', destination: '/blog/:path*' },
       { source: '/kategoria/:path*', destination: '/kategoria/:path*' },
       { source: '/kolekcje/:path*', destination: '/kolekcje/:path*' },
-      { source: '/category/:path*', destination: '/category/:path*' },
       { source: '/contact/:path*', destination: '/contact/:path*' },
       { source: '/create-order/:path*', destination: '/create-order/:path*' },
       { source: '/payment-webhooks/:path*', destination: '/payment-webhooks/:path*' },
@@ -97,7 +98,6 @@ const nextConfig = {
       { source: '/wygodne-zwroty/:path*', destination: '/wygodne-zwroty/:path*' },
       { source: '/zapomniane-haslo/:path*', destination: '/zapomniane-haslo/:path*' },
       { source: '/zwroty-i-reklamacje/:path*', destination: '/zwroty-i-reklamacje/:path*' },
-      { source: '/produkt/:path*', destination: '/produkt/:path*' },
       { source: '/wp-json/:path*', destination: 'https://wp.hvyt.pl/wp-json/:path*' },
       {
         source: '/',

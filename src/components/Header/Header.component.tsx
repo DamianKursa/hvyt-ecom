@@ -277,20 +277,15 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                             PL
                           </span>
                         ) : (
-                          <a
-                            href={alternateLangPath || getPath(router.asPath, 'pl')}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              // const newPath = alternateLangPath || getPath(router.asPath, 'pl');
-                              // window.location.href = newPath;
-                              router.push(router.pathname, router.asPath, {locale: 'pl'});
-                            }}
+                          <Link
+                            href={router.asPath}
+                            locale="pl"
                             className="cursor-pointer"
                           >
                             <span className="px-3 py-3 font-bold rounded-full transition-all hover:bg-[#DAD3C8] text-neutral-darkest">
                               PL
                             </span>
-                          </a>
+                          </Link>
                         )}
                         <span className="text-neutral-darkest">/</span>
                         {router?.locale === 'en' ? (
@@ -298,20 +293,15 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                             EN
                           </span>
                         ) : (
-                          <a
-                            href={alternateLangPath || getPath(router.asPath, 'en')}
-                            onClick={(e) => {
-                              e.preventDefault();
-                              // const newPath = alternateLangPath || getPath(router.asPath, 'en');
-                              // window.location.href = newPath;
-                              router.push(router.pathname, router.asPath, {locale: 'en'});
-                            }}
+                          <Link
+                            href={router.asPath}
+                            locale="en"
                             className="cursor-pointer"
                           >
                             <span className="px-3 py-3 font-bold rounded-full transition-all hover:bg-[#DAD3C8] text-neutral-darkest">
                               EN
                             </span>
-                          </a>
+                          </Link>
                         )}
                       </li>
                     </ul>
