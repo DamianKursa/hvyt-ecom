@@ -21,7 +21,7 @@ import { getCache, setCache } from '../../lib/cache';
 const CACHE_TTL = 3600;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { action } = req.query;
+  const { action, lang } = req.query;
 
   try {
     switch (action) {
@@ -54,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         if (req.method !== 'GET' || typeof id !== 'string') {
           return res.status(400).json({ error: 'Invalid id' });
         }
-        const result = await fetchProductById(id);
+        const result = await fetchProductById(id, lang as string);
         return res.status(200).json(result);
       }
 
@@ -94,7 +94,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 };
               }
               if (it?.productId) {
-                const p = await fetchProductById(String(it.productId));
+                const p = await fetchProductById(String(it.productId), lang as string);
                 return {
                   cartKey: String(it.cartKey),
                   price: p?.price ?? p?.sale_price ?? p?.regular_price,

@@ -12,20 +12,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: `Method ${req.method} not allowed` });
   }
 
-  const { slug, page = "1", perPage = "12", sortingOption = "default", filters } = req.query;
+  const { slug, page = "1", perPage = "12", sortingOption = "default", filters, lang = '' } = req.query;
 
   if (!slug || typeof slug !== 'string') {
     return res.status(400).json({ error: 'Missing or invalid slug parameter' });
   }
 
-  const cacheKey = `category:slug=${slug}:page=${page}:perPage=${perPage}:sort=${sortingOption}:filters=${filters || 'none'}`;
+  const cacheKey = `category:slug=${slug}:page=${page}:perPage=${perPage}:sort=${sortingOption}:filters=${filters || 'none'}:lang=${lang}`;
   try {
     const cached = await getCache(cacheKey);
     if (cached) {
       return res.status(200).json(cached);
     }
 
-    const category = await fetchCategoryBySlug(slug);
+    const category = await fetchCategoryBySlug(slug, lang as string);
     const categoryId = category.id;
 
     let parsedFilters: { name: string; value: string }[] = [];
@@ -42,9 +42,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       parseInt(page as string, 10),
       parseInt(perPage as string, 10),
       parsedFilters,
-      sortingOption as string
+      sortingOption as string,
+      lang as string,
     );
-    const attributes = await fetchProductAttributesWithTerms(categoryId);
+    const attributes = await fetchProductAttributesWithTerms(categoryId, lang as string);
 
     const responseData = {
       category,

@@ -14,7 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: `Method ${req.method} not allowed` });
   }
 
-  const { action } = req.query;
+  const { action, lang = '' } = req.query;
 
   try {
     if (action === 'fetchCategoryBySlug') {
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (!slug || typeof slug !== 'string') {
         return res.status(400).json({ error: 'Invalid slug parameter' });
       }
-      const result = await fetchCategoryBySlug(slug);
+      const result = await fetchCategoryBySlug(slug, lang as string);
       return res.status(200).json(result);
 
     } else if (action === 'fetchProductsByCategoryId') {
@@ -57,7 +57,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'categoryId parameter is required' });
       }
       const catId = parseInt(categoryId as string, 10);
-      const result = await fetchProductAttributesWithTerms(catId);
+      const result = await fetchProductAttributesWithTerms(catId, lang as string);
       return res.status(200).json(result);
 
     } else if (action === 'fetchProductsWithFilters') {
@@ -85,7 +85,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const catId = parseInt(categoryId as string, 10);
       const pageNum = page ? parseInt(page as string, 10) : 1;
       const perPageNum = perPage ? parseInt(perPage as string, 10) : 12;
-      const result = await fetchSortedProducts(catId, orderby as string, order as string, pageNum, perPageNum);
+      const result = await fetchSortedProducts(catId, orderby as string, order as string, pageNum, perPageNum, lang as string);
       return res.status(200).json(result);
 
     } else {

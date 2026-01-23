@@ -11,13 +11,13 @@ import {
   Language,
   I18nConfig 
 } from '@/utils/i18n/config';
-import { getTranslations, FooterTranslations } from '@/utils/i18n/translations';
+import { getTranslations, Translations } from '@/utils/i18n/translations';
 import { getLocalizedPath } from '@/utils/i18n/routing';
 
 export interface UseI18nReturn {
   language: Language;
   config: I18nConfig;
-  t: FooterTranslations;
+  t: Translations;
   getPath: (path: string, lang?: Language) => string;
   isEn: boolean;
   isPl: boolean;
