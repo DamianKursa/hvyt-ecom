@@ -7,6 +7,12 @@ type CurrencyConfig = {
     };
 }
 
+type CurrencyConfigItem = {
+    slug: string,
+    symbol: string,
+    name: string,
+}
+
 export const currenciesConfig: CurrencyConfig = {
   pl: {
     slug: 'pln',
@@ -20,6 +26,10 @@ export const currenciesConfig: CurrencyConfig = {
   },
 }
 
-export const getCurrencyByLocale = (locale : string) => {
-    return currenciesConfig[locale] || currenciesConfig['pl'];
+export const getCurrencyByLocale = (locale : string) : CurrencyConfigItem | null => {
+    return currenciesConfig[locale] || null;
+}
+
+export const getCurrencySlugByLocale = (locale : string) : string => {
+    return (currenciesConfig[locale] || currenciesConfig['pl']).name.toUpperCase();
 }

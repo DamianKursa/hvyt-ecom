@@ -1,3 +1,4 @@
+import { getCurrencySlugByLocale } from '@/config/currencies';
 import axios from 'axios';
 
 const WooCommerceAPI = axios.create({
@@ -18,12 +19,14 @@ interface Attribute {
   slug: string;
 }
 
-export const fetchCategoryBySlug = async (slug: string) => {
+export const fetchCategoryBySlug = async (slug: string, lang: string) => {
   try {
     const response = await WooCommerceAPI.get('/products/categories', {
       params: {
         slug,
         per_page: 50,
+        lang,
+        currency: getCurrencySlugByLocale(lang)
       },
     });
     if (response.data.length === 0) {
@@ -42,6 +45,7 @@ export const fetchProductsByCategoryId = async (
   perPage = 10,
   filters: { name: string; value: string }[] = [],
   sortingOption: string = 'default',
+  lang: string
 ) => {
   try {
     const params: Record<string, any> = {
@@ -49,6 +53,7 @@ export const fetchProductsByCategoryId = async (
       page,
       per_page: perPage,
       status: 'publish',
+      lang
     };
 
     filters.forEach((filter) => {
@@ -79,6 +84,10 @@ export const fetchProductsByCategoryId = async (
       params.order = sortingParams.order;
     }
 
+    if(params.lang) {
+      params.currency = getCurrencySlugByLocale(lang)
+    }
+
     const response = await WooCommerceAPI.get('/products', { params });
 
     return {
@@ -95,10 +104,10 @@ export const fetchProductsByCategoryId = async (
   }
 };
 
-export const fetchProductAttributesWithTerms = async (categoryId: number) => {
+export const fetchProductAttributesWithTerms = async (categoryId: number, lang: string) => {
   try {
     const response = await CustomAPI.get('/attributes', {
-      params: { category: categoryId },
+      params: { category: categoryId, lang },
     });
 
     return response.data.map((attribute: any) => ({
@@ -122,7 +131,7 @@ export const fetchProductsWithFilters = async (
   filters: { name: string; value: string }[],
   page = 1,
   perPage = 12,
-  lang = 'pl',
+  lang: string,
 ) => {
   if (!filters || filters.length === 0) {
     throw new Error(
@@ -153,9 +162,7 @@ export const fetchProductsWithFilters = async (
 
   try {
     const response = await CustomAPI.get('/filtered-products', { params });
-    console.log('filters', response);
     
-
     const mapped = (response.data.products || []).map((p: any) => ({
       ...p,
       // ensure date_created exists so the "Nowość" badge logic works
@@ -186,6 +193,7 @@ export const fetchSortedProducts = async (
   order: string,
   page = 1,
   perPage = 12,
+  lang: string
 ) => {
   try {
     const params = {
@@ -194,6 +202,7 @@ export const fetchSortedProducts = async (
       per_page: perPage,
       orderby,
       order,
+      lang,
     };
 
     const response = await CustomAPI.get('/sorted-products', { params });

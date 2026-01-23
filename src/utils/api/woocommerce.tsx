@@ -3,7 +3,7 @@ import { Kolekcja } from '../functions/interfaces';
 import { NowosciPost } from '../functions/interfaces';
 import { get } from 'lodash';
 import { getCurrency } from '../i18n/config';
-import { getCurrencyByLocale } from '@/config/currencies';
+import { getCurrencySlugByLocale } from '@/config/currencies';
 
 const WooCommerceAPI = axios.create({
   baseURL: process.env.REST_API,
@@ -75,10 +75,10 @@ export const fetchProductBySlug = async (slug: string) => {
 export const fetchProductById = async (id: number | string, lang: string) => {
   try {
 
-    const currency = getCurrencyByLocale(lang) ?? '';
+    const currency = getCurrencySlugByLocale(lang) ?? '';
 
     const response = await WooCommerceAPI.get(`/products/${id}`, {
-      params: { ts: Date.now(), currency: currency.name.toUpperCase() },
+      params: { ts: Date.now(), currency },
       timeout: 5000,
     });
 

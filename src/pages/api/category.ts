@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(200).json(result);
 
     } else if (action === 'fetchProductsByCategoryId') {
-      const { categoryId, page, perPage, sortingOption, filters } = req.query;
+      const { categoryId, page, perPage, sortingOption, filters, lang } = req.query;
       if (!categoryId) {
         return res.status(400).json({ error: 'categoryId parameter is required' });
       }
@@ -46,7 +46,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         pageNum,
         perPageNum,
         parsedFilters,
-        (sortingOption as string) || 'default'
+        (sortingOption as string) || 'default',
+        lang as string,
       );
       return res.status(200).json(result);
 

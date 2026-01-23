@@ -171,9 +171,9 @@ const CategoryPage = ({
         orderby: 'menu_order',
         order: 'asc',
       };
-      return `/api/category?action=fetchSortedProducts&categoryId=${category.id}&orderby=${sortingParams.orderby}&order=${sortingParams.order}&page=${currentPage}&perPage=12`;
+      return `/api/category?action=fetchSortedProducts&categoryId=${category.id}&orderby=${sortingParams.orderby}&order=${sortingParams.order}&page=${currentPage}&perPage=12&lang=${router?.locale}`;
     } else {
-      return `/api/category?action=fetchProductsByCategoryId&categoryId=${category.id}&page=${currentPage}&perPage=12`;
+      return `/api/category?action=fetchProductsByCategoryId&categoryId=${category.id}&page=${currentPage}&perPage=12&lang=${router?.locale}`;
     }
   };
 
