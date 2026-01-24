@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import DiscountCode from '@/components/Cart/DiscountCode';
 import { getCurrency, Language } from '@/utils/i18n/config';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface CartSummaryProps {
   totalProductsPrice: number;
@@ -23,6 +24,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   // Local loading state to disable the button during submission or for timeout
   const [localLoading, setLocalLoading] = useState(false);
   const router = useRouter();
+  const { t, getPath } = useI18n();
 
   const currency = getCurrency(router?.locale as Language ?? 'pl');
 
@@ -55,7 +57,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
         setLocalLoading(false);
       }
     } else {
-      router.push('/checkout');
+      router.push(getPath('/checkout'));
     }
   };
 
@@ -66,20 +68,20 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     >
       {!isCheckoutPage && (
         <h2 className="text-[32px] font-bold mb-6 text-neutral-darkest">
-          Podsumowanie
+          {t.cart.summary.title}
         </h2>
       )}
 
       {isCheckoutPage ? (
         <div className="flex justify-between text-[20px] mb-6">
-          <span className="text-neutral-darkest font-bold">Wartość produktów</span>
+          <span className="text-neutral-darkest font-bold">{t.cart.summary.productsValue}</span>
           <span className="font-semibold text-neutral-darkest">
             {formatPrice(totalProductsPrice)}
           </span>
         </div>
       ) : (
         <div className="flex justify-between text-[20px] mb-6">
-          <span className="text-neutral-darkest font-bold">Razem produkty</span>
+          <span className="text-neutral-darkest font-bold">{t.cart.summary.productsTotal}</span>
           <span className="font-semibold text-neutral-darkest">
             {formatPrice(totalProductsPrice)}
           </span>
@@ -88,7 +90,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
       {totalProductsPrice > totalPrice && (
         <div className="flex justify-between text-lg mb-6">
-          <span className="text-neutral-darkest font-medium">Wartość rabatu</span>
+          <span className="text-neutral-darkest font-medium">{t.cart.summary.discountValue}</span>
           <span className="font-semibold text-neutral-darkest">
             {formatPrice(totalProductsPrice - totalPrice)}
           </span>
@@ -100,7 +102,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
       {isCheckoutPage && (
         <div className="flex justify-between text-lg mb-6">
           <span className="text-neutral-darkest font-medium">
-            Wysyłka
+            {t.cart.summary.shipping}
           </span>
           <span className="font-semibold text-neutral-darkest">
             {loading ? (
@@ -108,7 +110,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             ) : shippingPrice > 0 ? (
               formatPrice(shippingPrice)
             ) : (
-              'Darmowa'
+              t.cart.summary.shippingFree
             )}
           </span>
         </div>
@@ -116,7 +118,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
 
       <div className="flex justify-between items-top mb-6">
         <div className="flex flex-col">
-          <span className=" text-neutral-darkest font-medium text-[18px]">Suma</span>
+          <span className=" text-neutral-darkest font-medium text-[18px]">{t.cart.summary.total}</span>
         </div>
         <span className="text-2xl font-bold text-dark-pastel-red">
           {loading ? (
@@ -129,7 +131,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             </p>
           )}
           <span className="text-sm text-black font-light">
-            <p>kwota zawiera 23% VAT</p>
+            <p>{t.cart.summary.vatInfo}</p>
           </span>
         </span>
       </div>
@@ -143,10 +145,10 @@ const CartSummary: React.FC<CartSummaryProps> = ({
     ${localLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         {localLoading
-          ? 'Przetwarzanie...'
+          ? t.common.processing
           : isCheckoutPage
-            ? 'Zamawiam i Płacę'
-            : 'Przejdź do kasy'}
+            ? t.cart.summary.placeOrder
+            : t.cart.summary.proceedToCheckout}
       </button>
 
 

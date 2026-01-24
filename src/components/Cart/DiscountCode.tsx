@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { CartContext } from '@/stores/CartProvider';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const toNum = (v: any): number => {
   if (v === null || v === undefined) return NaN;
@@ -204,6 +205,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
   setCartTotal,
 }) => {
   const { applyCoupon, removeCoupon, cart } = useContext(CartContext);
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
   const [code, setCode] = useState(cart?.coupon?.code || '');
   const [codeError, setCodeError] = useState<string>('');
@@ -249,8 +251,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       (couponRules.excludeCategoriesOnSale?.length ?? 0) > 0;
     const message =
       saleRestrictionActive && hadMatchesIgnoringSale
-        ? 'Kod nie działa na produkty z promocji — usunięto.'
-        : 'Kod rabatowy usunięty – brak produktów spełniających warunki';
+        ? t.cart.discountCode.removedSaleItems
+        : t.cart.discountCode.removedNoProducts;
 
     setSnackbar({ message, type: 'error', visible: true });
     const timeout = setTimeout(
@@ -268,6 +270,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     productsMatchingRulesIgnoringSale.length,
     removeCoupon,
     setCartTotal,
+    t,
   ]);
 
   // Start editing: restore totals, clear coupon, open input with current code
@@ -283,7 +286,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
   const handleApplyCode = async () => {
     if (!code.trim()) {
-      setCodeError('Uzupełnij kod rabatowy');
+      setCodeError(t.cart.discountCode.emptyError);
       return;
     }
     setCodeError('');
@@ -316,8 +319,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         console.log('Coupon debug:', data.debug);
         const msg =
           data?.debug === 'only_sale_products_in_scope'
-            ? 'Kod nie działa na produkty z promocji.'
-            : data.message || 'Niepoprawny kod rabatowy';
+            ? t.cart.discountCode.saleItemsError
+            : data.message || t.cart.discountCode.invalidError;
         setCodeError(msg);
         setSnackbar({ message: msg, type: 'error', visible: true });
         return;
@@ -343,8 +346,8 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         saleRestrictionActive &&
         eligibleProductsIgnoringSale.length > eligibleProducts.length;
       const noMatchMessage = saleOnly
-        ? 'Kod nie działa na produkty z promocji.'
-        : 'Brak produktów spełniających warunki kodu.';
+        ? t.cart.discountCode.saleItemsError
+        : t.cart.discountCode.noMatchingProductsError;
 
       if (!eligibleProducts.length) {
         setCodeError(noMatchMessage);
@@ -422,10 +425,10 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
           : '';
       const successMessage =
         isFreeShippingOnly
-          ? 'Kod rabatowy został dodany – darmowa wysyłka.'
+          ? t.cart.discountCode.addedFreeShipping
           : limitedDiscount && formattedNames
-            ? `Kod rabatowy został dodany - rabat naliczono dla: ${formattedNames}.`
-            : 'Kod rabatowy został dodany';
+            ? `${t.cart.discountCode.addedLimited} ${formattedNames}.`
+            : t.cart.discountCode.added;
 
       setSnackbar({
         message: successMessage,
@@ -435,7 +438,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     } catch (error) {
       console.error('Error validating discount code:', error);
       setSnackbar({
-        message: 'Wystąpił błąd. Spróbuj ponownie później.',
+        message: t.cart.errors.loadingError,
         type: 'error',
         visible: true,
       });
@@ -458,7 +461,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     setCode('');
     removeCoupon();
     setSnackbar({
-      message: 'Kod rabatowy został usunięty',
+      message: t.cart.discountCode.removed,
       type: 'success',
       visible: true,
     });
@@ -494,7 +497,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
               alt="Discount Icon"
               className="w-5 h-5 mr-2"
             />
-            Posiadasz kod rabatowy?
+            {t.cart.discountCode.title}
           </div>
           <img
             src={`/icons/arrow-${isOpen ? 'up' : 'down'}.svg`}
@@ -528,7 +531,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
                   <input
                     id="discount-code"
                     type="text"
-                    placeholder="Wpisz kod"
+                    placeholder={t.cart.discountCode.placeholder}
                     value={code}
                     onChange={e => {
                       setCode(e.target.value);
@@ -542,7 +545,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
                     disabled={!code.trim() || isLoading}
                     className={`w-1/2 md:w-auto md:ml-4 px-4 py-2 border ${(!code.trim() || isLoading) ? 'border-neutral-light text-neutral-light' : 'border-black text-black'} rounded-full focus:outline-none ${(!code.trim() || isLoading) ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    {isLoading ? 'Ładowanie...' : 'Zapisz'}
+                    {isLoading ? t.cart.discountCode.loading : t.cart.discountCode.apply}
                   </button>
                 </div>
                 {codeError && (
@@ -559,7 +562,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
       {cart?.coupon?.discountValue != null && (
         <div className="flex justify-between items-center">
-          <span className="text-neutral-darkest font-medium text-[18px]">Wartość rabatu</span>
+          <span className="text-neutral-darkest font-medium text-[18px]">{t.cart.summary.discountValue}</span>
           <span className="font-semibold text-neutral-darkest">
             - {Number(cart.coupon.discountValue).toFixed(2).replace('.', ',')} zł
           </span>

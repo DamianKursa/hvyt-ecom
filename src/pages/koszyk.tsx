@@ -8,12 +8,14 @@ import Link from 'next/link';
 import Bestsellers from '@/components/Index/Bestsellers.component';
 import { pushGTMEvent } from '@/utils/gtm';
 import axios from 'axios';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const Koszyk: React.FC = () => {
   const { cart, updateCartItem, removeCartItem, updateCartItemPrice } = useContext(CartContext);
   const [mounted, setMounted] = useState(false);
   const [variationMessage, setVariationMessage] = useState<string | null>(null);
   const [cartErrorMessage, setCartErrorMessage] = useState<string | null>(null);
+  const { t, getPath } = useI18n();
 
   // Helpers to compute real stock for the currently selected variant (based on cart item attributes)
   const normalize = (s: unknown) =>
@@ -130,14 +132,14 @@ const Koszyk: React.FC = () => {
 
   useEffect(() => {
     if (invalidItems.length > 0) {
-      const names = invalidItems.map((p: Product) => `„${p.name}”`).join(', ');
-      setCartErrorMessage(`Niektóre pozycje są niedostępne lub przekraczają stan: ${names}. Zmień wariant lub ilość, aby kontynuować.`);
+      const names = invalidItems.map((p: Product) => `„${p.name}"`).join(', ');
+      setCartErrorMessage(`${t.cart.errors.variantUnavailable.split('.')[0]}: ${names}.`);
     } else if (cartErrorMessage) {
       setCartErrorMessage(null);
     }
-  }, [invalidItems]);
+  }, [invalidItems, t]);
 
-  if (!mounted) return <div>Loading...</div>;
+  if (!mounted) return <div>{t.common.loading}</div>;
 
   const handleIncreaseQuantity = (product: Product) => {
     const currentStock = computeAvailableStock(product);
@@ -145,16 +147,16 @@ const Koszyk: React.FC = () => {
     if (currentStock <= 0) {
       const hasVariations = Array.isArray(((product as any).baselinker_variations) || []) && ((product as any).baselinker_variations || []).length > 0;
       if (hasVariations) {
-        setCartErrorMessage(`Wariant wybrany dla "${product.name}" jest niedostępny. Zmień wariant, aby kontynuować.`);
+        setCartErrorMessage(t.cart.errors.variantUnavailable.replace('{name}', product.name));
       } else {
-        setCartErrorMessage(`Produkt "${product.name}" jest niedostępny.`);
+        setCartErrorMessage(t.cart.errors.outOfStock);
       }
       return;
     }
 
     if (product.qty >= currentStock) {
       console.log(`Reached maximum stock for ${product.name}`);
-      setCartErrorMessage(`Nie można dodać więcej niż ${currentStock} szt. dla "${product.name}".`);
+      setCartErrorMessage(t.cart.errors.maxQuantity.replace('{count}', String(currentStock)));
       return;
     }
 
@@ -205,7 +207,7 @@ const Koszyk: React.FC = () => {
   const isCartEmpty = !cart || cart.products.length === 0;
 
   return (
-    <Layout title="Hvyt | Koszyk">
+    <Layout title={t.cart.pageTitle}>
       <section className="container mx-auto px-4 md:px-0">
         {isCartEmpty ? (
           <div className="mt-[64px] md:mt-0 rounded-[25px] py-[90px] bg-white p-8 shadow-sm flex flex-col items-center justify-center">
@@ -215,23 +217,23 @@ const Koszyk: React.FC = () => {
               className="w-28 h-28 mb-4"
             />
             <h2 className="text-[18px] md:text-[28px] font-semibold mb-4 text-black">
-              Twój koszyk jest pusty
+              {t.cart.emptyCart.title}
             </h2>
             <p className="text-[18px] text-black text-center font-light mb-6">
-              Znajdź produkt w naszym sklepie, który wyróżni Twoje wnętrze!
+              {t.cart.emptyCart.description}
             </p>
             <div className="flex gap-4">
               <Link
-                href="/kategoria/uchwyty-meblowe"
+                href={getPath('/kategoria/uchwyty-meblowe')}
                 className="px-10 md:px-16 py-3 bg-black text-white rounded-full text-sm font-[16px]"
               >
-                Uchwyty
+                {t.cart.emptyCart.handlesButton}
               </Link>
               <Link
-                href="/"
+                href={getPath('/')}
                 className="px-6 md:px-16 py-3 border border-black text-black rounded-full text-sm font-medium"
               >
-                Strona Główna
+                {t.cart.emptyCart.homeButton}
               </Link>
             </div>
           </div>
@@ -259,7 +261,7 @@ const Koszyk: React.FC = () => {
                 onDecreaseQuantity={handleDecreaseQuantity}
                 onRemoveItem={handleRemoveItem}
                 onVariationChange={(name: string) => {
-                  setVariationMessage(`Rozstaw produktu ${name} został zmieniony`);
+                  setVariationMessage(t.cart.messages.variationChanged.replace('{name}', name));
                   setCartErrorMessage(null);
                 }}
               />
@@ -274,8 +276,8 @@ const Koszyk: React.FC = () => {
 
         <div className="mt-16">
           <Bestsellers
-            title="Produkty, które mogą Ci się spodobać"
-            description="Sprawdź produkty, które idealnie pasują z wybranym produktem."
+            title={t.cart.recommendations.title}
+            description={t.cart.recommendations.description}
           />
         </div>
       </section>

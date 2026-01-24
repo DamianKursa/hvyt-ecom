@@ -5,6 +5,7 @@ import { CartContext, Product } from '@/stores/CartProvider';
 import QuantityChanger from '@/components/UI/QuantityChanger';
 import AttributeSwitcher from '@/components/UI/AttributeSwitcher.component';
 import { getCurrency, Language } from '@/utils/i18n/config';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface CartItemProps {
   product: Product;
@@ -14,7 +15,7 @@ interface CartItemProps {
   onVariationChange?: (productName: string) => void;
 }
 
-/** ① We now track both the human label and the Woo variation ID */
+/** ① We now track both the human label and the Woo variation ID */
 interface SelVar {
   label: string;
   id: number;
@@ -29,10 +30,11 @@ const CartItem: React.FC<CartItemProps> = ({
 }) => {
   const router = useRouter();
   const isKoszykPage = router.pathname === '/koszyk';
+  const { t } = useI18n();
 
   const currency = getCurrency(router?.locale as Language ?? 'pl');
 
-  /** ② Provider now expects (cartKey, attrName, newValue, newVariationId) */
+  /** ② Provider now expects (cartKey, attrName, newValue, newVariationId) */
   const { updateCartVariation } = React.useContext(CartContext);
 
   const [isModalOpen, setModalOpen] = useState(false);
@@ -109,7 +111,7 @@ const CartItem: React.FC<CartItemProps> = ({
     return matchingVariation?.id ?? null;
   }, [product.baselinker_variations]);
 
-  /** ④ Called when user clicks “Zapisz” in the modal */
+  /** ④ Called when user clicks "Zapisz" in the modal */
   const handleSaveVariation = (
     attributeName: string,
     newValue: string,
@@ -126,7 +128,7 @@ const CartItem: React.FC<CartItemProps> = ({
       product.cartKey,
       fullAttributeName,
       newValue,
-      newVarId, // ← pass the chosen variation ID
+      newVarId, // ← pass the chosen variation ID
     );
   };
 
@@ -167,7 +169,7 @@ const CartItem: React.FC<CartItemProps> = ({
                         className="font-light text-black underline flex items-center hover:text-gray-800 transition"
                         onClick={() => setModalOpen(true)}
                       >
-                        edytuj
+                        {t.cart.item.edit}
                         <img
                           src="/icons/edit.svg"
                           alt="Edit Icon"
@@ -259,7 +261,7 @@ const CartItem: React.FC<CartItemProps> = ({
               onClick={() => setModalOpen(true)}
               className="text-xs text-black underline mt-1 flex items-center"
             >
-              edytuj
+              {t.cart.item.edit}
               <img
                 src="/icons/edit.svg"
                 alt="Edit Icon"
@@ -297,14 +299,13 @@ const CartItem: React.FC<CartItemProps> = ({
             </button>
 
             <h3 className="text-[24px] font-semibold text-[#1C1C1C] mb-[24px]">
-              Edytuj rozstaw produktu
+              {t.cart.item.editModalTitle}
             </h3>
             <p className="text-neutral-darkest font-light text-base mb-[40px]">
-              Produkty zostaną dodane do koszyka z uwzględnieniem ich aktualnych
-              cen. Czy chcesz kontynuować?
+              {t.cart.item.editModalDescription}
             </p>
 
-            {/* One dropdown per attribute (usually only “Rozstaw”) */}
+            {/* One dropdown per attribute (usually only "Rozstaw") */}
             {Object.entries(variationOptions).map(([attrName, options]) => (
               <div key={attrName} className="mb-4" ref={dropdownRef}>
                 <label className="text-[#1C1C1C] text-base font-light mb-[16px] px-[16px] block flex items-center">
@@ -349,7 +350,7 @@ const CartItem: React.FC<CartItemProps> = ({
                 className="w-1/2 py-3 text-black border border-black rounded-full text-base font-light hover:bg-gray-100 transition"
                 onClick={() => setModalOpen(false)}
               >
-                Anuluj
+                {t.common.cancel}
               </button>
               <button
                 className={`w-1/2 py-3 text-white rounded-full text-base font-light transition ${(isMultiAttribute ? Object.keys(multiAttrSelections).length > 0 : selectedVariation)
@@ -387,7 +388,7 @@ const CartItem: React.FC<CartItemProps> = ({
                   }
                 }}
               >
-                Zapisz
+                {t.common.save}
               </button>
             </div>
           </div>

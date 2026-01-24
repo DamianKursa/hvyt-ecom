@@ -27,6 +27,19 @@ const slugMap: Record<string, { pl: string; en: string }> = {
   'polityka-prywatnosci': { pl: 'polityka-prywatnosci', en: 'privacy-policy' },
   'kolekcje': { pl: 'kolekcje', en: 'collections' },
   'blog': { pl: 'blog', en: 'blog' },
+  
+  // Cart & Checkout flow
+  'koszyk': { pl: 'koszyk', en: 'cart' },
+  'checkout': { pl: 'checkout', en: 'checkout' },
+  'dziekujemy': { pl: 'dziekujemy', en: 'thank-you' },
+  
+  // User pages
+  'logowanie': { pl: 'logowanie', en: 'login' },
+  'ulubione': { pl: 'ulubione', en: 'favorites' },
+  'moje-konto': { pl: 'moje-konto', en: 'my-account' },
+  'zapomniane-haslo': { pl: 'zapomniane-haslo', en: 'forgot-password' },
+  'aktywacja-konta': { pl: 'aktywacja-konta', en: 'account-activation' },
+  'potwierdzenie-email': { pl: 'potwierdzenie-email', en: 'email-confirmation' },
 };
 
 /**

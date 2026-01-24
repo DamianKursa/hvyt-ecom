@@ -1,27 +1,32 @@
 import React from 'react';
 import { useRouter } from 'next/router';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const CartProgress: React.FC = () => {
   const router = useRouter();
+  const { t, getPath } = useI18n();
   const isCheckoutPage = router.pathname === '/checkout';
   const isThankYouPage = router.pathname === '/dziekujemy';
 
   // Define the steps with their corresponding paths
   const steps = [
-    { label: 'Koszyk', icon: '/icons/cart.svg', path: '/koszyk' },
+    { label: t.cart.progress.cart, icon: '/icons/cart.svg', path: getPath('/koszyk') },
     {
-      label: 'Dostawa i płatność',
+      label: t.cart.progress.deliveryAndPayment,
       icon: '/icons/truck.svg',
-      path: '/checkout',
+      path: getPath('/checkout'),
     },
     {
-      label: 'Podsumowanie',
+      label: t.cart.progress.summary,
       icon: '/icons/podsumowanie.svg',
-      path: '/dziekujemy',
+      path: getPath('/dziekujemy'),
     },
   ];
 
-  const activeIndex = steps.findIndex(step => router.pathname === step.path);
+  const activeIndex = steps.findIndex(step => router.pathname === step.path || 
+    (step.path.includes('koszyk') && router.pathname === '/koszyk') ||
+    (step.path.includes('checkout') && router.pathname === '/checkout') ||
+    (step.path.includes('dziekujemy') && router.pathname === '/dziekujemy'));
 
   return (
     <div className="flex mt-6 md:mt-0 flex-col gap-4 w-full">
@@ -36,7 +41,7 @@ const CartProgress: React.FC = () => {
             alt="Back"
             className="w-4 h-4"
           />
-          <span>Wróć do produktów</span>
+          <span>{t.cart.progress.backToProducts}</span>
         </div>
       )}
 
@@ -47,7 +52,7 @@ const CartProgress: React.FC = () => {
           const isCompleted = activeIndex > index;
 
           const mobileFlexClass = isCheckoutPage
-            ? step.path === '/checkout'
+            ? step.path.includes('checkout')
               ? 'flex-[2]'
               : 'flex-[0.5]'
             : 'flex-1';
