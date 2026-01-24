@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { CartProvider } from '@/stores/CartProvider';
 import { UserProvider } from '@/context/UserContext';
 import { WishlistProvider } from '@/context/WhishlistContext';
+import { LanguageProvider } from '@/context/LanguageContext';
 import client from '@/utils/apollo/ApolloClient';
 import LoadingOverlay from '@/components/UI/LoadingOverlay';
 import axios from 'axios';
@@ -106,15 +107,17 @@ function MyApp({ Component, pageProps }: AppProps) {
 
       <ApolloProvider client={client}>
         {showOverlay && <LoadingOverlay />}
-        <CartProvider>
-          <ExternalIdProvider>
-            <UserProvider>
-              <WishlistProvider>
-                <Component {...pageProps} />
-              </WishlistProvider>
-            </UserProvider>
-          </ExternalIdProvider>
-        </CartProvider>
+        <LanguageProvider>
+          <CartProvider>
+            <ExternalIdProvider>
+              <UserProvider>
+                <WishlistProvider>
+                  <Component {...pageProps} />
+                </WishlistProvider>
+              </UserProvider>
+            </ExternalIdProvider>
+          </CartProvider>
+        </LanguageProvider>
       </ApolloProvider>
     </>
   );

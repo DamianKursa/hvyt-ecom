@@ -10,6 +10,7 @@ import { useUserContext } from '@/context/UserContext';
 import { CartContext } from '@/stores/CartProvider'
 import { useWishlist } from '@/context/WhishlistContext';
 import { useI18n } from '@/utils/hooks/useI18n';
+import LanguageSwitcher from '../UI/LanguageSwitcher';
 
 interface IHeaderProps {
   title?: string;
@@ -271,39 +272,6 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           </span>
                         </Link>
                       </li>
-                      <li className="ml-2 flex items-center gap-1">
-                        {router?.locale === 'pl' ? (
-                          <span className="px-3 py-3 font-bold rounded-full bg-white text-[#661F30]">
-                            PL
-                          </span>
-                        ) : (
-                          <Link
-                            href={router.asPath}
-                            locale="pl"
-                            className="cursor-pointer"
-                          >
-                            <span className="px-3 py-3 font-bold rounded-full transition-all hover:bg-[#DAD3C8] text-neutral-darkest">
-                              PL
-                            </span>
-                          </Link>
-                        )}
-                        <span className="text-neutral-darkest">/</span>
-                        {router?.locale === 'en' ? (
-                          <span className="px-3 py-3 font-bold rounded-full bg-white text-[#661F30]">
-                            EN
-                          </span>
-                        ) : (
-                          <Link
-                            href={router.asPath}
-                            locale="en"
-                            className="cursor-pointer"
-                          >
-                            <span className="px-3 py-3 font-bold rounded-full transition-all hover:bg-[#DAD3C8] text-neutral-darkest">
-                              EN
-                            </span>
-                          </Link>
-                        )}
-                      </li>
                     </ul>
                   </div>
                 </div>
@@ -464,7 +432,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                 </div>
               )}
           </div>
-        </nav>
+        </nav><LanguageSwitcher />
       </header>
 
       {searchOpen && <SearchComponent onClose={toggleSearch} />}

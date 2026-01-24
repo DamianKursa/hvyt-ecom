@@ -17,29 +17,33 @@ const slugMap: Record<string, { pl: string; en: string }> = {
   'galki': { pl: 'galki', en: 'knobs' },
   'meble': { pl: 'meble', en: 'furniture' },
   
-  // Pages
+  // Cart & Checkout
+  'koszyk': { pl: 'koszyk', en: 'cart' },
+  'checkout': { pl: 'checkout', en: 'checkout' },
+  'dziekujemy': { pl: 'dziekujemy', en: 'thank-you' },
+  'zamowienie-otrzymane': { pl: 'zamowienie-otrzymane', en: 'order-received' },
+  
+  // Auth & Account
+  'logowanie': { pl: 'logowanie', en: 'login' },
+  'zapomniane-haslo': { pl: 'zapomniane-haslo', en: 'forgot-password' },
+  'aktywacja-konta': { pl: 'aktywacja-konta', en: 'account-activation' },
+  'potwierdzenie-email': { pl: 'potwierdzenie-email', en: 'email-confirmation' },
+  'moje-konto': { pl: 'moje-konto', en: 'my-account' },
+  'ulubione': { pl: 'ulubione', en: 'wishlist' },
+  
+  // Static Pages
   'o-nas': { pl: 'o-nas', en: 'about-us' },
   'kontakt': { pl: 'kontakt', en: 'contact' },
   'wspolpraca': { pl: 'wspolpraca', en: 'cooperation' },
   'dostawa': { pl: 'dostawa', en: 'delivery' },
   'zwroty-i-reklamacje': { pl: 'zwroty-i-reklamacje', en: 'returns-and-complaints' },
+  'wygodne-zwroty': { pl: 'wygodne-zwroty', en: 'easy-returns' },
   'regulamin': { pl: 'regulamin', en: 'terms' },
   'polityka-prywatnosci': { pl: 'polityka-prywatnosci', en: 'privacy-policy' },
+  
+  // Content
   'kolekcje': { pl: 'kolekcje', en: 'collections' },
   'blog': { pl: 'blog', en: 'blog' },
-  
-  // Cart & Checkout flow
-  'koszyk': { pl: 'koszyk', en: 'cart' },
-  'checkout': { pl: 'checkout', en: 'checkout' },
-  'dziekujemy': { pl: 'dziekujemy', en: 'thank-you' },
-  
-  // User pages
-  'logowanie': { pl: 'logowanie', en: 'login' },
-  'ulubione': { pl: 'ulubione', en: 'favorites' },
-  'moje-konto': { pl: 'moje-konto', en: 'my-account' },
-  'zapomniane-haslo': { pl: 'zapomniane-haslo', en: 'forgot-password' },
-  'aktywacja-konta': { pl: 'aktywacja-konta', en: 'account-activation' },
-  'potwierdzenie-email': { pl: 'potwierdzenie-email', en: 'email-confirmation' },
 };
 
 /**

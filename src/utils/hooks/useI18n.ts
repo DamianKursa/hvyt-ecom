@@ -1,10 +1,14 @@
 /**
  * useI18n Hook
  * Main hook for internationalization
+ * 
+ * Zintegrowany z LanguageContext - używa kontekstu jako głównego źródła,
+ * z fallback do własnej logiki dla kompatybilności wstecznej.
  */
 
 import { useRouter } from 'next/router';
-import { useMemo } from 'react';
+import { useMemo, useContext } from 'react';
+import LanguageContext from '@/context/LanguageContext';
 import { 
   getCurrentLanguage, 
   getI18nConfig, 
@@ -21,13 +25,16 @@ export interface UseI18nReturn {
   getPath: (path: string, lang?: Language) => string;
   isEn: boolean;
   isPl: boolean;
+  switchLanguage?: () => void; // Opcjonalna funkcja z kontekstu
 }
 
 export const useI18n = (): UseI18nReturn => {
+  // === WSZYSTKIE HOOKI WYWOŁANE BEZWARUNKOWO NA POCZĄTKU ===
+  const context = useContext(LanguageContext);
   const router = useRouter();
   
-  // Detect language from router or environment
-  const language = useMemo(() => {
+  // Fallback language detection (używane gdy kontekst nie istnieje)
+  const fallbackLanguage = useMemo(() => {
     // Check window.location.pathname first (most reliable for language detection)
     if (typeof window !== 'undefined') {
       const pathname = window.location.pathname;
@@ -49,20 +56,38 @@ export const useI18n = (): UseI18nReturn => {
     
     // Fallback to environment or default
     return getCurrentLanguage();
-  }, [router.locale]);
+  }, [router.locale, router.pathname, router.asPath]);
   
-  const config = useMemo(() => getI18nConfig(language), [language]);
-  const t = useMemo(() => getTranslations(language), [language]);
+  const fallbackConfig = useMemo(() => getI18nConfig(fallbackLanguage), [fallbackLanguage]);
+  const fallbackT = useMemo(() => getTranslations(fallbackLanguage), [fallbackLanguage]);
   
-  const getPath = (path: string, targetLang?: Language) => getLocalizedPath(path, targetLang);
+  const fallbackGetPath = (path: string, targetLang?: Language) => 
+    getLocalizedPath(path, targetLang || fallbackLanguage);
   
+  // === LOGIKA WARUNKOWA PO WYWOŁANIU HOOKÓW ===
+  
+  // Jeśli kontekst istnieje, użyj go jako głównego źródła
+  if (context) {
+    return {
+      language: context.language,
+      t: context.t,
+      config: context.config,
+      getPath: context.getPath,
+      isEn: context.language === 'en',
+      isPl: context.language === 'pl',
+      switchLanguage: context.switchLanguage,
+    };
+  }
+  
+  // Fallback - zachowaj całą obecną logikę dla kompatybilności
+  // (dla przypadków gdy kontekst nie jest dostępny)
   return {
-    language,
-    config,
-    t,
-    getPath,
-    isEn: language === 'en',
-    isPl: language === 'pl',
+    language: fallbackLanguage,
+    config: fallbackConfig,
+    t: fallbackT,
+    getPath: fallbackGetPath,
+    isEn: fallbackLanguage === 'en',
+    isPl: fallbackLanguage === 'pl',
+    switchLanguage: undefined, // Brak switchLanguage w fallback mode
   };
 };
-
