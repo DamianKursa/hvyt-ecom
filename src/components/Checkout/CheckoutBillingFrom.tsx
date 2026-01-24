@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CreateAccount from '@/components/UI/CreateAccount';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 export interface CheckoutBillingFormProps {
   customerType: 'individual' | 'company';
@@ -40,6 +41,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
   user,
   setBillingData,
 }) => {
+  const { t } = useI18n();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -141,7 +143,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
   };
 
   if (loading) {
-    return <p>Ładowanie danych do faktury...</p>;
+    return <p>{t.checkout.billingAddress.loadingData}</p>;
   }
 
   return (
@@ -164,7 +166,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
               : 'border-gray-400'
               }`}
           ></span>
-          <span className="ml-2">Klient indywidualny</span>
+          <span className="ml-2">{t.checkout.billingAddress.individualCustomer}</span>
         </label>
         <label className="flex items-center">
           <input
@@ -180,7 +182,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
               : 'border-gray-400'
               }`}
           ></span>
-          <span className="ml-2">Firma</span>
+          <span className="ml-2">{t.checkout.billingAddress.company}</span>
         </label>
       </div>
 
@@ -203,7 +205,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
               : 'opacity-100'
               }`}
           >
-            Imię<span className="text-red-500">*</span>
+            {t.checkout.billingAddress.firstName}<span className="text-red-500">*</span>
           </span>
         </div>
         {/* Last Name */}
@@ -223,7 +225,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
               : 'opacity-100'
               }`}
           >
-            Nazwisko<span className="text-red-500">*</span>
+            {t.checkout.billingAddress.lastName}<span className="text-red-500">*</span>
           </span>
         </div>
 
@@ -247,7 +249,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
                   : 'opacity-100'
                   }`}
               >
-                Nazwa firmy<span className="text-red-500">*</span>
+                {t.checkout.billingAddress.companyName}<span className="text-red-500">*</span>
               </span>
             </div>
             {/* VAT Number */}
@@ -267,7 +269,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
                   : 'opacity-100'
                   }`}
               >
-                NIP<span className="text-red-500">*</span>
+                {t.checkout.billingAddress.vatNumber}<span className="text-red-500">*</span>
               </span>
             </div>
           </>
@@ -316,7 +318,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
               : 'opacity-100'
               }`}
           >
-            Numer telefonu<span className="text-red-500">*</span>
+            {t.checkout.billingAddress.phone}<span className="text-red-500">*</span>
           </span>
         </div>
         {/* Email */}
@@ -333,7 +335,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
           <span
             className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${(email) || focusedField === 'email' ? 'opacity-0' : 'opacity-100'}`}
           >
-            Adres e-mail<span className="text-red-500">*</span>
+            {t.checkout.billingAddress.email}<span className="text-red-500">*</span>
           </span>
         </div>
       </div>
@@ -354,7 +356,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             <img src="/icons/check.svg" alt="check" className="w-4 h-4" />
           )}
         </label>
-        <span className="text-sm">Zapisz się do newslettera</span>
+        <span className="text-sm">{t.checkout.billingAddress.subscribeNewsletter}</span>
       </div>
     </div>
   );

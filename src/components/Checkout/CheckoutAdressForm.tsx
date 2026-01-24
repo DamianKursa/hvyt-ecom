@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Checkbox from '@/components/UI/Checkbox';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 export interface CheckoutAddressFormProps {
   billingData: {
@@ -68,6 +69,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   setSaveAddress,
   user,
 }) => {
+  const { t } = useI18n();
   const [loading, setLoading] = useState<boolean>(true);
   const [needVATInvoice, setNeedVATInvoice] = useState<boolean>(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -225,7 +227,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
 
 
   if (loading) {
-    return <p>Ładowanie adresów...</p>;
+    return <p>{t.checkout.shippingAddress.loadingAddresses}</p>;
   }
 
   return (
@@ -252,7 +254,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${billingData.street || focusedField === 'street' ? 'opacity-0' : 'opacity-100'
               }`}
           >
-            Nazwa ulicy<span className="text-red-500">*</span>
+            {t.checkout.shippingAddress.streetName}<span className="text-red-500">*</span>
           </span>
           {showAddressSuggestions && savedAddresses.length > 0 && (
             <div className="absolute top-full left-0 w-full bg-white border border-dark-pastel-red rounded-[24px] mt-2 z-50 max-h-60 overflow-y-auto shadow">
@@ -289,12 +291,12 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
               : 'opacity-100'
               }`}
           >
-            Nr budynku<span className="text-red-500">*</span>
+            {t.checkout.shippingAddress.buildingNumber}<span className="text-red-500">*</span>
           </span>
         </div>
         <input
           type="text"
-          placeholder="Nr lokalu"
+          placeholder={t.checkout.shippingAddress.apartmentNumber}
           value={billingData.apartmentNumber}
           onChange={(e) =>
             setBillingData((prev) => ({
@@ -320,7 +322,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${billingData.city || focusedField === 'city' ? 'opacity-0' : 'opacity-100'
               }`}
           >
-            Miasto<span className="text-red-500">*</span>
+            {t.checkout.shippingAddress.city}<span className="text-red-500">*</span>
           </span>
         </div>
         <div className="relative w-full">
@@ -339,7 +341,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${billingData.postalCode || focusedField === 'postalCode' ? 'opacity-0' : 'opacity-100'
               }`}
           >
-            Kod pocztowy<span className="text-red-500">*</span>
+            {t.checkout.shippingAddress.postalCode}<span className="text-red-500">*</span>
           </span>
         </div>
         <div className="relative w-full">
@@ -353,7 +355,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             }
             className="w-full text-[#363132] font-light border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
           >
-            <option value="Polska">Polska</option>
+            <option value="Polska">{t.common.poland}</option>
           </select>
           <svg xmlns="http://www.w3.org/2000/svg" className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#969394] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -361,7 +363,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           <span
             className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${billingData.country ? 'opacity-0' : 'opacity-100'}`}
           >
-            Kraj / Region<span className="text-red-500">*</span>
+            {t.checkout.shippingAddress.country}<span className="text-red-500">*</span>
           </span>
         </div>
       </div>
@@ -371,13 +373,13 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         <Checkbox
           checked={isShippingDifferent}
           onChange={() => setIsShippingDifferent(!isShippingDifferent)}
-          label="Dostawa pod inny adres"
+          label={t.checkout.shippingAddress.differentAddress}
         />
       </div>
 
       {isShippingDifferent && (
         <div className="mt-4">
-          <h3 className="text-lg font-bold mb-4">Wpisz inny adres</h3>
+          <h3 className="text-lg font-bold mb-4">{t.checkout.shippingAddress.enterDifferentAddress}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-4">
             <div className="relative w-full">
               <input
@@ -395,7 +397,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${shippingData.street || focusedField === 'street' ? 'opacity-0' : 'opacity-100'
                   }`}
               >
-                Nazwa ulicy<span className="text-red-500">*</span>
+                {t.checkout.shippingAddress.streetName}<span className="text-red-500">*</span>
               </span>
             </div>
             <div className="relative w-full">
@@ -419,12 +421,12 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                   : 'opacity-100'
                   }`}
               >
-                Nr budynku<span className="text-red-500">*</span>
+                {t.checkout.shippingAddress.buildingNumber}<span className="text-red-500">*</span>
               </span>
             </div>
             <input
               type="text"
-              placeholder="Nr lokalu"
+              placeholder={t.checkout.shippingAddress.apartmentNumber}
               value={shippingData.apartmentNumber}
               onChange={(e) =>
                 setShippingData((prev) => ({
@@ -450,7 +452,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${shippingData.city || focusedField === 'city' ? 'opacity-0' : 'opacity-100'
                   }`}
               >
-                Miasto<span className="text-red-500">*</span>
+                {t.checkout.shippingAddress.city}<span className="text-red-500">*</span>
               </span>
             </div>
             <div className="relative w-full">
@@ -472,7 +474,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${shippingData.postalCode || focusedField === 'postalCode' ? 'opacity-0' : 'opacity-100'
                   }`}
               >
-                Kod pocztowy<span className="text-red-500">*</span>
+                {t.checkout.shippingAddress.postalCode}<span className="text-red-500">*</span>
               </span>
             </div>
             <div className="relative w-full">
@@ -489,7 +491,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 }
                 className="w-full font-light text-[#363132] border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
               >
-                <option value="Polska">Polska</option>
+                <option value="Polska">{t.common.poland}</option>
               </select>
               <svg xmlns="http://www.w3.org/2000/svg" className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#969394] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -498,7 +500,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${shippingData.country ? 'opacity-0' : 'opacity-100'
                   }`}
               >
-                Kraj / Region<span className="text-red-500">*</span>
+                {t.checkout.shippingAddress.country}<span className="text-red-500">*</span>
               </span>
             </div>
           </div>
@@ -511,16 +513,16 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           <Checkbox
             checked={saveAddress}
             onChange={() => setSaveAddress(prev => !prev)}
-            label="Zapisz ten adres w moim koncie"
+            label={t.checkout.shippingAddress.saveAddress}
           />
         </div>
       )}
       {/* Additional order notes */}
       <h3 className="text-[14px] font-bold mt-8 mb-2">
-        Dodatkowe informacje do zamówienia (opcjonalnie)
+        {t.checkout.shippingAddress.additionalInfo}
       </h3>
       <textarea
-        placeholder="Opis..."
+        placeholder={t.checkout.shippingAddress.additionalInfoPlaceholder}
         value={shippingData.additionalInfo}
         onChange={(e) =>
           setShippingData((prev) => ({

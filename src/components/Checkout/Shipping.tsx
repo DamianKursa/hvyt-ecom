@@ -1,6 +1,7 @@
 import { getCurrency, Language } from '@/utils/i18n/config';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState, useRef } from 'react';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface ShippingMethod {
   id: string;
@@ -180,6 +181,7 @@ const Shipping: React.FC<ShippingProps> = ({
   selectedGlsPoint,
   setSelectedGlsPoint,
 }) => {
+  const { t } = useI18n();
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -238,7 +240,7 @@ const Shipping: React.FC<ShippingProps> = ({
 
         const response = await fetch('/api/shipping');
         if (!response.ok) {
-          throw new Error('Nie udało się pobrać metod dostawy');
+          throw new Error(t.checkout.shipping.errorLoading);
         }
         const data = await response.json();
 
@@ -375,10 +377,8 @@ const Shipping: React.FC<ShippingProps> = ({
 
         setShippingZones(updatedZones);
       } catch (err) {
-        console.error('Błąd podczas pobierania metod dostawy:', err);
-        setError(
-          'Wystąpił błąd podczas ładowania metod dostawy. Ponowna próba za 5 sekund.',
-        );
+        console.error('Error fetching shipping methods:', err);
+        setError(t.checkout.shipping.retryMessage);
         setTimeout(() => {
           fetchShippingMethods();
         }, 5000);
@@ -551,7 +551,7 @@ const Shipping: React.FC<ShippingProps> = ({
   }, [showGlsMap]);
 
   if (loading) {
-    return <p>Ładowanie metod dostawy...</p>;
+    return <p>{t.checkout.shipping.loading}</p>;
   }
   if (error) {
     return <p className="text-red-500">{error}</p>;
@@ -559,7 +559,7 @@ const Shipping: React.FC<ShippingProps> = ({
   return (
     <div>
       <h2 className="text-[20px] font-bold mb-6 text-neutral-darkest">
-        Wybierz sposób dostawy
+        {t.checkout.shipping.title}
       </h2>
       {shippingZones.map((zone) => (
         <div key={zone.zoneName}>
@@ -594,7 +594,7 @@ const Shipping: React.FC<ShippingProps> = ({
                 <span className="text-sm text-gray-700 text-center w-full">
                   {method.cost
                     ? `${parseFloat(String(method.cost)).toFixed(2)} ${currency.symbol}`
-                    : 'Darmowa'}
+                    : t.checkout.shipping.free}
                 </span>
 
                 {/* Third Column: Icon */}
@@ -617,11 +617,11 @@ const Shipping: React.FC<ShippingProps> = ({
                       onClick={openInpostModal}
                       className="mt-6 text-black border border-black px-4 py-2 rounded-full flex items-center text-sm"
                     >
-                      Wybierz Paczkomat
+                      {t.checkout.shipping.selectLocker}
                     </button>
                     {selectedLockerData && (
                       <p className="mt-2 text-sm text-gray-700">
-                        Wybrany punkt: {selectedLockerData.id} -{' '}
+                        {t.checkout.shipping.selectedPoint} {selectedLockerData.id} -{' '}
                         {selectedLockerData.address}, {selectedLockerData.city},{' '}
                         {selectedLockerData.postalCode}
                       </p>
@@ -639,12 +639,12 @@ const Shipping: React.FC<ShippingProps> = ({
                       className="mt-6 text-black border border-black px-4 py-2 rounded-full flex items-center text-sm"
                     >
                       {selectedGlsPoint
-                        ? 'Zmień punkt GLS'
-                        : 'Wybierz punkt GLS'}
+                        ? t.checkout.shipping.changeGlsPoint
+                        : t.checkout.shipping.selectGlsPoint}
                     </button>
                     {selectedGlsPoint && (
                       <p className="mt-2 text-sm text-gray-700">
-                        Wybrany punkt:{' '}
+                        {t.checkout.shipping.selectedPoint}{' '}
                         {getField(selectedGlsPoint, 'name') || 'N/A'} –{' '}
                         {getField(selectedGlsPoint, 'street') || 'N/A'},{' '}
                         {getField(selectedGlsPoint, 'city') || 'N/A'},{' '}

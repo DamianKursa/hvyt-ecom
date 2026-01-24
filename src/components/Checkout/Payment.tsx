@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface PaymentProps {
   paymentMethod: string;
@@ -17,6 +18,7 @@ const Payment: React.FC<PaymentProps> = ({
   setPaymentMethod,
   shippingMethod,
 }) => {
+  const { t } = useI18n();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,15 +39,13 @@ const Payment: React.FC<PaymentProps> = ({
         setError(null);
         const response = await fetch('/api/payment');
         if (!response.ok) {
-          throw new Error('Nie udało się pobrać metod płatności');
+          throw new Error(t.checkout.payment.errorLoading);
         }
         const data = await response.json();
         setPaymentMethods(data);
       } catch (err) {
-        console.error('Błąd podczas pobierania metod płatności:', err);
-        setError(
-          'Wystąpił błąd podczas pobierania metod płatności. Ponowna próba za 5 sekund.',
-        );
+        console.error('Error fetching payment methods:', err);
+        setError(t.checkout.payment.retryMessage);
         setTimeout(() => {
           fetchPaymentMethods();
         }, 5000);
@@ -55,7 +55,7 @@ const Payment: React.FC<PaymentProps> = ({
     };
 
     fetchPaymentMethods();
-  }, []);
+  }, [t]);
 
   // Filter payment methods based on the selected shipping method
   const getFilteredPaymentMethods = () => {
@@ -87,7 +87,7 @@ const Payment: React.FC<PaymentProps> = ({
   }, [shippingMethod, setPaymentMethod]);
 
   if (loading) {
-    return <p>Ładowanie metod płatności...</p>;
+    return <p>{t.checkout.payment.loading}</p>;
   }
 
   if (error) {
@@ -97,7 +97,7 @@ const Payment: React.FC<PaymentProps> = ({
   return (
     <div>
       <h2 className="text-[20px] font-bold mb-6 text-neutral-darkest">
-        Wybierz sposób płatności
+        {t.checkout.payment.title}
       </h2>
       {availableMethods.length > 0 ? (
         <div>
@@ -128,7 +128,7 @@ const Payment: React.FC<PaymentProps> = ({
         </div>
       ) : (
         <p className="text-red-500 mt-4">
-          Brak dostępnych metod płatności dla wybranej metody dostawy.
+          {t.checkout.payment.noMethods}
         </p>
       )}
     </div>

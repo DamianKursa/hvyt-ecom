@@ -2,20 +2,22 @@ import React, { useContext } from 'react';
 import { CartContext, Product } from '@/stores/CartProvider';
 import { useRouter } from 'next/router';
 import { getCurrency, Language } from '@/utils/i18n/config';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const OrderItems: React.FC = () => {
+  const { t } = useI18n();
   const { cart } = useContext(CartContext);
   const router = useRouter();
   const currency = getCurrency(router?.locale as Language ?? 'pl');
 
   if (!cart || cart.products.length === 0) {
-    return <p>Twój koszyk jest pusty.</p>;
+    return <p>{t.checkout.orderSummary.emptyCart}</p>;
   }
 
   return (
     <div>
       <h2 className="px-[12px] text-2xl font-bold mb-6 text-dark-pastel-red">
-        Twoje zamówienie
+        {t.checkout.orderSummary.title}
       </h2>
       <div className=" px-[12px] divide-y divide-neutral-light">
         {cart.products.map((product: Product) => (
@@ -43,7 +45,7 @@ const OrderItems: React.FC = () => {
               </div>
               {/* Product Quantity */}
               <p className="text-[14px] font-light text-black">
-                Ilość: {product.qty}
+                {t.checkout.orderSummary.quantity} {product.qty}
               </p>
             </div>
           </div>

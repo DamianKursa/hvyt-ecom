@@ -194,6 +194,10 @@ export interface Translations {
       changeGlsPoint: string;
       selectedPoint: string;
       freeShipping: string;
+      free: string;
+      selectLocker: string;
+      errorLoading: string;
+      retryMessage: string;      
     };
     payment: {
       title: string;
@@ -202,6 +206,9 @@ export interface Translations {
       error: string;
       errorRetry: string;
       noMethodsAvailable: string;
+      noMethods: string;
+      errorLoading: string;
+      retryMessage: string;      
     };
     order: {
       title: string;
@@ -213,6 +220,11 @@ export interface Translations {
       termsLink: string;
       privacyLink: string;
       termsAcceptance: string;
+      confirm: string;
+      regulamin: string;
+      and: string;
+      privacyPolicy: string;
+      accept: string;      
     };
     validation: {
       selectLocker: string;
@@ -224,7 +236,55 @@ export interface Translations {
       fillRequired: string;
       orderError: string;
       orderCreatedNoId: string;
+      firstName: string;
+      lastName: string;
+      phone: string;
+      email: string;
+      street: string;
+      buildingNumber: string;
+      city: string;
+      postalCode: string;      
     };
+    deliveryAndPayment: string;
+    hasAccount: string;
+    createAccount: string;
+    shippingAddress: {
+      loadingAddresses: string;
+      streetName: string;
+      buildingNumber: string;
+      apartmentNumber: string;
+      city: string;
+      postalCode: string;
+      country: string;
+      differentAddress: string;
+      enterDifferentAddress: string;
+      saveAddress: string;
+      additionalInfo: string;
+      additionalInfoPlaceholder: string;
+    };
+    billingAddress: {
+      loadingData: string;
+      individualCustomer: string;
+      company: string;
+      firstName: string;
+      lastName: string;
+      companyName: string;
+      vatNumber: string;
+      phone: string;
+      email: string;
+      subscribeNewsletter: string;
+    };
+    orderSummary: {
+      title: string;
+      emptyCart: string;
+      quantity: string;
+    };
+    errors: {
+      orderCreationFailed: string;
+      shippingLoadFailed: string;
+      orderCreatedNoId: string;
+    };
+    placeOrder: string;    
   };
   thankYou: {
     pageTitle: string;
@@ -457,6 +517,10 @@ const translations: Record<Language, Translations> = {
         changeGlsPoint: 'Zmień punkt GLS',
         selectedPoint: 'Wybrany punkt:',
         freeShipping: 'Darmowa',
+        free: 'Darmowa',
+        selectLocker: 'Wybierz Paczkomat',
+        errorLoading: 'Nie udało się pobrać metod dostawy',
+        retryMessage: 'Wystąpił błąd podczas ładowania metod dostawy. Ponowna próba za 5 sekund.',        
       },
       payment: {
         title: 'Wybierz sposób płatności',
@@ -465,6 +529,9 @@ const translations: Record<Language, Translations> = {
         error: 'Nie udało się pobrać metod płatności',
         errorRetry: 'Wystąpił błąd podczas pobierania metod płatności. Ponowna próba za 5 sekund.',
         noMethodsAvailable: 'Brak dostępnych metod płatności dla wybranej metody dostawy.',
+        noMethods: 'Brak dostępnych metod płatności dla wybranej metody dostawy.',
+        errorLoading: 'Nie udało się pobrać metod płatności',
+        retryMessage: 'Wystąpił błąd podczas pobierania metod płatności. Ponowna próba za 5 sekund.',        
       },
       order: {
         title: 'Twoje zamówienie',
@@ -476,6 +543,11 @@ const translations: Record<Language, Translations> = {
         termsLink: 'Regulaminu',
         privacyLink: 'Polityki Prywatności',
         termsAcceptance: 'oraz akceptuję ich postanowienia.',
+        confirm: '*Potwierdzam, że zapoznałam/em się z treścią',
+        regulamin: 'Regulaminu',
+        and: 'i',
+        privacyPolicy: 'Polityki Prywatności',
+        accept: 'oraz akceptuję ich postanowienia.',        
       },
       validation: {
         selectLocker: 'Wybierz paczkomat przed złożeniem zamówienia.',
@@ -487,7 +559,55 @@ const translations: Record<Language, Translations> = {
         fillRequired: 'Proszę uzupełnić wymagane pola:',
         orderError: 'Wystąpił błąd podczas składania zamówienia. Spróbuj ponownie.',
         orderCreatedNoId: 'Zamówienie utworzone, ale brakuje identyfikatora zamówienia.',
+        firstName: 'Imię',
+        lastName: 'Nazwisko',
+        phone: 'Numer telefonu',
+        email: 'Adres e-mail',
+        street: 'Nazwa ulicy',
+        buildingNumber: 'Numer budynku',
+        city: 'Miasto',
+        postalCode: 'Kod pocztowy',        
       },
+      deliveryAndPayment: 'Dostawa i płatność',
+      hasAccount: 'Masz już konto? Zaloguj się',
+      createAccount: 'Stwórz konto',
+      shippingAddress: {
+        loadingAddresses: 'Ładowanie adresów...',
+        streetName: 'Nazwa ulicy',
+        buildingNumber: 'Nr budynku',
+        apartmentNumber: 'Nr lokalu',
+        city: 'Miasto',
+        postalCode: 'Kod pocztowy',
+        country: 'Kraj / Region',
+        differentAddress: 'Dostawa pod inny adres',
+        enterDifferentAddress: 'Wpisz inny adres',
+        saveAddress: 'Zapisz ten adres w moim koncie',
+        additionalInfo: 'Dodatkowe informacje do zamówienia (opcjonalnie)',
+        additionalInfoPlaceholder: 'Opis...',
+      },
+      billingAddress: {
+        loadingData: 'Ładowanie danych do faktury...',
+        individualCustomer: 'Klient indywidualny',
+        company: 'Firma',
+        firstName: 'Imię',
+        lastName: 'Nazwisko',
+        companyName: 'Nazwa firmy',
+        vatNumber: 'NIP',
+        phone: 'Numer telefonu',
+        email: 'Adres e-mail',
+        subscribeNewsletter: 'Zapisz się do newslettera',
+      },
+      orderSummary: {
+        title: 'Twoje zamówienie',
+        emptyCart: 'Twój koszyk jest pusty.',
+        quantity: 'Ilość:',
+      },
+      errors: {
+        orderCreationFailed: 'Wystąpił błąd podczas składania zamówienia. Spróbuj ponownie.',
+        shippingLoadFailed: 'Nie udało się załadować metod dostawy.',
+        orderCreatedNoId: 'Zamówienie utworzone, ale brakuje identyfikatora zamówienia.',
+      },
+      placeOrder: 'Złóż zamówienie',      
     },
     thankYou: {
       pageTitle: 'Dziękujemy za zakupy!',
@@ -718,6 +838,10 @@ const translations: Record<Language, Translations> = {
         changeGlsPoint: 'Change GLS Point',
         selectedPoint: 'Selected point:',
         freeShipping: 'Free',
+        free: 'Free',
+        selectLocker: 'Select Parcel Locker',
+        errorLoading: 'Failed to load shipping methods',
+        retryMessage: 'Error loading shipping methods. Retrying in 5 seconds.',        
       },
       payment: {
         title: 'Select payment method',
@@ -726,6 +850,9 @@ const translations: Record<Language, Translations> = {
         error: 'Failed to load payment methods',
         errorRetry: 'Error loading payment methods. Retrying in 5 seconds.',
         noMethodsAvailable: 'No payment methods available for selected delivery method.',
+        noMethods: 'No payment methods available for selected shipping method.',
+        errorLoading: 'Failed to load payment methods',
+        retryMessage: 'Error loading payment methods. Retrying in 5 seconds.',        
       },
       order: {
         title: 'Your order',
@@ -737,6 +864,11 @@ const translations: Record<Language, Translations> = {
         termsLink: 'Terms and Conditions',
         privacyLink: 'Privacy Policy',
         termsAcceptance: 'and I accept their provisions.',
+        confirm: '*I confirm that I have read the',
+        regulamin: 'Terms and Conditions',
+        and: 'and',
+        privacyPolicy: 'Privacy Policy',
+        accept: 'and I accept their provisions.',        
       },
       validation: {
         selectLocker: 'Please select a locker before placing your order.',
@@ -748,7 +880,55 @@ const translations: Record<Language, Translations> = {
         fillRequired: 'Please fill in the required fields:',
         orderError: 'An error occurred while placing the order. Please try again.',
         orderCreatedNoId: 'Order created, but order ID is missing.',
+        firstName: 'First name',
+        lastName: 'Last name',
+        phone: 'Phone number',
+        email: 'Email address',
+        street: 'Street name',
+        buildingNumber: 'Building number',
+        city: 'City',
+        postalCode: 'Postal code',        
       },
+      deliveryAndPayment: 'Delivery & Payment',
+      hasAccount: 'Already have an account? Sign in',
+      createAccount: 'Create account',
+      shippingAddress: {
+        loadingAddresses: 'Loading addresses...',
+        streetName: 'Street name',
+        buildingNumber: 'Building no.',
+        apartmentNumber: 'Apt. no.',
+        city: 'City',
+        postalCode: 'Postal code',
+        country: 'Country / Region',
+        differentAddress: 'Ship to a different address',
+        enterDifferentAddress: 'Enter different address',
+        saveAddress: 'Save this address to my account',
+        additionalInfo: 'Additional order information (optional)',
+        additionalInfoPlaceholder: 'Description...',
+      },
+      billingAddress: {
+        loadingData: 'Loading billing data...',
+        individualCustomer: 'Individual customer',
+        company: 'Company',
+        firstName: 'First name',
+        lastName: 'Last name',
+        companyName: 'Company name',
+        vatNumber: 'VAT number',
+        phone: 'Phone number',
+        email: 'Email address',
+        subscribeNewsletter: 'Subscribe to newsletter',
+      },
+      orderSummary: {
+        title: 'Your order',
+        emptyCart: 'Your cart is empty.',
+        quantity: 'Qty:',
+      },
+      errors: {
+        orderCreationFailed: 'An error occurred while placing your order. Please try again.',
+        shippingLoadFailed: 'Failed to load shipping methods.',
+        orderCreatedNoId: 'Order created, but order ID is missing.',
+      },
+      placeOrder: 'Place order',      
     },
     thankYou: {
       pageTitle: 'Thank you for your purchase!',
