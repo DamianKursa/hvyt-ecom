@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useWishlist } from '@/context/WhishlistContext';
 import { useRouter } from 'next/router';
 import { getCurrency, Language } from '@/utils/i18n/config';
+import { getLocalizedPath } from '@/utils/i18n/routing';
 
 /** Ensures we never get NaN from parseFloat */
 const safeParse = (v: unknown): number => {
@@ -379,7 +380,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
       </div>
 
       {/* Clickable Overlay */}
-      <Link href={`/produkt/${product.slug}`} legacyBehavior>
+      <Link href={ getLocalizedPath(`/produkt/${product.slug}`) } legacyBehavior>
         <a
           className="absolute inset-0 z-10"
           aria-label={`View product ${product.name}`}
