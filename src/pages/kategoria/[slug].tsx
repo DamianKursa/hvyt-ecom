@@ -9,6 +9,12 @@ import ProductArchive from '@/components/Product/ProductArchive';
 import FiltersControls from '@/components/Filters/FiltersControls';
 import CategoryDescription from '@/components/Category/CategoryDescription.component';
 import FilterModal from '@/components/Filters/FilterModal';
+import { 
+  getPolishCategorySlug, 
+  isEnglishCategorySlug, 
+  getLocalizedCategorySlug,
+  categorySlugMapping 
+} from '@/utils/i18n/routing';
 
 interface Category {
   id: number;
@@ -28,9 +34,11 @@ interface CategoryPageProps {
   initialTotalProducts: number;
   seoData: SEOData | null;
   initialAttributes: any[];
+  lang?: string;
 }
 
 const filterOrder: Record<string, string[]> = {
+  // Polish slugs
   'uchwyty-meblowe': [
     'Rodzaj',
     'Kolor',
@@ -43,13 +51,34 @@ const filterOrder: Record<string, string[]> = {
   klamki: ['Kształt rozety', 'Kolor', 'Materiał'],
   wieszaki: ['Kolor', 'Materiał'],
   meble: ['Rodzaj', 'Wykończenie', 'Styl'],
+  galki: ['Kolor', 'Materiał'],
+  // English slugs - same filters as Polish equivalents
+  'handles': [
+    'Rodzaj',
+    'Kolor',
+    'Rozstaw',
+    'Materiał',
+    'Styl',
+    'Kolekcja',
+    'Przeznaczenie',
+  ],
+  'door-handles': ['Kształt rozety', 'Kolor', 'Materiał'],
+  'wall-hooks': ['Kolor', 'Materiał'],
+  'furniture': ['Rodzaj', 'Wykończenie', 'Styl'],
+  'knobs': ['Kolor', 'Materiał'],
 };
 
 const icons: Record<string, string> = {
+  // Polish slugs
   'uchwyty-meblowe': '/icons/uchwyty-kształty.svg',
   klamki: '/icons/klamki-kształty.svg',
   wieszaki: '/icons/wieszaki-kształty.svg',
   meble: '/images/HVYT_meble_znak graficzny_burgundy.png',
+  // English slugs
+  'handles': '/icons/uchwyty-kształty.svg',
+  'door-handles': '/icons/klamki-kształty.svg',
+  'wall-hooks': '/icons/wieszaki-kształty.svg',
+  'furniture': '/images/HVYT_meble_znak graficzny_burgundy.png',
 };
 
 const ignoredParams = new Set([
@@ -80,7 +109,17 @@ const CategoryPage = ({
   initialTotalProducts,
   seoData,
   initialAttributes,
+  lang: serverLang,
 }: CategoryPageProps) => {
+  const router = useRouter();
+  
+  // Determine current language from server prop, locale, or slug
+  const slug = Array.isArray(router.query.slug)
+    ? router.query.slug[0]
+    : router.query.slug;
+  
+  const currentLang = serverLang || (isEnglishCategorySlug(slug || '') ? 'en' : (router.locale || 'pl'));
+  
   useEffect(() => {
     console.log('🛠 CategoryPage props on mount:', {
       category,
@@ -88,12 +127,9 @@ const CategoryPage = ({
       initialTotalProducts,
       seoData,
       initialAttributes,
+      lang: currentLang,
     });
   }, []);
-  const router = useRouter();
-  const slug = Array.isArray(router.query.slug)
-    ? router.query.slug[0]
-    : router.query.slug;
 
   const seoTitle =
     seoData && seoData.yoastTitle
@@ -157,7 +193,7 @@ const CategoryPage = ({
   // Build dynamic SWR key based on filters, sorting, and page
   const buildApiEndpoint = () => {
     if (activeFilters.length > 0) {
-      return `/api/category?action=fetchProductsWithFilters&categoryId=${category.id}&lang=${router?.locale}&filters=${encodeURIComponent(
+      return `/api/category?action=fetchProductsWithFilters&categoryId=${category.id}&lang=${currentLang}&filters=${encodeURIComponent(
         JSON.stringify(activeFilters),
       )}&page=${currentPage}&perPage=12`;
     } else if (sortingOption !== 'Sortowanie') {
@@ -171,9 +207,9 @@ const CategoryPage = ({
         orderby: 'menu_order',
         order: 'asc',
       };
-      return `/api/category?action=fetchSortedProducts&categoryId=${category.id}&orderby=${sortingParams.orderby}&order=${sortingParams.order}&page=${currentPage}&perPage=12&lang=${router?.locale}`;
+      return `/api/category?action=fetchSortedProducts&categoryId=${category.id}&orderby=${sortingParams.orderby}&order=${sortingParams.order}&page=${currentPage}&perPage=12&lang=${currentLang}`;
     } else {
-      return `/api/category?action=fetchProductsByCategoryId&categoryId=${category.id}&page=${currentPage}&perPage=12&lang=${router?.locale}`;
+      return `/api/category?action=fetchProductsByCategoryId&categoryId=${category.id}&page=${currentPage}&perPage=12&lang=${currentLang}`;
     }
   };
 
@@ -381,29 +417,48 @@ const CategoryPage = ({
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const slug = context.params?.slug as string;
+  const locale = context.locale || 'pl';
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
   const wpApi =
     process.env.NEXT_PUBLIC_WP_REST_API || 'https://hvyt.pl/wp-json/wp/v2';
 
-  let categoryInfo = { id: 0, name: 'Unknown', slug };
+  // Determine language: check if slug is English or use locale
+  const isEnSlug = isEnglishCategorySlug(slug);
+  const lang = isEnSlug ? 'en' : (locale === 'en' ? 'en' : 'pl');
+  
+  // Get Polish slug for WP/WooCommerce queries (they use Polish slugs as primary)
+  const polishSlug = getPolishCategorySlug(slug);
+  
+  // Get the appropriate slug for display based on language
+  const displaySlug = getLocalizedCategorySlug(slug, lang as 'pl' | 'en');
+
+  console.log(`[kategoria/${slug}] Language: ${lang}, Polish slug: ${polishSlug}, Display slug: ${displaySlug}`);
+
+  let categoryInfo = { id: 0, name: 'Unknown', slug: displaySlug };
   let seoData: SEOData | null = null;
 
   try {
-    // Fetch the WP product_cat term by slug (includes yoast_head_json)
+    // Fetch the WP product_cat term by Polish slug (includes yoast_head_json)
+    // Add lang parameter for WPML support
+    const langParam = lang === 'en' ? '&lang=en' : '';
     const termRes = await fetch(
-      `${wpApi}/product_cat?slug=${encodeURIComponent(slug)}` +
-      `&_fields=id,name,description,yoast_head_json`,
+      `${wpApi}/product_cat?slug=${encodeURIComponent(polishSlug)}` +
+      `&_fields=id,name,description,yoast_head_json${langParam}`,
     );
 
     if (termRes.ok) {
-      const [term] = await termRes.json();
+      const terms = await termRes.json();
+      const term = terms[0];
       if (term) {
-        categoryInfo = { id: term.id, name: term.name, slug };
+        categoryInfo = { id: term.id, name: term.name, slug: displaySlug };
         seoData = {
           yoastTitle: term.yoast_head_json?.title ?? '',
           yoastDescription: term.yoast_head_json?.description ?? '',
           description: term.description ?? '',
         };
+        console.log(`[kategoria/${slug}] Found category: id=${term.id}, name=${term.name}`);
+      } else {
+        console.warn(`[kategoria/${slug}] No category found for Polish slug: ${polishSlug}`);
       }
     } else {
       console.warn(
@@ -414,7 +469,33 @@ export const getStaticProps: GetStaticProps = async (context) => {
     console.warn('Error fetching category term from WP:', err);
   }
 
-  // aggregator fetch remains the same…
+  // If we didn't find the category with Polish slug and lang=en, try without lang parameter
+  if (categoryInfo.id === 0 && lang === 'en') {
+    try {
+      const termRes = await fetch(
+        `${wpApi}/product_cat?slug=${encodeURIComponent(polishSlug)}` +
+        `&_fields=id,name,description,yoast_head_json`,
+      );
+
+      if (termRes.ok) {
+        const terms = await termRes.json();
+        const term = terms[0];
+        if (term) {
+          categoryInfo = { id: term.id, name: term.name, slug: displaySlug };
+          seoData = {
+            yoastTitle: term.yoast_head_json?.title ?? '',
+            yoastDescription: term.yoast_head_json?.description ?? '',
+            description: term.description ?? '',
+          };
+          console.log(`[kategoria/${slug}] Found category (fallback): id=${term.id}, name=${term.name}`);
+        }
+      }
+    } catch (err) {
+      console.warn('Error fetching category term from WP (fallback):', err);
+    }
+  }
+
+  // aggregator fetch with lang parameter
   let aggregatorData = {
     category: categoryInfo,
     products: [] as any[],
@@ -424,34 +505,57 @@ export const getStaticProps: GetStaticProps = async (context) => {
   try {
     const aggRes = await fetch(
       `${baseUrl}/api/category-aggregator` +
-      `?slug=${encodeURIComponent(slug)}` +
-      `&page=1&perPage=12`,
+      `?slug=${encodeURIComponent(polishSlug)}` +
+      `&page=1&perPage=12&lang=${lang}`,
     );
-    if (aggRes.ok) aggregatorData = await aggRes.json();
-    else console.error('Aggregator fetch failed:', await aggRes.text());
+    if (aggRes.ok) {
+      aggregatorData = await aggRes.json();
+      // Override slug in category to use display slug
+      if (aggregatorData.category) {
+        aggregatorData.category.slug = displaySlug;
+      }
+      console.log(`[kategoria/${slug}] Aggregator returned ${aggregatorData.products?.length || 0} products, category id: ${aggregatorData.category?.id}`);
+    } else {
+      console.error('Aggregator fetch failed:', await aggRes.text());
+    }
   } catch (err) {
     console.error('Aggregator fetch error:', err);
   }
 
+  // Use aggregator category if we have a valid one, otherwise use our fetched one
+  const finalCategory = aggregatorData.category?.id ? aggregatorData.category : categoryInfo;
+  // Ensure display slug is correct
+  finalCategory.slug = displaySlug;
+
   return {
     props: {
-      category: categoryInfo,
+      category: finalCategory,
       initialProducts: aggregatorData.products,
       initialTotalProducts: aggregatorData.totalProducts,
       initialAttributes: aggregatorData.attributes,
-      seoData, // now never contains undefined
+      seoData,
+      lang, // Pass language to the component
     },
     revalidate: 21600,
   };
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
+  // Include both Polish and English slugs for all categories
   const paths = [
+    // Polish slugs
     { params: { slug: 'uchwyty-meblowe' } },
     { params: { slug: 'klamki' } },
     { params: { slug: 'wieszaki' } },
     { params: { slug: 'meble' } },
+    { params: { slug: 'galki' } },
     { params: { slug: 'sale' } },
+    // English slugs
+    { params: { slug: 'handles' } },
+    { params: { slug: 'door-handles' } },
+    { params: { slug: 'wall-hooks' } },
+    { params: { slug: 'furniture' } },
+    { params: { slug: 'knobs' } },
   ];
 
   return {

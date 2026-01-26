@@ -17,31 +17,14 @@ const slugMap: Record<string, { pl: string; en: string }> = {
   'galki': { pl: 'galki', en: 'knobs' },
   'meble': { pl: 'meble', en: 'furniture' },
   
-  // Cart & Checkout
-  'koszyk': { pl: 'koszyk', en: 'cart' },
-  'checkout': { pl: 'checkout', en: 'checkout' },
-  'dziekujemy': { pl: 'dziekujemy', en: 'thank-you' },
-  'zamowienie-otrzymane': { pl: 'zamowienie-otrzymane', en: 'order-received' },
-  
-  // Auth & Account
-  'logowanie': { pl: 'logowanie', en: 'login' },
-  'zapomniane-haslo': { pl: 'zapomniane-haslo', en: 'forgot-password' },
-  'aktywacja-konta': { pl: 'aktywacja-konta', en: 'account-activation' },
-  'potwierdzenie-email': { pl: 'potwierdzenie-email', en: 'email-confirmation' },
-  'moje-konto': { pl: 'moje-konto', en: 'my-account' },
-  'ulubione': { pl: 'ulubione', en: 'wishlist' },
-  
-  // Static Pages
+  // Pages
   'o-nas': { pl: 'o-nas', en: 'about-us' },
   'kontakt': { pl: 'kontakt', en: 'contact' },
   'wspolpraca': { pl: 'wspolpraca', en: 'cooperation' },
   'dostawa': { pl: 'dostawa', en: 'delivery' },
   'zwroty-i-reklamacje': { pl: 'zwroty-i-reklamacje', en: 'returns-and-complaints' },
-  'wygodne-zwroty': { pl: 'wygodne-zwroty', en: 'easy-returns' },
   'regulamin': { pl: 'regulamin', en: 'terms' },
   'polityka-prywatnosci': { pl: 'polityka-prywatnosci', en: 'privacy-policy' },
-  
-  // Content
   'kolekcje': { pl: 'kolekcje', en: 'collections' },
   'blog': { pl: 'blog', en: 'blog' },
 };
@@ -54,6 +37,58 @@ Object.keys(slugMap).forEach((key) => {
   const mapping = slugMap[key];
   reverseSlugMap[mapping.en] = key;
 });
+
+/**
+ * Category slug mapping: PL ↔ EN for category pages
+ * Used primarily for server-side rendering and API calls
+ */
+export const categorySlugMapping: Record<string, { pl: string; en: string }> = {
+  'uchwyty-meblowe': { pl: 'uchwyty-meblowe', en: 'handles' },
+  'handles': { pl: 'uchwyty-meblowe', en: 'handles' },
+  'klamki': { pl: 'klamki', en: 'door-handles' },
+  'door-handles': { pl: 'klamki', en: 'door-handles' },
+  'wieszaki': { pl: 'wieszaki', en: 'wall-hooks' },
+  'wall-hooks': { pl: 'wieszaki', en: 'wall-hooks' },
+  'galki': { pl: 'galki', en: 'knobs' },
+  'knobs': { pl: 'galki', en: 'knobs' },
+  'meble': { pl: 'meble', en: 'furniture' },
+  'furniture': { pl: 'meble', en: 'furniture' },
+  'sale': { pl: 'sale', en: 'sale' },
+};
+
+/**
+ * Get Polish slug from any slug (PL or EN)
+ * Used for fetching data from WooCommerce which uses Polish slugs
+ */
+export const getPolishCategorySlug = (slug: string): string => {
+  const mapping = categorySlugMapping[slug];
+  return mapping ? mapping.pl : slug;
+};
+
+/**
+ * Get English slug from any slug (PL or EN)
+ */
+export const getEnglishCategorySlug = (slug: string): string => {
+  const mapping = categorySlugMapping[slug];
+  return mapping ? mapping.en : slug;
+};
+
+/**
+ * Check if a slug is an English category slug
+ */
+export const isEnglishCategorySlug = (slug: string): boolean => {
+  const mapping = categorySlugMapping[slug];
+  return mapping ? mapping.en === slug && mapping.pl !== slug : false;
+};
+
+/**
+ * Get localized category slug based on language
+ */
+export const getLocalizedCategorySlug = (slug: string, lang: Language): string => {
+  const mapping = categorySlugMapping[slug];
+  if (!mapping) return slug;
+  return lang === 'en' ? mapping.en : mapping.pl;
+};
 
 /**
  * Check if we're in multi-domain mode (production: hvyt.pl / hvyt.eu)

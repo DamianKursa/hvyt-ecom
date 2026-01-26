@@ -316,6 +316,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           />
                         </Link>
                       )}
+                      <LanguageSwitcher />
                       <button onClick={toggleMobileMenu}>
                         <img
                           src={
@@ -416,6 +417,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           />
                         </Link>
                       )}
+                      <LanguageSwitcher />
                     </div>
                   )}
                 </div>
@@ -432,7 +434,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                 </div>
               )}
           </div>
-        </nav><LanguageSwitcher />
+        </nav>
       </header>
 
       {searchOpen && <SearchComponent onClose={toggleSearch} />}
