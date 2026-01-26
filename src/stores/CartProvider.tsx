@@ -46,6 +46,11 @@ export interface Product {
     canonical?: string;
     [key: string]: any;
   };
+  // Pola walutowe - zachowują oryginalną walutę produktu przy dodaniu do koszyka
+  // WAŻNE: Te pola NIE powinny być nadpisywane przez syncCartPricesFromServer
+  currency?: string;        // np. 'PLN', 'EUR'
+  currencySymbol?: string;  // np. 'zł', '€'
+  lang?: string;            // np. 'pl', 'en' - język w którym produkt został dodany
 }
 
 export interface Coupon {
@@ -200,6 +205,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       );
 
       if (existingProduct) {
+        // Zwiększ ilość, ale NIE zmieniaj waluty ani ceny jednostkowej
+        // Cena i waluta pozostają takie jak przy pierwszym dodaniu
         existingProduct.qty += product.qty;
         existingProduct.totalPrice += product.totalPrice;
       } else {
@@ -222,6 +229,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
               return Number.isFinite(rp) && Number.isFinite(sp) && sp > 0 && sp < rp;
             })(),
           availableStock: typeof product.availableStock !== 'undefined' ? product.availableStock : Number((product as any).stock_quantity ?? 0),
+          // Pola walutowe są zachowywane przez spread operator powyżej
+          // WAŻNE: currency, currencySymbol, lang nie powinny być nadpisywane
         });
       }
 
@@ -269,7 +278,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       );
       if (!chosen) return prev; // safety
 
-      // 4 build the *new* cart line
+      // 4 build the *new* cart line
+      // WAŻNE: Zachowujemy oryginalne pola walutowe (currency, currencySymbol, lang)
+      // poprzez spread ...oldItem - cena wariantu jest w tej samej walucie
       const newItem: Product = {
         ...oldItem,
         cartKey: String(chosen.id),      // <- new key
@@ -288,6 +299,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
           ...oldItem.attributes,
           [attributeName]: newValue,
         },
+        // Pola walutowe zachowane przez spread ...oldItem powyżej
       };
 
       // 5 replace the array element

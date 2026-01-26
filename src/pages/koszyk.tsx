@@ -8,14 +8,12 @@ import Link from 'next/link';
 import Bestsellers from '@/components/Index/Bestsellers.component';
 import { pushGTMEvent } from '@/utils/gtm';
 import axios from 'axios';
-import { useI18n } from '@/utils/hooks/useI18n';
 
 const Koszyk: React.FC = () => {
   const { cart, updateCartItem, removeCartItem, updateCartItemPrice } = useContext(CartContext);
   const [mounted, setMounted] = useState(false);
   const [variationMessage, setVariationMessage] = useState<string | null>(null);
   const [cartErrorMessage, setCartErrorMessage] = useState<string | null>(null);
-  const { t, getPath } = useI18n();
 
   // Helpers to compute real stock for the currently selected variant (based on cart item attributes)
   const normalize = (s: unknown) =>
@@ -67,40 +65,35 @@ const Koszyk: React.FC = () => {
     return Number.isFinite(n) ? n : NaN;
   };
 
+  /**
+   * UWAGA: Synchronizacja cen z serwera została WYŁĄCZONA dla wielojęzyczności.
+   * 
+   * Problem: Poprzednia implementacja pobierała ceny z API bez parametru `lang`,
+   * co powodowało nadpisywanie cen EUR na PLN (domyślne dla serwera).
+   * 
+   * Przykład: Produkt dodany w EN (7 EUR) był aktualizowany do 29 PLN,
+   * ponieważ API zwracało ceny w domyślnej walucie (PLN).
+   * 
+   * Rozwiązanie: Ceny produktów są już poprawne w momencie dodania do koszyka
+   * (zapisane z właściwą walutą i językiem w polach currency, currencySymbol, lang).
+   * NIE powinny być automatycznie aktualizowane, ponieważ każdy produkt może być
+   * w innej walucie.
+   * 
+   * Jeśli w przyszłości potrzebna będzie synchronizacja cen, należy:
+   * 1. Przekazać `lang` z każdego produktu do API
+   * 2. NIE nadpisywać pól currency, currencySymbol, lang
+   * 3. Aktualizować tylko dostępność/stan magazynowy
+   */
   const syncCartPricesFromServer = async (): Promise<void> => {
-    if (!cart || !Array.isArray(cart.products) || cart.products.length === 0) return;
-
-    const items = cart.products.map((p: Product) => ({
-      cartKey: p.cartKey,
-      productId: (p as any).productId ?? p.productId,
-      variationId: (p as any).variationId ?? undefined,
-      slug: (p as any).slug ?? undefined,
-    }));
-
-    try {
-      const resp = await axios.post('/api/woocommerce?action=batchFetchPrices', { items });
-      const updates = Array.isArray(resp.data?.updates) ? resp.data.updates : [];
-      updates.forEach((u: any) => {
-        const target = cart.products.find((x: Product) => x.cartKey === u.cartKey);
-        if (!target) return;
-        const serverPrice = toNum(u?.price ?? u?.sale_price ?? u?.regular_price);
-        if (!Number.isFinite(serverPrice)) return;
-        if (Math.abs(serverPrice - target.price) > 0.009) {
-          updateCartItemPrice(u.cartKey, serverPrice, {
-            regular_price: u?.regular_price,
-            sale_price: u?.sale_price,
-            on_sale: !!u?.on_sale,
-          });
-        }
-      });
-    } catch (e) {
-      console.error('Silent batch price sync failed', e);
-    }
+    // WYŁĄCZONE - ceny nie są synchronizowane aby zachować wielojęzyczność
+    // Ceny zostały zapisane z poprawnymi walutami przy dodaniu do koszyka
+    console.log('[Cart] Price sync disabled for multi-currency support');
+    return;
   };
 
   useEffect(() => {
-    // silently refresh prices when user enters the cart or when items change
-    syncCartPricesFromServer();
+    // Sync wyłączony - zachowujemy oryginalne ceny z momentu dodania produktu
+    // syncCartPricesFromServer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart?.products?.length]);
 
@@ -132,14 +125,14 @@ const Koszyk: React.FC = () => {
 
   useEffect(() => {
     if (invalidItems.length > 0) {
-      const names = invalidItems.map((p: Product) => `„${p.name}"`).join(', ');
-      setCartErrorMessage(`${t.cart.errors.variantUnavailable.split('.')[0]}: ${names}.`);
+      const names = invalidItems.map((p: Product) => `„${p.name}”`).join(', ');
+      setCartErrorMessage(`Niektóre pozycje są niedostępne lub przekraczają stan: ${names}. Zmień wariant lub ilość, aby kontynuować.`);
     } else if (cartErrorMessage) {
       setCartErrorMessage(null);
     }
-  }, [invalidItems, t]);
+  }, [invalidItems]);
 
-  if (!mounted) return <div>{t.common.loading}</div>;
+  if (!mounted) return <div>Loading...</div>;
 
   const handleIncreaseQuantity = (product: Product) => {
     const currentStock = computeAvailableStock(product);
@@ -147,16 +140,16 @@ const Koszyk: React.FC = () => {
     if (currentStock <= 0) {
       const hasVariations = Array.isArray(((product as any).baselinker_variations) || []) && ((product as any).baselinker_variations || []).length > 0;
       if (hasVariations) {
-        setCartErrorMessage(t.cart.errors.variantUnavailable.replace('{name}', product.name));
+        setCartErrorMessage(`Wariant wybrany dla "${product.name}" jest niedostępny. Zmień wariant, aby kontynuować.`);
       } else {
-        setCartErrorMessage(t.cart.errors.outOfStock);
+        setCartErrorMessage(`Produkt "${product.name}" jest niedostępny.`);
       }
       return;
     }
 
     if (product.qty >= currentStock) {
       console.log(`Reached maximum stock for ${product.name}`);
-      setCartErrorMessage(t.cart.errors.maxQuantity.replace('{count}', String(currentStock)));
+      setCartErrorMessage(`Nie można dodać więcej niż ${currentStock} szt. dla "${product.name}".`);
       return;
     }
 
@@ -207,7 +200,7 @@ const Koszyk: React.FC = () => {
   const isCartEmpty = !cart || cart.products.length === 0;
 
   return (
-    <Layout title={t.cart.pageTitle}>
+    <Layout title="Hvyt | Koszyk">
       <section className="container mx-auto px-4 md:px-0">
         {isCartEmpty ? (
           <div className="mt-[64px] md:mt-0 rounded-[25px] py-[90px] bg-white p-8 shadow-sm flex flex-col items-center justify-center">
@@ -217,23 +210,23 @@ const Koszyk: React.FC = () => {
               className="w-28 h-28 mb-4"
             />
             <h2 className="text-[18px] md:text-[28px] font-semibold mb-4 text-black">
-              {t.cart.emptyCart.title}
+              Twój koszyk jest pusty
             </h2>
             <p className="text-[18px] text-black text-center font-light mb-6">
-              {t.cart.emptyCart.description}
+              Znajdź produkt w naszym sklepie, który wyróżni Twoje wnętrze!
             </p>
             <div className="flex gap-4">
               <Link
-                href={getPath('/kategoria/uchwyty-meblowe')}
+                href="/kategoria/uchwyty-meblowe"
                 className="px-10 md:px-16 py-3 bg-black text-white rounded-full text-sm font-[16px]"
               >
-                {t.cart.emptyCart.handlesButton}
+                Uchwyty
               </Link>
               <Link
-                href={getPath('/')}
+                href="/"
                 className="px-6 md:px-16 py-3 border border-black text-black rounded-full text-sm font-medium"
               >
-                {t.cart.emptyCart.homeButton}
+                Strona Główna
               </Link>
             </div>
           </div>
@@ -261,7 +254,7 @@ const Koszyk: React.FC = () => {
                 onDecreaseQuantity={handleDecreaseQuantity}
                 onRemoveItem={handleRemoveItem}
                 onVariationChange={(name: string) => {
-                  setVariationMessage(t.cart.messages.variationChanged.replace('{name}', name));
+                  setVariationMessage(`Rozstaw produktu ${name} został zmieniony`);
                   setCartErrorMessage(null);
                 }}
               />
@@ -276,8 +269,8 @@ const Koszyk: React.FC = () => {
 
         <div className="mt-16">
           <Bestsellers
-            title={t.cart.recommendations.title}
-            description={t.cart.recommendations.description}
+            title="Produkty, które mogą Ci się spodobać"
+            description="Sprawdź produkty, które idealnie pasują z wybranym produktem."
           />
         </div>
       </section>

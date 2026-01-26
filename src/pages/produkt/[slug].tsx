@@ -488,6 +488,11 @@ console.log('currentprod', product);
         });
       });
     });
+    // Zapisz informacje o walucie z aktualnego locale
+    // WAŻNE: Te pola są kluczowe dla poprawnego wyświetlania cen w koszyku
+    const currentLang = router?.locale || 'pl';
+    const currentCurrency = getCurrency(currentLang as Language);
+
     const cartItem: Product = {
       cartKey: selectedVariation?.id || product.id.toString(),
       name: product.name,
@@ -506,7 +511,10 @@ console.log('currentprod', product);
       variationOptions,
       baselinker_variations: product.baselinker_variations,
       availableStock,
-
+      // Pola walutowe - zachowują oryginalną walutę z momentu dodania
+      currency: currentCurrency.code,      // 'PLN' lub 'EUR'
+      currencySymbol: currentCurrency.symbol, // 'zł' lub '€'
+      lang: currentLang,                   // 'pl' lub 'en'
     };
 
     addCartItem(cartItem);
@@ -515,7 +523,7 @@ console.log('currentprod', product);
     (window as any).window.dataLayer?.push({
       event: 'add_to_cart',
       ecommerce: {
-        currency: 'PLN',
+        currency: currentCurrency.code,
         value: cartItem.totalPrice,
         items: [
           {

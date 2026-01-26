@@ -10,6 +10,12 @@ export interface Translations {
     category: string,
     product: string,
   },
+  product: {  
+  notAvailableInLanguage: string;  
+  notAvailableDescription: string;  
+  backToHome: string;  
+  loading: string;  
+},
   serviceInfo: {
     freeShipping: { title: string; desc: string };
     shipping24h: { title: string; desc: string };
@@ -88,6 +94,7 @@ export interface Translations {
     noData: string;
     poland: string;
     countryRegion: string;
+    backToHome: string;
   };
   cart: {
     pageTitle: string;
@@ -321,6 +328,12 @@ const translations: Record<Language, Translations> = {
       category: 'kategoria',
       product: 'produkt',
     },
+    product: {  
+      notAvailableInLanguage: 'Produkt niedostępny w tym języku',  
+      notAvailableDescription: 'Niestety ten produkt nie jest dostępny w wybranej wersji językowej...',  
+      backToHome: 'Wróć do strony głównej',  
+      loading: 'Ładowanie produktu...',  
+    },
     serviceInfo: {
       freeShipping: {
         title: 'Darmowa dostawa',
@@ -411,6 +424,7 @@ const translations: Record<Language, Translations> = {
       noData: 'Brak danych',
       poland: 'Polska',
       countryRegion: 'Kraj / Region',
+      backToHome: 'Wróć do strony głównej',
     },
     cart: {
       pageTitle: 'Hvyt | Koszyk',
@@ -642,6 +656,12 @@ const translations: Record<Language, Translations> = {
       category: 'category',
       product: 'product',
     },
+    product: {  
+      notAvailableInLanguage: 'Product not available in this language',  
+      notAvailableDescription: 'Unfortunately, this product is not available in the selected language version...',  
+      backToHome: 'Back to homepage',  
+      loading: 'Loading product...',  
+    },
     serviceInfo: {
       freeShipping: {
         title: 'Free shipping',
@@ -732,6 +752,7 @@ const translations: Record<Language, Translations> = {
       noData: 'No data',
       poland: 'Poland',
       countryRegion: 'Country / Region',
+      backToHome: 'Back to homepage',
     },
     cart: {
       pageTitle: 'Hvyt | Cart',
