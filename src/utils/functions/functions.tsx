@@ -250,3 +250,8 @@ export const normalizeString = (text: string): string => {
     .replace(/[ąćęłńóśźż]/g, (char) => polishMap[char] || char)
     .replace(/\s+/g, '-');
 };
+
+
+export const deepCopy = (obj: any) : any => {
+  return JSON.parse(JSON.stringify(obj));
+}

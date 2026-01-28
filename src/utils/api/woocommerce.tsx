@@ -78,7 +78,7 @@ export const fetchProductById = async (id: number | string, lang: string) => {
     const currency = getCurrencySlugByLocale(lang) ?? '';
 
     const response = await WooCommerceAPI.get(`/products/${id}`, {
-      params: { ts: Date.now(), currency },
+      params: { ts: Date.now(), currency, lang },
       timeout: 5000,
     });
 

@@ -1,7 +1,9 @@
 // CartProvider.tsx
-import { getCurrency, Language } from '@/utils/i18n/config';
-import { useRouter } from 'next/router';
-import React, { createContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { getCurrencyByLocale } from '@/config/currencies';
+import { deepCopy } from '@/utils/functions/functions';
+import { getCurrentLanguage, Language } from '@/utils/i18n/config';
+import { log } from 'console';
+import React, { createContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 
 export interface Category {
   id: number;
@@ -46,11 +48,10 @@ export interface Product {
     canonical?: string;
     [key: string]: any;
   };
-  // Pola walutowe - zachowują oryginalną walutę produktu przy dodaniu do koszyka
-  // WAŻNE: Te pola NIE powinny być nadpisywane przez syncCartPricesFromServer
-  currency?: string;        // np. 'PLN', 'EUR'
-  currencySymbol?: string;  // np. 'zł', '€'
-  lang?: string;            // np. 'pl', 'en' - język w którym produkt został dodany
+  // Currency and language tracking for multi-language support
+  currency?: string;
+  currencySymbol?: string;
+  lang?: Language;
 }
 
 export interface Coupon {
@@ -94,6 +95,7 @@ interface CartContextProps {
     newUnitPrice: number,
     extras?: { regular_price?: number | string; sale_price?: number | string; on_sale?: boolean }
   ) => void;
+  isUpdatingTranslations: boolean;
 }
 
 const STORAGE_KEY = 'woocommerce-cart';
@@ -137,15 +139,18 @@ export const CartContext = createContext<CartContextProps>({
   applyCoupon: () => { },
   removeCoupon: () => { },
   updateCartItemPrice: () => { },
+  isUpdatingTranslations: false,
 });
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [cart, setCart] = useState<Cart>(() => createEmptyCart());
+  const [isUpdatingTranslations, setIsUpdatingTranslations] = useState(false);
+  const prevLanguageRef = useRef<Language | null>(null);
 
-  const router = useRouter();
-  const currency = getCurrency(router?.locale as Language ?? 'pl');
+  // const router = useRouter();
+  const currentLanguage: Language = getCurrentLanguage();
 
   const recalculateCartTotals = useCallback((updatedCart: Cart): Cart => {
     const totalProductsPrice = updatedCart.products.reduce(
@@ -197,6 +202,111 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
   }, [cart]);
 
+  /**
+   * Update cart product translations when language changes
+   * IMPORTANT: Only updates translatable fields (name, description, attributes, images)
+   * PRESERVES: price, regular_price, sale_price, currency, currencySymbol, lang (original purchase values)
+   */
+  const updateCartProductTranslations = useCallback(async (newLanguage: Language) => {
+    if (cart.products.length === 0) return;
+    
+    setIsUpdatingTranslations(true);
+
+    // setCart( prev => {
+    //   const newCart = {...prev};
+
+    //   return recalculateCartTotals(newCart);
+    // });
+    
+    const newCart: Cart = { ...cart };
+    
+    try {
+      const updatedProducts = await Promise.all(
+        newCart.products.map(async (item) => {
+          try {
+            // Fetch product in new language
+
+            // get product slugs and ids for all languages
+            const productMultilangIdsResponse = await fetch(`/api/product?idmultilang=${item.productId}`);
+            
+            if (!productMultilangIdsResponse.ok) {
+              throw new Error('No product id found');
+            }
+
+            const productMultilangIds = await productMultilangIdsResponse.json();
+            const translatedProductId = productMultilangIds?.ids[newLanguage] ? productMultilangIds?.ids[newLanguage] : item.productId;
+
+            const response = await fetch(
+              `/api/product?id=${translatedProductId}&lang=${newLanguage}`
+            );
+            
+            if (!response.ok) {
+              console.error(`Failed to fetch translation for product ${item.productId}`);
+              return item; // Keep original product on error
+            }
+            
+            const translatedProduct = await response.json();
+
+            // Return updated product with translated fields only
+            // IMPORTANT: Preserve original price and currency data!
+            
+            return {
+              ...item,
+              name: translatedProduct.name || item.name,
+              short_description: translatedProduct.short_description || item.short_description,
+              attributes: item.attributes, // deepCopy(translatedProduct.attributes),
+              // Update images only if different
+              image: translatedProduct.images?.[0]?.src || item.image,              
+
+              price: translatedProduct.price,
+              regular_price: translatedProduct.regular_price,
+              sale_price: translatedProduct.sale_price,
+              totalPrice: translatedProduct.price * item.qty,
+              currency: translatedProduct.currency || getCurrencyByLocale(newLanguage)?.name,
+              currencySymbol: translatedProduct.currencySymbol || getCurrencyByLocale(newLanguage)?.symbol,
+              lang: translatedProduct.lang,
+
+              on_sale: translatedProduct.on_sale,
+              availableStock: translatedProduct.availableStock,
+              variationId: translatedProduct.variationId,
+              baselinker_variations: translatedProduct.baselinker_variations,
+              variationOptions: translatedProduct.variationOptions,
+            }
+          } catch (error) {
+            console.error(`Failed to update product ${item.productId}:`, error);
+            return item; // Keep original product on error
+          }
+        })
+      );
+      
+      //add updated products back to cart
+      newCart.products = updatedProducts;
+
+      setCart(recalculateCartTotals(newCart));
+      
+    } catch (error) {
+      console.error('Failed to update cart translations:', error);
+    } finally {
+      setIsUpdatingTranslations(false);
+    }
+  }, [cart.products]);
+
+  // Listen for language changes and update cart product translations
+  useEffect(() => {
+    // Skip on initial mount
+    if (prevLanguageRef.current === null) {
+      prevLanguageRef.current = currentLanguage;
+      return;
+    }
+    
+    // Only update if language actually changed
+    if (prevLanguageRef.current !== currentLanguage && cart.products.length > 0 && !isUpdatingTranslations) {
+      prevLanguageRef.current = currentLanguage;
+      updateCartProductTranslations(currentLanguage);
+    }
+  // }, [currentLanguage]);
+  }, [currentLanguage, cart.products.length, isUpdatingTranslations, updateCartProductTranslations]);
+
   const addCartItem = (product: Product) => {
     setCart((prevCart) => {
       const updatedCart = { ...prevCart };
@@ -205,8 +315,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       );
 
       if (existingProduct) {
-        // Zwiększ ilość, ale NIE zmieniaj waluty ani ceny jednostkowej
-        // Cena i waluta pozostają takie jak przy pierwszym dodaniu
         existingProduct.qty += product.qty;
         existingProduct.totalPrice += product.totalPrice;
       } else {
@@ -229,8 +337,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
               return Number.isFinite(rp) && Number.isFinite(sp) && sp > 0 && sp < rp;
             })(),
           availableStock: typeof product.availableStock !== 'undefined' ? product.availableStock : Number((product as any).stock_quantity ?? 0),
-          // Pola walutowe są zachowywane przez spread operator powyżej
-          // WAŻNE: currency, currencySymbol, lang nie powinny być nadpisywane
         });
       }
 
@@ -278,9 +384,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       );
       if (!chosen) return prev; // safety
 
-      // 4 build the *new* cart line
-      // WAŻNE: Zachowujemy oryginalne pola walutowe (currency, currencySymbol, lang)
-      // poprzez spread ...oldItem - cena wariantu jest w tej samej walucie
+      // 4 build the *new* cart line
       const newItem: Product = {
         ...oldItem,
         cartKey: String(chosen.id),      // <- new key
@@ -299,7 +403,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
           ...oldItem.attributes,
           [attributeName]: newValue,
         },
-        // Pola walutowe zachowane przez spread ...oldItem powyżej
       };
 
       // 5 replace the array element
@@ -394,6 +497,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         applyCoupon,
         removeCoupon,
         updateCartItemPrice,
+        isUpdatingTranslations,
       }}
     >
       {children}

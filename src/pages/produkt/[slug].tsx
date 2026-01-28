@@ -26,9 +26,10 @@ import { useForm, FormProvider } from 'react-hook-form';
 import Head from 'next/head';
 import LowestPriceInfo from '@/components/SingleProduct/LowestPriceInfo';
 import { pushGTMEvent } from '@/utils/gtm';
-import { getCurrency, Language } from '@/utils/i18n/config';
+import { getCurrency, getCurrentLanguage, Language } from '@/utils/i18n/config';
 import { WooProductIds } from '@/types/woocommerce';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { get } from 'lodash';
 
 const NajczęściejKupowaneRazem = dynamic(
   () => import('@/components/Product/CrossSell'),
@@ -161,11 +162,11 @@ console.log('currentprod', product);
         // verify current slug matches current locale, else redirect to correct lang version
         if(router?.locale && typeof router.locale === 'string') {
           
-          const locale = router.locale as string;
+          const lang = getCurrentLanguage();
 
-          if(typeof productIdData.slugs[locale] !== 'undefined') {            
-            if(slug !== productIdData.slugs[locale]) {
-              router.push(`/${t.slugs.product}/${productIdData.slugs[locale]}`);
+          if(typeof productIdData.slugs[lang] !== 'undefined') {            
+            if(slug !== productIdData.slugs[lang]) {
+              router.push(`/${t.slugs.product}/${productIdData.slugs[lang]}`);
               return;
             } 
           } else {
@@ -173,8 +174,8 @@ console.log('currentprod', product);
             return
           }
 
-          if(productIdData.ids[locale]) {
-            productId = productIdData.ids[locale];
+          if(productIdData.ids[lang]) {
+            productId = productIdData.ids[lang];
           } else {
             router.push('/404');
             return;
@@ -490,7 +491,7 @@ console.log('currentprod', product);
     });
     // Zapisz informacje o walucie z aktualnego locale
     // WAŻNE: Te pola są kluczowe dla poprawnego wyświetlania cen w koszyku
-    const currentLang = router?.locale || 'pl';
+    const currentLang = getCurrentLanguage();
     const currentCurrency = getCurrency(currentLang as Language);
 
     const cartItem: Product = {

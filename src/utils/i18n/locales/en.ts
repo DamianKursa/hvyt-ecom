@@ -112,6 +112,17 @@ export const en: Translations = {
     },
     cart: {
       pageTitle: 'Hvyt | Cart',
+      updatingTranslations: 'Updating translations...',
+      title: 'Cart',
+      emptyCartMessage: 'Your cart is empty',
+      continueShopping: 'Continue shopping',
+      total: 'Total',
+      subtotal: 'Subtotal',
+      shipping: 'Shipping',
+      proceedToCheckout: 'Proceed to checkout',
+      removeItem: 'Remove',
+      quantity: 'Quantity',
+      priceNote: 'Price in purchase currency',      
       emptyCart: {
         title: 'Your cart is empty',
         description: 'Find a product in our store that will make your interior stand out!',

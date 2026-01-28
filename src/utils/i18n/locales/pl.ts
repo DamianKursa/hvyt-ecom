@@ -110,6 +110,17 @@ export const pl = {
     },
     cart: {
       pageTitle: 'Hvyt | Koszyk',
+      updatingTranslations: 'Aktualizowanie tłumaczeń...',
+      title: 'Koszyk',
+      emptyCartMessage: 'Twój koszyk jest pusty',
+      continueShopping: 'Kontynuuj zakupy',
+      total: 'Razem',
+      subtotal: 'Suma częściowa',
+      shipping: 'Dostawa',
+      proceedToCheckout: 'Przejdź do kasy',
+      removeItem: 'Usuń',
+      quantity: 'Ilość',
+      priceNote: 'Cena w walucie zakupu',      
       emptyCart: {
         title: 'Twój koszyk jest pusty',
         description: 'Znajdź produkt w naszym sklepie, który wyróżni Twoje wnętrze!',
@@ -332,6 +343,7 @@ export const pl = {
         loadingError: 'Nie udało się załadować zamówienia.',
       },
     },
+    
   };
 
 /**

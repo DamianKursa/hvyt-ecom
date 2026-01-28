@@ -10,32 +10,21 @@ const WooCommerceAPI = axios.create({
   },
 });
 
-interface Attribute {
-  id: number;
-  name: string;
-}
-interface MediaItem {
-  id: number;
-  source_url: string;
-}
+// Fetch product ids and slugs in all languages
+export const fetchProductMultilangIds = async (id: number | string) => {
+  try {
 
-// export const fetchCategoryBySlug = async (slug: string) => {
-//   try {
-//     const response = await WooCommerceAPI.get('/products/categories', {
-//       params: {
-//         slug,
-//         per_page: 50,
-//       },
-//     });
-//     if (response.data.length === 0) {
-//       throw new Error('Category not found');
-//     }
-//     return response.data[0];
-//   } catch (error) {
-//     console.error('Error fetching category:', error);
-//     throw error;
-//   }
-// };
+    const response = await WooCommerceAPI.get(`/product-multilang`, {
+      params: { ts: Date.now(), id },
+      timeout: 5000,
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching multilang product ids:', error);
+    throw error;
+  }
+};
 
 // Fetch product id by slug
 export const fetchProductIdBySlug = async (slug: string) => {

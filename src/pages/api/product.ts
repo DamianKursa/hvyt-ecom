@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { fetchProductById, fetchProductBySlug } from '../../utils/api/woocommerce';
 import { getCache, setCache } from '../../lib/cache';
-import { fetchProductIdBySlug } from '@/utils/api/woocommerce_custom';
+import { fetchProductIdBySlug, fetchProductMultilangIds } from '@/utils/api/woocommerce_custom';
 
 const STATIC_TTL = 21600; // Cache static data for 6 hours
 
@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
   
-  const { slug, idbyslug, id, lang } = req.query;
+  const { slug, idbyslug, idmultilang, id, lang } = req.query;
 
   // PRODUCT BY SLUG
   if( (slug && typeof slug === 'string') || (id && typeof id === 'string') ) {
@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
 
       // Attempt to retrieve cached static data
-      const cacheKey = `staticProductData:${slug + '-' + id}`;
+      const cacheKey = `staticProductData:${lang}:${slug}:${id}`;
       let cachedStaticData = await getCache(cacheKey);
       if (!cachedStaticData) {
         // Cache static data if not available
@@ -71,9 +71,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       console.error('Error fetching product ID by slug:', error);
       res.status(500).json({ error: 'Error loading product data' });
     }
+  }
+
+  // PRODUCT MULTILANG IDS
+  else if( idmultilang && typeof idmultilang === 'string' ) {
+    try {
+      // Fetch full product data from WooCommerce
+      const productMultilangIds = await fetchProductMultilangIds(idmultilang);
+      
+      if (!productMultilangIds) {
+        return res.status(404).json({ error: 'Product multilang IDs not found' });
+      }
+
+      res.status(200).json(productMultilangIds);
+    } catch (error) {
+      console.error('Error fetching product multilang IDs:', error);
+      res.status(500).json({ error: 'Error loading product multilang data' });
+    }
   }  else {
     res.status(400).json({ error: 'Invalid slug or id' });
     return;
   }
-
 }
