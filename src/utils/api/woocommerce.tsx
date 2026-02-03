@@ -344,13 +344,14 @@ export const fetchCrossSellProducts = async (productId: string) => {
   }
 };
 
-export const searchProducts = async (query: string, perPage = 10) => {
+export const searchProducts = async (query: string, perPage = 10, lang: string) => {
   try {
     const response = await WooCommerceAPI.get('/products', {
       params: {
         search: query,
         per_page: perPage,
         status: 'publish',
+        lang: lang
       },
     });
 

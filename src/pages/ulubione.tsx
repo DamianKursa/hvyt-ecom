@@ -2,18 +2,20 @@ import { useWishlist } from '@/context/WhishlistContext';
 import ProductPreview from '@/components/Product/ProductPreview.component';
 import React from 'react';
 import Layout from '@/components/Layout/Layout.component';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const WishlistPage = () => {
+  const { t } = useI18n();
   const { wishlist, removeFromWishlist } = useWishlist();
 
   return (
-    <Layout title="Ulubione">
+    <Layout title={t.wishlist.wishlist}>
       <div className="container px-4 py-8 md:py-0 md:px-0 max-w-[1440px]">
         <h1 className="text-[40px] text-dark-pastel-red font-bold mb-6">
-          Ulubione
+          {t.wishlist.wishlist}
         </h1>
         {wishlist.length === 0 ? (
-          <p className="text-gray-500">Nie masz ulubionych produktów.</p>
+          <p className="text-gray-500">{t.wishlist.noProducts}</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {wishlist.map((product) => (
@@ -34,7 +36,7 @@ const WishlistPage = () => {
                     alt="Trash Icon"
                     className="w-5 h-5 mr-2"
                   />
-                  Usuń z ulubionych
+                  {t.wishlist.removeFrom}
                 </button>
               </div>
             ))}

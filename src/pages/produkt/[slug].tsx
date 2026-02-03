@@ -1008,8 +1008,8 @@ console.log('currentprod', product);
                     }
                     alt={
                       isInWishlist(product?.slug ?? '')
-                        ? 'Usuń z ulubionych'
-                        : 'Dodaj do ulubionych'
+                        ? t.wishlist.removeFrom
+                        : t.wishlist.addTo
                     }
                     width={30}
                     height={30}

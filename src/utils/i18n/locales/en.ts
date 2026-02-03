@@ -511,6 +511,16 @@ export const en: Translations = {
   search: {
     search: 'Search',
     placeholder: 'Search products...',
-    noResults: 'No results',
+    noResults: 'No results for',
+    noResultsDetails: 'Please try again using different spelling or keywords.',
+    whatsNew: 'What\'s new?',
   },
+
+  // === WISHLIST ===
+  wishlist: {
+    wishlist: 'Wishlist',
+    noProducts: 'You have no products in wishlist.',
+    removeFrom: 'Remove from wishlist',
+    addTo: 'Add to wishlist',
+  }
 };

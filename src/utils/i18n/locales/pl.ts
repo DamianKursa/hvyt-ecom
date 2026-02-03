@@ -503,8 +503,17 @@ export const pl = {
     search: {
       search: 'Szukaj',
       placeholder: 'Szukaj produktów...',
-      noResults: 'Brak wyników',
+      noResults: 'Brak wyników dla ',
+      noResultsDetails: 'Spróbuj ponownie używając innej pisowni lub słów kluczowych.',
+      whatsNew: 'Co nowego?',
     },
+  // === WISHLIST ===
+  wishlist: {
+    wishlist: 'Ulubione',
+    noProducts: 'Nie masz ulubionych produktów.',    
+    removeFrom: 'Usuń z ulubionych',
+    addTo: 'Dodaj do ulubionych',
+  }    
   };
 
 /**

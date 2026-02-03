@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useWishlist } from '@/context/WhishlistContext';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface MobileMenuProps {
   menuOpen: boolean;
@@ -16,6 +17,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 }) => {
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const router = useRouter();
+  const { t } = useI18n();
   const currentPath = router.asPath.split('?')[0];
   const { wishlist } = useWishlist();
   const favoriteCount = wishlist.length;
@@ -330,7 +332,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 <div className="flex items-center">
                   <img src="/icons/heart.svg" alt="Wishlist" className="h-6 mr-3" />
                   <span>
-                    Ulubione{favoriteCount > 0 && ` (${favoriteCount})`}
+                    {t.wishlist.wishlist}{favoriteCount > 0 && ` (${favoriteCount})`}
                   </span>
                 </div>
               </a>

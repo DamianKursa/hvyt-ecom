@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { getCurrentLanguage } from '@/utils/i18n/config';
 
 const SearchComponent = ({ onClose }: { onClose: () => void }) => {
   const { t } = useI18n();
@@ -88,7 +89,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
 
     try {
       const res = await fetch(
-        `/api/woocommerce?action=searchProducts&query=${encodeURIComponent(normalizedQuery)}`,
+        `/api/woocommerce?action=searchProducts&query=${encodeURIComponent(normalizedQuery)}&lang=${getCurrentLanguage()}`,
       );
       if (!res.ok) {
         throw new Error('Error fetching search results');
@@ -184,7 +185,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
                   {t.search.noResults} &quot;{query}&quot;.
                 </p>
                 <p>
-                  Spróbuj ponownie używając innej pisowni lub słów kluczowych.
+                  {t.search.noResultsDetails}
                 </p>
               </div>
             )
@@ -225,7 +226,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
 
             {/* Kolekcje */}
             <div className="w-3/10">
-              <h3 className="text-sm font-semibold mb-2">Co nowego?</h3>
+              <h3 className="text-sm font-semibold mb-2">{t.search.whatsNew}</h3>
               {latestKolekcja && (
                 <Link href={`/kolekcje/${latestKolekcja.slug}`} passHref>
                   <div
