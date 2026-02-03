@@ -503,7 +503,7 @@ export const pl = {
     search: {
       search: 'Szukaj',
       placeholder: 'Szukaj produktów...',
-      noResults: 'Brak wyników dla ',
+      noResults: 'Brak wyników dla frazy',
       noResultsDetails: 'Spróbuj ponownie używając innej pisowni lub słów kluczowych.',
       whatsNew: 'Co nowego?',
     },
