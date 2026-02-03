@@ -17,6 +17,7 @@ import {
 } from '../../utils/api/woocommerce';
 
 import { getCache, setCache } from '../../lib/cache';
+import { getCurrentLanguage } from '@/utils/i18n/config';
 
 const CACHE_TTL = 3600;
 
@@ -226,7 +227,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const cached = await getCache(cacheKey);
         if (cached) return res.status(200).json(cached);
 
-        const result = await searchProducts(q, pp);
+        const result = await searchProducts(q, pp, getCurrentLanguage());
         await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }
