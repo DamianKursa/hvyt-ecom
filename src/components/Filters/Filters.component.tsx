@@ -3,6 +3,8 @@ import SkeletonFilter from '../Skeletons/SkeletonFilter.component';
 import Snackbar from '../UI/Snackbar.component';
 import PriceSlider from '@/components/UI/PriceSlider';
 import { useRouter } from 'next/router';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { getCurrentLanguage } from '@/utils/i18n/config';
 
 interface FilterOption {
   name: string;
@@ -36,6 +38,7 @@ const Filters: React.FC<FiltersProps> = ({
   initialAttributes = [],
   categorySlug,
 }) => {
+  const { t } = useI18n();
   const router = useRouter();
   const slugFromRouter = Array.isArray(router.query.slug) ? router.query.slug[0] : (router.query.slug as string | undefined);
   const slug = categorySlug ?? slugFromRouter;
@@ -87,7 +90,7 @@ const Filters: React.FC<FiltersProps> = ({
       setLoading(true);
       try {
         const res = await fetch(
-          `/api/category?action=fetchProductAttributesWithTerms&categoryId=${categoryId}`,
+          `/api/category?action=fetchProductAttributesWithTerms&categoryId=${categoryId}&lang=${getCurrentLanguage()}`,
         );
         if (!res.ok) throw new Error('Failed to fetch attributes');
         const fetchedAttributes: FilterAttribute[] = await res.json();
@@ -95,8 +98,12 @@ const Filters: React.FC<FiltersProps> = ({
         const orderedAttributes =
           filterOrder.length > 0
             ? filterOrder
-              .map((order) =>
-                fetchedAttributes.find((attr) => attr.name === order),
+              .map((order) => {
+                const fetched = fetchedAttributes.find((attr) => attr.slug === order);
+                return fetched
+                
+              }
+                
               )
               .filter((attr): attr is FilterAttribute => !!attr)
             : fetchedAttributes;
@@ -121,7 +128,7 @@ const Filters: React.FC<FiltersProps> = ({
     if (categoryId) {
       fetchAttributes();
     }
-  }, [categoryId, filterOrder, initialAttributes]);
+  }, [categoryId, filterOrder, initialAttributes, router.locale]);
 
   const handleFilterChange = async (
     attributeSlug: string,
@@ -159,7 +166,7 @@ const Filters: React.FC<FiltersProps> = ({
     setIsFetchingProducts(true);
     try {
       const res = await fetch(
-        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12`,
+        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12&lang=${getCurrentLanguage()}`,
       );
       if (!res.ok) throw new Error('Error fetching filtered products');
       const data = await res.json();
@@ -191,7 +198,7 @@ const Filters: React.FC<FiltersProps> = ({
     setIsFetchingProducts(true);
     try {
       const res = await fetch(
-        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12`,
+        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12&lang=${getCurrentLanguage()}`,
       );
       if (!res.ok) throw new Error('Error applying price filter');
       const data = await res.json();
@@ -327,7 +334,7 @@ const Filters: React.FC<FiltersProps> = ({
                   onClick={() => toggleMoreOptions(attribute.slug)}
                   disabled={isFetchingProducts}
                 >
-                  {moreOptionsVisible[attribute.slug] ? 'Mniej' : 'Wiecej'}
+                  {moreOptionsVisible[attribute.slug] ? t.filters.less : t.filters.more}
                 </button>
               )}
             </div>
@@ -341,7 +348,7 @@ const Filters: React.FC<FiltersProps> = ({
             onClick={() => toggleFilter('price')}
             disabled={isFetchingProducts}
           >
-            <span>Cena</span>
+            <span>{t.filters.price}</span>
             <img
               src={
                 expandedFilters['price']

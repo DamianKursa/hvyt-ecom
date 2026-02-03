@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import CustomDropdown from '@/components/UI/CustomDropdown.component';
+import CustomDropdown from '@/components/UI/CustomDropdownWithLabels.component';
 import { Order } from '@/utils/functions/interfaces';
 import Link from 'next/link';
 import Image from 'next/image';

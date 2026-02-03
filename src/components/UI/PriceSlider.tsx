@@ -1,3 +1,4 @@
+import { useI18n } from '@/utils/hooks/useI18n';
 import { getCurrency, Language } from '@/utils/i18n/config';
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
@@ -20,7 +21,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
   categorySlug,
   disabled = false,
 }) => {
-
+  const { t } = useI18n();
   const [range, setRange] = useState<[number, number]>(currentRange);
   
   const router = useRouter();
@@ -114,7 +115,7 @@ const PriceSlider: React.FC<PriceSliderProps> = ({
           disabled={disabled}
           className="px-4 py-2 bg-black text-white rounded-full hover:bg-neutral-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Zastosuj
+          {t.filters.apply}
         </button>
       </div>
     </div>

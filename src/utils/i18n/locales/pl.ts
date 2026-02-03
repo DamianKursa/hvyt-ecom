@@ -6,16 +6,31 @@
  */
 
 export const pl = {
+    // === SLUGI URL ===
     slugs: {
       category: 'kategoria',
       product: 'produkt',
     },
+    // === PRODUKT ===
     product: {  
       notAvailableInLanguage: 'Produkt niedostępny w tym języku',  
       notAvailableDescription: 'Niestety ten produkt nie jest dostępny w wybranej wersji językowej...',  
       backToHome: 'Wróć do strony głównej',  
       loading: 'Ładowanie produktu...',  
+      details: 'Szczegóły produktu',
+      morePhotos: 'Więcej zdjęć +',
+      lessPhotos: 'Mniej zdjęć −',
+      over50InStock: 'Ponad 50 szt. na stanie.',
+      onlyXInStock: 'Tylko {count} szt. na stanie.',
+      inStock: 'Na stanie.',
+      shippingIn24h: 'Wysyłka w 24h!',
+      shippingAfter: 'Wysyłka po 15.01',
+      returnPolicy: '30 dni na zwrot',
+      checkSameColor: 'Sprawdź produkty w tym samym kolorze',
+      check: 'Sprawdź',
+      addToCart: 'Dodaj do koszyka',      
     },
+    // === INFORMACJE O SERWISIE (stopka) ===
     serviceInfo: {
       freeShipping: {
         title: 'Darmowa dostawa',
@@ -34,11 +49,13 @@ export const pl = {
         desc: 'Przez formularz i social media',
       },
     },
+    // === DANE FIRMY ===
     company: {
       title: 'Dane firmowe:',
       contact: 'Kontakt:',
       email: 'hello@hvyt.pl',
     },
+    // === LINKI NAWIGACYJNE ===
     links: {
       categories: {
         handles: 'Uchwyty',
@@ -57,21 +74,25 @@ export const pl = {
         returns: 'Zwroty i reklamacje',
       },
     },
+    // === NEWSLETTER ===
     newsletter: {
       title: 'Zapisz się do newslettera, aby być na bieżąco z nowościami i promocjami.',
       placeholder: 'Podaj swój adres e-mail',
       button: 'Zapisz się',
       consent: 'Subskrybując, wyrażasz zgodę na naszą Politykę prywatności i na otrzymywanie aktualizacji od naszej firmy.',
     },
+    // === PARTNERZY I PŁATNOŚCI ===
     partners: {
       title: 'Nasi partnerzy:',
       paymentMethods: 'Metody płatności:',
     },
+    // === PRAWNE ===
     legal: {
       copyright: '© HVYT. Wszystkie prawa zastrzeżone.',
       terms: 'Regulamin',
       privacy: 'Polityka prywatności',
     },
+    // === STRONA O NAS ===
     aboutUs: {
       pageTitle: 'Hvyt | O nas',
       metaDescription: 'Poznaj HVYT - małą firmę z wielką ofertą. Stworzyliśmy markę z miłości do designu i dodatków, które nadają indywidualny charakter każdemu wnętrzu. Odkryj nasze kolekcje uchwytów, klamek i wieszaków.',
@@ -80,6 +101,7 @@ export const pl = {
       heroDescriptionDesktop: 'HVYT powstał z miłości do designu i dodatków.<br /> Wierzymy, że to właśnie one są odpowiedzialne<br /> za indywidualny charakter każdego wnętrza.<br /> Sami jesteśmy całkiem zakręceni, dlatego nasza<br /> nazwa to alternatywny zapis słowa „chwyt".<br /><br /> Staramy się aby nasza oferta była<br /> różnorodna i każdy mógł znaleźć coś dla siebie.',
       contactButton: 'Kontakt →',
     },
+    // === WSPÓLNE ===
     common: {
       loading: 'Ładowanie...',
       error: 'Błąd',
@@ -107,7 +129,11 @@ export const pl = {
       poland: 'Polska',
       countryRegion: 'Kraj / Region',
       backToHome: 'Wróć do strony głównej',
+      continue: 'Kontynuuj',
+      success: 'Sukces',
+      showPassword: 'Pokaż hasło',
     },
+    // === KOSZYK ===
     cart: {
       pageTitle: 'Hvyt | Koszyk',
       updatingTranslations: 'Aktualizowanie tłumaczeń...',
@@ -121,6 +147,16 @@ export const pl = {
       removeItem: 'Usuń',
       quantity: 'Ilość',
       priceNote: 'Cena w walucie zakupu',      
+      yourCart: 'Twój koszyk',
+      goToCart: 'Przejdź do koszyka',
+      cartSummary: 'Suma produktów w koszyku:',
+      completeOrder: 'Uzupełnij zamówienie',
+      noRecommendations: 'Brak rekomendacji',
+      backToProducts: 'Wróć do produktów',
+      deliveryAndPayment: 'Dostawa i płatność',
+      editVariation: 'Edytuj rozstaw produktu',
+      variationNote: 'Produkty zostaną dodane do koszyka z uwzględnieniem ich aktualnych',
+      addedToCart: 'Dodano do koszyka',
       emptyCart: {
         title: 'Twój koszyk jest pusty',
         description: 'Znajdź produkt w naszym sklepie, który wyróżni Twoje wnętrze!',
@@ -180,8 +216,27 @@ export const pl = {
         description: 'Sprawdź produkty, które idealnie pasują z wybranym produktem.',
       },
     },
+    // === ZAMÓWIENIE / CHECKOUT ===
     checkout: {
       pageTitle: 'Hvyt | Checkout',
+      loadingAddresses: 'Ładowanie adresów...',
+      differentShippingAddress: 'Dostawa pod inny adres',
+      saveAddress: 'Zapisz ten adres w moim koncie',
+      loadingShipping: 'Ładowanie metod dostawy...',
+      changeGlsPoint: 'Zmień punkt GLS',
+      loadingPayment: 'Ładowanie metod płatności...',
+      noPaymentMethods: 'Brak dostępnych metod płatności dla wybranej metody dostawy.',
+      loadingBilling: 'Ładowanie danych do faktury...',
+      price: 'Cena',
+      quantity: 'Ilość:',
+      orderTotal: 'Razem:',
+      noShippingData: 'Brak danych o wysyłce.',
+      noBillingData: 'Brak danych do faktury.',
+      shippingData: 'Dane do wysyłki:',
+      billingData: 'Dane do faktury:',
+      noAddress: 'Brak adresu',
+      noData: 'Brak danych',
+      paymentMethod: 'Metoda płatności',      
       personalData: {
         title: 'Dane osobowe',
         loginPrompt: 'Masz już konto? Zaloguj się',
@@ -343,7 +398,113 @@ export const pl = {
         loadingError: 'Nie udało się załadować zamówienia.',
       },
     },
-    
+    // === KOD RABATOWY ===
+    discountCode: {
+      placeholder: 'Uzupełnij kod rabatowy',
+      noProductsMatch: 'Brak produktów spełniających warunki kodu.',
+    },
+    // === KONTO UŻYTKOWNIKA ===
+    account: {
+      myData: 'Moje dane',
+      myOrders: 'Moje zamówienia',
+      boughtProducts: 'Kupione produkty',
+      billingData: 'Dane do faktury',
+      myAddresses: 'Moje adresy',
+      logout: 'Wyloguj',
+      logoutFull: 'Wyloguj się',
+      deleteAccount: 'Usuń konto',
+      noOrders: 'Brak zamówień',
+      orderDate: 'Data zamówienia',
+      orderStatus: 'Status realizacji',
+      sum: 'Suma',
+      shippingAddress: 'Adres dostawy',
+      addShippingAddress: 'Dodaj adres dostawy',
+      saveAddress: 'Zapisz adres',
+      editBillingData: 'Edytuj dane do faktury',
+      addBillingData: 'Dodaj dane do faktury',
+      saveBillingData: 'Zapisz dane do faktury',
+      billingIndividual: 'Dane do faktury - klient indywidualny',
+      billingCompany: 'Dane do faktury - firma',
+      productsWillBeAdded: 'Produkty zostaną dodane do koszyka z uwzględnieniem ich aktualnych',
+      sorting: 'Sortowanie',
+    },
+    // === AUTENTYKACJA / LOGOWANIE ===
+    auth: {
+      login: 'Zaloguj się',
+      register: 'Zarejestruj się',
+      loading: 'Ładowanie...',
+      sendResetLink: 'Wyślij link do zresetowania',
+      backToLogin: 'Wróć do logowania',
+      forgotPassword: 'Nie pamiętam hasła',
+      loginError: 'Wystąpił błąd podczas logowania, spróbuj ponownie później.',
+      emailAddress: 'Adres email',
+      password: 'Hasło',
+      passwordMinLength: 'Hasło musi mieć co najmniej 8 znaków.',
+      currentPassword: 'Obecne hasło',
+      newPassword: 'Nowe hasło',
+      confirmPassword: 'Powtórz nowe hasło',
+      changePassword: 'Zmień hasło',
+      saving: 'Zapisywanie...',
+      saveChanges: 'Zapisz zmiany',
+    },
+    // === FORMULARZ / POLA ===
+    form: {
+      firstName: 'Imię',
+      lastName: 'Nazwisko',
+      email: 'Email',
+      phone: 'Telefon',
+      country: 'Polska',
+      required: 'Wymagane',
+    },
+    // === OPINIE / RECENZJE ===
+    reviews: {
+      addReview: 'Dodaj opinię',
+      addYourReview: 'Dodaj swoją opinię',
+      writeReview: 'Napisz opinię',
+      fillName: 'Uzupełnij imię',
+      fillEmail: 'Uzupełnij adres e-mail',
+      mustAcceptConsent: 'Musisz zaakceptować zgodę',
+      reviewError: 'Wystąpił błąd podczas przesyłania opinii.',
+      attachments: 'Dodaj załączniki (max 5, jpg/png, max 1MB każdy)',
+      onlyImages: 'Dozwolone są tylko pliki graficzne.',
+      maxFileSize: 'Maksymalny rozmiar pliku to 1MB.',
+      consentText: 'Potwierdzam, że zapoznałam/em się z treścią Regulaminu i Polityki Prywatności oraz akceptuję ich postanowienia.',
+      preview: 'Podgląd',
+    },
+    // === FILTRY ===
+    filters: {
+      filters: 'Filtry',      
+      price: 'Cena',
+      less: 'Mniej',
+      more: 'Więcej',
+      removeFilter: 'Usuń filtr',
+      showResults: 'Pokaż',
+      bestsellers: 'Bestsellers',
+      newest: 'Najnowsze produkty',
+      highestPrice: 'Najwyższa cena',
+      lowestPrice: 'Najniższa cena',
+      sorting: 'Sortowanie',
+      choose: 'Wybierz',
+      apply: 'Zastosuj'
+    },    
+    // === STRONA GŁÓWNA / INDEX ===
+    index: {
+      seeHandles: 'Zobacz uchwyty',
+      seeKnobs: 'Zobacz gałki',
+      seeAllCollections: 'Zobacz wszystkie kolekcje →',
+      seeOurNews: 'Zobacz nasze nowości',
+      seeFurniture: 'Zobacz meble →',
+      seeOurInstagram: 'Zobacz nasz Instagram',
+      seeAll: 'Zobacz wszystkie →',
+      addAtLeast4Images: 'Dodaj co najmniej 4 obrazy do sekcji „Wybierz swój HVYT".',
+      recentlyAdded: 'Zobacz co ostatnio nowego dodaliśmy dla Ciebie.',
+    },
+    // === WYSZUKIWANIE ===
+    search: {
+      search: 'Szukaj',
+      placeholder: 'Szukaj produktów...',
+      noResults: 'Brak wyników',
+    },
   };
 
 /**

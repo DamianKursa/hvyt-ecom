@@ -1,12 +1,15 @@
 import React from 'react';
-import CustomDropdown from '@/components/UI/CustomDropdown.component';
+import CustomDropdown from '@/components/UI/CustomDropdownWithLabels.component';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { dropdownOption } from '@/types/filters';
+import { getSortingOptions } from '@/utils/data/filters';
 
 interface FiltersControlsProps {
   filtersVisible: boolean;
   toggleFilters: () => void;
   filters: { name: string; value: string }[];
-  sorting: string;
-  onSortingChange: (value: string) => void;
+  sorting: dropdownOption;
+  onSortingChange: (value: dropdownOption) => void;
   onRemoveFilter: (filter: { name: string; value: string }) => void;
   isMobile: boolean;
 }
@@ -20,12 +23,10 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
   onRemoveFilter,
   isMobile,
 }) => {
-  const sortingOptions = [
-    'Bestsellers',
-    'Najnowsze produkty',
-    'Najwyższa cena',
-    'Najniższa cena',
-  ];
+
+  const { t } = useI18n();
+
+  const sortingOptions = getSortingOptions(t);
 
   const handleFilterRemove = (filter: { name: string; value: string }) => {
     onRemoveFilter(filter);
@@ -40,7 +41,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
             onClick={toggleFilters}
             className="filters-toggle border border-beige-dark rounded-[24px] px-4 h-12 mr-[32px] font-bold flex justify-center items-center w-1/2"
           >
-            <span className="font-semibold text-center">Filtry</span>
+            <span className="font-semibold text-center">{t.filters.filters}</span>
             {!isMobile && (
               <img
                 src={
@@ -56,10 +57,10 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
           {/* Sorting Dropdown */}
           <div className="relative w-1/2">
             <CustomDropdown
-              className={`${sorting !== 'Sortowanie' ? 'border border-dark-pastel-red text-dark-pastel-red' : ''} h-12 flex items-center justify-center px-4 text-center`}
+              className={`${sorting.key !== 'sort' ? 'border border-dark-pastel-red text-dark-pastel-red' : ''} h-12 flex items-center justify-center px-4 text-center`}
               options={sortingOptions}
               selectedValue={sorting}
-              placeholder="Sortowanie"
+              placeholder={t.filters.sorting}
               onChange={(value) => onSortingChange(value)}
               isProductPage={false}
             />
@@ -96,7 +97,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
           onClick={toggleFilters}
           className="filters-toggle border border-beige-dark rounded-[24px] p-[7px_16px] font-bold w-full flex justify-between items-center"
         >
-          <span className="font-semibold text-left">Filtry</span>
+          <span className="font-semibold text-left">{t.filters.filters}</span>
           <img
             src={
               filtersVisible
@@ -134,7 +135,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
           <CustomDropdown
             options={sortingOptions}
             selectedValue={sorting}
-            placeholder="Sortowanie"
+            placeholder={t.filters.sorting}
             onChange={(value) => onSortingChange(value)}
             isProductPage={false}
           />

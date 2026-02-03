@@ -15,6 +15,10 @@ import {
   getLocalizedCategorySlug,
   categorySlugMapping 
 } from '@/utils/i18n/routing';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { dropdownOption } from '@/types/filters';
+import { getSortingOptions } from '@/utils/data/filters';
+import { getCurrentLanguage } from '@/utils/i18n/config';
 
 interface Category {
   id: number;
@@ -36,37 +40,37 @@ interface CategoryPageProps {
   initialAttributes: any[];
   lang?: string;
 }
-
-const filterOrder: Record<string, string[]> = {
-  // Polish slugs
-  'uchwyty-meblowe': [
-    'Rodzaj',
-    'Kolor',
-    'Rozstaw',
-    'Materiał',
-    'Styl',
-    'Kolekcja',
-    'Przeznaczenie',
-  ],
-  klamki: ['Kształt rozety', 'Kolor', 'Materiał'],
-  wieszaki: ['Kolor', 'Materiał'],
-  meble: ['Rodzaj', 'Wykończenie', 'Styl'],
-  galki: ['Kolor', 'Materiał'],
-  // English slugs - same filters as Polish equivalents
-  'handles': [
-    'Rodzaj',
-    'Kolor',
-    'Rozstaw',
-    'Materiał',
-    'Styl',
-    'Kolekcja',
-    'Przeznaczenie',
-  ],
-  'door-handles': ['Kształt rozety', 'Kolor', 'Materiał'],
-  'wall-hooks': ['Kolor', 'Materiał'],
-  'furniture': ['Rodzaj', 'Wykończenie', 'Styl'],
-  'knobs': ['Kolor', 'Materiał'],
-};
+const filterOrder: Record<string, string[]> = {};
+// const filterOrder: Record<string, string[]> = {
+//   // Polish slugs
+//   'uchwyty-meblowe': [
+//     'pa_dlugosc',
+//     'pa_kolor',
+//     'pa_rozstaw',
+//     'pa_material',
+//     'pa_styl',
+//     'pa_kolekcja',
+//     'pa_przeznaczenie',
+//   ],
+//   klamki: ['Kształt rozety', 'Kolor', 'Materiał'],
+//   wieszaki: ['Kolor', 'Materiał'],
+//   meble: ['Rodzaj', 'Wykończenie', 'Styl'],
+//   galki: ['Kolor', 'Materiał'],
+//   // English slugs - same filters as Polish equivalents
+//   'handles': [
+//     'pa_dlugosc',
+//     'pa_kolor',
+//     'pa_rozstaw',
+//     'pa_material',
+//     'pa_styl',
+//     'pa_kolekcja',
+//     'pa_przeznaczenie',
+//   ],
+//   'door-handles': ['Kształt rozety', 'Kolor', 'Materiał'],
+//   'wall-hooks': ['Kolor', 'Materiał'],
+//   'furniture': ['Rodzaj', 'Wykończenie', 'Styl'],
+//   'knobs': ['Kolor', 'Materiał'],
+// };
 
 const icons: Record<string, string> = {
   // Polish slugs
@@ -112,6 +116,8 @@ const CategoryPage = ({
   lang: serverLang,
 }: CategoryPageProps) => {
   const router = useRouter();
+  const { t } = useI18n()
+  const [sortingOptions, updateSortingOptions] = useState<dropdownOption[]>(getSortingOptions(t));
   
   // Determine current language from server prop, locale, or slug
   const slug = Array.isArray(router.query.slug)
@@ -142,7 +148,7 @@ const CategoryPage = ({
   const [activeFilters, setActiveFilters] = useState<
     { name: string; value: string }[]
   >([]);
-  const [sortingOption, setSortingOption] = useState('Sortowanie');
+  const [sortingOption, setSortingOption] = useState<dropdownOption>({key: 'sort', label: t.filters.sorting});
   const [isMobile, setIsMobile] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -151,12 +157,14 @@ const CategoryPage = ({
   useEffect(() => {
     const updateFiltersFromQuery = () => {
       const queryFilters: { name: string; value: string }[] = [];
-      let sortFromQuery = 'Sortowanie';
+      let sortFromQuery = {key: 'sort', label: t.filters.sorting};
+      
       const pageFromQuery = Number(router.query.page ?? 1);
       Object.keys(router.query).forEach((key) => {
         if (ignoredParams.has(key)) return;
         if (key === 'sort') {
-          sortFromQuery = router.query[key] as string;
+          const sortOption = sortingOptions.find(option => option.key === router.query[key] as string);
+          sortFromQuery = sortOption || {key: 'sort', label: t.filters.sorting};
           return;
         }
         const values = router.query[key];
@@ -167,7 +175,9 @@ const CategoryPage = ({
         }
       });
       setActiveFilters(queryFilters);
-      if (sortFromQuery !== 'Sortowanie') {
+      if (sortFromQuery.key !== 'sort') {
+        console.log('sortFromQuery', sortFromQuery);
+        
         setSortingOption(sortFromQuery);
       }
       setCurrentPage(Number.isFinite(pageFromQuery) && pageFromQuery > 0 ? pageFromQuery : 1);
@@ -177,6 +187,14 @@ const CategoryPage = ({
       updateFiltersFromQuery();
     }
   }, [router.query, router.isReady]);
+
+    useEffect(()=>{
+      updateSortingOptions(getSortingOptions(t));      
+    },[router.locale])
+
+    useEffect(()=> {
+      setSortingOption(prev => sortingOptions.find(option => option.key === prev.key) || {key: 'sort', label: t.filters.sorting})
+    }, [sortingOptions])
 
   // Handle resizing to update mobile state
   useEffect(() => {
@@ -193,17 +211,17 @@ const CategoryPage = ({
   // Build dynamic SWR key based on filters, sorting, and page
   const buildApiEndpoint = () => {
     if (activeFilters.length > 0) {
-      return `/api/category?action=fetchProductsWithFilters&categoryId=${category.id}&lang=${currentLang}&filters=${encodeURIComponent(
+      return `/api/category?action=fetchProductsWithFilters&categoryId=${category.id}&lang=${getCurrentLanguage()}&filters=${encodeURIComponent(
         JSON.stringify(activeFilters),
       )}&page=${currentPage}&perPage=12`;
-    } else if (sortingOption !== 'Sortowanie') {
+    } else if (sortingOption.key !== 'sort') {
       const sortingMap: Record<string, { orderby: string; order: string }> = {
-        Bestsellers: { orderby: 'popularity', order: 'desc' },
-        'Najnowsze produkty': { orderby: 'date', order: 'desc' },
-        'Najwyższa cena': { orderby: 'price', order: 'desc' },
-        'Najniższa cena': { orderby: 'price', order: 'asc' },
+        'bestseller': { orderby: 'popularity', order: 'desc' },
+        'newest': { orderby: 'date', order: 'desc' },
+        'pricehigh': { orderby: 'price', order: 'desc' },
+        'pricelow': { orderby: 'price', order: 'asc' },
       };
-      const sortingParams = sortingMap[sortingOption] || {
+      const sortingParams = sortingMap[sortingOption.key] || {
         orderby: 'menu_order',
         order: 'asc',
       };
@@ -217,7 +235,7 @@ const CategoryPage = ({
 
   const fallback =
     activeFilters.length === 0 &&
-      sortingOption === 'Sortowanie' &&
+      sortingOption.label === t.filters.sorting &&
       currentPage === 1
       ? { products: initialProducts, totalProducts: initialTotalProducts }
       : undefined;
@@ -255,12 +273,12 @@ const CategoryPage = ({
     setIsFilterModalOpen((prev) => !prev);
   };
 
-  const handleSortingChange = (sortingValue: string) => {
+  const handleSortingChange = (sortingValue: dropdownOption) => {
     setCurrentPage(1);
     router.push(
       {
         pathname: router.pathname,
-        query: { ...router.query, sort: sortingValue },
+        query: { ...router.query, sort: sortingValue.key },
       },
       undefined,
       { shallow: true },

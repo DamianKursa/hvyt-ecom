@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const RegisterForm: React.FC = () => {
+  const { t } = useI18n();
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -22,7 +24,7 @@ const RegisterForm: React.FC = () => {
     setFormData({ ...formData, [name]: value });
 
     if (name === 'password' && value.length < 8) {
-      setPasswordError('Hasło musi mieć co najmniej 8 znaków.');
+      setPasswordError(t.auth.passwordMinLength);
     } else {
       setPasswordError('');
     }
@@ -51,11 +53,11 @@ const RegisterForm: React.FC = () => {
         // Extract the exact error message from the response
         const exactMessage =
           errorData?.message ||
-          'Wystąpił błąd podczas rejestracji, spróbuj ponownie później.';
+          t.auth.loginError;
         setError(exactMessage);
       }
     } catch (err) {
-      setError('Wystąpił błąd podczas rejestracji, spróbuj ponownie później.');
+      setError(t.auth.loginError);
     } finally {
       setLoading(false);
     }
@@ -74,10 +76,10 @@ const RegisterForm: React.FC = () => {
         <div className="mt-4 px-4 py-2 rounded-lg flex items-center bg-[#2A5E45] text-white">
           <img
             src="/icons/circle-check.svg"
-            alt="Success"
+            alt={t.common.success}
             className="w-5 h-5 mr-2"
           />
-          <span>Konto zostało pomyślnie utworzone!</span>
+          <span>{t.common.success}</span>
         </div>
       )}
 
@@ -100,7 +102,7 @@ const RegisterForm: React.FC = () => {
               : 'opacity-100'
           }`}
         >
-          Imię<span className="text-red-500">*</span>
+          {t.form.firstName}<span className="text-red-500">*</span>
         </span>
       </div>
 
@@ -123,7 +125,7 @@ const RegisterForm: React.FC = () => {
               : 'opacity-100'
           }`}
         >
-          Nazwisko<span className="text-red-500">*</span>
+          {t.form.lastName}<span className="text-red-500">*</span>
         </span>
       </div>
 
@@ -146,7 +148,7 @@ const RegisterForm: React.FC = () => {
               : 'opacity-100'
           }`}
         >
-          Adres email<span className="text-red-500">*</span>
+          {t.auth.emailAddress}<span className="text-red-500">*</span>
         </span>
       </div>
 
@@ -171,11 +173,11 @@ const RegisterForm: React.FC = () => {
               : 'opacity-100'
           }`}
         >
-          Hasło<span className="text-red-500">*</span>
+          {t.auth.password}<span className="text-red-500">*</span>
         </span>
         <img
           src="/icons/show-pass.svg"
-          alt="Show Password"
+          alt={t.common.showPassword}
           className="absolute right-2 top-3 w-5 h-5 cursor-pointer"
           onClick={() => setShowPassword(!showPassword)}
         />
@@ -187,11 +189,11 @@ const RegisterForm: React.FC = () => {
       <p className="text-[14px] ml-[8px] font-light mt-4">
         Zakładając konto, akceptujesz nasz{' '}
         <Link href="/regulamin" className="underline">
-          Regulamin
+          {t.legal.terms}
         </Link>
         . Przeczytaj naszą{' '}
         <Link href="/polityka-prywatnosci" className="underline">
-          Politykę prywatności
+          {t.legal.privacy}
         </Link>
         .
       </p>
@@ -202,7 +204,7 @@ const RegisterForm: React.FC = () => {
         className="w-full bg-black text-white py-3 rounded-full flex justify-center items-center"
         disabled={loading}
       >
-        {loading ? 'Ładowanie...' : 'Zarejestruj się'}
+        {loading ? t.auth.loading : t.auth.register}
       </button>
     </form>
   );

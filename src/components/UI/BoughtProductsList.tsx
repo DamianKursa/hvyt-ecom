@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import CustomDropdown from '@/components/UI/CustomDropdown.component';
+import CustomDropdown from '@/components/UI/CustomDropdownWithLabels.component';
 import { CartContext, Product as CartProduct } from '@/stores/CartProvider';
 import { Product } from '@/utils/functions/interfaces';
 import Snackbar from '../UI/Snackbar.component';

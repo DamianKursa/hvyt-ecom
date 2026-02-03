@@ -1,8 +1,11 @@
 import React from 'react';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const PasswordChangeConfirmation: React.FC<{ onBackToLogin: () => void }> = ({
   onBackToLogin,
 }) => {
+  const { t } = useI18n();
+  
   return (
     <div className="flex flex-col md:flex-row w-full h-auto md:h-[400px] bg-white rounded-[40px] shadow-md">
       {/* Left Section */}
@@ -14,7 +17,7 @@ const PasswordChangeConfirmation: React.FC<{ onBackToLogin: () => void }> = ({
           backgroundPosition: 'center',
         }}
       >
-        <h1 className="text-2xl font-bold text-black">Nie pamiętam hasła</h1>
+        <h1 className="text-2xl font-bold text-black">{t.auth.forgotPassword}</h1>
       </div>
 
       {/* Right Section */}
@@ -23,7 +26,7 @@ const PasswordChangeConfirmation: React.FC<{ onBackToLogin: () => void }> = ({
         <div className="bg-[#41464B] p-4 rounded-lg text-black flex items-center gap-3 mb-6 w-full">
           <img
             src="/icons/check-in-icon.svg"
-            alt="Success"
+            alt={t.common.success}
             className="w-6 h-6"
           />
           <span className="font-light text-[14px] text-[#fff]">
@@ -48,7 +51,7 @@ const PasswordChangeConfirmation: React.FC<{ onBackToLogin: () => void }> = ({
           onClick={onBackToLogin}
           className="w-full py-3 bg-black text-white rounded-full"
         >
-          Wróć do logowania
+          {t.auth.backToLogin}
         </button>
       </div>
     </div>

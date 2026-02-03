@@ -8,16 +8,31 @@
 import type { Translations } from './pl';
 
 export const en: Translations = {
+  // === URL SLUGS ===
     slugs: {
       category: 'category',
       product: 'product',
     },
+    // === PRODUCT ===
     product: {  
       notAvailableInLanguage: 'Product not available in this language',  
       notAvailableDescription: 'Unfortunately, this product is not available in the selected language version...',  
       backToHome: 'Back to homepage',  
-      loading: 'Loading product...',  
+      loading: 'Loading product...', 
+      details: 'Product details',
+      morePhotos: 'More photos +',
+      lessPhotos: 'Less photos −',
+      over50InStock: 'Over 50 pcs in stock.',
+      onlyXInStock: 'Only {count} pcs in stock.',
+      inStock: 'In stock.',
+      shippingIn24h: 'Ships within 24h!',
+      shippingAfter: 'Ships after Jan 15',
+      returnPolicy: '30-day return policy',
+      checkSameColor: 'Check products in the same color',
+      check: 'Check',
+      addToCart: 'Add to cart',      
     },
+    // === SERVICE INFO (footer) ===
     serviceInfo: {
       freeShipping: {
         title: 'Free shipping',
@@ -36,11 +51,13 @@ export const en: Translations = {
         desc: 'Via form and social media',
       },
     },
+    // === COMPANY DATA ===
     company: {
       title: 'Company details:',
       contact: 'Contact:',
       email: 'hello@hvyt.pl',
     },
+    // === LINKS ===
     links: {
       categories: {
         handles: 'Handles',
@@ -59,21 +76,25 @@ export const en: Translations = {
         returns: 'Returns and complaints',
       },
     },
+    // === NEWSLETTER ===
     newsletter: {
       title: 'Subscribe to our newsletter to stay up to date with news and promotions.',
       placeholder: 'Enter your email address',
       button: 'Subscribe',
       consent: 'By subscribing, you agree to our Privacy Policy and to receive updates from our company.',
     },
+    // === PARTNERS & PAYMENTS ===
     partners: {
       title: 'Our partners:',
       paymentMethods: 'Payment methods:',
     },
+    // === LEGAL ===
     legal: {
       copyright: '© HVYT. All rights reserved.',
       terms: 'Terms and Conditions',
       privacy: 'Privacy Policy',
     },
+    // === ABOUT US PAGE ===
     aboutUs: {
       pageTitle: 'Hvyt | About Us',
       metaDescription: 'Discover HVYT - a small company with a great offer. We created our brand from a love of design and accessories that give each interior its individual character. Explore our collections of handles, door handles and wall hooks.',
@@ -82,6 +103,7 @@ export const en: Translations = {
       heroDescriptionDesktop: 'HVYT was born from a love of design and accessories.<br /> We believe that these are what give each interior<br /> its individual character. We are quite quirky ourselves,<br /> which is why our name is an alternative spelling<br /> of the word "grip".<br /><br /> We strive to make our offer diverse<br /> so everyone can find something for themselves.',
       contactButton: 'Contact →',
     },
+    // === COMMON ===
     common: {
       loading: 'Loading...',
       error: 'Error',
@@ -109,7 +131,11 @@ export const en: Translations = {
       poland: 'Poland',
       countryRegion: 'Country / Region',
       backToHome: 'Back to homepage',
+      continue: 'Continue',
+      success: 'Success',
+      showPassword: 'Show password',      
     },
+    // === CART ===
     cart: {
       pageTitle: 'Hvyt | Cart',
       updatingTranslations: 'Updating translations...',
@@ -123,6 +149,16 @@ export const en: Translations = {
       removeItem: 'Remove',
       quantity: 'Quantity',
       priceNote: 'Price in purchase currency',      
+      yourCart: 'Your cart',
+      goToCart: 'Go to cart',
+      cartSummary: 'Cart total:',
+      completeOrder: 'Complete your order',
+      noRecommendations: 'No recommendations',
+      backToProducts: 'Back to products',
+      deliveryAndPayment: 'Delivery and payment',
+      editVariation: 'Edit product variation',
+      variationNote: 'Products will be added to cart with their current',
+      addedToCart: 'Added to cart',      
       emptyCart: {
         title: 'Your cart is empty',
         description: 'Find a product in our store that will make your interior stand out!',
@@ -182,8 +218,27 @@ export const en: Translations = {
         description: 'Check out products that perfectly match your selection.',
       },
     },
+    // === CHECKOUT ===
     checkout: {
       pageTitle: 'Hvyt | Checkout',
+      loadingAddresses: 'Loading addresses...',
+      differentShippingAddress: 'Ship to different address',
+      saveAddress: 'Save this address to my account',
+      loadingShipping: 'Loading shipping methods...',
+      changeGlsPoint: 'Change GLS point',
+      loadingPayment: 'Loading payment methods...',
+      noPaymentMethods: 'No payment methods available for the selected shipping method.',
+      loadingBilling: 'Loading billing data...',
+      price: 'Price',
+      quantity: 'Quantity:',
+      orderTotal: 'Total:',
+      noShippingData: 'No shipping data available.',
+      noBillingData: 'No billing data available.',
+      shippingData: 'Shipping address:',
+      billingData: 'Billing address:',
+      noAddress: 'No address',
+      noData: 'No data',
+      paymentMethod: 'Payment method',      
       personalData: {
         title: 'Personal details',
         loginPrompt: 'Already have an account? Log in',
@@ -318,6 +373,7 @@ export const en: Translations = {
       },
       placeOrder: 'Place order',      
     },
+    // === THANK YOU PAGE ===
     thankYou: {
       pageTitle: 'Thank you for your purchase!',
       hero: {
@@ -345,4 +401,116 @@ export const en: Translations = {
         loadingError: 'Failed to load order.',
       },
     },
-  };
+    // === DISCOUNT CODE ===
+    discountCode: {
+      placeholder: 'Enter discount code',
+      noProductsMatch: 'No products match the code conditions.',
+    },
+  // === USER ACCOUNT ===
+  account: {
+    myData: 'My data',
+    myOrders: 'My orders',
+    boughtProducts: 'Bought products',
+    billingData: 'Billing data',
+    myAddresses: 'My addresses',
+    logout: 'Logout',
+    logoutFull: 'Log out',
+    deleteAccount: 'Delete account',
+    noOrders: 'No orders',
+    orderDate: 'Order date',
+    orderStatus: 'Status',
+    sum: 'Total',
+    shippingAddress: 'Shipping address',
+    addShippingAddress: 'Add shipping address',
+    saveAddress: 'Save address',
+    editBillingData: 'Edit billing data',
+    addBillingData: 'Add billing data',
+    saveBillingData: 'Save billing data',
+    billingIndividual: 'Billing data - individual',
+    billingCompany: 'Billing data - company',
+    productsWillBeAdded: 'Products will be added to cart with their current',
+    sorting: 'Sort by',
+  },
+
+  // === AUTHENTICATION / LOGIN ===
+  auth: {
+    login: 'Log in',
+    register: 'Register',
+    loading: 'Loading...',
+    sendResetLink: 'Send reset link',
+    backToLogin: 'Back to login',
+    forgotPassword: 'Forgot password',
+    loginError: 'An error occurred during login, please try again later.',
+    emailAddress: 'Email address',
+    password: 'Password',
+    passwordMinLength: 'Password must be at least 8 characters.',
+    currentPassword: 'Current password',
+    newPassword: 'New password',
+    confirmPassword: 'Confirm new password',
+    changePassword: 'Change password',
+    saving: 'Saving...',
+    saveChanges: 'Save changes',
+  },
+
+  // === FORM FIELDS ===
+  form: {
+    firstName: 'First name',
+    lastName: 'Last name',
+    email: 'Email',
+    phone: 'Phone',
+    country: 'Poland',
+    required: 'Required',
+  },
+
+  // === REVIEWS ===
+  reviews: {
+    addReview: 'Add review',
+    addYourReview: 'Add your review',
+    writeReview: 'Write a review',
+    fillName: 'Please enter your name',
+    fillEmail: 'Please enter your email',
+    mustAcceptConsent: 'You must accept the consent',
+    reviewError: 'An error occurred while submitting the review.',
+    attachments: 'Add attachments (max 5, jpg/png, max 1MB each)',
+    onlyImages: 'Only image files are allowed.',
+    maxFileSize: 'Maximum file size is 1MB.',
+    consentText: 'I confirm that I have read the Terms and Conditions and Privacy Policy and accept their provisions.',
+    preview: 'Preview',
+  },
+
+  // === FILTERS ===
+  filters: {
+    filters: 'Filters',
+    price: 'Price',
+    less: 'Less',
+    more: 'More',
+    removeFilter: 'Remove filter',
+    showResults: 'Show',
+    bestsellers: 'Bestsellers',
+    newest: 'Newest products',
+    highestPrice: 'Highest price',
+    lowestPrice: 'Lowest price',
+    sorting: 'Sorting',
+    choose: 'Choose',
+    apply: 'Apply'
+  },
+  // === INDEX / HOME PAGE ===
+  index: {
+    seeHandles: 'See handles',
+    seeKnobs: 'See knobs',
+    seeAllCollections: 'See all collections →',
+    seeOurNews: 'See our news',
+    seeFurniture: 'See furniture →',
+    seeOurInstagram: 'See our Instagram',
+    seeAll: 'See all →',
+    addAtLeast4Images: 'Add at least 4 images to the "Choose your HVYT" section.',
+    recentlyAdded: 'See what we have recently added for you.',
+  },
+
+  // === SEARCH ===
+  search: {
+    search: 'Search',
+    placeholder: 'Search products...',
+    noResults: 'No results',
+  },
+};

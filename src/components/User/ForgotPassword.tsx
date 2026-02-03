@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import PasswordChangeConfirmation from '@/components/User/PasswordChangeConfirmation';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const ForgotPassword: React.FC<{ onBackToLogin: () => void }> = ({
   onBackToLogin,
 }) => {
+  const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [message, setMessage] = useState(false);
@@ -49,7 +51,7 @@ const ForgotPassword: React.FC<{ onBackToLogin: () => void }> = ({
           backgroundPosition: 'center',
         }}
       >
-        <h1 className="text-2xl font-bold text-black">Nie pamiętam hasła</h1>
+        <h1 className="text-2xl font-bold text-black">{t.auth.forgotPassword}</h1>
       </div>
 
       <div className="p-10 w-full md:w-1/2 flex flex-col justify-center items-center">
@@ -69,7 +71,7 @@ const ForgotPassword: React.FC<{ onBackToLogin: () => void }> = ({
                 email || focusedField === 'email' ? 'opacity-0' : 'opacity-100'
               }`}
             >
-              Adres email<span className="text-red-500">*</span>
+              {t.auth.emailAddress}<span className="text-red-500">*</span>
             </span>
           </div>
 
@@ -80,7 +82,7 @@ const ForgotPassword: React.FC<{ onBackToLogin: () => void }> = ({
             className="w-full bg-black text-white py-3 rounded-full"
             disabled={loading}
           >
-            {loading ? 'Ładowanie...' : 'Wyślij link do zresetowania'}
+            {loading ? t.auth.loading : t.auth.sendResetLink}
           </button>
 
           <button
@@ -88,7 +90,7 @@ const ForgotPassword: React.FC<{ onBackToLogin: () => void }> = ({
             onClick={onBackToLogin}
             className="w-full py-3 border-2 border-black text-black rounded-full"
           >
-            Wróć do logowania
+            {t.auth.backToLogin}
           </button>
         </form>
       </div>

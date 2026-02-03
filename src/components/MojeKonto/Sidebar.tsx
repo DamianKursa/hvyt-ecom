@@ -1,31 +1,34 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const Sidebar = ({ section }: { section: string }) => {
+  const { t } = useI18n();
+  
   const menuItems = [
     {
-      label: 'Moje dane',
+      label: t.account.myData,
       href: '/moje-konto/moje-dane',
       icon: '/icons/user.svg',
     },
     {
-      label: 'Moje zamówienia',
+      label: t.account.myOrders,
       href: '/moje-konto/moje-zamowienia',
       icon: '/icons/cart.svg',
     },
     {
-      label: 'Kupione produkty',
+      label: t.account.boughtProducts,
       href: '/moje-konto/kupione-produkty',
       icon: '/icons/kupione.svg',
     },
     {
-      label: 'Dane do faktury',
+      label: t.account.billingData,
       href: '/moje-konto/dane-do-faktury',
       icon: '/icons/do-faktury.svg',
     },
     {
-      label: 'Wyloguj',
+      label: t.account.logout,
       href: '/logowanie',
       icon: '/icons/logout-01.svg',
     },

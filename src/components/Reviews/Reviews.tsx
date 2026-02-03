@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReviewItem from './ReviewItem';
 import ReviewForm from './ReviewForm';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface Review {
   id: number;
@@ -11,6 +12,7 @@ interface Review {
 }
 
 const Reviews = ({ productId }: { productId: number }) => {
+  const { t } = useI18n();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -148,7 +150,7 @@ const Reviews = ({ productId }: { productId: number }) => {
               onClick={() => setShowForm(true)}
               className="w-full sm:w-auto px-6 py-3 text-lg font-light border border-neutral-dark rounded-full hover:bg-dark-pastel-red hover:text-white transition-all"
             >
-              Dodaj opinię +
+              {t.reviews.addReview} +
             </button>
           </div>
         )}

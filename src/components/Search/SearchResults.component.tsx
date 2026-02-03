@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const SearchComponent = ({ onClose }: { onClose: () => void }) => {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -117,7 +119,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
             type="text"
             value={query}
             onChange={handleSearch}
-            placeholder="Wyszukaj"
+            placeholder={t.search.placeholder}
             className="w-full p-2 border-b border-gray-300 focus:outline-none"
           />
           <button onClick={onClose} className="text-gray-500 text-2xl ml-4">
@@ -131,14 +133,14 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
             onClick={handleSearchSubmit}
             className="px-4 py-2 bg-black text-white rounded-full hover:bg-neutral-dark transition-colors"
           >
-            Szukaj
+            {t.search.search}
           </button>
         </div>
 
         {/* Content area (scrollable) */}
         <div className="flex-grow overflow-y-auto">
           {loading ? (
-            <div className="mt-6 text-center">Wyszukuje...</div>
+            <div className="mt-6 text-center">{t.common.loading}</div>
           ) : results.length > 0 ? (
             <div className="mt-6">
               <h3 className="text-sm font-semibold mb-2">
@@ -179,8 +181,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
             query.length >= 3 && (
               <div className="text-left text-black text-regular">
                 <p>
-                  Niestety nie znaleziono żadnych wyników dla &quot;{query}
-                  &quot;.
+                  {t.search.noResults} &quot;{query}&quot;.
                 </p>
                 <p>
                   Spróbuj ponownie używając innej pisowni lub słów kluczowych.

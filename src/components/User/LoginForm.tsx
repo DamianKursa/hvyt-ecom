@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useUserContext } from '@/context/UserContext';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
   onForgotPassword,
 }) => {
+  const { t } = useI18n();
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -39,11 +41,11 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
         const cleanedMessage =
           data.message && typeof data.message === 'string'
             ? stripHtmlTags(data.message)
-            : 'Wystąpił błąd podczas logowania, spróbuj ponownie później.';
+            : t.auth.loginError;
         setError(cleanedMessage);
       }
     } catch (err) {
-      setError('Wystąpił błąd podczas logowania, spróbuj ponownie później.');
+      setError(t.auth.loginError);
     } finally {
       setLoading(false);
     }
@@ -70,7 +72,7 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
               : 'opacity-100'
             }`}
         >
-          Adres email<span className="text-red-500">*</span>
+          {t.auth.emailAddress}<span className="text-red-500">*</span>
         </span>
       </div>
       {/* Password Input */}
@@ -92,11 +94,11 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
               : 'opacity-100'
             }`}
         >
-          Hasło<span className="text-red-500">*</span>
+          {t.auth.password}<span className="text-red-500">*</span>
         </span>
         <img
           src="/icons/show-pass.svg"
-          alt="Show Password"
+          alt={t.common.showPassword}
           className="absolute right-2 top-3 w-5 h-5 cursor-pointer"
           onClick={() => setShowPassword(!showPassword)}
         />
@@ -106,7 +108,7 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
         className="text-sm underline font-light text-black mt-2 cursor-pointer"
         onClick={onForgotPassword}
       >
-        Nie pamiętam hasła
+        {t.auth.forgotPassword}
       </p>
       {/* Error Message */}
       {error && (
@@ -120,7 +122,7 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
         className="w-full bg-black text-white py-3 rounded-full"
         disabled={loading}
       >
-        {loading ? 'Ładowanie...' : 'Zaloguj się'}
+        {loading ? t.auth.loading : t.auth.login}
       </button>
     </form>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 // Product IDs that should show custom delivery text
 const CUSTOM_DELIVERY_PRODUCT_IDS = new Set([
@@ -22,18 +23,20 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
   isMeble,
   productId,
 }) => {
+  const { t } = useI18n();
   const isCustomDeliveryProduct = productId
     ? CUSTOM_DELIVERY_PRODUCT_IDS.has(String(productId))
     : false;
+  
   const items = [
     {
       icon: '/icons/zwrot.svg',
-      text: '30 dni na zwrot',
+      text: t.product.returnPolicy,
       alt: 'Return Policy',
     },
     {
       icon: '/icons/galka.png',
-      text: 'Sprawdź produkty w tym samym kolorze',
+      text: t.product.checkSameColor,
       alt: 'Frequently bought together',
       isInteractive: true,
     },
@@ -48,6 +51,21 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
     (typeof stock === 'number' && stock > 0) ||
     stockStatus === 'instock';
 
+  const getStockText = () => {
+    const shippingText = isCustomDeliveryProduct ? t.product.shippingAfter : t.product.shippingIn24h;
+    
+    if (typeof stock === 'number' && stock > 0) {
+      if (stock >= 50) {
+        return `${t.product.over50InStock} ${shippingText}`;
+      }
+      return `${t.product.onlyXInStock.replace('{count}', String(stock))} ${shippingText}`;
+    }
+    if (stockStatus === 'instock') {
+      return `${t.product.inStock} ${shippingText}`;
+    }
+    return null;
+  };
+
   return (
     <div className="mt-4 border border-beige-dark rounded-[24px]">
       {shouldRenderStockRow && (
@@ -61,13 +79,7 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
             height={24}
           />
           <span className="text-black font-medium">
-            {typeof stock === 'number' && stock > 0
-              ? stock >= 50
-                ? `Ponad 50 szt. na stanie. ${isCustomDeliveryProduct ? 'Wysyłka po 15.01' : 'Wysyłka w 24h!'}`
-                : `Tylko ${stock} szt. na stanie. ${isCustomDeliveryProduct ? 'Wysyłka po 15.01' : 'Wysyłka w 24h!'}`
-              : stockStatus === 'instock'
-                ? `Na stanie. ${isCustomDeliveryProduct ? 'Wysyłka po 15.01' : 'Wysyłka w 24h!'}`
-                : null}
+            {getStockText()}
           </span>
         </div>
       )}
@@ -92,9 +104,9 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
                   className="underline cursor-pointer text-dark-pastel-red"
                   onClick={onScrollToSection}
                 >
-                  Sprawdź
+                  {t.product.check}
                 </span>{' '}
-                produkty w tym samym kolorze
+                {t.product.checkSameColor.replace(t.product.check, '').trim()}
               </>
             ) : (
               item.text

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: () => void }> = ({
   productId,
   onSubmit,
   onCancel,
 }) => {
+  const { t } = useI18n();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -36,8 +38,8 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
       if (current.length >= 5) break; // max 5
       const isImage = file.type.startsWith('image/');
       const isSmall = file.size <= 1024 * 1024; // 1MB
-      if (!isImage) { setAttachmentError('Dozwolone są tylko pliki graficzne.'); continue; }
-      if (!isSmall) { setAttachmentError('Maksymalny rozmiar pliku to 1MB.'); continue; }
+      if (!isImage) { setAttachmentError(t.reviews.onlyImages); continue; }
+      if (!isSmall) { setAttachmentError(t.reviews.maxFileSize); continue; }
       current.push(file);
     }
     setAttachments(current.slice(0, 5));
@@ -49,10 +51,10 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
     e.preventDefault();
 
     const errors: { [k: string]: string } = {};
-    if (!formData.name.trim()) errors.name = 'Uzupełnij imię';
-    if (!formData.email.trim()) errors.email = 'Uzupełnij adres e-mail';
-    if (!formData.content.trim()) errors.content = 'Napisz opinię';
-    if (!formData.consent) errors.consent = 'Musisz zaakceptować zgodę';
+    if (!formData.name.trim()) errors.name = t.reviews.fillName;
+    if (!formData.email.trim()) errors.email = t.reviews.fillEmail;
+    if (!formData.content.trim()) errors.content = t.reviews.writeReview;
+    if (!formData.consent) errors.consent = t.reviews.mustAcceptConsent;
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       return;
@@ -93,7 +95,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
       onSubmit();
     } catch (error) {
       console.error('Error submitting review:', error);
-      alert('Wystąpił błąd podczas przesyłania opinii.');
+      alert(t.reviews.reviewError);
     }
   };
 
@@ -106,11 +108,11 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
         type="button"
         onClick={onCancel}
         className="absolute top-4 right-4 text-2xl font-bold text-gray-500 hover:text-gray-700"
-        aria-label="Close form"
+        aria-label={t.common.close}
       >
         &times;
       </button>
-      <h3 className="text-xl font-bold mb-6">Dodaj swoją opinię</h3>
+      <h3 className="text-xl font-bold mb-6">{t.reviews.addYourReview}</h3>
       <div className="flex items-center mb-4">
         <div className="flex items-center gap-1">
           {Array.from({ length: 5 }, (_, index) => (
@@ -134,7 +136,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
         <div className="flex flex-col">
           <input
             type="text"
-            placeholder="Imię"
+            placeholder={t.form.firstName}
             className={`border-b ${fieldErrors.name
               ? 'border-[#A83232]'
               : 'border-gray-300'} focus:border-black outline-none px-2 py-2 w-full`}
@@ -151,7 +153,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
         <div className="flex flex-col">
           <input
             type="email"
-            placeholder="E-mail"
+            placeholder={t.form.email}
             className={`border-b ${fieldErrors.email
               ? 'border-[#A83232]'
               : 'border-gray-300'} focus:border-black outline-none px-2 py-2 w-full`}
@@ -166,7 +168,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
         </div>
       </div>
       <textarea
-        placeholder="Napisz opinię"
+        placeholder={t.reviews.writeReview}
         className={`border-b ${fieldErrors.content ? 'border-[#A83232]' : 'border-gray-300'} focus:border-black outline-none w-full px-2 py-2 mb-6`}
         rows={4}
         onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -179,7 +181,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
       )}
       {/* Załączniki (opcjonalne) */}
       <div className="mt-2">
-        <label className="block text-sm mb-2">Dodaj załączniki (max 5, jpg/png, max 1MB każdy)</label>
+        <label className="block text-sm mb-2">{t.reviews.attachments}</label>
         <div className="flex items-center gap-4">
           <input
             type="file"
@@ -199,7 +201,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
       {attachments.length > 0 && (
         <div className="flex flex-wrap gap-2 text-sm text-neutral-darkest mt-2">
           {attachments.map((file, idx) => (
-            <img key={idx} src={URL.createObjectURL(file)} alt={`Podgląd ${idx + 1}`} className="w-14 h-14 object-cover rounded-md" />
+            <img key={idx} src={URL.createObjectURL(file)} alt={`${t.reviews.preview} ${idx + 1}`} className="w-14 h-14 object-cover rounded-md" />
           ))}
         </div>
       )}
@@ -221,15 +223,15 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
             {formData.consent && <img src="/icons/check.svg" alt="check" />}
           </span>
           <span>
-            Potwierdzam, że zapoznałam/em się z treścią{' '}
+            {t.reviews.consentText.split('Regulaminu')[0]}
             <Link className="underline" href="/regulamin">
-              Regulaminu
-            </Link>{' '}
-            i{' '}
+              {t.legal.terms}
+            </Link>
+            {' i '}
             <Link className="underline" href="/polityka-prywatnosci">
-              Polityki Prywatności
-            </Link>{' '}
-            oraz akceptuję ich postanowienia.
+              {t.legal.privacy}
+            </Link>
+            {t.reviews.consentText.split('Polityki Prywatności')[1] || ' oraz akceptuję ich postanowienia.'}
           </span>
         </label>
         {fieldErrors.consent && (
@@ -244,7 +246,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
           type="submit"
           className="px-[75px] font-light py-3 bg-black text-white rounded-full hover:bg-dark-pastel-red transition-all"
         >
-          Dodaj opinię
+          {t.reviews.addReview}
         </button>
       </div>
     </form>

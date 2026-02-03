@@ -5,6 +5,7 @@ import { CartContext } from '@/stores/CartProvider';
 import ProductPreview from '@/components/Product/ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import { getCurrency, Language } from '@/utils/i18n/config';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface RecommendedProduct {
   id: string;
@@ -33,6 +34,7 @@ const CartModal: React.FC<CartModalProps> = ({
   crossSellProducts,
   loading,
 }) => {
+  const { t } = useI18n();
   const router = useRouter();
   const { cart } = React.useContext(CartContext);
 
@@ -46,7 +48,7 @@ const CartModal: React.FC<CartModalProps> = ({
       <div className="bg-beige-light w-full h-full md:h-auto md:max-w-[830px] md:min-w-[830px] px-6 py-6 md:px-12 md:py-14 rounded-none md:rounded-2xl relative shadow-lg">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-bold">Twój koszyk</h2>
+          <h2 className="text-2xl font-bold">{t.cart.yourCart}</h2>
           <button className="text-2xl font-bold text-black" onClick={onClose}>
             &times;
           </button>
@@ -82,7 +84,7 @@ const CartModal: React.FC<CartModalProps> = ({
             </span>
           </div>
           <span className="text-regular font-light text-black">
-            Suma produktów w koszyku:
+            {t.cart.cartSummary}
           </span>
           <span className="text-regular font-light">{totalPrice}{currency.symbol}</span>
         </div>
@@ -93,23 +95,23 @@ const CartModal: React.FC<CartModalProps> = ({
             onClick={onClose}
             className="w-full md:w-1/2 py-3 border border-black text-black rounded-full hover:bg-gray-100 transition"
           >
-            Kontynuuj zakupy
+            {t.cart.continueShopping}
           </button>
           <button
             onClick={() => router.push('/koszyk')}
             className="w-full md:w-1/2 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition"
           >
-            Przejdź do koszyka
+            {t.cart.goToCart}
           </button>
         </div>
 
         {/* Recommended Products */}
         <div className="pt-10 border-t border-[#DAD3C8]">
-          <h3 className="text-lg font-semibold mb-4">Uzupełnij zamówienie</h3>
+          <h3 className="text-lg font-semibold mb-4">{t.cart.completeOrder}</h3>
           {/* Desktop View: Grid */}
           <div className="hidden md:grid grid-cols-2 sm:grid-cols-3 gap-4">
             {loading ? (
-              <p className="text-center text-gray-500">Ładowanie...</p>
+              <p className="text-center text-gray-500">{t.common.loading}</p>
             ) : crossSellProducts.slice(0, 3).length > 0 ? (
               crossSellProducts
                 .slice(0, 3)
@@ -117,13 +119,13 @@ const CartModal: React.FC<CartModalProps> = ({
                   <ProductPreview key={item.id} isSmall product={item} />
                 ))
             ) : (
-              <p className="text-center text-gray-500">Brak rekomendacji</p>
+              <p className="text-center text-gray-500">{t.cart.noRecommendations}</p>
             )}
           </div>
           {/* Mobile View: Responsive Slider */}
           <div className="md:hidden">
             {loading ? (
-              <p className="text-center text-gray-500">Ładowanie...</p>
+              <p className="text-center text-gray-500">{t.common.loading}</p>
             ) : crossSellProducts.slice(0, 3).length > 0 ? (
               <ResponsiveSlider
                 items={crossSellProducts.slice(0, 3)}
@@ -132,7 +134,7 @@ const CartModal: React.FC<CartModalProps> = ({
                 )}
               />
             ) : (
-              <p className="text-center text-gray-500">Brak rekomendacji</p>
+              <p className="text-center text-gray-500">{t.cart.noRecommendations}</p>
             )}
           </div>
         </div>
