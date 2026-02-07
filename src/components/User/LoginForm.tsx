@@ -122,7 +122,7 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
         className="w-full bg-black text-white py-3 rounded-full"
         disabled={loading}
       >
-        {loading ? t.auth.loading : t.auth.login}
+        {loading ? t.modal.loading : t.auth.login}
       </button>
     </form>
   );

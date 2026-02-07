@@ -82,7 +82,7 @@ const ForgotPassword: React.FC<{ onBackToLogin: () => void }> = ({
             className="w-full bg-black text-white py-3 rounded-full"
             disabled={loading}
           >
-            {loading ? t.auth.loading : t.auth.sendResetLink}
+            {loading ? t.modal.loading : t.auth.sendResetLink}
           </button>
 
           <button

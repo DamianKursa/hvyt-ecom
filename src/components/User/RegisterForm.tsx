@@ -204,7 +204,7 @@ const RegisterForm: React.FC = () => {
         className="w-full bg-black text-white py-3 rounded-full flex justify-center items-center"
         disabled={loading}
       >
-        {loading ? t.auth.loading : t.auth.register}
+        {loading ? t.modal.loading : t.auth.register}
       </button>
     </form>
   );
