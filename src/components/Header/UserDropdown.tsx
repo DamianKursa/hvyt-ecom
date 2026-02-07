@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useUserContext } from '@/context/UserContext';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface UserDropdownProps {
   onLogout: () => void;
@@ -14,6 +15,8 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
   onMouseLeave,
 }) => {
   const { user } = useUserContext();
+
+  const { t } = useI18n()
 
   console.log('User in UserDropdown:', user);
 
@@ -29,7 +32,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
           {user?.name || 'Użytkownik'}
         </p>
         <p className="font-light px-4 text-[#661F30] text-[16px]">
-          fajnie, że jesteś z nami!
+          {t.account.thanksMessage}
         </p>
       </div>
 
@@ -38,35 +41,35 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
         <li>
           <Link href="/moje-konto/moje-zamowienia">
             <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
-              Moje zamówienia
+              {t.account.myOrders}
             </span>
           </Link>
         </li>
         <li>
           <Link href="/moje-konto/kupione-produkty">
             <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
-              Kupione produkty
+              {t.account.boughtProducts}
             </span>
           </Link>
         </li>
         <li>
           <Link href="/moje-konto/moje-dane">
             <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
-              Moje dane
+              {t.account.myData}
             </span>
           </Link>
         </li>
         <li>
           <Link href="/moje-konto/moje-adresy">
             <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
-              Moje adresy
+              {t.account.myAddresses}
             </span>
           </Link>
         </li>
         <li>
           <Link href="/moje-konto/dane-do-faktury">
             <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
-              Dane do faktury
+              {t.account.billingData}
             </span>
           </Link>
         </li>
@@ -81,7 +84,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
               alt="Logout Icon"
               className="w-5 h-5 mr-2"
             />
-            Wyloguj się
+            {t.account.logoutFull}
           </button>
         </li>
       </ul>

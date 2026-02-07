@@ -982,7 +982,7 @@ console.log('currentprod', product);
                     }`
                   }
                 >
-                  Dodaj do koszyka
+                  {t.product.addToCart}
                   <Image
                     src="/icons/dodaj-do-koszyka.svg"
                     alt="Add to Cart"

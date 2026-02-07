@@ -47,6 +47,8 @@ export interface Order {
   date_created: string;
   payment_status: string;
   status: string;
+  currency?: string;
+  currency_symbol?: string;
   total: string;
   subtotal?: string;
   shipping_total?: string;
@@ -97,6 +99,7 @@ export interface Product {
   id: string;
   name: string;
   price: string;
+  lang?: string;
   type?: 'simple' | 'variable';
   slug: string;
   sale_price?: string;

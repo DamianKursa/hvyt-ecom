@@ -145,7 +145,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
           ) : results.length > 0 ? (
             <div className="mt-6">
               <h3 className="text-sm font-semibold mb-2">
-                Wyniki wyszukiwania
+                {t.search.searchResults}
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {results.map((product) => (

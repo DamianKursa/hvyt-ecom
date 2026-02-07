@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import CustomDropdown from '@/components/UI/CustomDropdown.component';
+import CustomDropdownWithLabels from '@/components/UI/CustomDropdownWithLabels.component';
 import { Order } from '@/utils/functions/interfaces';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { getCurrency, Language } from '@/utils/i18n/config';
+import { getCurrency, getCurrentLanguage, Language } from '@/utils/i18n/config';
+import { getCurrencyByLocale, getCurrencyBySlug } from '@/config/currencies';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { dropdownOption } from '@/types/filters';
 
 interface OrderTableProps {
   content: Order[];
@@ -52,7 +55,9 @@ const getPaymentStatusLabel = (paymentStatus: string) => {
 const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
 
   const router = useRouter();
-  const currency = getCurrency(router?.locale as Language ?? 'pl');
+  const {t} = useI18n();
+  const currency = getCurrencyByLocale(getCurrentLanguage());
+
 
   const [sortOpen, setSortOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | ''>('');
@@ -64,21 +69,30 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
         const db = new Date(b.date_created).getTime();
         return sortOrder === 'newest' ? db - da : da - db;
       });
-  const sortingOptions = ['Najnowsze zamówienia', 'Najstarsze zamówienia'];
+  const sortingOptions: dropdownOption[] = [
+    {
+      key: 'newest',
+      label: t.account.sortNewest
+      }, 
+    {
+      key: 'oldest',
+      label: t.account.sortOldest
+    }
+  ];
 
   if (!content || content.length === 0) {
     return (
       <div className="mt-[64px] md:mt-0 rounded-[25px]  bg-white p-4 flex flex-col items-center justify-center">
         <img
           src="/icons/brak-zamowien.svg"
-          alt="Brak zamówień"
+          alt={t.account.noOrders}
           className="w-28 h-28 mb-4"
         />
         <h2 className="text-[18px] md:text-[28px] text-center font-semibold mb-4 text-black">
-          Nie masz jeszcze żadnych zamówień
+          {t.account.noOrdersFull}
         </h2>
         <p className="text-[16px] md:text-[18px] text-black text-center font-light mb-6">
-          Zacznij buszować i znajdź coś dla siebie
+          {t.account.findSomething}
         </p>
         <div className="flex gap-4">
           <div className="flex gap-4">
@@ -86,11 +100,11 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
               href="/kolekcje"
               className="flex items-center px-10 md:px-16 py-3 bg-black text-white rounded-full font-light text-[16px]"
             >
-              Sprawdź nasze kolekcje
+              {t.account.checkCollections}
               <span className="ml-2">
                 <Image
                   src="/icons/sprawdz-kolekcje.svg"
-                  alt="Ikona kolekcji"
+                  alt={t.account.collectionIcon}
                   width={16}
                   height={16}
                 />
@@ -108,23 +122,21 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
       <div className="hidden md:block">
         <div className="flex items-center justify-between mb-4 px-4">
           <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
-            Moje zamówienia
+            {t.account.myOrders}
           </h2>
           <div className="w-1/3">
-            <CustomDropdown
+            <CustomDropdownWithLabels
               className={`${sortOrder ? 'border border-dark-pastel-red text-dark-pastel-red' : ''} h-12 bg-white flex items-center justify-center px-4 text-center`}
               options={sortingOptions}
               selectedValue={
-                sortOrder
-                  ? sortOrder === 'newest'
-                    ? 'Najnowsze zamówienia'
-                    : 'Najstarsze zamówienia'
-                  : null
+                sortOrder && sortOrder === 'oldest' ?
+                    sortingOptions[1] 
+                  : sortingOptions[0]
               }
-              placeholder="Sortowanie"
+              placeholder={t.account.sort}
               onChange={(value) =>
                 setSortOrder(
-                  value === 'Najnowsze zamówienia' ? 'newest' : 'oldest'
+                  value.key === 'newest' ? 'newest' : 'oldest'
                 )
               }
               isProductPage={false}
@@ -135,17 +147,17 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
           <thead className="bg-beige">
             <tr>
               <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
-                Zamówienie
+                {t.account.order}
               </th>
               <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
-                Data zamówienia
+                {t.account.orderDate}
               </th>
               <th className="py-4 px-4 text-left font-semibold text-neutral-darker"></th>
               <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
-                Status realizacji
+                {t.account.orderStatus}
               </th>
               <th className="py-4 px-4 text-left font-semibold text-neutral-darker">
-                Suma
+                {t.account.total}
               </th>
               <th className="py-3 px-4 text-left font-semibold text-neutral-darker"></th>
             </tr>
@@ -171,7 +183,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
                     </span>
                   </td>
                   <td className="py-3 text-black font-light px-4">
-                    {order.total} {currency.symbol}
+                    {order.total} {order.currency ? getCurrencyBySlug(order.currency).symbol : getCurrencyByLocale('').symbol}
                   </td>
                   <td className="py-3 px-4">
                     {onViewDetails ? (
@@ -180,7 +192,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
                         className="text-black font-light underline"
                       >
                         <span className="flex items-center">
-                          Szczegóły
+                          {t.account.details}
                           <img src="/icons/arrow-right-pagination-black.svg" alt="" className="ml-2" />
                         </span>
                       </button>
@@ -189,7 +201,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
                         href={`/moje-konto/moje-zamowienia/${order.id}`}
                         className="text-black font-light underline"
                       >
-                        Szczegóły
+                        {t.account.details}
                       </Link>
                     )}
                   </td>
@@ -229,7 +241,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
               </div>
               <div className="flex items-center justify-between mb-2 mx-4">
                 <span>Suma</span>
-                <span>{order.total} {currency.symbol}</span>
+                <span>{order.total} {currency?.symbol}</span>
               </div>
               <div className="flex justify-center mb-4">
                 {onViewDetails ? (
@@ -237,7 +249,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
                     onClick={() => onViewDetails(order)}
                     className="text-black font-light underline flex items-center"
                   >
-                    Szczegóły
+                    {t.account.details}
                     <svg
                       className="ml-1 w-4 h-4"
                       fill="none"
@@ -255,7 +267,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
                     href={`/moje-konto/moje-zamowienia/${order.id}`}
                     className="text-black font-light underline flex items-center"
                   >
-                    Szczegóły
+                    {t.account.details}
                     <svg
                       className="ml-1 w-4 h-4"
                       fill="none"

@@ -4,16 +4,27 @@ import Layout from '@/components/Layout/Layout.component';
 import Link from 'next/link';
 import Image from 'next/image';
 import LoadingModal from '@/components/UI/LoadingModal';
+import { useI18n } from '@/utils/hooks/useI18n';
 
-const endpoints = [
+type AccountEndpoints = {
+    key: string,
+    langKey: string,    
+    label: string,
+    path: string,
+    icon: string,
+}
+
+const endpoints: AccountEndpoints[] = [
   {
     key: 'orders',
+    langKey: 'myOrders',    
     label: 'Moje zamówienia',
     path: '/moje-konto/moje-zamowienia',
     icon: '/icons/cart.svg',
   },
   {
     key: 'kupione-produkty',
+    langKey: 'boughtProducts',    
     label: 'Kupione produkty',
     path: '/moje-konto/kupione-produkty',
     icon: '/icons/kupione.svg',
@@ -21,17 +32,20 @@ const endpoints = [
   {
     key: 'moje-dane',
     label: 'Moje dane',
+    langKey: 'myData',      
     path: '/moje-konto/moje-dane',
     icon: '/icons/user.svg',
   },
   {
     key: 'moje-adresy',
+    langKey: 'myAddresses',          
     label: 'Moje adresy',
     path: '/moje-konto/moje-adresy',
     icon: '/icons/home.svg',
   },
   {
     key: 'dane-do-faktury',
+    langKey: 'billingData',  
     label: 'Dane do faktury',
     path: '/moje-konto/dane-do-faktury',
     icon: '/icons/do-faktury.svg',
@@ -46,6 +60,7 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
+  const { t } = useI18n();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -86,12 +101,12 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
   }
 
   return (
-    <Layout title="Moje konto">
+    <Layout title={t.account.myAccount}>
       <div className="container mx-auto py-[64px] md:py-8 flex">
         {/* Sidebar (hidden on mobile) */}
         <aside className="hidden md:block w-[300px] bg-beige  max-h-[410px] rounded-[25px]">
           <div className="p-4">
-            <h2 className="text-2xl font-semibold">Moje konto</h2>
+            <h2 className="text-2xl font-semibold">{t.account.myAccount}</h2>
           </div>
           <ul className="space-y-4">
             {endpoints.map((endpoint) => (
@@ -105,12 +120,12 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
                   >
                     <Image
                       src={endpoint.icon}
-                      alt={endpoint.label}
+                      alt={t.account[endpoint.langKey as keyof typeof t.account]}
                       width={24}
                       height={24}
                       className="mr-3"
                     />
-                    <span className="text-[18px]">{endpoint.label}</span>
+                    <span className="text-[18px]">{t.account[endpoint.langKey as keyof typeof t.account]}</span>
                   </div>
                 </Link>
               </li>
@@ -125,10 +140,10 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
               >
                 <img
                   src="/icons/logout-01.svg"
-                  alt="Wyloguj się"
+                  alt={t.account.logoutFull}
                   className="h-6 mr-3"
                 />
-                Wyloguj się
+                {t.account.logoutFull}
               </button>
             </li>
           </ul>

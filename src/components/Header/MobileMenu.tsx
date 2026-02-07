@@ -183,7 +183,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                   className="font-bold flex items-center w-full text-left"
                 >
                   <img src="/icons/user.svg" alt="User" className="h-6 mr-3" />
-                  Moje konto
+                  {t.account.myAccount}
                   {/* Optional arrow icon for visual feedback */}
                   <svg
                     className={`ml-2 h-4 w-4 transform transition-transform duration-200 ${accountDropdownOpen ? 'rotate-180' : 'rotate-0'
@@ -215,10 +215,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                         >
                           <img
                             src="/icons/cart.svg"
-                            alt="Moje zamówienia"
+                            alt={t.account.myOrders}
                             className="h-6 mr-3"
                           />
-                          Moje zamówienia
+                          {t.account.myOrders}
                         </a>
                       </Link>
                     </li>
@@ -233,10 +233,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                         >
                           <img
                             src="/icons/kupione.svg"
-                            alt="Kupione produkty"
+                            alt={t.account.boughtProducts}
                             className="h-6 mr-3"
                           />
-                          Kupione produkty
+                          {t.account.boughtProducts}
                         </a>
                       </Link>
                     </li>
@@ -305,10 +305,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                       >
                         <img
                           src="/icons/logout-01.svg"
-                          alt="Wyloguj się"
+                          alt={t.account.logoutFull}
                           className="h-6 mr-3"
                         />
-                        Wyloguj się
+                        {t.account.logoutFull}
                       </button>
                     </li>
                   </ul>

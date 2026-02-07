@@ -14,6 +14,11 @@ type CurrencyConfigItem = {
 }
 
 export const currenciesConfig: CurrencyConfig = {
+  fallback: {
+    slug: '',
+    symbol: '',
+    name: '',
+  },
   pl: {
     slug: 'pln',
     symbol: 'zł',
@@ -26,8 +31,18 @@ export const currenciesConfig: CurrencyConfig = {
   },
 }
 
-export const getCurrencyByLocale = (locale : string) : CurrencyConfigItem | null => {
-    return currenciesConfig[locale] || null;
+export const getCurrencyByLocale = (locale : string ) : CurrencyConfigItem => {
+    return currenciesConfig[locale] || currenciesConfig['fallback'];
+}
+
+export const getCurrencyBySlug = (slug : string ) : CurrencyConfigItem => {
+    for (let locale of Object.keys(currenciesConfig)) {
+        if(currenciesConfig[locale].slug === slug.toLocaleLowerCase()) {
+            return currenciesConfig[locale]
+        }
+    }
+    
+    return currenciesConfig['fallback'];
 }
 
 export const getCurrencySlugByLocale = (locale : string) : string => {

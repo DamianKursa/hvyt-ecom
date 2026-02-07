@@ -18,11 +18,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { token, user_display_name } = response.data;
 
+    console.log('loggedin', user_display_name, token );
+    
+
     res.setHeader(
       'Set-Cookie',
       serialize('token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: true, //process.env.NODE_ENV === 'production',
         sameSite: 'none',
         path: '/',
         maxAge: 60 * 60 * 24, 

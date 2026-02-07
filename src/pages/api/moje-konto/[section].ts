@@ -8,6 +8,7 @@ interface OrderItem {
   name: string;
   quantity: number;
   price: string;
+  lang?: string;
 }
 
 interface Order {
@@ -170,6 +171,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             } catch (error: any) {
               console.error('Error fetching product image:', error.response?.data || error.message);
             }
+
             return {
               id: item.product_id,
               name: item.name,
@@ -177,6 +179,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               quantity: item.quantity,
               price: item.price,
               description: '',
+              lang: item.lang || '',
               image,
               attributes: [],
               totalPrice: parseFloat(item.price) * item.quantity,

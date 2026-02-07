@@ -9,8 +9,10 @@ import MojeDane from '@/components/MojeKonto/MojeDane';
 import MyAddresses from '@/components/MojeKonto/MyAdresses';
 import BillingAddresses from '@/components/MojeKonto/BillingAddresses';
 import { Order, Product } from '@/utils/functions/interfaces';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const SectionPage: React.FC = () => {
+  const {t} = useI18n();
   const router = useRouter();
   const { section } = router.query;
 
@@ -162,7 +164,7 @@ const SectionPage: React.FC = () => {
             onClick={handleBackToOrders}
             className="mb-4 text-[#661F30] font-semibold"
           >
-            ← Powrót do zamówień
+            ← {t.order.backToOrders}
           </button>
           <OrderDetails order={selectedOrder} />
         </div>
@@ -172,7 +174,6 @@ const SectionPage: React.FC = () => {
     if (section === 'moje-zamowienia') {
       return (
         <div className="rounded-[25px] bg-white p-4 md:p-8 shadow-sm">
-
           {content && Array.isArray(content) && (
             <OrderTable
               content={content as Order[]}

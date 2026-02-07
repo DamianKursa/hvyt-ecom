@@ -15,6 +15,7 @@ export const en: Translations = {
     },
     // === PRODUCT ===
     product: {  
+      product: 'Product',
       notAvailableInLanguage: 'Product not available in this language',  
       notAvailableDescription: 'Unfortunately, this product is not available in the selected language version...',  
       backToHome: 'Back to homepage',  
@@ -430,6 +431,25 @@ export const en: Translations = {
     billingCompany: 'Billing data - company',
     productsWillBeAdded: 'Products will be added to cart with their current',
     sorting: 'Sort by',
+    alreadyUser: 'You are already a user?',
+    noAccoountYet: 'You don\'t have an account yet?',
+    signup: "Sign up",
+    myAccount: 'My account',
+    thanksMessage: 'It\'s great that you\'re with us!',
+    noOrdersFull: 'You don\'t have any orders yet',
+    findSomething: 'Start browsing and find something for yourself',
+    checkCollections: 'Check out our collections',
+    collectionIcon: 'Collection icon',
+    sortNewest: 'Latest orders',
+    sortOldest: 'Oldest orders',
+    sortProductsNewest: 'Latest purchases',
+    sortProductsOldest: 'Oldest purchases',    
+    sort: 'Sorting',    
+    order: 'Order',
+    total: 'Total',
+    details: 'Details',
+    lastPurchase: 'Latest purchase',
+    currentPrice: 'Current price',
   },
 
   // === AUTHENTICATION / LOGIN ===
@@ -514,8 +534,24 @@ export const en: Translations = {
     noResults: 'No results for',
     noResultsDetails: 'Please try again using different spelling or keywords.',
     whatsNew: 'What\'s new?',
+    searchResults: 'Search results'
   },
-
+    // === ZAMÓWIENIE ===
+    order: {
+      order: 'Order',
+      myOrder: 'My order',
+      orderFromDay: 'from',
+      summary: 'Summary',
+      productsPrice: 'Products prices',
+      tax: 'Tax',
+      togther: 'Total',
+      orderAgain: 'Reorder',
+      orderAgainInfo: 'The products will be added to your cart at their current prices. Would you like to continue?',
+      shippingAddress: 'Shipping address',
+      invoiceDetails: 'Invoice details',
+      noInvoiceData: 'No invoice data.',
+      backToOrders: 'Back to orders',
+    },
   // === WISHLIST ===
   wishlist: {
     wishlist: 'Wishlist',

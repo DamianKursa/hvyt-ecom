@@ -3,10 +3,13 @@ import Layout from '@/components/Layout/Layout.component';
 import LoginForm from '@/components/User/LoginForm';
 import RegisterForm from '@/components/User/RegisterForm';
 import ForgotPassword from '@/components/User/ForgotPassword';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const Logowanie = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+
+  const { t } = useI18n();
 
   return (
     <Layout title="Hvyt | Logowanie">
@@ -30,7 +33,7 @@ const Logowanie = () => {
                   }}
                 >
                   <h2 className="text-xl md:text-2xl font-bold mb-4 text-center md:text-left">
-                    Jesteś już użytkownikiem?
+                    {t.account.alreadyUser}
                   </h2>
                 </div>
 
@@ -66,7 +69,7 @@ const Logowanie = () => {
                 {/* Left Section */}
                 <div className="bg-[#CBDBE7] p-10 w-full md:w-1/2 flex flex-col justify-start">
                   <h2 className="text-xl md:text-2xl font-bold mb-4 text-center md:text-left">
-                    Nie masz jeszcze konta?
+                    { t.account.noAccoountYet }
                   </h2>
                 </div>
 
@@ -78,7 +81,7 @@ const Logowanie = () => {
                       onClick={() => setIsRegistering(true)}
                       className="w-full py-3 px-6 border-2 border-black text-black rounded-full"
                     >
-                      Zarejestruj się
+                      { t.account.signup}
                     </button>
                   )}
                 </div>

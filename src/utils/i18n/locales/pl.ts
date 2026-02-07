@@ -13,6 +13,7 @@ export const pl = {
     },
     // === PRODUKT ===
     product: {  
+      product: 'Produkt',
       notAvailableInLanguage: 'Produkt niedostępny w tym języku',  
       notAvailableDescription: 'Niestety ten produkt nie jest dostępny w wybranej wersji językowej...',  
       backToHome: 'Wróć do strony głównej',  
@@ -427,6 +428,26 @@ export const pl = {
       billingCompany: 'Dane do faktury - firma',
       productsWillBeAdded: 'Produkty zostaną dodane do koszyka z uwzględnieniem ich aktualnych',
       sorting: 'Sortowanie',
+      alreadyUser: 'Jesteś już użytkownikiem?',
+      noAccoountYet: 'Nie masz jeszcze konta?',
+      signup: "Zarejestruj się",
+      myAccount: 'Moje konto',
+      thanksMessage: 'fajnie, że jesteś z nami!',
+      noOrdersFull: 'Nie masz jeszcze żadnych zamówień',
+      findSomething: 'Zacznij buszować i znajdź coś dla siebie',
+      checkCollections: 'Sprawdź nasze kolekcje',
+      collectionIcon: 'Ikona kolekcji',
+      sortNewest: 'Najnowsze zamówienia',
+      sortOldest: 'Najstarsze zamówienia',
+      sortProductsNewest: 'Najnowsze zakupy',
+      sortProductsOldest: 'Najstarsze zakupy',
+      sort: 'Sortowanie',
+      order: 'Zamówienie',
+      total: 'Suma',
+      details: 'Szczegóły',
+      lastPurchase: 'Ostatni zakup',
+      currentPrice: 'Aktualna cena',
+
     },
     // === AUTENTYKACJA / LOGOWANIE ===
     auth: {
@@ -506,14 +527,32 @@ export const pl = {
       noResults: 'Brak wyników dla frazy',
       noResultsDetails: 'Spróbuj ponownie używając innej pisowni lub słów kluczowych.',
       whatsNew: 'Co nowego?',
+      searchResults: 'Wyniki wyszukiwania',
     },
-  // === WISHLIST ===
-  wishlist: {
-    wishlist: 'Ulubione',
-    noProducts: 'Nie masz ulubionych produktów.',    
-    removeFrom: 'Usuń z ulubionych',
-    addTo: 'Dodaj do ulubionych',
-  }    
+    // === ZAMÓWIENIE ===
+    order: {
+      order: 'Zamówienie',
+      myOrder: 'Moje zamówienie',
+      orderFromDay: 'z dnia',
+      summary: 'Podsumowanie',
+      productsPrice: 'Cena produktów',
+      tax: 'Podatek',
+      togther: 'Razem',
+      orderAgain: 'Ponów zamówienie',
+      orderAgainInfo: 'Produkty zostaną dodane do koszyka z&nbsp;uwzględnieniem ich aktualnych cen. Czy chcesz kontynuować?',
+      shippingAddress: 'Adres wysyłki',
+      invoiceDetails: 'Dane do faktury',
+      noInvoiceData: 'Brak danych do faktury.',
+      backToOrders: 'Powrót do zamówień',
+
+    },
+    // === WISHLIST ===
+    wishlist: {
+      wishlist: 'Ulubione',
+      noProducts: 'Nie masz ulubionych produktów.',    
+      removeFrom: 'Usuń z ulubionych',
+      addTo: 'Dodaj do ulubionych',
+    }    
   };
 
 /**

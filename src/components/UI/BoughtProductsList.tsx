@@ -1,10 +1,12 @@
 import React, { useContext, useState } from 'react';
-import CustomDropdown from '@/components/UI/CustomDropdown.component';
+import CustomDropdownWithLabels from '@/components/UI/CustomDropdownWithLabels.component';
 import { CartContext, Product as CartProduct } from '@/stores/CartProvider';
 import { Product } from '@/utils/functions/interfaces';
 import Snackbar from '../UI/Snackbar.component';
 import { useRouter } from 'next/router';
-import { getCurrency, Language } from '@/utils/i18n/config';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { dropdownOption } from '@/types/filters';
+import { getCurrencyByLocale } from '@/config/currencies';
 
 interface BoughtProductsListProps {
   products: Product[];
@@ -13,10 +15,23 @@ interface BoughtProductsListProps {
 const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
   products,
 }) => {
+  const router = useRouter();
+  const { t } = useI18n();     
   const { addCartItem } = useContext(CartContext);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | ''>('');
-  const sortingOptions = ['Najnowsze zakupy', 'Najstarsze zakupy'];
+
+    const sortingOptions: dropdownOption[] = [
+      {
+        key: 'newest',
+        label: t.account.sortProductsNewest
+        }, 
+      {
+        key: 'oldest',
+        label: t.account.sortProductsOldest
+      }
+    ];
+
   const sortedProducts =
     sortOrder === ''
       ? products
@@ -25,9 +40,6 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
           ? Number(b.id) - Number(a.id)
           : Number(a.id) - Number(b.id)
       );
-
-  const router = useRouter();
-  const currency = getCurrency(router?.locale as Language ?? 'pl');      
 
   const handleAddToCart = (product: Product) => {
     const price = parseFloat(product.price);
@@ -86,14 +98,14 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
 
         {/* Ostatni zakup */}
         <div className="flex items-center justify-between mb-2">
-          <span className="text-gray-700">Ostatni zakup:</span>
+          <span className="text-gray-700">{t.account.lastPurchase}:</span>
           <span className="text-black">{new Date().toLocaleDateString()}</span>
         </div>
 
         {/* Aktualna cena */}
         <div className="flex items-center justify-between  mb-2">
-          <span className="text-gray-700">Aktualna cena:</span>
-          <span className="text-black font-medium">{product.price} {currency.symbol}</span>
+          <span className="text-gray-700">{t.account.currentPrice}:</span>
+          <span className="text-black font-medium">{product.price} {getCurrencyByLocale(product.lang || 'pl')?.symbol}</span>
         </div>
 
         {/* Add to Cart Button */}
@@ -102,7 +114,7 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
             onClick={() => handleAddToCart(product)}
             className="bg-transparent border border-gray-400 rounded-full py-2 mt-4 px-4 flex items-center hover:bg-gray-100 transition text-black"
           >
-            Dodaj do koszyka
+            {t.product.addToCart}
             <span className="ml-2 flex items-center">
               <img
                 src="/icons/cart.svg"
@@ -120,23 +132,21 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
     <>
       <div className="flex items-center justify-between mb-4 px-6">
         <h2 className="text-2xl font-semibold text-[#661F30]">
-          Kupione produkty
+          {t.account.boughtProducts}
         </h2>
         <div className="w-1/3">
-          <CustomDropdown
+          <CustomDropdownWithLabels
 
             className="h-12 bg-white flex items-center justify-center px-4 text-center"
             options={sortingOptions}
-            selectedValue={
-              sortOrder === 'newest'
-                ? 'Najnowsze zakupy'
-                : sortOrder === 'oldest'
-                  ? 'Najstarsze zakupy'
-                  : null
-            }
+              selectedValue={
+                sortOrder && sortOrder === 'oldest' ?
+                    sortingOptions[1] 
+                  : sortingOptions[0]
+              }
             placeholder="Sortowanie"
             onChange={(value) =>
-              setSortOrder(value === 'Najnowsze zakupy' ? 'newest' : 'oldest')
+              setSortOrder(value.key === 'newest' ? 'newest' : 'oldest')
             }
           />
         </div>
@@ -147,13 +157,13 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
           <thead className="bg-beige">
             <tr>
               <th className="py-4 px-6 text-left font-semibold text-neutral-darker">
-                Produkt
+                {t.product.product}
               </th>
               <th className="py-4 px-6 text-center font-semibold text-neutral-darker">
-                Ostatni zakup
+                {t.account.lastPurchase}
               </th>
               <th className="py-4 px-6 text-center font-semibold text-neutral-darker">
-                Aktualna cena
+                {t.account.currentPrice}
               </th>
               <th className="py-4 px-6 text-center font-semibold text-neutral-darker"></th>
             </tr>
@@ -187,14 +197,14 @@ const BoughtProductsList: React.FC<BoughtProductsListProps> = ({
                   {new Date().toLocaleDateString()}
                 </td>
                 <td className="py-4 text-center align-middle">
-                  <p>{product.price} {currency.symbol}</p>
+                  <p>{Number(product.price).toFixed(2)} {getCurrencyByLocale(product.lang || 'pl')?.symbol}</p>
                 </td>
                 <td className="py-4 px-6 text-center align-middle">
                   <button
                     onClick={() => handleAddToCart(product)}
                     className="bg-transparent border border-gray-400 rounded-full py-2 px-2 flex items-center hover:bg-gray-100 transition"
                   >
-                    Dodaj do koszyka
+                    {t.product.addToCart}
                     <span className="ml-2 flex items-center">
                       <img
                         src="/icons/cart.svg"
