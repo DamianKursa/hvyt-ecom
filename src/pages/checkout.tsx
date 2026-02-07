@@ -560,7 +560,7 @@ const Checkout: React.FC = () => {
           <div className="md:w-8/12 bg-white p-6 rounded-2xl shadow-lg">
             <div className="flex flex-col md:flex-row justify-between items-start mb-6">
               <h2 className="text-2xl font-bold text-dark-pastel-red">
-                Dane osobowe
+                {t.checkout.personalData.title}
               </h2>
               {!user && (
                 <Link
@@ -621,7 +621,7 @@ const Checkout: React.FC = () => {
             )}
             <div className="mt-8">
               <h2 className="text-2xl font-bold mb-6 text-dark-pastel-red">
-                Adres
+                {t.checkout.address.title}
               </h2>
               <CheckoutAddressForm
                 billingData={billingData}
@@ -637,7 +637,7 @@ const Checkout: React.FC = () => {
             </div>
             <div className="mt-8">
               <h2 className="text-2xl font-bold mb-6 text-dark-pastel-red">
-                Dostawa i płatność
+                {t.checkout.shipping.title}
               </h2>
               <div className="border-[#DAD3C8] md:border  rounded-[24px] px-0 md:px-[16px] py-[24px]">
                 <Shipping

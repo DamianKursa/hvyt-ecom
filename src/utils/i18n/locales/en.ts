@@ -160,7 +160,9 @@ export const en: Translations = {
       deliveryAndPayment: 'Delivery and payment',
       editVariation: 'Edit product variation',
       variationNote: 'Products will be added to cart with their current',
-      addedToCart: 'Added to cart',      
+      addedToCart: 'Added to cart',   
+      chooseVariant: 'Please select a variant before adding to cart.',   
+      removeAll: 'Clear cart',
       emptyCart: {
         title: 'Your cart is empty',
         description: 'Find a product in our store that will make your interior stand out!',
@@ -587,5 +589,6 @@ export const en: Translations = {
       messageShippingAddressAdded: 'Your shipping address has been added.',
       messageWaitLoading: 'Please wait, loading...',
       messageWaitForRedirection: 'We will redirect you to your account in a moment', 
+      messageAcceptTerms: '*I confirm that I have read the Regulations and Privacy Policy and accept their provisions.',      
     }  
 };

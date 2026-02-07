@@ -469,7 +469,7 @@ console.log('currentprod', product);
     }
 
     if (product.baselinker_variations?.length && !selectedVariation) {
-      setValidationError('Wybierz wariant przed dodaniem do koszyka.');
+      setValidationError(t.cart.chooseVariant);
       return;
     }
 

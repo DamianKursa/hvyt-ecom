@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { CartContext, Product } from '@/stores/CartProvider';
 import CartItem from './CartItem';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface CartItemsProps {
   onIncreaseQuantity: (product: Product) => void;
@@ -15,19 +16,20 @@ const CartItems: React.FC<CartItemsProps> = ({
   onRemoveItem,
   onVariationChange,
 }) => {
+  const {t} = useI18n();
   const { cart, clearCart } = useContext(CartContext);
 
   return (
     <div className="lg:w-8/12 bg-white shadow rounded-[24px] p-6 mt-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-dark-pastel-red">
-          Koszyk ({cart?.products.length})
+          {t.cart.title} ({cart?.products.length})
         </h2>
         <button
           className="flex items-center justify-between px-4 py-2 border border-black text-black rounded-full hover:bg-gray-100 transition"
           onClick={clearCart}
         >
-          Wyczyść koszyk
+          {t.cart.removeAll}
           <img
             src="/icons/trash-black.svg"
             alt="Trash Icon"
@@ -48,7 +50,7 @@ const CartItems: React.FC<CartItemsProps> = ({
           />
         ))
       ) : (
-        <p className="text-center text-lg">Twój koszyk jest pusty</p>
+        <p className="text-center text-lg">{t.cart.emptyCartMessage}</p>
       )}
     </div>
   );

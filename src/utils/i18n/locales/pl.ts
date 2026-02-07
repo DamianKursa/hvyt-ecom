@@ -159,6 +159,8 @@ export const pl = {
       editVariation: 'Edytuj rozstaw produktu',
       variationNote: 'Produkty zostaną dodane do koszyka z uwzględnieniem ich aktualnych',
       addedToCart: 'Dodano do koszyka',
+      chooseVariant: 'Wybierz wariant przed dodaniem do koszyka.',
+      removeAll: 'Wyczyść koszyk',
       emptyCart: {
         title: 'Twój koszyk jest pusty',
         description: 'Znajdź produkt w naszym sklepie, który wyróżni Twoje wnętrze!',
@@ -580,7 +582,7 @@ export const pl = {
       messageShippingAddressAdded: 'Twój adres dostawy został dodany.',      
       messageWaitLoading: 'Proszę czekać, trwa ładowanie danych...',
       messageWaitForRedirection: 'Za chwilę przekierujemy Cię do Twojego konta',
-
+      messageAcceptTerms: '*Potwierdzam, że zapoznałam/em się z treścią Regulaminu i Polityki Prywatności oraz akceptuję ich postanowienia.',
     }
   };
 

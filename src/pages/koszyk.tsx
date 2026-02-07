@@ -7,9 +7,10 @@ import CartSummary from '@/components/Cart/CartSummary';
 import Link from 'next/link';
 import Bestsellers from '@/components/Index/Bestsellers.component';
 import { pushGTMEvent } from '@/utils/gtm';
-import axios from 'axios';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const Koszyk: React.FC = () => {
+  const {t} = useI18n();
   const { cart, updateCartItem, removeCartItem, updateCartItemPrice } = useContext(CartContext);
   const [mounted, setMounted] = useState(false);
   const [variationMessage, setVariationMessage] = useState<string | null>(null);
@@ -210,23 +211,23 @@ const Koszyk: React.FC = () => {
               className="w-28 h-28 mb-4"
             />
             <h2 className="text-[18px] md:text-[28px] font-semibold mb-4 text-black">
-              Twój koszyk jest pusty
+              {t.cart.emptyCartMessage}
             </h2>
             <p className="text-[18px] text-black text-center font-light mb-6">
-              Znajdź produkt w naszym sklepie, który wyróżni Twoje wnętrze!
+              {t.cart.emptyCart.description}
             </p>
             <div className="flex gap-4">
               <Link
                 href="/kategoria/uchwyty-meblowe"
                 className="px-10 md:px-16 py-3 bg-black text-white rounded-full text-sm font-[16px]"
               >
-                Uchwyty
+                {t.cart.emptyCart.handlesButton}
               </Link>
               <Link
                 href="/"
                 className="px-6 md:px-16 py-3 border border-black text-black rounded-full text-sm font-medium"
               >
-                Strona Główna
+                {t.cart.emptyCart.homeButton}
               </Link>
             </div>
           </div>
