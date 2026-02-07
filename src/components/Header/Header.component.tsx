@@ -56,62 +56,63 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
   }, [router.query]);
   
   // Get alternate language path for product pages
-  useEffect(() => {
-    const updateAlternateLangPath = async () => {
-      // Check if we're on a product page
-      const isProductPage = router.pathname === '/produkt/[slug]' || router.pathname === '/product/[slug]';
-      if (!isProductPage) {
-        setAlternateLangPath(null);
-        return;
-      }
+  // useEffect(() => {
+  //   const updateAlternateLangPath = async () => {
+  //     // Check if we're on a product page
+  //     const isProductPage = router.pathname === '/produkt/[slug]' || router.pathname === '/product/[slug]';
+  //     if (!isProductPage) {
+  //       setAlternateLangPath(null);
+  //       return;
+  //     }
       
-      // Get current URL path (without query/hash)
-      const currentPath = router.asPath.split('?')[0].split('#')[0];
-      const productSlug = router.query.slug as string;
+  //     // Get current URL path (without query/hash)
+  //     const currentPath = router.asPath.split('?')[0].split('#')[0];
+  //     const productSlug = router.query.slug as string;
       
-      // Skip if path contains literal [slug] (SSR/hydration issue)
-      if (currentPath.includes('[slug]')) {
-        return;
-      }
+  //     // Skip if path contains literal [slug] (SSR/hydration issue)
+  //     if (currentPath.includes('[slug]')) {
+  //       return;
+  //     }
       
-      const targetLang = language === 'pl' ? 'en' : 'pl';
+  //     const targetLang = language === 'pl' ? 'en' : 'pl';
       
-      try {
-        // Use WordPress endpoint that accepts full URL and returns translated URL
-        const wpApiUrl = process.env.NEXT_PUBLIC_WP_REST_API || '';
-        let wpBaseUrl = wpApiUrl.replace('/wp-json/wp/v2', '');
-        wpBaseUrl = wpBaseUrl.replace(/\/$/, '');
+  //     try {
+  //       // Use WordPress endpoint that accepts full URL and returns translated URL
+  //       const wpApiUrl = process.env.NEXT_PUBLIC_WP_REST_API || '';
+  //       let wpBaseUrl = wpApiUrl.replace('/wp-json/wp/v2', '');
+  //       wpBaseUrl = wpBaseUrl.replace(/\/$/, '');
         
-        if (wpBaseUrl) {
-          const endpointUrl = `${wpBaseUrl}/wp-json/custom/v1/translate-url?url=${encodeURIComponent(productSlug)}&to=${targetLang}`;
-          const response = await fetch(endpointUrl);
+  //       if (wpBaseUrl) {
+  //         const endpointUrl = `${wpBaseUrl}/wp-json/custom/v1/translate-url?url=${encodeURIComponent(productSlug)}&to=${targetLang}`;
+  //         const response = await fetch(endpointUrl);
           
-          if (response.ok) {
-            const data = await response.json();
-            if (data.url) {
-              console.log('[Header] ✅ Got translated URL:', data.url);
-              setAlternateLangPath(data.url);
-              return;
-            }
-          } else if (response.status === 404) {
-            console.log('[Header] ⚠️ Translation not found');
-          } else {
-            const errorData = await response.json().catch(() => ({}));
-            console.error('[Header] ❌ WordPress endpoint error:', response.status, errorData);
-          }
-        }
-      } catch (error: any) {
-        console.error('[Header] ❌ Error getting translated URL:', error.message);
-      }
+  //         if (response.ok) {
+  //           const data = await response.json();
+  //           if (data.url) {
+  //             console.log('[Header] ✅ Got translated URL:', data.url);
+  //             setAlternateLangPath(data.url);
+  //             return;
+  //           }
+  //         } else if (response.status === 404) {
+  //           console.log('[Header] ⚠️ Translation not found');
+  //         } else {
+  //           const errorData = await response.json().catch(() => ({}));
+  //           console.error('[Header] ❌ WordPress endpoint error:', response.status, errorData);
+  //         }
+  //       }
+  //     } catch (error: any) {
+  //       console.error('[Header] ❌ Error getting translated URL:', error.message);
+  //     }
       
-      // Fallback: use getPath
-      const fallbackPath = getPath(currentPath, targetLang);
-      console.log('[Header] ⚠️ Using fallback path:', fallbackPath);
-      setAlternateLangPath(fallbackPath);
-    };
+  //     // Fallback: use getPath
+  //     const fallbackPath = getPath(currentPath, targetLang);
+  //     console.log('[Header] ⚠️ Using fallback path:', fallbackPath);
+  //     setAlternateLangPath(fallbackPath);
+  //   };
     
-    updateAlternateLangPath();
-  }, [router.asPath, router.pathname, language, getPath]);
+  //   updateAlternateLangPath();
+  // }, [router.asPath, router.pathname, language, getPath]);
+
   useEffect(() => {
     if (title) {
       document.title = title;
