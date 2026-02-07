@@ -1,15 +1,16 @@
 import React, { useEffect } from 'react';
 import { Order } from '@/utils/functions/interfaces';
-import { getCurrency, Language } from '@/utils/i18n/config';
 import { useRouter } from 'next/router';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { getCurrencyBySlug } from '@/config/currencies';
 
 interface OrderConfirmationProps {
   order: Order;
 }
 
 const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
-  const router = useRouter();
-  const currency = getCurrency(router?.locale as Language ?? 'pl');
+  const {t} = useI18n()
+  const currency = getCurrencyBySlug(order.currency || '').symbol;
 
   useEffect(() => {
     console.log('Fetched Order:', order);
@@ -54,9 +55,9 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                 </td>
                 <td className="py-3 ">
                   <div className="grid grid-cols-3 items-center">
-                    <span className="font-bold">{(parseFloat(item.price) / item.quantity).toFixed(2)} {currency.symbol}</span>
+                    <span className="font-bold">{(parseFloat(item.price) / item.quantity).toFixed(2)} {currency}</span>
                     <span className="text-left font-light">{item.quantity}</span>
-                    <span className="text-right pr-6 font-bold">{item.price} {currency.symbol}</span>
+                    <span className="text-right pr-6 font-bold">{item.price} {currency}</span>
                   </div>
                 </td>
               </tr>
@@ -87,7 +88,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
           </div>
           <div className="space-y-6">
             <p className=" font-bold font-light text-[16px] rounded-tr-[24px] rounded-br-[24px]">
-              {order.total} {currency.symbol}
+              {order.total} {currency}
             </p>
           </div>
         </div>
@@ -173,7 +174,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                   <div className="flex justify-between">
                     <span className="font-bold text-[#5D5759]">Cena:</span>
                     <span className="font-light text-[#0E0B0C]">
-                      {(parseFloat(item.price) / item.quantity).toFixed(2)} {currency.symbol}
+                      {(parseFloat(item.price) / item.quantity).toFixed(2)} {currency}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -184,7 +185,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                   </div>
                   <div className="flex justify-between">
                     <span className="font-bold text-[#5D5759]">Suma:</span>
-                    <span className="font-light text-[#0E0B0C]">{item.price} {currency.symbol}</span>
+                    <span className="font-light text-[#0E0B0C]">{item.price} {currency}</span>
                   </div>
                 </div>
               </div>
@@ -209,7 +210,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                 Razem
               </span>
               <span className=" text-[16px]  text-left mt-2">
-                {order.total} {currency.symbol}
+                {order.total} {currency}
               </span>
             </div>
           </div>
@@ -240,7 +241,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
           {/* Billing address */}
           <div>
             <h3 className="text-[16px] font-light text-[#857C7F] mb-2">
-              Dane do faktury:
+              {t.checkout.billingData}:
             </h3>
             {order.billing?.first_name ? (
               <>

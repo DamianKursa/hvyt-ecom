@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AddressModal from './AddressModal';
 import LoadingModal from '@/components/UI/LoadingModal';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const MyAddresses: React.FC = () => {
   const [addresses, setAddresses] = useState<any[]>([]);
@@ -9,6 +10,8 @@ const MyAddresses: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const {t} = useI18n();
 
   // Parse address_line_2 into buildingNumber and apartmentNumber
   const parseAddressLine2 = (addressLine2: string) => {
@@ -70,7 +73,7 @@ const MyAddresses: React.FC = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        alert(errorData.error || 'Nie udało się zapisać adresu.');
+        alert(errorData.error || t.modal.messagePasswordUpdateError);
         return;
       }
 
@@ -89,14 +92,14 @@ const MyAddresses: React.FC = () => {
       setModalData(null); // Close modal
       setSuccessMessage(
         isEdit
-          ? 'Twój adres dostawy został zmieniony.'
-          : 'Twój adres dostawy został dodany.',
+          ? t.modal.messageShippingAddressUpdated
+          : t.modal.messageShippingAddressAdded,
       );
 
       // Clear the success message after 5 seconds
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch {
-      alert('Wystąpił błąd podczas zapisywania adresu. Spróbuj ponownie.');
+      alert(t.modal.messageShippingAddressUpdateError);
     }
   };
 
@@ -116,8 +119,8 @@ const MyAddresses: React.FC = () => {
   if (loading) {
     return (
       <LoadingModal
-        title="Ładowanie..."
-        description="Proszę czekać, trwa ładowanie adresów..."
+        title={t.modal.loading}
+        description={t.modal.messageLoadingAddresses}
       />
     );
   }
@@ -125,7 +128,7 @@ const MyAddresses: React.FC = () => {
   return (
     <div className="rounded-[25px] bg-white p-8 shadow-sm relative">
       <h2 className="text-2xl font-semibold mb-4 text-[#661F30]">
-        Moje adresy
+        {t.account.myAddresses}
       </h2>
       <div className="border rounded-[25px]">
         {error ? (
@@ -139,7 +142,7 @@ const MyAddresses: React.FC = () => {
               >
                 <div>
                   <p className="font-semibold mb-[32px]">
-                    Adres dostawy #{index + 1}
+                    {t.account.shippingAddress} #{index + 1}
                   </p>
                   <p>
                     {address.street}, {address.buildingNumber}
@@ -154,8 +157,8 @@ const MyAddresses: React.FC = () => {
                   className="text-black border border-black px-4 py-2 rounded-full flex items-center"
                 >
                   {/* Mobile: show "Edytuj", Desktop: show full text */}
-                  <span className="md:hidden">Edytuj</span>
-                  <span className="hidden md:inline">Edytuj Adres dostawy</span>
+                  <span className="md:hidden">{t.common.edit}</span>
+                  <span className="hidden md:inline">{t.account.editShippingAddress}</span>
                   <img
                     src="/icons/edit.svg"
                     alt="Edytuj"
@@ -167,14 +170,14 @@ const MyAddresses: React.FC = () => {
             {addresses.length < 3 && (
               <div className="py-4 flex items-start justify-between px-4">
                 <p className="font-semibold mb-[32px]">
-                  Adres dostawy #{addresses.length + 1}
+                  {t.account.shippingAddress} #{addresses.length + 1}
                 </p>
                 <button
                   onClick={handleAddAddress}
                   className="text-white bg-[#000] border border-black px-4 py-2 rounded-full flex items-center"
                 >
-                  <span className="md:hidden">Dodaj</span>
-                  <span className="hidden md:inline">Dodaj Adres dostawy</span>
+                  <span className="md:hidden">{t.common.add}</span>
+                  <span className="hidden md:inline">{t.account.addShippingAddress}</span>
                   <span className="ml-2">+</span>
                 </button>
               </div>

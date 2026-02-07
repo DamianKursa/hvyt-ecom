@@ -6,8 +6,10 @@ import SocialIcons from '@/components/UI/SocialIcons';
 import Checkbox from '@/components/UI/Checkbox';
 import { useState } from 'react';
 import Head from 'next/head';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const Kontakt = () => {
+  const {t} = useI18n();
   const methods = useForm();
   const [isTermsChecked, setIsTermsChecked] = useState(false);
   const [termsError, setTermsError] = useState('');
@@ -111,7 +113,7 @@ const Kontakt = () => {
                       className="mr-4 mt-1 w-8 h-8 md:w-6 h-6"
                     />
                     <div className="text-left">
-                      <span className="block font-bold mb-2">Telefon</span>
+                      <span className="block font-bold mb-2">{t.form.phone}</span>
                       <Link href="tel:+48513790697">+48 513 790 697</Link>
                     </div>
                   </li>
@@ -144,14 +146,14 @@ const Kontakt = () => {
                 <InputField
                   inputLabel="Imię i nazwisko"
                   inputName="name"
-                  customValidation={{ required: 'To pole jest wymagane' }}
+                  customValidation={{ required: t.account.messageRequiredField }}
                   errors={methods.formState.errors}
                 />
                 <InputField
                   inputLabel="Email"
                   inputName="email"
                   type="email"
-                  customValidation={{ required: 'To pole jest wymagane' }}
+                  customValidation={{ required: t.account.messageRequiredField }}
                   errors={methods.formState.errors}
                 />
                 <InputField
@@ -159,7 +161,7 @@ const Kontakt = () => {
                   inputName="message"
                   type="textarea"
                   customValidation={{
-                    required: 'To pole jest wymagane',
+                    required: t.account.messageRequiredField,
                     minLength: {
                       value: 10,
                       message:

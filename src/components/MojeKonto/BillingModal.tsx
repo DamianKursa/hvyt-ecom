@@ -1,3 +1,4 @@
+import { useI18n } from '@/utils/hooks/useI18n';
 import React, { useState } from 'react';
 
 interface BillingData {
@@ -24,6 +25,9 @@ const BillingModal: React.FC<BillingModalProps> = ({
   onSave,
   onClose,
 }) => {
+
+  const {t} = useI18n();
+
   const [formData, setFormData] = useState<BillingData>({
     type: billingData?.type || 'individual',
     firstName: billingData?.firstName || '',
@@ -77,7 +81,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
         {/* Title and Close Button */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">
-            {billingData ? 'Edytuj dane do faktury' : 'Dodaj dane do faktury'}
+            {billingData ? t.account.editBillingData : t.account.addBillingData}
           </h2>
           <button onClick={onClose}>
             <img
@@ -122,7 +126,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                     : 'border-gray-400'
                     }`}
                 ></span>
-                <span className="ml-2">Klient indywidualny</span>
+                <span className="ml-2">{t.checkout.personalData.customerTypeIndividual}</span>
               </label>
             </div>
             <div className="w-full flex items-center">
@@ -154,7 +158,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                     : 'border-gray-400'
                     }`}
                 ></span>
-                <span className="ml-2">Firma</span>
+                <span className="ml-2">{t.checkout.personalData.customerTypeCompany}</span>
               </label>
             </div>
           </div>
@@ -173,7 +177,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                   className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.firstName ? 'opacity-0' : 'opacity-100'
                     }`}
                 >
-                  Imię <span className="text-red-500">*</span>
+                  {t.form.firstName} <span className="text-red-500">*</span>
                 </span>
               </div>
               <div className="relative">
@@ -188,7 +192,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                   className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.lastName ? 'opacity-0' : 'opacity-100'
                     }`}
                 >
-                  Nazwisko <span className="text-red-500">*</span>
+                  {t.form.lastName} <span className="text-red-500">*</span>
                 </span>
               </div>
             </>
@@ -206,7 +210,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                   className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.companyName ? 'opacity-0' : 'opacity-100'
                     }`}
                 >
-                  Nazwa firmy <span className="text-red-500">*</span>
+                  {t.checkout.personalData.customerTypeCompany} <span className="text-red-500">*</span>
                 </span>
               </div>
               <div className="relative">
@@ -240,7 +244,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
               className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.street ? 'opacity-0' : 'opacity-100'
                 }`}
             >
-              Nazwa ulicy <span className="text-red-500">*</span>
+              {t.checkout.shippingAddress.streetName}<span className="text-red-500">*</span>
             </span>
           </div>
           <div className="flex space-x-4">
@@ -256,14 +260,14 @@ const BillingModal: React.FC<BillingModalProps> = ({
                 className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.buildingNumber ? 'opacity-0' : 'opacity-100'
                   }`}
               >
-                Nr budynku <span className="text-red-500">*</span>
+                {t.checkout.shippingAddress.buildingNumber} <span className="text-red-500">*</span>
               </span>
             </div>
             <input
               name="apartmentNumber"
               value={formData.apartmentNumber || ''}
               onChange={handleChange}
-              placeholder="Nr lokalu"
+              placeholder={t.checkout.shippingAddress.apartmentNumber}
               className="w-full border-b border-black p-2 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
             />
           </div>
@@ -280,7 +284,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                 className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.city ? 'opacity-0' : 'opacity-100'
                   }`}
               >
-                Miasto <span className="text-red-500">*</span>
+                {t.checkout.shippingAddress.city} <span className="text-red-500">*</span>
               </span>
             </div>
             <div className="relative w-full">
@@ -295,7 +299,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
                 className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.postalCode ? 'opacity-0' : 'opacity-100'
                   }`}
               >
-                Kod pocztowy <span className="text-red-500">*</span>
+                {t.checkout.shippingAddress.postalCode} <span className="text-red-500">*</span>
               </span>
             </div>
           </div>
@@ -308,7 +312,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
             disabled={!isFormValid}
             className="w-[100%] md:w-[35%] py-3 font-medium bg-black text-white rounded-full hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            Zapisz dane do faktury
+            {t.account.saveInvoiceData}
           </button>
         </div>
       </div>

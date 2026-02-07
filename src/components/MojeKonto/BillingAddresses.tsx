@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import BillingModal from './BillingModal';
 import LoadingModal from '@/components/UI/LoadingModal';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface BillingData {
   type: 'individual' | 'company';
@@ -21,6 +22,8 @@ const BillingAddresses: React.FC = () => {
   const [modalData, setModalData] = useState<BillingData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  const {t} = useI18n()
 
   useEffect(() => {
     fetchBillingData();
@@ -100,8 +103,8 @@ const BillingAddresses: React.FC = () => {
   if (loading) {
     return (
       <LoadingModal
-        title="Ładowanie..."
-        description="Proszę czekać, trwa ładowanie danych..."
+        title={t.modal.loading}
+        description={t.modal.messageWaitLoading}
       />
     );
   }
@@ -109,7 +112,7 @@ const BillingAddresses: React.FC = () => {
   return (
     <div className="rounded-[25px] bg-white px-4 md:p-8 shadow-sm">
       <h2 className="text-2xl font-semibold p-4 md:p-0 md:mb-8 text-[#661F30]">
-        Dane do faktury
+        {t.checkout.billingData}
       </h2>
 
       <div className="md:border rounded-[25px]">
@@ -123,7 +126,7 @@ const BillingAddresses: React.FC = () => {
                 <div className="flex justify-between items-center w-full">
                   <div>
                     <p className="text-[18px] font-semibold mb-[32px]">
-                      Dane do faktury - klient indywidualny
+                      {t.checkout.billingData} - {t.checkout.personalData.customerTypeIndividual}
                     </p>
                     <p className="text-[18px]">
                       {individualAddress.firstName} {individualAddress.lastName}
@@ -150,15 +153,15 @@ const BillingAddresses: React.FC = () => {
                     }}
                     className="flex-shrink-0 text-black border border-black px-4 py-2 rounded-full flex items-center"
                   >
-                    <span className="md:hidden">Edytuj</span>
-                    <span className="hidden md:inline">Edytuj dane</span>
-                    <img src="/icons/edit.svg" alt="Edytuj" className="w-4 h-4 ml-2" />
+                    <span className="md:hidden">{t.common.edit}</span>
+                    <span className="hidden md:inline">{t.account.editData}</span>
+                    <img src="/icons/edit.svg" alt={t.common.edit} className="w-4 h-4 ml-2" />
                   </button>
                 </div>
               ) : (
                 <div className="flex justify-between items-center w-full">
                   <p className="text-[18px] font-semibold mb-[32px]">
-                    Dane do faktury - klient indywidualny
+                    {t.checkout.billingData} - {t.checkout.personalData.customerTypeIndividual}
                   </p>
                   <button
                     onClick={() =>
@@ -177,9 +180,9 @@ const BillingAddresses: React.FC = () => {
                     }
                     className="flex-shrink-0 text-white bg-black border border-black px-4 py-2 rounded-full flex items-center"
                   >
-                    <span className="md:hidden">Dodaj</span>
-                    <span className="hidden md:inline">Dodaj dane</span>
-                    <img src="/icons/edit.svg" alt="Dodaj" className="w-4 h-4 ml-2" />
+                    <span className="md:hidden">{t.common.add}</span>
+                    <span className="hidden md:inline">{t.account.addData}</span>
+                    <img src="/icons/edit.svg" alt={t.common.add} className="w-4 h-4 ml-2" />
                   </button>
                 </div>
               )}
@@ -191,7 +194,7 @@ const BillingAddresses: React.FC = () => {
                 <div className="flex justify-between items-center w-full">
                   <div>
                     <p className="text-[18px] font-semibold mb-[32px]">
-                      Dane do faktury - firma
+                      {t.checkout.billingData} - {t.checkout.personalData.customerTypeCompany}
                     </p>
                     <p className="text-[18px]">
                       {companyAddress.companyName}, NIP: {companyAddress.nip}
@@ -226,7 +229,7 @@ const BillingAddresses: React.FC = () => {
               ) : (
                 <div className="flex justify-between items-center w-full">
                   <p className="text-[18px] font-semibold mb-[32px]">
-                    Dane do faktury - firma
+                    {t.checkout.billingData} - {t.checkout.personalData.customerTypeCompany}
                   </p>
                   <button
                     onClick={() =>
@@ -245,9 +248,9 @@ const BillingAddresses: React.FC = () => {
                     }
                     className="flex-shrink-0 text-white bg-black border border-black px-4 py-2 rounded-full flex items-center"
                   >
-                    <span className="md:hidden">Dodaj</span>
-                    <span className="hidden md:inline">Dodaj dane</span>
-                    <img src="/icons/edit.svg" alt="Dodaj" className="w-4 h-4 ml-2" />
+                    <span className="md:hidden">{t.common.add}</span>
+                    <span className="hidden md:inline">{t.account.addData}</span>
+                    <img src="/icons/edit.svg" alt={t.common.add} className="w-4 h-4 ml-2" />
                   </button>
                 </div>
               )}

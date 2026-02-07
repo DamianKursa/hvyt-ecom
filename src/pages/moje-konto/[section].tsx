@@ -213,8 +213,8 @@ const SectionPage: React.FC = () => {
     return (
       <MojeKonto>
         <LoadingModal
-          title="Ładowanie..."
-          description="Proszę czekać, trwa ładowanie danych..."
+          title={t.modal.loading}
+          description={t.modal.messageWaitLoading}
         />
       </MojeKonto>
     );

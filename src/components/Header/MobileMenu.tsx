@@ -251,10 +251,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                         >
                           <img
                             src="/icons/user.svg"
-                            alt="Moje dane"
+                            alt={t.account.myData}
                             className="h-6 mr-3"
                           />
-                          Moje dane
+                          {t.account.myData}
                         </a>
                       </Link>
                     </li>
@@ -269,10 +269,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                         >
                           <img
                             src="/icons/home.svg"
-                            alt="Moje adresy"
+                            alt={t.account.myAddresses}
                             className="h-6 mr-3"
                           />
-                          Moje adresy
+                          {t.account.myAddresses}
                         </a>
                       </Link>
                     </li>

@@ -111,7 +111,7 @@ const CartModal: React.FC<CartModalProps> = ({
           {/* Desktop View: Grid */}
           <div className="hidden md:grid grid-cols-2 sm:grid-cols-3 gap-4">
             {loading ? (
-              <p className="text-center text-gray-500">{t.common.loading}</p>
+              <p className="text-center text-gray-500">{t.modal.loading}</p>
             ) : crossSellProducts.slice(0, 3).length > 0 ? (
               crossSellProducts
                 .slice(0, 3)
@@ -125,7 +125,7 @@ const CartModal: React.FC<CartModalProps> = ({
           {/* Mobile View: Responsive Slider */}
           <div className="md:hidden">
             {loading ? (
-              <p className="text-center text-gray-500">{t.common.loading}</p>
+              <p className="text-center text-gray-500">{t.modal.loading}</p>
             ) : crossSellProducts.slice(0, 3).length > 0 ? (
               <ResponsiveSlider
                 items={crossSellProducts.slice(0, 3)}

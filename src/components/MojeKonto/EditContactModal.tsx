@@ -1,3 +1,4 @@
+import { useI18n } from '@/utils/hooks/useI18n';
 import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 
@@ -32,6 +33,8 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
       phone: user.phone || '',
     },
   });
+
+  const {t} = useI18n();
 
   useEffect(() => {
     methods.reset({
@@ -68,7 +71,7 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
       >
         {/* Title and Close Button */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold">Edytuj Dane Kontaktowe</h2>
+          <h2 className="text-xl font-semibold">{t.account.editContactData}</h2>
           <button onClick={onClose}>
             <img
               src="/icons/close-button.svg"
@@ -87,14 +90,14 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-black mb-1 pl-2">
-                  Imię
+                  {t.form.firstName}
                 </label>
                 <input
                   {...methods.register('firstName', {
-                    required: 'To pole jest wymagane',
+                    required: t.account.messageRequiredField,
                   })}
                   type="text"
-                  placeholder="Imię"
+                  placeholder={t.form.firstName}
                   className="w-full border-b border-black p-2 bg-beige-light focus:outline-none"
                 />
                 {methods.formState.errors.firstName && (
@@ -106,11 +109,11 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
 
               <div>
                 <label className="block text-sm font-medium text-black mb-1 pl-2">
-                  Nazwisko
+                  {t.form.lastName} 
                 </label>
                 <input
                   {...methods.register('lastName', {
-                    required: 'To pole jest wymagane',
+                    required: t.account.messageRequiredField,
                   })}
                   type="text"
                   placeholder="Nazwisko"
@@ -129,7 +132,7 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
                 </label>
                 <input
                   {...methods.register('email', {
-                    required: 'To pole jest wymagane',
+                    required: t.account.messageRequiredField,
                     pattern: {
                       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                       message: 'Podaj poprawny adres email',
@@ -147,19 +150,19 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-medium text-black mb-1 pl-2">
-                  Telefon
+                  {t.form.phone} 
                 </label>
                 <input
                   {...methods.register('phone', {
-                    required: 'To pole jest wymagane',
+                    required: t.account.messageRequiredField,
                     pattern: {
                       value: /^\+?[0-9\s-]{7,15}$/,
-                      message: 'Podaj poprawny numer telefonu',
+                      message: t.account.messageEnterPhone,
                     },
                   })}
                   type="tel"
                   inputMode="tel"
-                  placeholder="Telefon"
+                  placeholder={t.form.phone} 
                   className="w-full border-b border-black p-2 bg-beige-light focus:outline-none"
                 />
                 {methods.formState.errors.phone && (

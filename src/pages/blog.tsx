@@ -4,6 +4,7 @@ import { getPostsArchive } from '@/utils/api/getPosts';
 import Layout from '@/components/Layout/Layout.component';
 import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
 import Head from 'next/head';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const trimToWords = (text: string, wordLimit: number): string => {
   const words = text.split(' ');
@@ -22,6 +23,7 @@ const formatDate = (dateString: string): string => {
 };
 
 const BlogArchive = () => {
+  const {t} = useI18n();
   const [posts, setPosts] = useState<PostArchive[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -199,7 +201,7 @@ const BlogArchive = () => {
                 className="px-6 py-3 bg-black text-white text-[16px] font-medium rounded-full hover:bg-gray-800 transition"
                 disabled={loadingMore}
               >
-                {loadingMore ? 'Ładowanie...' : 'Pokaż więcej'}
+                {loadingMore ? t.modal.loading : t.common.showMore}
               </button>
             )}
           </div>

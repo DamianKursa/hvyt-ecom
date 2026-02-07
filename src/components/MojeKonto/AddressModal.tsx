@@ -1,3 +1,4 @@
+import { useI18n } from '@/utils/hooks/useI18n';
 import React, { useState } from 'react';
 
 interface AddressModalProps {
@@ -31,6 +32,8 @@ const AddressModal: React.FC<AddressModalProps> = ({
     },
   );
 
+  const {t} = useI18n();
+
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const handleChange = (
@@ -60,7 +63,7 @@ const AddressModal: React.FC<AddressModalProps> = ({
         {/* Title and Close Button */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-semibold">
-            Dodaj adres dostawy #{addressNumber}
+           {t.account.addShippingAddress} #{addressNumber}
           </h2>
 
           <button onClick={onClose}>
@@ -90,7 +93,7 @@ const AddressModal: React.FC<AddressModalProps> = ({
               className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.street || focusedField === 'street' ? 'opacity-0' : 'opacity-100'
                 }`}
             >
-              Nazwa ulicy <span className="text-red-500">*</span>
+              {t.checkout.shippingAddress.streetName} <span className="text-red-500">*</span>
             </span>
           </div>
           <div className="flex space-x-4">
@@ -111,14 +114,14 @@ const AddressModal: React.FC<AddressModalProps> = ({
                   : 'opacity-100'
                   }`}
               >
-                Nr budynku <span className="text-red-500">*</span>
+                {t.checkout.shippingAddress.buildingNumber} <span className="text-red-500">*</span>
               </span>
             </div>
             <input
               name="apartmentNumber"
               value={formData.apartmentNumber}
               onChange={handleChange}
-              placeholder="Nr lokalu"
+              placeholder={t.checkout.shippingAddress.apartmentNumber}
               className="w-full border-b border-black py-2 px-6 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
             />
           </div>
@@ -138,7 +141,7 @@ const AddressModal: React.FC<AddressModalProps> = ({
                 className={`absolute left-2 top-2 text-black font-light pointer-events-none transition-all duration-200 ${formData.city || focusedField === 'city' ? 'opacity-0' : 'opacity-100'
                   }`}
               >
-                Miasto <span className="text-red-500">*</span>
+                {t.checkout.shippingAddress.city} <span className="text-red-500">*</span>
               </span>
             </div>
             <div className="relative w-full">
@@ -158,7 +161,7 @@ const AddressModal: React.FC<AddressModalProps> = ({
                   : 'opacity-100'
                   }`}
               >
-                Kod pocztowy <span className="text-red-500">*</span>
+                {t.checkout.shippingAddress.postalCode} <span className="text-red-500">*</span>
               </span>
             </div>
           </div>
@@ -184,7 +187,7 @@ const AddressModal: React.FC<AddressModalProps> = ({
                 : 'opacity-100'
                 }`}
             >
-              Kraj / Region <span className="text-red-500">*</span>
+              {t.checkout.shippingAddress.country} <span className="text-red-500">*</span>
             </span>
           </div>
         </div>
@@ -195,7 +198,7 @@ const AddressModal: React.FC<AddressModalProps> = ({
             onClick={handleSave}
             className="w-[100%] md:w-[25%] py-3 font-medium bg-black text-white rounded-full hover:bg-gray-800 transition-all"
           >
-            Zapisz adres
+            {t.account.saveAddress}
           </button>
         </div>
       </div>

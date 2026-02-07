@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout/Layout.component';
 import { useRouter } from 'next/router';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const ResetPassword: React.FC = () => {
+  const {t} = useI18n();
   const router = useRouter();
   const { key, login } = router.query;
 
@@ -88,7 +90,7 @@ const ResetPassword: React.FC = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full border-b border-gray-300 focus:border-black px-2 py-2 focus:outline-none font-light text-black text-left"
-                    aria-label="Nowe hasło"
+                    aria-label={t.auth.newPassword}
                     required
                   />
                   <span
@@ -152,7 +154,7 @@ const ResetPassword: React.FC = () => {
                   className="w-full bg-black text-white py-3 rounded-full"
                   disabled={loading}
                 >
-                  {loading ? 'Ładowanie...' : 'Zmień hasło'}
+                  {loading ? t.modal.loading : t.auth.changePassword}
                 </button>
               </form>
 

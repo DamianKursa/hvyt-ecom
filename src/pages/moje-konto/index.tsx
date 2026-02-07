@@ -90,8 +90,8 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
   if (loading) {
     return (
       <LoadingModal
-        title="Logowanie"
-        description="Za chwilę przekierujemy Cię do Twojego konta"
+        title={t.modal.logging}
+        description={t.modal.messageWaitForRedirection}
       />
     );
   }

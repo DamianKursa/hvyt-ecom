@@ -12,9 +12,11 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import KolekcjaDescription from '@/components/UI/KolekcjaDescription'; // adjust path
 import ProductArchive from '@/components/Product/ProductArchive';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 
 const CollectionPage = () => {
+  const {t} = useI18n();
   const router = useRouter();
   const { slug } = router.query;
   const slugString = Array.isArray(slug) ? slug[0] : slug;
@@ -114,7 +116,7 @@ const CollectionPage = () => {
 
   if (loading) {
     return (
-      <Layout title="Hvyt | Ładowanie...">
+      <Layout title={`Hvyt | ${t.modal.loading}`}>
         <SkeletonCollectionPage />
       </Layout>
     );

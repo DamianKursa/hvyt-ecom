@@ -16,6 +16,7 @@ import { ExternalIdContext } from '@/context/ExternalIdContext';
 import { useUserContext } from '@/context/UserContext';
 import { pushGTMEvent } from '@/utils/gtm';
 import CreateAccount from '@/components/UI/CreateAccount';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -70,6 +71,7 @@ const Checkout: React.FC = () => {
   const externalAnonId = useContext(ExternalIdContext);
   const { user } = useUserContext();
   const { cart } = useContext(CartContext);
+  const {t} = useI18n();
 
   const mapCountry = (country: string): string => {
     const countryMapping: Record<string, string> = { Polska: 'PL' };
@@ -181,14 +183,14 @@ const Checkout: React.FC = () => {
 
     const missingFields = [];
 
-    if (!billingData.firstName) missingFields.push('Imię');
-    if (!billingData.lastName) missingFields.push('Nazwisko');
-    if (!billingData.phone) missingFields.push('Numer telefonu');
-    if (!email) missingFields.push('Adres e-mail');
-    if (!billingData.street) missingFields.push('Nazwa ulicy');
-    if (!billingData.buildingNumber) missingFields.push('Numer budynku');
-    if (!billingData.city) missingFields.push('Miasto');
-    if (!billingData.postalCode) missingFields.push('Kod pocztowy');
+    if (!billingData.firstName) missingFields.push(t.checkout.personalData.firstName);
+    if (!billingData.lastName) missingFields.push(t.checkout.personalData.lastName);
+    if (!billingData.phone) missingFields.push(t.checkout.personalData.phone);
+    if (!email) missingFields.push(t.checkout.personalData.email);
+    if (!billingData.street) missingFields.push(t.checkout.address.streetName);
+    if (!billingData.buildingNumber) missingFields.push(t.checkout.address.buildingNumber);
+    if (!billingData.city) missingFields.push(t.checkout.address.city);
+    if (!billingData.postalCode) missingFields.push(t.checkout.address.postalCode);
 
     if (missingFields.length > 0) {
       alert(

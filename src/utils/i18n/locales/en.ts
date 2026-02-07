@@ -106,7 +106,6 @@ export const en: Translations = {
     },
     // === COMMON ===
     common: {
-      loading: 'Loading...',
       error: 'Error',
       save: 'Save',
       cancel: 'Cancel',
@@ -135,6 +134,8 @@ export const en: Translations = {
       continue: 'Continue',
       success: 'Success',
       showPassword: 'Show password',      
+      add: 'Dodaj',
+      showMore: 'Show more',
     },
     // === CART ===
     cart: {
@@ -235,8 +236,8 @@ export const en: Translations = {
       orderTotal: 'Total:',
       noShippingData: 'No shipping data available.',
       noBillingData: 'No billing data available.',
-      shippingData: 'Shipping address:',
-      billingData: 'Billing address:',
+      shippingData: 'Shipping address',
+      billingData: 'Billing address',
       noAddress: 'No address',
       noData: 'No data',
       paymentMethod: 'Payment method',      
@@ -423,6 +424,7 @@ export const en: Translations = {
     sum: 'Total',
     shippingAddress: 'Shipping address',
     addShippingAddress: 'Add shipping address',
+    editShippingAddress: 'Edit shipping address',
     saveAddress: 'Save address',
     editBillingData: 'Edit billing data',
     addBillingData: 'Add billing data',
@@ -450,13 +452,22 @@ export const en: Translations = {
     details: 'Details',
     lastPurchase: 'Latest purchase',
     currentPrice: 'Current price',
+    contactData: 'Contact data',
+    editContactData: 'Edit contact data',
+    questionDeleteAccount: 'Are you sure you want to delete your account?',
+    messageContactUpdated: 'Your contact details have been changed.',
+    messagePasswordUpdated: 'Your password has been changed.',    
+    messageEnterPhone: 'Please enter a valid phone number',
+    messageRequiredField: 'This field is required',
+    saveInvoiceData: 'Save invoice details',
+    addData: 'Add details',    
+    editData: 'Edit details',
   },
 
   // === AUTHENTICATION / LOGIN ===
   auth: {
     login: 'Log in',
     register: 'Register',
-    loading: 'Loading...',
     sendResetLink: 'Send reset link',
     backToLogin: 'Back to login',
     forgotPassword: 'Forgot password',
@@ -464,12 +475,14 @@ export const en: Translations = {
     emailAddress: 'Email address',
     password: 'Password',
     passwordMinLength: 'Password must be at least 8 characters.',
+    passwordMinLengthValidated: 'Your password is 8 characters long, it\'s good.',
     currentPassword: 'Current password',
     newPassword: 'New password',
     confirmPassword: 'Confirm new password',
     changePassword: 'Change password',
     saving: 'Saving...',
     saveChanges: 'Save changes',
+    editPassword: 'Edytuj Hasło',    
   },
 
   // === FORM FIELDS ===
@@ -478,6 +491,7 @@ export const en: Translations = {
     lastName: 'Last name',
     email: 'Email',
     phone: 'Phone',
+    phoneNumber: 'Numer telefonu',
     country: 'Poland',
     required: 'Required',
   },
@@ -558,5 +572,20 @@ export const en: Translations = {
     noProducts: 'You have no products in wishlist.',
     removeFrom: 'Remove from wishlist',
     addTo: 'Add to wishlist',
-  }
+  },
+    // === MODAL MESSAGES ===
+    modal: {
+      loading: 'Loading...',
+      logging: 'Account login',
+      messageAllFieldsRequired: 'All fields are required.',
+      messagePasswordMismatch: 'The passwords do not match.',
+      messagePasswordUpdated: 'Your password has been changed.',
+      messagePasswordUpdateError: 'An error occurred while changing the password.',    
+      messageLoadingAddresses: 'Please wait, loading addresses...',
+      messageShippingAddressUpdateError: 'There was an error saving the address. Please try again.',
+      messageShippingAddressUpdated: 'Your shipping address has been changed.',
+      messageShippingAddressAdded: 'Your shipping address has been added.',
+      messageWaitLoading: 'Please wait, loading...',
+      messageWaitForRedirection: 'We will redirect you to your account in a moment', 
+    }  
 };

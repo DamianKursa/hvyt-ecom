@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import EditContactModal from './EditContactModal';
 import EditPasswordModal from './EditPasswordModal';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface MojeDaneProps {
   user: {
@@ -24,10 +25,11 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
   const [isEditContactModalOpen, setIsEditContactModalOpen] = useState(false);
   const [isEditPasswordModalOpen, setIsEditPasswordModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const {t} = useI18n();
   const router = useRouter();
 
   const handleDeleteAccount = async () => {
-    if (!confirm('Czy na pewno chcesz usunąć konto?')) return;
+    if (!confirm(t.account.questionDeleteAccount)) return;
     try {
       await fetch('/api/auth/delete-account', {
         method: 'POST',
@@ -50,7 +52,7 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
       await onUpdate(updatedUser);
       // Refresh the page data so props reflect the saved changes (no local state needed)
       router.replace(router.asPath);
-      setSuccessMessage('Twoje dane kontaktowe zostały zmienione.');
+      setSuccessMessage(t.account.messageContactUpdated);
       setTimeout(() => setSuccessMessage(null), 5000);
     } catch (error) {
       console.error('Failed to update contact details:', error);
@@ -58,18 +60,18 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
   };
 
   const handlePasswordUpdate = () => {
-    setSuccessMessage('Twoje hasło zostało zmienione.');
+    setSuccessMessage(t.account.messagePasswordUpdated);
     setTimeout(() => setSuccessMessage(null), 5000);
   };
 
   return (
     <div className="rounded-[25px] bg-white  md:p-8 shadow-sm">
-      <h2 className="text-2xl font-semibold p-4 md:p-0 md:mb-8 text-[#661F30]">Moje dane</h2>
+      <h2 className="text-2xl font-semibold p-4 md:p-0 md:mb-8 text-[#661F30]">{t.account.myData}</h2>
       <div className="md:border rounded-[25px]">
         {/* Contact Details */}
         <div className="py-4 border-b border-t md:border-t-0 border-gray-300 flex items-start justify-between px-4">
           <div>
-            <p className="text-[18px] font-semibold mb-[32px]">Dane kontaktowe</p>
+            <p className="text-[18px] font-semibold mb-[32px]">{t.account.contactData}</p>
             <p className="text-[18px]" >
               {user.firstName} {user.lastName}
             </p>
@@ -81,8 +83,8 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
             className="text-black border border-black px-4 py-2 rounded-full flex items-center"
           >
             {/* On mobile show only "Edytuj", on larger screens show full text */}
-            <span className="md:hidden">Edytuj</span>
-            <span className="hidden md:inline">Edytuj Dane kontaktowe</span>
+            <span className="md:hidden">{t.common.edit}</span>
+            <span className="hidden md:inline">{t.account.editContactData}</span>
             <img src="/icons/edit.svg" alt="Edytuj" className="w-4 h-4 ml-2" />
           </button>
         </div>
@@ -90,15 +92,15 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
         {/* Password */}
         <div className="py-4 flex items-start border-b md:border-b-0 justify-between px-4">
           <div>
-            <p className="text-[18px] font-semibold mb-[32px]">Hasło</p>
+            <p className="text-[18px] font-semibold mb-[32px]">{t.auth.password}</p>
             <p className="text-[18px]">********</p>
           </div>
           <button
             onClick={() => setIsEditPasswordModalOpen(true)}
             className="text-black border border-black px-4 py-2 rounded-full flex items-center"
           >
-            <span className="md:hidden">Edytuj</span>
-            <span className="hidden md:inline">Edytuj Hasło</span>
+            <span className="md:hidden">{t.common.edit}</span>
+            <span className="hidden md:inline">{t.auth.editPassword}</span>
             <img src="/icons/edit.svg" alt="Edytuj" className="w-4 h-4 ml-2" />
           </button>
         </div>
@@ -106,12 +108,12 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
 
       {/* Delete Account Section */}
       <div className="pb-12 md:pb-0 py-4 md:mt-8 px-4">
-        <p className=" text-[18px] font-semibold mb-[32px]">Usuń konto</p>
+        <p className=" text-[18px] font-semibold mb-[32px]">{t.account.deleteAccount}</p>
         <button
           onClick={handleDeleteAccount}
           className="text-[18px] text-black underline font-medium"
         >
-          Usuń konto
+          {t.account.deleteAccount}
         </button>
       </div>
 

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const Instagram = () => {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const {t} = useI18n();
+  
   useEffect(() => {
     const getInstagramPosts = async () => {
       try {
@@ -25,7 +28,7 @@ const Instagram = () => {
   }, []);
 
   if (loading) {
-    return <p>Ładowanie...</p>;
+    return <p>{t.modal.loading}</p>;
   }
 
   return (

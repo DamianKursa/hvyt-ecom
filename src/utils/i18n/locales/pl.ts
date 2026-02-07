@@ -104,7 +104,6 @@ export const pl = {
     },
     // === WSPÓLNE ===
     common: {
-      loading: 'Ładowanie...',
       error: 'Błąd',
       save: 'Zapisz',
       cancel: 'Anuluj',
@@ -133,6 +132,8 @@ export const pl = {
       continue: 'Kontynuuj',
       success: 'Sukces',
       showPassword: 'Pokaż hasło',
+      add: 'Dodaj',
+      showMore: 'Pokaż więcej',
     },
     // === KOSZYK ===
     cart: {
@@ -233,8 +234,8 @@ export const pl = {
       orderTotal: 'Razem:',
       noShippingData: 'Brak danych o wysyłce.',
       noBillingData: 'Brak danych do faktury.',
-      shippingData: 'Dane do wysyłki:',
-      billingData: 'Dane do faktury:',
+      shippingData: 'Dane do wysyłki',
+      billingData: 'Dane do faktury',
       noAddress: 'Brak adresu',
       noData: 'Brak danych',
       paymentMethod: 'Metoda płatności',      
@@ -420,6 +421,7 @@ export const pl = {
       sum: 'Suma',
       shippingAddress: 'Adres dostawy',
       addShippingAddress: 'Dodaj adres dostawy',
+      editShippingAddress: 'Edytuj Adres dostawy',
       saveAddress: 'Zapisz adres',
       editBillingData: 'Edytuj dane do faktury',
       addBillingData: 'Dodaj dane do faktury',
@@ -447,13 +449,21 @@ export const pl = {
       details: 'Szczegóły',
       lastPurchase: 'Ostatni zakup',
       currentPrice: 'Aktualna cena',
-
+      contactData: 'Dane kontaktowe',
+      editContactData: 'Edytuj Dane Kontaktowe',
+      questionDeleteAccount: 'Czy na pewno chcesz usunąć konto?',
+      messageContactUpdated: 'Twoje dane kontaktowe zostały zmienione.',
+      messagePasswordUpdated: 'Twoje hasło zostało zmienione.',
+      messageEnterPhone: 'Podaj poprawny numer telefonu',
+      messageRequiredField: 'To pole jest wymagane',
+      saveInvoiceData: 'Zapisz dane do faktury',
+      addData: 'Dodaj dane',
+      editData: 'Edytuj dane',
     },
     // === AUTENTYKACJA / LOGOWANIE ===
     auth: {
       login: 'Zaloguj się',
       register: 'Zarejestruj się',
-      loading: 'Ładowanie...',
       sendResetLink: 'Wyślij link do zresetowania',
       backToLogin: 'Wróć do logowania',
       forgotPassword: 'Nie pamiętam hasła',
@@ -461,12 +471,15 @@ export const pl = {
       emailAddress: 'Adres email',
       password: 'Hasło',
       passwordMinLength: 'Hasło musi mieć co najmniej 8 znaków.',
+      passwordMinLengthValidated: 'Twoje hasło ma 8 znaków, jest dobre.',
       currentPassword: 'Obecne hasło',
       newPassword: 'Nowe hasło',
       confirmPassword: 'Powtórz nowe hasło',
       changePassword: 'Zmień hasło',
       saving: 'Zapisywanie...',
       saveChanges: 'Zapisz zmiany',
+      editPassword: 'Edytuj Hasło',
+
     },
     // === FORMULARZ / POLA ===
     form: {
@@ -474,6 +487,7 @@ export const pl = {
       lastName: 'Nazwisko',
       email: 'Email',
       phone: 'Telefon',
+      phoneNumber: 'Numer telefonu',
       country: 'Polska',
       required: 'Wymagane',
     },
@@ -544,7 +558,6 @@ export const pl = {
       invoiceDetails: 'Dane do faktury',
       noInvoiceData: 'Brak danych do faktury.',
       backToOrders: 'Powrót do zamówień',
-
     },
     // === WISHLIST ===
     wishlist: {
@@ -552,7 +565,23 @@ export const pl = {
       noProducts: 'Nie masz ulubionych produktów.',    
       removeFrom: 'Usuń z ulubionych',
       addTo: 'Dodaj do ulubionych',
-    }    
+    },
+    // === KOMUNIKATY MODALNE ===
+    modal: {
+      loading: 'Ładowanie...',
+      logging: 'Logowanie',
+      messageAllFieldsRequired: 'Wszystkie pola są wymagane.',
+      messagePasswordMismatch: 'Hasła się nie zgadzają.',
+      messagePasswordUpdated: 'Twoje hasło zostało zmienione.',
+      messagePasswordUpdateError: 'Wystąpił błąd przy zmianie hasła.',
+      messageLoadingAddresses: 'Proszę czekać, trwa ładowanie adresów...',
+      messageShippingAddressUpdateError: 'Wystąpił błąd podczas zapisywania adresu. Spróbuj ponownie.',
+      messageShippingAddressUpdated: 'Twój adres dostawy został zmieniony.',
+      messageShippingAddressAdded: 'Twój adres dostawy został dodany.',      
+      messageWaitLoading: 'Proszę czekać, trwa ładowanie danych...',
+      messageWaitForRedirection: 'Za chwilę przekierujemy Cię do Twojego konta',
+
+    }
   };
 
 /**

@@ -141,7 +141,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
         {/* Content area (scrollable) */}
         <div className="flex-grow overflow-y-auto">
           {loading ? (
-            <div className="mt-6 text-center">{t.common.loading}</div>
+            <div className="mt-6 text-center">{t.modal.loading}</div>
           ) : results.length > 0 ? (
             <div className="mt-6">
               <h3 className="text-sm font-semibold mb-2">

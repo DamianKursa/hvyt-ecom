@@ -676,7 +676,7 @@ console.log('currentprod', product);
 
   if (loading) {
     return (
-      <Layout title="Hvyt | Ładowanie...">
+      <Layout title={`Hvyt | ${t.modal.loading}`}>
         <SkeletonProductPage />
       </Layout>
     );
@@ -929,7 +929,7 @@ console.log('currentprod', product);
                         inputName="notifyEmail"
                         type="email"
                         customValidation={{
-                          required: 'To pole jest wymagane',
+                          required: t.account.messageRequiredField,
                           pattern: {
                             value: /\S+@\S+\.\S+/,
                             message: 'Niepoprawny adres email',
@@ -937,7 +937,7 @@ console.log('currentprod', product);
                         }}
                         errors={errors}
                         {...register('notifyEmail', {
-                          required: 'To pole jest wymagane',
+                          required: t.account.messageRequiredField,
                           pattern: {
                             value: /\S+@\S+\.\S+/,
                             message: 'Niepoprawny adres email',

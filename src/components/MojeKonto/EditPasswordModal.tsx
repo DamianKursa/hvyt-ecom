@@ -1,3 +1,4 @@
+import { useI18n } from '@/utils/hooks/useI18n';
 import React, { useState } from 'react';
 
 interface EditPasswordModalProps {
@@ -18,6 +19,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const {t} = useI18n();
 
   const isPasswordValid = formData.newPassword.length >= 8;
 
@@ -32,12 +34,12 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
       !formData.newPassword ||
       !formData.confirmPassword
     ) {
-      alert('Wszystkie pola są wymagane.');
+      alert(t.modal.messageAllFieldsRequired);
       return;
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
-      alert('Hasła się nie zgadzają.');
+      alert(t.modal.messagePasswordMismatch);
       return;
     }
 
@@ -58,11 +60,11 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
         throw new Error(errorData.message || 'Nie udało się zmienić hasła.');
       }
 
-      onUpdateSuccess('Twoje hasło zostało zmienione.');
+      onUpdateSuccess(t.modal.messagePasswordUpdated);
       onClose();
     } catch (error: any) {
       console.error('Błąd przy zmianie hasła:', error.message);
-      alert('Wystąpił błąd przy zmianie hasła.');
+      alert(t.modal.messagePasswordUpdateError);
     }
   };
 
@@ -77,7 +79,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
       >
         {/* Title and Close Button */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold">Zmień Hasło</h2>
+          <h2 className="text-xl font-semibold">{t.auth.changePassword}</h2>
           <button onClick={onClose}>
             <img
               src="/icons/close-button.svg"
@@ -100,7 +102,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
               onBlur={() => setFocusedField(null)}
               onChange={handleChange}
               className="w-full border-b border-black p-2 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
-              placeholder="Obecne hasło"
+              placeholder={t.auth.currentPassword}
             />
             <img
               src="/icons/show-pass.svg"
@@ -120,7 +122,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
               onBlur={() => setFocusedField(null)}
               onChange={handleChange}
               className="w-full border-b border-black p-2 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
-              placeholder="Nowe hasło"
+              placeholder={t.auth.newPassword}
             />
             <img
               src="/icons/show-pass.svg"
@@ -142,8 +144,8 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
                 }`}
               >
                 {isPasswordValid
-                  ? 'Twoje hasło ma 8 znaków, jest dobre.'
-                  : 'Twoje hasło musi mieć co najmniej 8 znaków.'}
+                  ? t.auth.passwordMinLengthValidated
+                  : t.auth.passwordMinLength}
               </p>
             </div>
           </div>
@@ -158,7 +160,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
               onBlur={() => setFocusedField(null)}
               onChange={handleChange}
               className="w-full border-b border-black p-2 bg-beige-light focus:outline-none placeholder:font-light placeholder:text-black"
-              placeholder="Powtórz nowe hasło"
+              placeholder={t.auth.confirmPassword}
             />
             <img
               src="/icons/show-pass.svg"
@@ -175,7 +177,7 @@ const EditPasswordModal: React.FC<EditPasswordModalProps> = ({
             onClick={handleSave}
             className="w-[100%] md:w-[25%] py-3 font-medium bg-black text-white rounded-full hover:bg-gray-800 transition-all"
           >
-            Zmień hasło
+            {t.auth.changePassword}
           </button>
         </div>
       </div>
