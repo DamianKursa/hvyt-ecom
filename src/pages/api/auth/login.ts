@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     );
 
-    res.status(200).json({ message: 'Login successful', name: user_display_name });
+    res.status(200).json({ message: 'Login successful', name: user_display_name, details: `domain: ${process.env.COOKIE_DOMAIN}, token: ${token}` });
   } catch (err) {
     const error = err as AxiosError;
     const statusCode = error.response?.status || 500;
