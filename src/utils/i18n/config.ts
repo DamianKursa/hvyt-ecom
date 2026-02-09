@@ -61,14 +61,8 @@ export const getSiteUrl = (lang?: Language): string => {
 /**
  * Get API URL for current language
  */
-export const getApiUrl = (lang?: Language): string => {
-  const currentLang = lang || getCurrentLanguage();
-  const baseUrl = process.env.WORDPRESS_API_URL || 'https://wp.hvyt.pl';
-  
-  // Subdirectory mode: staging.hvyt.pl/en/wp-json/...
-  if (currentLang === 'en' && baseUrl.includes('staging')) {
-    return `${baseUrl}/en/wp-json/wc/v3`;
-  }
+export const getApiUrl = (): string => {
+  const baseUrl = process.env.WORDPRESS_API_URL || 'https://hvyt.pl';
   
   // Multi-domain mode: same API, different language param
   return `${baseUrl}/wp-json/wc/v3`;
@@ -97,7 +91,7 @@ export const getI18nConfig = (lang?: Language): I18nConfig => {
   return {
     language: currentLang,
     siteUrl: getSiteUrl(currentLang),
-    apiUrl: getApiUrl(currentLang),
+    apiUrl: getApiUrl(),
     currency: currency.code,
     currencySymbol: currency.symbol,
   };

@@ -125,6 +125,8 @@ export const fetchMediaById = async (mediaId: number) => {
 
 export const fetchKolekcjePostsWithImages = async () => {
   try {
+    console.log('kolekcjeurl', `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`);
+    
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`,
       {

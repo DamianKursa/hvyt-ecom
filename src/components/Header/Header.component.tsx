@@ -180,7 +180,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
         <div className="fixed bottom-0 left-0 bg-black text-white p-2 text-xs z-[9999] max-w-xs">
           <div>Lang: {language}</div>
           <div>Path: {router.asPath}</div>
-          <div>Handles: {t.links.categories.handles}</div>
+          <div>Handles: {t.links.categories.handles}</div.label>
           <div>About: {t.links.pages.about}</div>
         </div>
       )}
@@ -224,7 +224,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           <span
                             className={`px-3 py-3 font-bold  rounded-full transition-all ${getActiveClass('/kategoria/uchwyty-meblowe')}`}
                           >
-                            {t.links.categories.handles}
+                            {t.links.categories.handles.label}
                           </span>
                         </Link>
                       </li>
@@ -233,7 +233,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           <span
                             className={`px-3 py-3 font-bold rounded-full transition-all ${getActiveClass('/kategoria/klamki')}`}
                           >
-                            {t.links.categories.doorHandles}
+                            {t.links.categories.doorHandles.label}
                           </span>
                         </Link>
                       </li>
@@ -242,7 +242,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           <span
                             className={`px-3 py-3 font-bold rounded-full transition-all ${getActiveClass('/kategoria/wieszaki')}`}
                           >
-                            {t.links.categories.wallHooks}
+                            {t.links.categories.wallHooks.label}
                           </span>
                         </Link>
                       </li>
@@ -251,7 +251,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           <span
                             className={`px-3 py-3 font-bold rounded-full transition-all ${getActiveClass('/kategoria/meble')}`}
                           >
-                            {t.links.categories.furniture}
+                            {t.links.categories.furniture.label}
                           </span>
                         </Link>
                       </li>
@@ -260,7 +260,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           <span
                             className={`px-3 py-3 font-bold rounded-full transition-all ${getActiveClass('/kolekcje')}`}
                           >
-                            {t.links.categories.collections}
+                            {t.links.categories.collections.label}
                           </span>
                         </Link>
                       </li>
@@ -269,7 +269,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                           <span
                             className={`px-3 py-3 font-bold rounded-full transition-all ${getActiveClass('/o-nas')}`}
                           >
-                            {t.links.pages.about}
+                            {t.links.pages.about.label}
                           </span>
                         </Link>
                       </li>

@@ -59,20 +59,20 @@ export const pl = {
     // === LINKI NAWIGACYJNE ===
     links: {
       categories: {
-        handles: 'Uchwyty',
-        doorHandles: 'Klamki',
-        wallHooks: 'Wieszaki',
-        knobs: 'Gałki',
-        furniture: 'Meble',
-        collections: 'Kolekcje',
-        blog: 'Blog',
+        handles: {label: 'Uchwyty', slug: 'uchwyty-meblowe'},
+        doorHandles: {label: 'Klamki', slug: 'klamki'},
+        wallHooks: {label: 'Wieszaki', slug: 'wieszaki'},
+        knobs: {label: 'Gałki', slug: 'galki'},
+        furniture: {label: 'Meble', slug: 'meble'},
+        collections: {label: 'Kolekcje', slug: 'kolekcje'},
+        blog: {label: 'Blog', slug: 'blog'},
       },
       pages: {
-        about: 'O nas',
-        contact: 'Kontakt',
-        cooperation: 'Współpraca',
-        delivery: 'Dostawa',
-        returns: 'Zwroty i reklamacje',
+        about: {label: 'O nas', slug: 'o-nas'},
+        contact: {label: 'Kontakt', slug: 'kontakt'},
+        cooperation: {label: 'Współpraca', slug: 'wspolpraca'},
+        delivery: {label: 'Dostawa', slug: 'dostawa'},
+        returns: {label: 'Zwroty i reklamacje', slug: 'zwroty-i-reklamacje'},
       },
     },
     // === NEWSLETTER ===

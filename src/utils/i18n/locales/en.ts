@@ -61,22 +61,22 @@ export const en: Translations = {
     // === LINKS ===
     links: {
       categories: {
-        handles: 'Handles',
-        doorHandles: 'Door handles',
-        wallHooks: 'Wall hooks',
-        knobs: 'Knobs',
-        furniture: 'Furniture',
-        collections: 'Collections',
-        blog: 'Blog',
+        handles: {label: 'Handles', slug: 'handles'},
+        doorHandles: {label: 'Door handles', slug: 'door-handles'},
+        wallHooks: {label: 'Wall hooks', slug: 'wall-hooks'},
+        knobs: {label: 'Knobs', slug: 'knobs'},
+        furniture: {label: 'Furniture', slug: 'furniture'},
+        collections: {label: 'Collections', slug: 'collections'},
+        blog: {label: 'Blog', slug: 'blog'},
       },
       pages: {
-        about: 'About us',
-        contact: 'Contact',
-        cooperation: 'Cooperation',
-        delivery: 'Delivery',
-        returns: 'Returns and complaints',
+        about: {label: 'About us', slug: 'about-us'},
+        contact: {label: 'Contact', slug: 'contact'},
+        cooperation: {label: 'Cooperation', slug: 'cooperation'},
+        delivery: {label: 'Delivery', slug: 'delivery'},
+        returns: {label: 'Returns and complaints', slug: 'returns-and-complaints'},
       },
-    },
+    },    
     // === NEWSLETTER ===
     newsletter: {
       title: 'Subscribe to our newsletter to stay up to date with news and promotions.',

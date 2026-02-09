@@ -5,8 +5,12 @@ import Layout from '@/components/Layout/Layout.component';
 import SkeletonKolekcjePage from '../components/Skeletons/SkeletonKolekcjePage';
 import IconRenderer from '@/components/UI/IconRenderer';
 import Head from 'next/head';
+import { getCurrentLanguage, getSiteUrl } from '@/utils/i18n/config';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const KolekcjePage = () => {
+  const {t} = useI18n();
+  const lang = getCurrentLanguage();
   const [kolekcjePosts, setKolekcjePosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -15,7 +19,7 @@ const KolekcjePage = () => {
     const fetchKolekcje = async () => {
       try {
         const res = await fetch(
-          '/api/woocommerce?action=fetchKolekcjePostsWithImages',
+          `/api/woocommerce?action=fetchKolekcjePostsWithImages&lang=${lang}`,
         );
         if (!res.ok) {
           throw new Error('Failed to fetch Kolekcje posts');
@@ -45,6 +49,8 @@ const KolekcjePage = () => {
           rel="canonical"
           href={`${process.env.NEXT_PUBLIC_SITE_URL}/kolekcje`}
         />
+        <link rel="alternate" hrefLang="en" href={`${getSiteUrl('en')}/${t.links.categories.collections}`} />
+        <link rel="alternate" hrefLang="x-default" href={`${getSiteUrl('pl')}/kolekcje`} />        
       </Head>
       <section className="w-full px-4 lg:px-0 mt-[115px] mb-[150px]">
         <div className="container mx-auto max-w-grid-desktop">
@@ -98,7 +104,7 @@ const KolekcjePage = () => {
                       }`}
                     style={{ height: '445px' }}
                   >
-                    <Link href={`/kolekcje/${kolekcja.slug}`}>
+                    <Link href={`/${t.links.categories.collections.slug}/${kolekcja.slug}`}>
                       <Image
                         src={kolekcja.imageUrl || '/placeholder.jpg'}
                         alt={kolekcja.title.rendered}
@@ -134,7 +140,7 @@ const KolekcjePage = () => {
                     className="relative transition-all duration-300 col-span-1"
                     style={{ height: '445px' }}
                   >
-                    <Link href={`/kolekcje/${kolekcja.slug}`}>
+                    <Link href={`/${t.links.categories.collections.slug}/${kolekcja.slug}`}>
                       <Image
                         src={kolekcja.imageUrl}
                         alt={kolekcja.title.rendered}

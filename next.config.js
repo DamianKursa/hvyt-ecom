@@ -78,7 +78,7 @@ const nextConfig = {
       { source: '/posts/:path*', destination: '/posts/:path*' },
       { source: '/blog/:path*', destination: '/blog/:path*' },
       { source: '/kategoria/:path*', destination: '/kategoria/:path*' },
-      { source: '/kolekcje/:path*', destination: '/kolekcje/:path*' },
+      { source: '/collections/:path*', destination: '/kolekcje/:path*' },
       { source: '/contact/:path*', destination: '/contact/:path*' },
       { source: '/create-order/:path*', destination: '/create-order/:path*' },
       { source: '/payment-webhooks/:path*', destination: '/payment-webhooks/:path*' },
@@ -123,108 +123,108 @@ const nextConfig = {
         destination: 'https://wp.hvyt.pl/:path*',
       },
       // English category routes
-      {
-        source: '/en/category/:slug*',
-        destination: '/kategoria/:slug*',
-        locale: false,
-      },
-      // English product routes
-      {
-        source: '/en/product/:slug*',
-        destination: '/produkt/:slug*',
-        locale: false,
-      },
-      // English static page routes
-      {
-        source: '/en/cart',
-        destination: '/koszyk',
-        locale: false,
-      },
-      {
-        source: '/en/checkout',
-        destination: '/checkout',
-        locale: false,
-      },
-      {
-        source: '/en/thank-you',
-        destination: '/dziekujemy',
-        locale: false,
-      },
-      {
-        source: '/en/login',
-        destination: '/logowanie',
-        locale: false,
-      },
-      {
-        source: '/en/about-us',
-        destination: '/o-nas',
-        locale: false,
-      },
-      {
-        source: '/en/contact',
-        destination: '/kontakt',
-        locale: false,
-      },
-      {
-        source: '/en/delivery',
-        destination: '/dostawa',
-        locale: false,
-      },
-      {
-        source: '/en/returns-and-complaints',
-        destination: '/zwroty-i-reklamacje',
-        locale: false,
-      },
-      {
-        source: '/en/terms',
-        destination: '/regulamin',
-        locale: false,
-      },
-      {
-        source: '/en/privacy-policy',
-        destination: '/polityka-prywatnosci',
-        locale: false,
-      },
-      {
-        source: '/en/collections',
-        destination: '/kolekcje',
-        locale: false,
-      },
-      {
-        source: '/en/collections/:slug*',
-        destination: '/kolekcje/:slug*',
-        locale: false,
-      },
-      {
-        source: '/en/my-account',
-        destination: '/moje-konto',
-        locale: false,
-      },
-      {
-        source: '/en/my-account/:section*',
-        destination: '/moje-konto/:section*',
-        locale: false,
-      },
-      {
-        source: '/en/wishlist',
-        destination: '/ulubione',
-        locale: false,
-      },
-      {
-        source: '/en/cooperation',
-        destination: '/wspolpraca',
-        locale: false,
-      },
-      {
-        source: '/en/forgot-password',
-        destination: '/zapomniane-haslo',
-        locale: false,
-      },
-      {
-        source: '/en/easy-returns',
-        destination: '/wygodne-zwroty',
-        locale: false,
-      },      
+      // {
+      //   source: '/en/category/:slug*',
+      //   destination: '/kategoria/:slug*',
+      //   locale: false,
+      // },
+      // // English product routes
+      // {
+      //   source: '/en/product/:slug*',
+      //   destination: '/produkt/:slug*',
+      //   locale: false,
+      // },
+      // // English static page routes
+      // {
+      //   source: '/en/cart',
+      //   destination: '/koszyk',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/checkout',
+      //   destination: '/checkout',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/thank-you',
+      //   destination: '/dziekujemy',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/login',
+      //   destination: '/logowanie',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/about-us',
+      //   destination: '/o-nas',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/contact',
+      //   destination: '/kontakt',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/delivery',
+      //   destination: '/dostawa',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/returns-and-complaints',
+      //   destination: '/zwroty-i-reklamacje',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/terms',
+      //   destination: '/regulamin',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/privacy-policy',
+      //   destination: '/polityka-prywatnosci',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/collections',
+      //   destination: '/kolekcje',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/collections/:slug*',
+      //   destination: '/kolekcje/:slug*',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/my-account',
+      //   destination: '/moje-konto',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/my-account/:section*',
+      //   destination: '/moje-konto/:section*',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/wishlist',
+      //   destination: '/ulubione',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/cooperation',
+      //   destination: '/wspolpraca',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/forgot-password',
+      //   destination: '/zapomniane-haslo',
+      //   locale: false,
+      // },
+      // {
+      //   source: '/en/easy-returns',
+      //   destination: '/wygodne-zwroty',
+      //   locale: false,
+      // },      
     ];
   },
 

@@ -31,10 +31,10 @@ const Footer = () => {
 
   // Category links mapping
   const categoryLinks = [
-    { key: 'Uchwyty', label: t.links.categories.handles },
-    { key: 'Klamki', label: t.links.categories.doorHandles },
-    { key: 'Wieszaki', label: t.links.categories.wallHooks },
-    { key: 'Gałki', label: t.links.categories.knobs },
+    { key: 'Uchwyty', label: t.links.categories.handles.label },
+    { key: 'Klamki', label: t.links.categories.doorHandles.label },
+    { key: 'Wieszaki', label: t.links.categories.wallHooks.label },
+    { key: 'Gałki', label: t.links.categories.knobs.label },
   ];
 
   return (
@@ -129,7 +129,7 @@ const Footer = () => {
                       href={getPath('/kolekcje')}
                       className="underline text-black text-[16px] font-light"
                     >
-                      {t.links.categories.collections}
+                      {t.links.categories.collections.label}
                     </Link>
                   </li>
                   <li>
@@ -137,7 +137,7 @@ const Footer = () => {
                       href={getPath('/blog')}
                       className="underline text-black text-[16px] font-light"
                     >
-                      {t.links.categories.blog}
+                      {t.links.categories.blog.label}
                     </Link>
                   </li>
                 </ul>
@@ -145,11 +145,11 @@ const Footer = () => {
               <div>
                 <ul className="space-y-2">
                   {[
-                    { key: 'about', label: t.links.pages.about, path: '/o-nas' },
-                    { key: 'contact', label: t.links.pages.contact, path: '/kontakt' },
-                    { key: 'cooperation', label: t.links.pages.cooperation, path: '/wspolpraca' },
-                    { key: 'delivery', label: t.links.pages.delivery, path: '/dostawa' },
-                    { key: 'returns', label: t.links.pages.returns, path: '/zwroty-i-reklamacje' },
+                    { key: 'about', label: t.links.pages.about.label, path: `/${t.links.pages.about.slug}` },
+                    { key: 'contact', label: t.links.pages.contact.label, path: `/${t.links.pages.contact.slug}` },
+                    { key: 'cooperation', label: t.links.pages.cooperation.label, path: `/${t.links.pages.cooperation.slug}` },
+                    { key: 'delivery', label: t.links.pages.delivery.label, path: `/${t.links.pages.delivery.slug}` },
+                    { key: 'returns', label: t.links.pages.returns.label, path: `/${t.links.pages.returns.slug}` },
                   ].map((link, index) => (
                     <li key={index}>
                       <Link
