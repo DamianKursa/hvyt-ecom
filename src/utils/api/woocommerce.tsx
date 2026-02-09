@@ -40,22 +40,6 @@ export const fetchCategoryBySlug = async (slug: string) => {
   }
 };
 
-// Fetch product id by slug
-// export const fetchProductIdBySlug = async (slug: string) => {
-//   try {
-//     const response = await WooCommerceAPI.get('/product-id-by-slug', {
-//       params: {
-//         slug,
-//       },
-//     });
-
-//     return response.data[0];
-//   } catch (error) {
-//     console.error('Error fetching product by slug:', error);
-//     throw error;
-//   }
-// };
-
 // Fetch product by slug
 export const fetchProductBySlug = async (slug: string) => {
   try {
