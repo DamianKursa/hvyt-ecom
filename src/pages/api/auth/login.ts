@@ -26,10 +26,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       serialize('token', token, {
         httpOnly: true,
         secure: true, //process.env.NODE_ENV === 'production',
-        sameSite: 'none',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         path: '/',
         maxAge: 60 * 60 * 24, 
-        domain: process.env.COOKIE_DOMAIN || '.hvyt.pl', 
+        // domain: process.env.COOKIE_DOMAIN || '.hvyt.pl', 
       })
     );
 
