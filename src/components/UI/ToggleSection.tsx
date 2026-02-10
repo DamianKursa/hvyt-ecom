@@ -1,3 +1,4 @@
+import { useI18n } from '@/utils/hooks/useI18n';
 import React, { useState } from 'react';
 
 interface ToggleSectionProps {
@@ -6,6 +7,7 @@ interface ToggleSectionProps {
 }
 
 const ToggleSection: React.FC<ToggleSectionProps> = ({ title, content }) => {
+  const {t} = useI18n();
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -26,7 +28,7 @@ const ToggleSection: React.FC<ToggleSectionProps> = ({ title, content }) => {
         onClick={() => setIsExpanded(!isExpanded)}
         className="text-black mb-[24px] underline hover:text-dark-pastel-red mt-2"
       >
-        {isExpanded ? 'Zwiń' : 'Rozwiń'}
+        {isExpanded ? t.product.collapse : t.product.expand}
       </button>
     </div>
   );

@@ -16,7 +16,7 @@ import {
   fetchInstagramPosts,
 } from '../../utils/api/woocommerce';
 
-import { getCache, setCache } from '../../lib/cache';
+import { deleteCache, getCache, setCache } from '../../lib/cache';
 import { getCurrentLanguage } from '@/utils/i18n/config';
 
 const CACHE_TTL = 3600;
@@ -207,11 +207,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(400).json({ error: 'Invalid productId' });
         }
 
-        const cacheKey = `fetchCrossSellProducts:${productId}`;
+        const cacheKey = `fetchCrossSellProducts:${productId}_${lang}`;deleteCache(cacheKey);
         const cached = await getCache(cacheKey);
         if (cached) return res.status(200).json(cached);
+        
 
-        const result = await fetchCrossSellProducts(productId);
+        const result = await fetchCrossSellProducts(productId, lang as string);
         await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }

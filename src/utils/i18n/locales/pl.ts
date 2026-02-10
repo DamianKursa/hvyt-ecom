@@ -5,6 +5,8 @@
  * Struktura tego pliku definiuje typ Translations używany przez cały projekt
  */
 
+import { m } from "framer-motion";
+
 export const pl = {
     // === SLUGI URL ===
     slugs: {
@@ -19,8 +21,8 @@ export const pl = {
       backToHome: 'Wróć do strony głównej',  
       loading: 'Ładowanie produktu...',  
       details: 'Szczegóły produktu',
-      morePhotos: 'Więcej zdjęć +',
-      lessPhotos: 'Mniej zdjęć −',
+      morePhotos: 'Więcej zdjęć',
+      lessPhotos: 'Mniej zdjęć',
       over50InStock: 'Ponad 50 szt. na stanie.',
       onlyXInStock: 'Tylko {count} szt. na stanie.',
       inStock: 'Na stanie.',
@@ -29,7 +31,22 @@ export const pl = {
       returnPolicy: '30 dni na zwrot',
       checkSameColor: 'Sprawdź produkty w tym samym kolorze',
       check: 'Sprawdź',
-      addToCart: 'Dodaj do koszyka',      
+      addToCart: 'Dodaj do koszyka',
+      expand: 'Rozwiń',
+      collapse: 'Zwiń',
+      dimensions: 'Wymiary',
+      additionalInfo: 'Informacje dodatkowe',
+      productCardModel3d: 'Karta produktu i model 3D',
+      crossSellTtile: 'Najczęściej kupowane razem',
+      crossSellMessage: 'Sprawdź produkty, które idealnie pasują z wybranym produktem.',
+      instagramTitle: 'Hvyt w waszych domach',
+      instagramMessage: 'Zainspiruj się i zobacz jak nasze produkty sprawdzają się u innych.',
+      instagramCTA: 'Zobacz nasz Instagram',
+      newProductsTitle: 'Zobacz nasze nowości',
+      newProductsMessage: 'Nowi najlepsi przyjaciele Twojego domu',
+      reviewsTitle: 'Klienci o HVYT',
+      reviewsMessage: 'Sprawdź co mówią osoby, które kupiły nasze produkty lub podziel się swoją opinią.',
+
     },
     // === INFORMACJE O SERWISIE (stopka) ===
     serviceInfo: {
@@ -530,11 +547,13 @@ export const pl = {
       seeKnobs: 'Zobacz gałki',
       seeAllCollections: 'Zobacz wszystkie kolekcje →',
       seeOurNews: 'Zobacz nasze nowości',
-      seeFurniture: 'Zobacz meble →',
+      seeFurniture: 'Zobacz meble',
       seeOurInstagram: 'Zobacz nasz Instagram',
-      seeAll: 'Zobacz wszystkie →',
+      seeAll: 'Zobacz wszystkie',
       addAtLeast4Images: 'Dodaj co najmniej 4 obrazy do sekcji „Wybierz swój HVYT".',
       recentlyAdded: 'Zobacz co ostatnio nowego dodaliśmy dla Ciebie.',
+      title: 'Tworzymy meble, które żyją razem z Tobą.',
+      description: 'Wnętrza to nie tylko ściany i metry. To codzienność. Kawa wypita w biegu, pilot schowany pod poduszką, pies, który postanowił coś zbroić.',      
     },
     // === WYSZUKIWANIE ===
     search: {
@@ -567,6 +586,8 @@ export const pl = {
       noProducts: 'Nie masz ulubionych produktów.',    
       removeFrom: 'Usuń z ulubionych',
       addTo: 'Dodaj do ulubionych',
+      messageAdded: 'Produkt został dodany do ulubionych.',
+      messageRemoved: 'Produkt został usunięty z ulubionych.'      
     },
     // === KOMUNIKATY MODALNE ===
     modal: {

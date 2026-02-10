@@ -4,6 +4,7 @@ import ExpandableSection from '@/components/UI/ExpandableSection';
 import { Product } from '@/utils/functions/interfaces';
 import { cleanHTML } from '@/utils/cleanHTML';
 import ModalImageGallery from '../UI/ModalGalleryImage';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface SingleProductDetailsProps {
   product: Product;
@@ -12,6 +13,8 @@ interface SingleProductDetailsProps {
 const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
   product,
 }) => {
+  const {t} = useI18n();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImages, setModalImages] = useState<string[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
@@ -98,7 +101,7 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
     <div className="product-details mx-4 md:mx-0" onClick={handleImageClick}>
       {product.meta_data?.find((meta) => meta.key === 'szczegoly_produktu') && (
         <ToggleSection
-          title="Szczegóły produktu"
+          title={t.product.details}
           content={cleanHTML(
             product.meta_data.find((meta) => meta.key === 'szczegoly_produktu')
               ?.value || '',
@@ -109,7 +112,7 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
       {product.meta_data?.find((meta) => meta.key === 'wymiary') && (
         <ExpandableSection
           isWymiary={true}
-          title="Wymiary"
+          title={t.product.dimensions}
           content={cleanHTML(
             product.meta_data.find((meta) => meta.key === 'wymiary')?.value ||
             '',
@@ -121,7 +124,7 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
         (meta) => meta.key === 'informacje_dodatkowe',
       ) && (
           <ExpandableSection
-            title="Informacje dodatkowe"
+            title={t.product.additionalInfo}
             content={cleanHTML(
               product.meta_data.find(
                 (meta) => meta.key === 'informacje_dodatkowe',
@@ -132,7 +135,7 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
 
       {product.meta_data?.find((meta) => meta.key === 'karta') && (
         <ExpandableSection
-          title="Karta produktu i model 3D"
+          title={t.product.productCardModel3d}
           content={processedContent}
         />
       )}

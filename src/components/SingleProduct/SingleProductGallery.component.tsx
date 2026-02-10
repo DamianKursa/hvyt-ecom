@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import ModalImageGallery from '../UI/ModalGalleryImage';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface ImageType {
   id: string;
@@ -17,6 +18,9 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
   images,
   primaryImage,
 }) => {
+
+  const {t} = useI18n();
+
   const displayImages = React.useMemo(() => {
     if (!images || images.length === 0) return images;
     if (!primaryImage) return images;
@@ -172,7 +176,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
                 onClick={toggleGallery}
                 className="relative z-20 mt-4 px-6 py-2 text-lg font-light text-neutral-darkest  border border-neutral-dark rounded-full "
               >
-                Więcej zdjęć +
+                {t.product.morePhotos} +
               </button>
             </div>
           )}
@@ -206,7 +210,7 @@ const SingleProductGallery: React.FC<SingleProductGalleryProps> = ({
                 onClick={toggleGallery}
                 className="px-6 py-2 text-lg font-light text-neutral-darkest border border-neutral-dark rounded-full"
               >
-                Mniej zdjęć −
+                {t.product.lessPhotos} −
               </button>
             </div>
           )}

@@ -11,8 +11,10 @@ import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
 import Instagram from '@/components/Index/Instagram';
 import Head from 'next/head';
 import WybierzHvyt from '@/components/Index/WybierzHvyt';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const Index: NextPage = () => {
+  const {t} = useI18n();
   const maintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true';
 
   if (maintenanceMode) {
@@ -61,11 +63,11 @@ const Index: NextPage = () => {
         />
       </Head>
       <Hero
-        secondButtonText="Zobacz gałki"
+        secondButtonText={t.index.seeHandles}
         secondButtonLink="/kategoria/uchwyty-meblowe?pa_rodzaj=galki&pa_rodzaj=t-bary"
-        title="Tworzymy meble, które żyją razem z Tobą."
-        description="Wnętrza to nie tylko ściany i metry. To codzienność. Kawa wypita w biegu, pilot schowany pod poduszką, pies, który postanowił coś zbroić."
-        buttonText="Zobacz meble"
+        title={t.index.title}
+        description={t.index.description}
+        buttonText={t.index.seeFurniture}
         buttonLink="/kategoria/meble"
         imageSrc="/images/strona-główna.png"
         imageAlt="Hvyt Hero Image"

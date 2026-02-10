@@ -5,6 +5,7 @@ import { useWishlist } from '@/context/WhishlistContext';
 import { useRouter } from 'next/router';
 import { getCurrency, Language } from '@/utils/i18n/config';
 import { getLocalizedPath } from '@/utils/i18n/routing';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 /** Ensures we never get NaN from parseFloat */
 const safeParse = (v: unknown): number => {
@@ -135,6 +136,8 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const router = useRouter();
   const currency = getCurrency(router?.locale as Language ?? 'pl');
 
+  const {t} = useI18n();
+
   const [isLoading, setIsLoading] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
@@ -228,10 +231,10 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const handleWishlistClick = () => {
     if (isInWishlist(product.slug)) {
       removeFromWishlist(product.slug);
-      setWishlistMessage('Produkt został usunięty z ulubionych.');
+      setWishlistMessage(t.wishlist.messageRemoved);
     } else {
       addToWishlist(product);
-      setWishlistMessage('Produkt został dodany do ulubionych.');
+      setWishlistMessage(t.wishlist.messageAdded);
     }
     setTimeout(() => setWishlistMessage(null), 3000);
   };
@@ -378,7 +381,6 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
           )}
         </div>
       </div>
-
       {/* Clickable Overlay */}
       <Link href={ getLocalizedPath(`/produkt/${product.slug}`) } legacyBehavior>
         <a

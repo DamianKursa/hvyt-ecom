@@ -3,6 +3,7 @@ import ProductPreview from './ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import SkeletonProduct from '@/components/Skeletons/SkeletonProduct';
 import { RecommendedProduct } from '@/utils/hooks/useCrossSellProducts';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface NajczesciejKupowaneProps {
   productId: string;
@@ -17,6 +18,8 @@ const CrossSell: React.FC<NajczesciejKupowaneProps> = ({
 }) => {
   const products = crossSellProducts;
   const loading = crossSellLoading;
+  
+  const {t} = useI18n();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemWidth = 350;
@@ -43,10 +46,10 @@ const CrossSell: React.FC<NajczesciejKupowaneProps> = ({
       <div className="flex justify-between mb-[40px]">
         <div className="flex px-[16px] lg:px-0 flex-col h-full">
           <h2 className="font-size-h2 font-bold text-neutral-darkest">
-            Najczęściej kupowane razem
+            {t.product.crossSellTtile}
           </h2>
           <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
-            Sprawdź produkty, które idealnie pasują z wybranym produktem.
+            {t.product.crossSellMessage}
           </p>
         </div>
 

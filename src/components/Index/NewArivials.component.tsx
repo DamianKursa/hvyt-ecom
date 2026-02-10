@@ -6,6 +6,7 @@ import SkeletonNowosci from '@/components/Skeletons/SkeletonNowosci';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import useSWR from 'swr';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface NowosciItem {
   id: number;
@@ -67,6 +68,9 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
     threshold: 1,
     triggerOnce: true,
   });
+
+  const {t} = useI18n();
+
   const combinedRef = mergeRefs(sectionRef, inViewRef);
 
   //SWR to fetch nowości posts
@@ -108,16 +112,16 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
       {/* Mobile View */}
       <div className="px-[16px] flex flex-col items-start mb-8 md:hidden">
         <h2 className="font-size-h2 font-bold text-neutral-darkest">
-          Zobacz nasze nowości
+          {t.product.newProductsTitle}
         </h2>
         <p className="font-size-text-medium text-neutral-darkest mt-2">
-          Nowi najlepsi przyjaciele Twojego domu
+          {t.product.newProductsMessage}
         </p>
         <Link
           href="/kategoria/meble"
           className="mt-4 px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
         >
-          Zobacz meble →
+          {t.index.seeFurniture} →
         </Link>
       </div>
       <div className="md:hidden">
@@ -229,16 +233,16 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
             className="absolute z-20 left-0 p-4"
           >
             <h2 className="font-size-h2 font-bold text-neutral-darkest">
-              Zobacz nasze nowości
+              {t.product.newProductsTitle}
             </h2>
             <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
-              Nowi najlepsi przyjaciele Twojego domu
+              {t.product.newProductsMessage}
             </p>
             <Link
               href="/kategoria/meble"
               className="mt-[40px] inline-block px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
             >
-              Zobacz meble →
+              {t.index.seeFurniture} →
             </Link>
           </motion.div>
         </div>

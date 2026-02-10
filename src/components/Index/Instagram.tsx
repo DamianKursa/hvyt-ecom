@@ -35,10 +35,10 @@ const Instagram = () => {
     <section className="mx-auto max-w-grid-desktop py-16 px-4 md:px-4 lg:px-4 xl:px-4 min-[1440px]:px-0">
       <div className="px-4 md:px-0 mb-8">
         <h2 className="font-size-h2 font-bold text-neutral-darkest text-left">
-          Hvyt w waszych domach
+          {t.product.instagramTitle}
         </h2>
         <p className="font-size-text-medium text-neutral-darkest mt-[10px] text-left">
-          Zainspiruj się i zobacz jak nasze produkty sprawdzają się u innych.
+          {t.product.instagramMessage}
         </p>
       </div>
 
@@ -75,7 +75,7 @@ const Instagram = () => {
             href="https://www.instagram.com/hvyt_pl"
             className="px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all flex items-center space-x-2"
           >
-            <span>Zobacz nasz Instagram</span>
+            <span>{t.product.instagramCTA}</span>
             <img
               src="/icons/Instagram.svg"
               alt="Instagram Icon"
@@ -117,7 +117,7 @@ const Instagram = () => {
           href="https://www.instagram.com/hvyt_pl"
           className="px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all flex items-center space-x-2"
         >
-          <span>Zobacz nasz Instagram</span>
+          <span>{t.product.instagramCTA}</span>
           <img
             src="/icons/Instagram.svg"
             alt="Instagram Icon"

@@ -3,7 +3,7 @@ import { Kolekcja } from '../functions/interfaces';
 import { NowosciPost } from '../functions/interfaces';
 import { get } from 'lodash';
 import { getCurrency } from '../i18n/config';
-import { getCurrencySlugByLocale } from '@/config/currencies';
+import { getCurrencyByLocale, getCurrencySlugByLocale } from '@/config/currencies';
 
 const WooCommerceAPI = axios.create({
   baseURL: process.env.REST_API,
@@ -278,11 +278,11 @@ export const fetchProductsByAttribute = async (kolekcja: string) => {
   }
 };
 
-export const fetchCrossSellProducts = async (productId: string) => {
+export const fetchCrossSellProducts = async (productId: string, lang: string) => {
   try {
     // 1) Get product and its cross_sell_ids
     const productResponse = await WooCommerceAPI.get(`/products/${productId}`, {
-      params: { ts: Date.now() }, // bust caches
+      params: { ts: Date.now()}, // bust caches
     });
     const productData = productResponse.data;
     const crossSellIds: number[] = (productData.cross_sell_ids || []).filter(Boolean);
@@ -290,6 +290,8 @@ export const fetchCrossSellProducts = async (productId: string) => {
     if (!crossSellIds.length) {
       return { products: [] };
     }
+
+    const currency = getCurrencyByLocale(lang);
 
     // 2) Fetch those products, preserving order from include
     const response = await WooCommerceAPI.get('/products', {
@@ -299,11 +301,16 @@ export const fetchCrossSellProducts = async (productId: string) => {
         status: 'publish',            // only published
         orderby: 'include',           // preserve provided order
         ts: Date.now(),               // bust caches
+        lang: lang,
+        currency: currency.name
       },
       timeout: 5000,
     });
 
     let items: any[] = Array.isArray(response.data) ? response.data : [];
+
+    console.log('items', items[0]);
+    
 
     // 3) Filter out hidden/out‑of‑stock if desired
     items = items.filter((p) => (

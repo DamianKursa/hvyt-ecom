@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { categoryContent, Section } from './CategoryContent';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface CategoryDescriptionProps {
   category: string;
@@ -13,6 +14,7 @@ const ExpandableSection: React.FC<{ title: string; content: string }> = ({
   title,
   content,
 }) => {
+  const {t} = useI18n();
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
@@ -26,7 +28,7 @@ const ExpandableSection: React.FC<{ title: string; content: string }> = ({
         onClick={() => setIsExpanded(!isExpanded)}
         className="text-black underline hover:text-dark-pastel-red mt-2"
       >
-        {isExpanded ? 'Zwiń' : 'Rozwiń'}
+        {isExpanded ? t.product.collapse : t.product.expand}
       </button>
     </div>
   );

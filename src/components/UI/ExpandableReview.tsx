@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import DOMPurify from 'dompurify';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface ExpandableReviewProps {
   content: string;
 }
 
 const ExpandableReview: React.FC<ExpandableReviewProps> = ({ content }) => {
+  const {t} = useI18n();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isTruncated, setIsTruncated] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -48,7 +50,7 @@ const ExpandableReview: React.FC<ExpandableReviewProps> = ({ content }) => {
           className="mt-2 text-dark-pastel-red text-sm underline"
           aria-expanded={isExpanded}
         >
-          {isExpanded ? 'Zwiń' : 'Rozwiń'}
+          {isExpanded ? t.product.collapse : t.product.expand}
         </button>
       )}
     </div>

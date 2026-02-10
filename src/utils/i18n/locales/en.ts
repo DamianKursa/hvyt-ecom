@@ -21,8 +21,8 @@ export const en: Translations = {
       backToHome: 'Back to homepage',  
       loading: 'Loading product...', 
       details: 'Product details',
-      morePhotos: 'More photos +',
-      lessPhotos: 'Less photos −',
+      morePhotos: 'More photos',
+      lessPhotos: 'Less photos',
       over50InStock: 'Over 50 pcs in stock.',
       onlyXInStock: 'Only {count} pcs in stock.',
       inStock: 'In stock.',
@@ -31,7 +31,21 @@ export const en: Translations = {
       returnPolicy: '30-day return policy',
       checkSameColor: 'Check products in the same color',
       check: 'Check',
-      addToCart: 'Add to cart',      
+      addToCart: 'Add to cart', 
+      expand: 'Expand',
+      collapse: 'Collapse',
+      dimensions: 'Dimensions',
+      additionalInfo: 'Additional info',
+      productCardModel3d: 'Product card and 3D model',
+      crossSellTtile: 'Most often bought together',
+      crossSellMessage: 'Check out the products that perfectly match your chosen product.',
+      instagramTitle: 'Hvyt in your homes',
+      instagramMessage: 'Get inspired and see how our products work for others.',
+      instagramCTA: 'See our Instagram',
+      newProductsTitle: 'See our new products',
+      newProductsMessage: 'Your home\'s new best friends',
+      reviewsTitle: 'Customers about HVYT',
+      reviewsMessage: 'Check out what people who have bought our products say or share your opinion.',      
     },
     // === SERVICE INFO (footer) ===
     serviceInfo: {
@@ -536,11 +550,13 @@ export const en: Translations = {
     seeKnobs: 'See knobs',
     seeAllCollections: 'See all collections →',
     seeOurNews: 'See our news',
-    seeFurniture: 'See furniture →',
+    seeFurniture: 'See furniture',
     seeOurInstagram: 'See our Instagram',
-    seeAll: 'See all →',
+    seeAll: 'See all',
     addAtLeast4Images: 'Add at least 4 images to the "Choose your HVYT" section.',
     recentlyAdded: 'See what we have recently added for you.',
+    title: 'We create furniture that lives with you.',
+    description: 'Interiors aren\'t just walls and meters. They\'re everyday life. Coffee drunk on the run, the remote hidden under the pillow, a dog that\'s decided to do something naughty.',
   },
 
   // === SEARCH ===
@@ -574,6 +590,8 @@ export const en: Translations = {
     noProducts: 'You have no products in wishlist.',
     removeFrom: 'Remove from wishlist',
     addTo: 'Add to wishlist',
+    messageAdded: 'The product has been added to wishlist.',
+    messageRemoved: 'The product has been removed from favorites.'
   },
     // === MODAL MESSAGES ===
     modal: {

@@ -136,9 +136,8 @@ const ProductPage = () => {
   const isNotifyEmailValid =
     !!notifyEmailValue && /\S+@\S+\.\S+/.test(notifyEmailValue);
 
-  const { products: crossSellProducts, loading: crossSellLoading } =
+  const { products: crossSellProducts, loading: crossSellLoading, setProdId: setCrosssellProdId } =
     useCrossSellProducts(product ?  '0' : null);
-console.log('currentprod', product);
 
   // Fetch product data on slug change
 
@@ -269,6 +268,7 @@ console.log('currentprod', product);
             }
           }
         }
+
         pushGTMEvent('view_item', {
           items: [
             {
@@ -280,6 +280,10 @@ console.log('currentprod', product);
           value: parseFloat(productData.price),
           currency: 'PLN',
         });
+
+        // update crossell items
+        setCrosssellProdId(productData.id)
+
         fetch('/api/pinterest-capi', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -326,10 +330,10 @@ console.log('currentprod', product);
     };
     if (isInWishlist(product.slug)) {
       removeFromWishlist(product.slug);
-      setWishlistMessage('Produkt został usunięty z ulubionych.');
+      setWishlistMessage(t.wishlist.messageRemoved);
     } else {
       addToWishlist(wishlistProduct);
-      setWishlistMessage('Produkt został dodany do ulubionych.');
+      setWishlistMessage(t.wishlist.messageAdded);
     }
     setTimeout(() => setWishlistMessage(null), 3000);
   };
