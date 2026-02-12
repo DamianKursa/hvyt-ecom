@@ -180,7 +180,7 @@ const EditContactModal: React.FC<EditContactModalProps> = ({
                 className="w-[100%] md:w-[25%] py-3  font-medium bg-black text-white rounded-full hover:bg-gray-800 transition-all"
                 disabled={loading}
               >
-                {loading ? 'Zapisywanie...' : 'Zapisz zmiany'}
+                {loading ? t.auth.saving : t.auth.saveChanges}
               </button>
             </div>
           </form>

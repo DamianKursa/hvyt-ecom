@@ -40,10 +40,13 @@ const AddressModal: React.FC<AddressModalProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+    
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = () => {
+    console.log(formData);
+    
     if (!formData.street || !formData.city || !formData.country) {
       alert('Please fill in all required fields.');
       return;
@@ -177,6 +180,7 @@ const AddressModal: React.FC<AddressModalProps> = ({
             >
 
               <option value="Polska">Polska</option>
+              <option value="Inny">Inny</option>
             </select>
             <span className="absolute right-2 top-2 pointer-events-none">
               <img src="/icons/arrow-down.svg" alt="" className="w-4 h-4" />

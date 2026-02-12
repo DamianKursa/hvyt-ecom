@@ -499,7 +499,7 @@ export const en: Translations = {
     changePassword: 'Change password',
     saving: 'Saving...',
     saveChanges: 'Save changes',
-    editPassword: 'Edytuj Hasło',    
+    editPassword: 'Edit password',    
   },
 
   // === FORM FIELDS ===
