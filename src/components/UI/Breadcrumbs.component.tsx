@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const Breadcrumbs: React.FC = () => {
+  const {t} = useI18n();
   const router = useRouter();
   const { asPath } = router;
   const [showBreadcrumbs, setShowBreadcrumbs] = useState(true);
@@ -40,18 +42,18 @@ const Breadcrumbs: React.FC = () => {
   ];
 
   // Category page: /kategoria/[slug]
-  if (rawSegments[0] === 'kategoria' && rawSegments[1]) {
+  if (rawSegments[0] === t.slugs.category && rawSegments[1]) {
     breadcrumbItems.push({
-      href: `/kategoria/${rawSegments[1]}`,
+      href: `/${t.slugs.category}/${rawSegments[1]}`,
       title: slugToTitle(rawSegments[1]),
     });
   }
   // Product page: /produkt/[slug]
-  else if (rawSegments[0] === 'produkt' && rawSegments[1]) {
+  else if (rawSegments[0] === t.slugs.product && rawSegments[1]) {
     // If you want the category crumb above product, add logic here to fetch the category slug
     // For now, show only product title
     breadcrumbItems.push({
-      href: `/produkt/${rawSegments[1]}`,
+      href: `/${t.slugs.product}/${rawSegments[1]}`,
       title: slugToTitle(rawSegments[1]),
     });
   }

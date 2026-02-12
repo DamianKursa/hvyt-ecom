@@ -11,5 +11,10 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/moje-konto', '/moje-konto/:path*'], 
+  matcher: [
+    '/moje-konto', 
+    '/moje-konto/:path*',
+    '/my-account', 
+    '/my-account/:path*'
+  ], 
 };

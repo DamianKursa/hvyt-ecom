@@ -16,7 +16,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
 }) => {
   const { user } = useUserContext();
 
-  const { t } = useI18n()
+  const { t, getPath } = useI18n()
 
   console.log('User in UserDropdown:', user);
 
@@ -39,35 +39,35 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       {/* Navigation Links */}
       <ul className="space-y-2 pb-2 text-black font-light">
         <li>
-          <Link href="/moje-konto/moje-zamowienia">
+          <Link href={getPath('/moje-konto/moje-zamowienia')}>
             <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
               {t.account.myOrders}
             </span>
           </Link>
         </li>
         <li>
-          <Link href="/moje-konto/kupione-produkty">
+          <Link href={getPath('/moje-konto/kupione-produkty')}>
             <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
               {t.account.boughtProducts}
             </span>
           </Link>
         </li>
         <li>
-          <Link href="/moje-konto/moje-dane">
+          <Link href={getPath('/moje-konto/moje-dane')}>
             <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
               {t.account.myData}
             </span>
           </Link>
         </li>
         <li>
-          <Link href="/moje-konto/moje-adresy">
+          <Link href={getPath('/moje-konto/moje-adresy')}>
             <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
               {t.account.myAddresses}
             </span>
           </Link>
         </li>
         <li>
-          <Link href="/moje-konto/dane-do-faktury">
+          <Link href={getPath('/moje-konto/dane-do-faktury')}>
             <span className="block py-2 px-4 rounded-[24px] hover:bg-beige-dark text-[18px]">
               {t.account.billingData}
             </span>

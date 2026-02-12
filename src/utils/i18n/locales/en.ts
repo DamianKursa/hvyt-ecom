@@ -89,6 +89,7 @@ export const en: Translations = {
         cooperation: {label: 'Cooperation', slug: 'cooperation'},
         delivery: {label: 'Delivery', slug: 'delivery'},
         returns: {label: 'Returns and complaints', slug: 'returns-and-complaints'},
+        account: {label: 'My account', slug: 'my-account'},
       },
     },    
     // === NEWSLETTER ===
@@ -449,7 +450,7 @@ export const en: Translations = {
     billingCompany: 'Billing data - company',
     productsWillBeAdded: 'Products will be added to cart with their current',
     sorting: 'Sort by',
-    alreadyUser: 'You are already a user?',
+    alreadyUser: 'Have you already signed up?',
     noAccoountYet: 'You don\'t have an account yet?',
     signup: "Sign up",
     myAccount: 'My account',

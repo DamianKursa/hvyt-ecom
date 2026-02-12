@@ -60,7 +60,7 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
-  const { t } = useI18n();
+  const { t, getPath } = useI18n();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -111,7 +111,7 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
           <ul className="space-y-4">
             {endpoints.map((endpoint) => (
               <li key={endpoint.key}>
-                <Link href={endpoint.path}>
+                <Link href={getPath(endpoint.path)}>
                   <div
                     className={` px-4 flex items-center py-2 rounded-[25px] cursor-pointer ${router.asPath === endpoint.path
                       ? 'bg-beige-light text-dark-pastel-red'

@@ -90,6 +90,7 @@ export const pl = {
         cooperation: {label: 'Współpraca', slug: 'wspolpraca'},
         delivery: {label: 'Dostawa', slug: 'dostawa'},
         returns: {label: 'Zwroty i reklamacje', slug: 'zwroty-i-reklamacje'},
+        account: {label: 'Moje konto', slug: 'moje-konto'},
       },
     },
     // === NEWSLETTER ===

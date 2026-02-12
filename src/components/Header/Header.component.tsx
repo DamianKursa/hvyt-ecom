@@ -295,7 +295,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       </button>
                       {count > 0 ? (
                         <Link
-                          href="/koszyk"
+                          href={getPath('/koszyk')}
                           className="relative inline-flex items-center space-x-2 h-[40px] px-4 rounded-full transition-all bg-[#E95F7F] text-white"
                         >
                           <span className="text-lg font-medium">{count}</span>
@@ -307,7 +307,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                         </Link>
                       ) : (
                         <Link
-                          href="/koszyk"
+                          href={getPath('/koszyk')}
                           className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] transition-all"
                         >
                           <img
@@ -345,7 +345,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       </button>
 
                       {/* Wishlist Icon */}
-                      <Link href="/ulubione">
+                      <Link href={getPath('/ulubione')}>
                         <span className="relative w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] transition-all">
                           <img src="/icons/wishlist.svg" alt="Wishlist" className="w-full h-full" />
                           {favoriteCount > 0 && (
@@ -361,20 +361,20 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                         onClick={handleUserClick}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
-                        className={`relative w-6 h-6 flex items-center justify-center rounded-full cursor-pointer ${router.asPath.startsWith('/moje-konto') && user
+                        className={`relative w-6 h-6 flex items-center justify-center rounded-full cursor-pointer ${router.asPath.startsWith(`/${t.links.pages.account.slug}`) && user
                           ? 'bg-white'
                           : 'hover:bg-[#DAD3C8]'
                           }`}
                       >
                         <button
-                          className={`w-full h-full flex items-center justify-center transition-all ${router.asPath.startsWith('/moje-konto') && user
+                          className={`w-full h-full flex items-center justify-center transition-all ${router.asPath.startsWith(`/${t.links.pages.account.slug}`) && user
                             ? 'text-dark-pastel-red'
                             : 'hover:text-neutral-darkest'
                             }`}
                         >
                           <img
                             src={
-                              router.asPath.startsWith('/moje-konto') && user
+                              router.asPath.startsWith(`/${t.links.pages.account.slug}`) && user
                                 ? '/icons/user-pastel.svg'
                                 : '/icons/user.svg'
                             }
@@ -396,7 +396,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                       {/* Cart Icon */}
                       {count > 0 ? (
                         <Link
-                          href="/koszyk"
+                          href={getPath('/koszyk')}
                           className="relative inline-flex items-center space-x-2 h-[43px] px-4 rounded-full transition-all bg-[#E95F7F] text-white"
                         >
                           <span className="text-lg font-medium">{count}</span>
@@ -408,7 +408,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
                         </Link>
                       ) : (
                         <Link
-                          href="/koszyk"
+                          href={getPath('/koszyk')}
                           className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-[#DAD3C8] transition-all"
                         >
                           <img

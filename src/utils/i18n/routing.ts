@@ -27,6 +27,14 @@ const slugMap: Record<string, { pl: string; en: string }> = {
   'polityka-prywatnosci': { pl: 'polityka-prywatnosci', en: 'privacy-policy' },
   'kolekcje': { pl: 'kolekcje', en: 'collections' },
   'blog': { pl: 'blog', en: 'blog' },
+  'koszyk': { pl: 'koszyk', en: 'cart' },
+  'moje-konto': { pl: 'moje-konto', en: 'my-account' },
+  'moje-konto/moje-zamowienia': { pl: 'moje-konto/moje-zamowienia', en: 'my-account/my-orders' },
+  'moje-konto/kupione-produkty': { pl: 'moje-konto/kupione-produkty', en: 'my-account/bought-products' },
+  'moje-konto/moje-dane': { pl: 'moje-konto/moje-dane', en: 'my-account/account-details' },
+  'moje-konto/moje-adresy': { pl: 'moje-konto/moje-adresy', en: 'my-account/my-addresses' },
+  'moje-konto/dane-do-faktury': { pl: 'moje-konto/dane-do-faktury', en: 'my-account/billing-data' },
+  'ulubione': { pl: 'ulubione', en: 'wishlist' },
 };
 
 /**
@@ -172,14 +180,14 @@ export const getLocalizedPath = (
     } else {
       return isEn ? `/en/product/${productSlug}` : `/produkt/${productSlug}`;
     }
-  }
+  }  
   
   // Handle regular pages
   let mapped = slugMap[cleanPath];
   if (!mapped && reverseSlugMap[cleanPath]) {
     mapped = slugMap[reverseSlugMap[cleanPath]];
   }
-  
+
   if (mapped) {
     if (isMultiDomain) {
       return isEn ? `/${mapped.en}` : `/${mapped.pl}`;

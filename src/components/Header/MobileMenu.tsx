@@ -17,7 +17,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
 }) => {
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const router = useRouter();
-  const { t } = useI18n();
+  const { t, getPath } = useI18n();
   const currentPath = router.asPath.split('?')[0];
   const { wishlist } = useWishlist();
   const favoriteCount = wishlist.length;
@@ -205,7 +205,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 {accountDropdownOpen && (
                   <ul className="mt-4 space-y-4 text-lg">
                     <li>
-                      <Link href="/moje-konto/moje-zamowienia" legacyBehavior>
+                      <Link href={getPath('/moje-konto/moje-zamowienia')} legacyBehavior>
                         <a
                           onClick={() => {
                             toggleMenu();
@@ -223,7 +223,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                       </Link>
                     </li>
                     <li>
-                      <Link href="/moje-konto/kupione-produkty" legacyBehavior>
+                      <Link href={getPath('/moje-konto/kupione-produkty')} legacyBehavior>
                         <a
                           onClick={() => {
                             toggleMenu();
@@ -241,7 +241,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                       </Link>
                     </li>
                     <li>
-                      <Link href="/moje-konto/moje-dane" legacyBehavior>
+                      <Link href={getPath('/moje-konto/moje-dane')} legacyBehavior>
                         <a
                           onClick={() => {
                             toggleMenu();
@@ -259,7 +259,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                       </Link>
                     </li>
                     <li>
-                      <Link href="/moje-konto/moje-adresy" legacyBehavior>
+                      <Link href={getPath('/moje-konto/moje-adresy')} legacyBehavior>
                         <a
                           onClick={() => {
                             toggleMenu();
@@ -277,7 +277,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                       </Link>
                     </li>
                     <li>
-                      <Link href="/moje-konto/dane-do-faktury" legacyBehavior>
+                      <Link href={getPath('/moje-konto/dane-do-faktury')} legacyBehavior>
                         <a
                           onClick={() => {
                             toggleMenu();
@@ -315,7 +315,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                 )}
               </div>
             ) : (
-              <Link href="/logowanie" legacyBehavior>
+              <Link href={getPath('/logowanie')} legacyBehavior>
                 <a
                   onClick={handleAccountClick}
                   className="font-bold flex items-center"
@@ -327,7 +327,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             )}
           </li>
           <li>
-            <Link href="/ulubione" legacyBehavior>
+            <Link href={getPath('/ulubione')} legacyBehavior>
               <a onClick={toggleMenu} className="font-bold">
                 <div className="flex items-center">
                   <img src="/icons/heart.svg" alt="Wishlist" className="h-6 mr-3" />

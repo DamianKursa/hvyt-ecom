@@ -4,32 +4,32 @@ import Image from 'next/image';
 import { useI18n } from '@/utils/hooks/useI18n';
 
 const Sidebar = ({ section }: { section: string }) => {
-  const { t } = useI18n();
+  const { t, getPath } = useI18n();
   
   const menuItems = [
     {
       label: t.account.myData,
-      href: '/moje-konto/moje-dane',
+      href: getPath('/moje-konto/moje-dane'),
       icon: '/icons/user.svg',
     },
     {
       label: t.account.myOrders,
-      href: '/moje-konto/moje-zamowienia',
+      href: getPath('/moje-konto/moje-zamowienia'),
       icon: '/icons/cart.svg',
     },
     {
       label: t.account.boughtProducts,
-      href: '/moje-konto/kupione-produkty',
+      href: getPath('/moje-konto/kupione-produkty'),
       icon: '/icons/kupione.svg',
     },
     {
       label: t.account.billingData,
-      href: '/moje-konto/dane-do-faktury',
+      href: getPath('/moje-konto/dane-do-faktury'),
       icon: '/icons/do-faktury.svg',
     },
     {
       label: t.account.logout,
-      href: '/logowanie',
+      href: getPath('/logowanie'),
       icon: '/icons/logout-01.svg',
     },
   ];
