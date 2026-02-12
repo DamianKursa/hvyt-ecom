@@ -396,9 +396,8 @@ export const pl = {
     thankYou: {
       pageTitle: 'Dziękujemy za zakupy!',
       hero: {
-        title: 'Dziękujemy za zakupy w naszym sklepie!',
-        description: 'Na podany adres e-mail wysłaliśmy potwierdzenie zakupu zamówienia',
-        orderNumber: '#',
+        title: 'Dziękujemy za <br />zakupy w naszym sklepie!',
+        description: 'Na podany adres e-mail wysłaliśmy potwierdzenie <br />zakupu zamówienia',
       },
       order: {
         title: 'Moje zamówienie',
@@ -406,13 +405,15 @@ export const pl = {
         price: 'Cena',
         quantity: 'Ilość',
         total: 'Suma',
-        paymentMethod: 'Metoda płatności:',
+        total2: 'Razem',
+        paymentMethod: 'Metoda&nbp;płatności',
         noPaymentData: 'Brak danych',
-        shippingAddress: 'Dane do wysyłki:',
-        noShippingData: 'Brak danych o wysyłce.',
-        billingAddress: 'Dane do faktury:',
+        shippingAddress: 'Dane do wysyłki',
+        noShippingData: 'Brak danych&nbsp;o&nbsp;wysyłce.',
+        billingAddress: 'Dane do faktury',
         noBillingData: 'Brak danych do faktury.',
         noAddress: 'Brak adresu',
+        noData: 'Brak danych',
       },
       backToHome: 'Wróć na stronę główną',
       error: {

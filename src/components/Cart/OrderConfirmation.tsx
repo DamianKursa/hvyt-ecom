@@ -27,13 +27,13 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
           <thead className="bg-beige py-4">
             <tr>
               <th className="py-3 px-6 w-1/2 text-left font-semibold text-neutral-darker">
-                Produkt
+                {t.thankYou.order.product}
               </th>
               <th className="py-3 pr-6 w-1/2 text-left font-semibold text-neutral-darker">
                 <div className="grid grid-cols-3 gap-4">
-                  <span>Cena</span>
-                  <span className="text-left">Ilość</span>
-                  <span className="text-right">Suma</span>
+                  <span>{t.thankYou.order.price}</span>
+                  <span className="text-left">{t.thankYou.order.quantity}</span>
+                  <span className="text-right">{t.thankYou.order.total}</span>
                 </div>
               </th>
             </tr>
@@ -67,9 +67,9 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
 
         {/* Payment Method (new row, same style) */}
         <div className="grid grid-cols-2 mt-8">
-          <h3 className="font-light text-[16px] pl-6">Metoda&nbsp;płatności:</h3>
+          <h3 className="font-light text-[16px] pl-6">{t.thankYou.order.paymentMethod}:</h3>
           <p className="text-left pr-6">
-            {order.payment_method || 'Brak danych'}
+            {order.payment_method || t.thankYou.order.noData}
           </p>
         </div>
 
@@ -80,7 +80,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
             <div className="grid grid-cols-1 text-right">
               <div className="text-left space-y-6">
                 <p className=" pl-6 font-light text-[16px] rounded-bl-[24px] rounded-tl-[24px]">
-                  Razem:
+                  {t.thankYou.order.total2}:
                 </p>
               </div>
 
@@ -95,7 +95,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
 
         {/* Shipping / Billing (same style) */}
         <div className="grid  grid-cols-2 mt-8">
-          <h3 className="font-light text-[16px] pl-6">Dane do wysyłki:</h3>
+          <h3 className="font-light text-[16px] pl-6">{t.thankYou.order.shippingAddress}:</h3>
           <div>
             {order.shipping?.first_name ? (
               <>
@@ -111,13 +111,13 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                 <p>{order.shipping.country}</p>
               </>
             ) : (
-              <p>Brak danych&nbsp;o&nbsp;wysyłce.</p>
+              <p>{t.thankYou.order.noShippingData}</p>
             )}
           </div>
         </div>
 
         <div className="grid  grid-cols-2 mt-8">
-          <h3 className="font-light pl-6 text-[16px] ">Dane do faktury:</h3>
+          <h3 className="font-light pl-6 text-[16px] ">{t.thankYou.order.billingAddress}:</h3>
           <div className="grid grid-cols-2 gap-x-8">
             <div>
               {order.billing?.first_name ? (
@@ -126,7 +126,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                     {order.billing.first_name} {order.billing.last_name}
                   </p>
                   {order.billing.company && <p>{order.billing.company}</p>}
-                  <p>{order.billing.address_1 || (order.billing as any)?.address || 'Brak adresu'}</p>
+                  <p>{order.billing.address_1 || (order.billing as any)?.address || t.thankYou.order.noAddress}</p>
                   {order.billing.address_2 && <p>{order.billing.address_2}</p>}
                   <p>
                     {order.billing.city} {order.billing.postcode}
@@ -134,7 +134,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                   <p>{order.billing.country}</p>
                 </>
               ) : (
-                <p>Brak danych do faktury.</p>
+                <p>{t.thankYou.order.noBillingData}</p>
               )}
             </div>
             <div>
@@ -149,7 +149,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
       <div className="block md:hidden bg-[#F8F5F1]  rounded-[24px]">
         <div className="bg-white rounded-[24px] p-4 space-y-6">
           <h2 className="text-[20px] text-dark-pastel-red font-bold">
-            Moje zamówienie
+            {t.thankYou.order.title}
           </h2>
 
           {order.line_items.map((item) => (
@@ -172,19 +172,19 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                 </p>
                 <div className="mt-3 space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span className="font-bold text-[#5D5759]">Cena:</span>
+                    <span className="font-bold text-[#5D5759]">{t.thankYou.order.price}:</span>
                     <span className="font-light text-[#0E0B0C]">
                       {(parseFloat(item.price) / item.quantity).toFixed(2)} {currency}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-bold text-[#5D5759]">Ilość:</span>
+                    <span className="font-bold text-[#5D5759]">{t.thankYou.order.quantity}:</span>
                     <span className="font-light text-[#0E0B0C]">
                       {item.quantity}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="font-bold text-[#5D5759]">Suma:</span>
+                    <span className="font-bold text-[#5D5759]">{t.thankYou.order.total}:</span>
                     <span className="font-light text-[#0E0B0C]">{item.price} {currency}</span>
                   </div>
                 </div>
@@ -195,10 +195,10 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
           {/* Payment */}
           <div className="border-t border-[#DAD3C8] pt-4">
             <h3 className="text-[16px] font-light text-[#857C7F] mb-2">
-              Metoda płatności:
+              {t.thankYou.order.paymentMethod}:
             </h3>
             <p className="text-[#0E0B0C]">
-              {order.payment_method || 'Brak danych'}
+              {order.payment_method || t.thankYou.order.noData}
             </p>
           </div>
 
@@ -207,7 +207,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
 
             <div className="grid grid-cols-1 text-sm gap-y-1">
               <span className=" text-[16px] font-light text-[#857C7F] mb-2 ">
-                Razem
+                {t.thankYou.order.total2}
               </span>
               <span className=" text-[16px]  text-left mt-2">
                 {order.total} {currency}
@@ -218,7 +218,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
           {/* Shipping address */}
           <div>
             <h3 className="text-[16px] font-light text-[#857C7F] mb-2">
-              Dane do wysyłki:
+              {t.thankYou.order.shippingAddress}:
             </h3>
             {order.shipping?.first_name ? (
               <>
@@ -226,7 +226,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                   {order.shipping.first_name} {order.shipping.last_name}
                 </p>
                 {order.shipping.company && <p>{order.shipping.company}</p>}
-                <p>{order.shipping.address_1 || (order.shipping as any)?.address || 'Brak adresu'}</p>
+                <p>{order.shipping.address_1 || (order.shipping as any)?.address || t.thankYou.order.noAddress}</p>
                 {order.shipping.address_2 && <p>{order.shipping.address_2}</p>}
                 <p>
                   {order.shipping.city} {order.shipping.postcode}
@@ -234,7 +234,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                 <p>{order.shipping.country}</p>
               </>
             ) : (
-              <p>Brak danych&nbsp;o&nbsp;wysyłce.</p>
+              <p>{t.thankYou.order.noShippingData}</p>
             )}
           </div>
 
@@ -249,7 +249,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                   {order.billing.first_name} {order.billing.last_name}
                 </p>
                 {order.billing.company && <p>{order.billing.company}</p>}
-                <p>{order.billing.address_1 || (order.billing as any)?.address || 'Brak adresu'}</p>
+                <p>{order.billing.address_1 || (order.billing as any)?.address || t.thankYou.order.noAddress}</p>
                 {order.billing.address_2 && <p>{order.billing.address_2}</p>}
                 <p>
                   {order.billing.city} {order.billing.postcode}
@@ -259,7 +259,7 @@ const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
                 {order.billing.phone && <p>{order.billing.phone}</p>}
               </>
             ) : (
-              <p>Brak danych do faktury.</p>
+              <p>{t.thankYou.order.noBillingData}</p>
             )}
           </div>
         </div>

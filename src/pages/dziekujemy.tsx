@@ -7,8 +7,10 @@ import CartProgress from '@/components/Cart/CartProgress';
 import OrderConfirmation from '@/components/Cart/OrderConfirmation';
 import { Order } from '@/utils/functions/interfaces';
 import { CartContext } from '@/stores/CartProvider';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const Dziekujemy = () => {
+  const {t} = useI18n();
   const router = useRouter();
   const { orderId, orderKey } = router.query;
   const [order, setOrder] = useState<Order | null>(null);
@@ -82,19 +84,17 @@ const Dziekujemy = () => {
   }, [orderId, orderKey]);
 
   return (
-    <Layout title="Dziękujemy za zakupy!">
+    <Layout title={t.thankYou.pageTitle}>
       <div className="mt-[55px] md:mt-0 container mx-auto px-4 mb-16 md:px-0">
         <CartProgress />
       </div>
       <div className="mx-4 xl:mx-0 hidden md:grid grid-cols-10 min-h-[750px] rounded-[24px] overflow-hidden mb-10">
         <div className="col-span-4 bg-[#F0E0CF] flex flex-col justify-center pl-[40px]">
           <h1 className="text-[48px] font-bold text-black leading-tight">
-            Dziękujemy za
-            <br /> zakupy w naszym sklepie!
+            {t.thankYou.hero.title}
           </h1>
           <p className="text-[18px] mt-8 font-light text-black">
-            Na podany adres e-mail wysłaliśmy potwierdzenie <br /> zakupu
-            zamówienia <span className="font-bold">#{order?.id}</span>.
+            {t.thankYou.hero.description} <span className="font-bold">#{order?.id}</span>.
           </p>
         </div>
         <div
@@ -109,12 +109,10 @@ const Dziekujemy = () => {
       <div className=" block md:hidden mb-10 mx-4 rounded-[24px] overflow-hidden">
         <div className="bg-[#F0E0CF] p-4">
           <h1 className="text-[36px] mt-4 font-bold text-black leading-tight">
-            Dziękujemy za
-            <br /> zakupy w naszym sklepie!
+            {t.thankYou.hero.title}
           </h1>
           <p className="text-[18px] pb-8 mt-4 font-light text-black">
-            Na podany adres e-mail wysłaliśmy potwierdzenie <br /> zakupu
-            zamówienia <span className="font-bold">#{order?.id}</span>.
+            {t.thankYou.hero.description} <span className="font-bold">#{order?.id}</span>.
           </p>
         </div>
         <div className="relative" style={{ height: '250px' }}>
@@ -136,7 +134,7 @@ const Dziekujemy = () => {
             href="/"
             className="w-full px-8 py-4 bg-black text-neutral-white text-[24px] font-light rounded-full hover:bg-neutral-dark transition"
           >
-            Wróć na stronę główną
+            {t.thankYou.backToHome}
           </Link>
         </div>
       </div>

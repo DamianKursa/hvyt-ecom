@@ -85,6 +85,7 @@ const nextConfig = {
       { source: '/about-us/:path*', destination: '/o-nas/:path*' },
       { source: '/wishlist/:path*', destination: '/ulubione/:path*' },
       { source: '/cart/:path*', destination: '/koszyk/:path*' },
+      { source: '/thank-you/:path*', destination: '/dziekujemy/:path*' },
       // { source: '/en/about-us/:path*', destination: '/o-nas/:path*' },
                
       { source: '/_next/:path*', destination: '/_next/:path*' },

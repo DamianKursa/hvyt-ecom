@@ -396,9 +396,8 @@ export const en: Translations = {
     thankYou: {
       pageTitle: 'Thank you for your purchase!',
       hero: {
-        title: 'Thank you for shopping at our store!',
+        title: 'Thank you for <br />shopping at our store!',
         description: 'We have sent a purchase confirmation to your email address for order',
-        orderNumber: '#',
       },
       order: {
         title: 'My order',
@@ -406,13 +405,15 @@ export const en: Translations = {
         price: 'Price',
         quantity: 'Quantity',
         total: 'Total',
-        paymentMethod: 'Payment method:',
+        total2: 'Total',
+        paymentMethod: 'Payment&nbsp;method',
         noPaymentData: 'No data',
-        shippingAddress: 'Shipping address:',
+        shippingAddress: 'Shipping address',
         noShippingData: 'No shipping data.',
-        billingAddress: 'Billing address:',
+        billingAddress: 'Billing address',
         noBillingData: 'No billing data.',
         noAddress: 'No address',
+        noData: 'No data'
       },
       backToHome: 'Back to home page',
       error: {
