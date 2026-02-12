@@ -479,6 +479,11 @@ export const pl = {
       saveInvoiceData: 'Zapisz dane do faktury',
       addData: 'Dodaj dane',
       editData: 'Edytuj dane',
+      confirmEmail: 'Potwierdź email',
+      messageEmailLinkSent: 'Link aktywacyjny został wysłany na adres e-mail',
+      messageEmailLinkClick: 'W celu zakończenia rejestracji kliknij w link.',
+      messageLinkProblem: 'Problemy z linkiem?',
+      messageCheckSpam: 'Nie widzisz maila? Sprawdź także w folderze spam.'
     },
     // === AUTENTYKACJA / LOGOWANIE ===
     auth: {

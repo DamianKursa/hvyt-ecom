@@ -479,6 +479,11 @@ export const en: Translations = {
     saveInvoiceData: 'Save invoice details',
     addData: 'Add details',    
     editData: 'Edit details',
+    confirmEmail: 'Confirm email',
+    messageEmailLinkSent: 'The activation link has been sent to your email address',
+    messageEmailLinkClick: 'To complete registration, click the link.',
+    messageLinkProblem: 'Problems with the link?',
+    messageCheckSpam: 'Don\'t see the email? Check your spam folder.'    
   },
 
   // === AUTHENTICATION / LOGIN ===
