@@ -46,6 +46,7 @@ export const en: Translations = {
       newProductsMessage: 'Your home\'s new best friends',
       reviewsTitle: 'Customers about HVYT',
       reviewsMessage: 'Check out what people who have bought our products say or share your opinion.',      
+      notifyAvailable: 'Notify when availabilable'
     },
     // === SERVICE INFO (footer) ===
     serviceInfo: {
@@ -114,9 +115,9 @@ export const en: Translations = {
     aboutUs: {
       pageTitle: 'Hvyt | About Us',
       metaDescription: 'Discover HVYT - a small company with a great offer. We created our brand from a love of design and accessories that give each interior its individual character. Explore our collections of handles, door handles and wall hooks.',
-      heroTitle: 'Small company,<br /> great offer',
+      heroTitle: 'Small company, great offer',
       heroDescriptionMobile: 'HVYT was born from a love of design and accessories. We believe that these are what give each interior its individual character. We are quite quirky ourselves, which is why our name is an alternative spelling of the word "grip". We strive to make our offer diverse so everyone can find something for themselves.',
-      heroDescriptionDesktop: 'HVYT was born from a love of design and accessories.<br /> We believe that these are what give each interior<br /> its individual character. We are quite quirky ourselves,<br /> which is why our name is an alternative spelling<br /> of the word "grip".<br /><br /> We strive to make our offer diverse<br /> so everyone can find something for themselves.',
+      heroDescriptionDesktop: 'HVYT was born from a love of design and accessories. We believe that these are what give each interior its individual character. We are quite quirky ourselves, which is why our name is an alternative spelling of the word "grip". We strive to make our offer diverse so everyone can find something for themselves.',
       contactButton: 'Contact →',
     },
     // === COMMON ===
@@ -320,6 +321,13 @@ export const en: Translations = {
         title: 'Your order',
         emptyCart: 'Your cart is empty.',
         quantity: 'Quantity:',
+        statusPending: 'Waiting for payment',
+        statusCompleted: 'Completed',
+        statusCanceled: 'Canceled',
+        statusUnknown: 'Unknown status',
+        statusProcessing: 'Processing',
+        statusPaid: 'Paid',
+        statusUnknownPayment: 'Payment status unknown',        
       },
       terms: {
         confirmTerms: 'I confirm that I have read',
@@ -396,7 +404,7 @@ export const en: Translations = {
     thankYou: {
       pageTitle: 'Thank you for your purchase!',
       hero: {
-        title: 'Thank you for <br />shopping at our store!',
+        title: 'Thank you for shopping at our store!',
         description: 'We have sent a purchase confirmation to your email address for order',
       },
       order: {

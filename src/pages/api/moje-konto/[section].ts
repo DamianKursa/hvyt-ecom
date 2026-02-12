@@ -86,7 +86,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
           const userData: any = userRes.data || {};
           const wcCustomer: any = wcRes?.data || {};
-
+          
           const firstName =
             userData.firstName ?? userData.first_name ?? wcCustomer.first_name ?? '';
           const lastName =

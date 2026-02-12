@@ -964,11 +964,11 @@ const ProductPage = () => {
                       : 'bg-black text-white hover:bg-dark-pastel-red'
                       }`}
                   >
-                    Powiadom o dostępności
+                    {t.product.notifyAvailable}
                   </button>
                   {waitingListError && (
                     <p className="text-red-500 mt-2">
-                      Błąd: {waitingListError}
+                      {t.common.error}: {waitingListError}
                     </p>
                   )}
                 </form>

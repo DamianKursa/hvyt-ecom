@@ -46,7 +46,7 @@ export const pl = {
       newProductsMessage: 'Nowi najlepsi przyjaciele Twojego domu',
       reviewsTitle: 'Klienci o HVYT',
       reviewsMessage: 'Sprawdź co mówią osoby, które kupiły nasze produkty lub podziel się swoją opinią.',
-
+      notifyAvailable: 'Powiadom o dostępności'
     },
     // === INFORMACJE O SERWISIE (stopka) ===
     serviceInfo: {
@@ -115,9 +115,9 @@ export const pl = {
     aboutUs: {
       pageTitle: 'Hvyt | O nas',
       metaDescription: 'Poznaj HVYT - małą firmę z wielką ofertą. Stworzyliśmy markę z miłości do designu i dodatków, które nadają indywidualny charakter każdemu wnętrzu. Odkryj nasze kolekcje uchwytów, klamek i wieszaków.',
-      heroTitle: 'Mała firma,<br /> wielka oferta',
+      heroTitle: 'Mała firma, wielka oferta',
       heroDescriptionMobile: 'HVYT powstał z miłości do designu i dodatków. Wierzymy, że to właśnie one są odpowiedzialne za indywidualny charakter każdego wnętrza. Sami jesteśmy całkiem zakręceni, dlatego nasza nazwa to alternatywny zapis słowa „chwyt". Staramy się aby nasza oferta była różnorodna i każdy mógł znaleźć coś dla siebie.',
-      heroDescriptionDesktop: 'HVYT powstał z miłości do designu i dodatków.<br /> Wierzymy, że to właśnie one są odpowiedzialne<br /> za indywidualny charakter każdego wnętrza.<br /> Sami jesteśmy całkiem zakręceni, dlatego nasza<br /> nazwa to alternatywny zapis słowa „chwyt".<br /><br /> Staramy się aby nasza oferta była<br /> różnorodna i każdy mógł znaleźć coś dla siebie.',
+      heroDescriptionDesktop: 'HVYT powstał z miłości do designu i dodatków. Wierzymy, że to właśnie one są odpowiedzialne za indywidualny charakter każdego wnętrza. Sami jesteśmy całkiem zakręceni, dlatego nasza nazwa to alternatywny zapis słowa „chwyt". Staramy się aby nasza oferta była różnorodna i każdy mógł znaleźć coś dla siebie.',
       contactButton: 'Kontakt →',
     },
     // === WSPÓLNE ===
@@ -321,6 +321,14 @@ export const pl = {
         title: 'Twoje zamówienie',
         emptyCart: 'Twój koszyk jest pusty.',
         quantity: 'Ilość:',
+        statusPending: 'Oczekuje na płatność',
+        statusCompleted: 'Zrealizowane',
+        statusCanceled: 'Anulowane',
+        statusUnknown: 'Nieznany status',
+        statusProcessing: 'W toku',      
+        statusPaid: 'Zapłacone',
+        statusUnknownPayment: 'Nieznany status płatności',
+
       },
       terms: {
         confirmTerms: 'Potwierdzam, że zapoznałam/em się z treścią',
@@ -396,8 +404,8 @@ export const pl = {
     thankYou: {
       pageTitle: 'Dziękujemy za zakupy!',
       hero: {
-        title: 'Dziękujemy za <br />zakupy w naszym sklepie!',
-        description: 'Na podany adres e-mail wysłaliśmy potwierdzenie <br />zakupu zamówienia',
+        title: 'Dziękujemy za zakupy w naszym sklepie!',
+        description: 'Na podany adres e-mail wysłaliśmy potwierdzenie zakupu zamówienia',
       },
       order: {
         title: 'Moje zamówienie',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { Key, useState } from 'react';
 import CustomDropdownWithLabels from '@/components/UI/CustomDropdownWithLabels.component';
 import { Order } from '@/utils/functions/interfaces';
 import Link from 'next/link';
@@ -14,28 +14,42 @@ interface OrderTableProps {
   onViewDetails?: (order: Order) => void;
 }
 
-const getOrderStatusLabel = (status: string) => {
+interface OrderStatusLabel {
+  label: string,
+  labelKey: string,
+  className: string
+}
+
+const getOrderStatusLabel = (status: string) : OrderStatusLabel=> {
   switch (status) {
     case 'pending':
       return {
         label: 'Oczekuje na płatność',
+        labelKey: 'statusPending',
         className: 'bg-yellow-200 text-yellow-800',
       };
     case 'processing':
-      return { label: 'W toku', className: 'bg-blue-200 text-blue-800' };
+      return { 
+        label: 'W toku', 
+        labelKey: 'statusProcessing',
+        className: 'bg-blue-200 text-blue-800' 
+      };
     case 'completed':
       return {
         label: 'Zrealizowane',
+        labelKey: 'statusCompleted',
         className: 'bg-[#EAEFEC] text-[#EAEFEC]',
       };
     case 'cancelled':
       return {
         label: 'Anulowane',
+        labelKey: 'statusCanceled',
         className: 'bg-dark-pastel-red text-[#F0E0CF]',
       };
     default:
       return {
         label: 'Nieznany status',
+        labelKey: 'statusUnknown',
         className: 'bg-gray-100 text-[#fff]',
       };
   }
@@ -44,11 +58,11 @@ const getOrderStatusLabel = (status: string) => {
 const getPaymentStatusLabel = (paymentStatus: string) => {
   switch (paymentStatus) {
     case 'paid':
-      return 'Zapłacone';
+      return 'statusPaid';
     case 'pending':
-      return 'Oczekuje na płatność';
+      return 'statusPending';
     default:
-      return 'Nieznany status płatności';
+      return 'statusUnknownPayment';
   }
 };
 
@@ -164,9 +178,9 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
           </thead>
           <tbody className="border border-gray-200 rounded-[25px]">
             {sortedContent.map((order) => {
-              const { label: orderLabel, className: orderClassName } =
+              const { label: orderLabel, labelKey: labelTranslationKey, className: orderClassName } =
                 getOrderStatusLabel(order.status);
-              const paymentLabel = getPaymentStatusLabel(order.payment_status);
+              const paymentLabel = t.checkout.order[getPaymentStatusLabel(order.payment_status)];
 
               return (
                 <tr key={order.id} className="border-b border-neutral-light">
@@ -179,7 +193,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-semibold ${orderClassName}`}
                     >
-                      {orderLabel}
+                      {t.checkout.order[labelTranslationKey as keyof typeof t.checkout.order]}
                     </span>
                   </td>
                   <td className="py-3 text-black font-light px-4">
@@ -215,7 +229,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
       {/* MOBILE CARD VIEW */}
       <div className="md:hidden">
         {content.map((order) => {
-          const { label: orderLabel, className: orderClassName } =
+          const { label: orderLabel, labelKey: labelTranslationKey,  className: orderClassName } =
             getOrderStatusLabel(order.status);
 
           return (
@@ -236,7 +250,7 @@ const OrderTable: React.FC<OrderTableProps> = ({ content, onViewDetails }) => {
                 <span
                   className={`px-3 py-1 rounded-full text-sm font-semibold ${orderClassName}`}
                 >
-                  {orderLabel}
+                  {t.checkout.order[labelTranslationKey as keyof typeof t.checkout.order]}
                 </span>
               </div>
               <div className="flex items-center justify-between mb-2 mx-4">
