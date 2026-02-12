@@ -222,7 +222,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
           >
             {formData.consent && <img src="/icons/check.svg" alt="check" />}
           </span>
-          <span>
+          <span>f
             {t.reviews.consentText.split('Regulaminu')[0]}
             <Link className="underline" href="/regulamin">
               {t.legal.terms}
@@ -231,7 +231,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
             <Link className="underline" href="/polityka-prywatnosci">
               {t.legal.privacy}
             </Link>
-            {t.reviews.consentText.split('Polityki Prywatności')[1] || ' oraz akceptuję ich postanowienia.'}
+            {t.reviews.consentText.split('Polityki Prywatności')[1] || ` ${t.checkout.terms.accept}`}
           </span>
         </label>
         {fieldErrors.consent && (

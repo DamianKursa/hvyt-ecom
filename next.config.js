@@ -83,6 +83,7 @@ const nextConfig = {
       { source: '/reviews/:path*', destination: '/reviews/:path*' },
       { source: '/shipping/:path*', destination: '/shipping/:path*' },
       { source: '/about-us/:path*', destination: '/o-nas/:path*' },
+      { source: '/wishlist/:path*', destination: '/ulubione/:path*' },
       // { source: '/en/about-us/:path*', destination: '/o-nas/:path*' },
                
       { source: '/_next/:path*', destination: '/_next/:path*' },
