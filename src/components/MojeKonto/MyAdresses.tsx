@@ -161,7 +161,7 @@ const MyAddresses: React.FC = () => {
                   <span className="hidden md:inline">{t.account.editShippingAddress}</span>
                   <img
                     src="/icons/edit.svg"
-                    alt="Edytuj"
+                    alt={t.common.edit}
                     className="w-4 h-4 ml-2"
                   />
                 </button>

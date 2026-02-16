@@ -5,6 +5,7 @@ import { CartContext, Product } from '@/stores/CartProvider';
 import QuantityChanger from '@/components/UI/QuantityChanger';
 import AttributeSwitcher from '@/components/UI/AttributeSwitcher.component';
 import { getCurrency, Language } from '@/utils/i18n/config';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface CartItemProps {
   product: Product;
@@ -27,6 +28,7 @@ const CartItem: React.FC<CartItemProps> = ({
   onRemoveItem,
   onVariationChange,
 }) => {
+  const {t} = useI18n();
   const router = useRouter();
   const isKoszykPage = router.pathname === '/koszyk';
 
@@ -172,7 +174,7 @@ const CartItem: React.FC<CartItemProps> = ({
                         className="font-light text-black underline flex items-center hover:text-gray-800 transition"
                         onClick={() => setModalOpen(true)}
                       >
-                        edytuj
+                        {t.common.edit}
                         <img
                           src="/icons/edit.svg"
                           alt="Edit Icon"
@@ -264,7 +266,7 @@ const CartItem: React.FC<CartItemProps> = ({
               onClick={() => setModalOpen(true)}
               className="text-xs text-black underline mt-1 flex items-center"
             >
-              edytuj
+              {t.common.edit}
               <img
                 src="/icons/edit.svg"
                 alt="Edit Icon"
@@ -302,11 +304,10 @@ const CartItem: React.FC<CartItemProps> = ({
             </button>
 
             <h3 className="text-[24px] font-semibold text-[#1C1C1C] mb-[24px]">
-              Edytuj rozstaw produktu
+              {t.cart.editVariation}
             </h3>
             <p className="text-neutral-darkest font-light text-base mb-[40px]">
-              Produkty zostaną dodane do koszyka z uwzględnieniem ich aktualnych
-              cen. Czy chcesz kontynuować?
+              {t.cart.variationNote}
             </p>
 
             {/* One dropdown per attribute (usually only “Rozstaw”) */}
@@ -354,7 +355,7 @@ const CartItem: React.FC<CartItemProps> = ({
                 className="w-1/2 py-3 text-black border border-black rounded-full text-base font-light hover:bg-gray-100 transition"
                 onClick={() => setModalOpen(false)}
               >
-                Anuluj
+                {t.common.cancel}
               </button>
               <button
                 className={`w-1/2 py-3 text-white rounded-full text-base font-light transition ${(isMultiAttribute ? Object.keys(multiAttrSelections).length > 0 : selectedVariation)
@@ -392,7 +393,7 @@ const CartItem: React.FC<CartItemProps> = ({
                   }
                 }}
               >
-                Zapisz
+                {t.common.save}
               </button>
             </div>
           </div>

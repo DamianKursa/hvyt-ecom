@@ -1,3 +1,4 @@
+import { useI18n } from '@/utils/hooks/useI18n';
 import { getCurrency, Language } from '@/utils/i18n/config';
 import { useRouter } from 'next/router';
 import React, { useState, useEffect } from 'react';
@@ -21,6 +22,7 @@ const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
     [],
   );
 
+  const {t} = useI18n();
   const router = useRouter();
   const currency = getCurrency(router?.locale as Language ?? 'pl');
 
@@ -61,7 +63,7 @@ const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
         onClick={() => setModalOpen(true)}
         style={{ fontSize: '16px' }}
       >
-        edytuj
+        {t.common.edit}
         <img src="/icons/edit.svg" alt="Edit Icon" className="w-4 h-4 ml-1" />
       </button>
 
@@ -74,7 +76,7 @@ const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
             >
               &times;
             </button>
-            <h3 className="text-lg font-bold mb-4">Edytuj {variationName}</h3>
+            <h3 className="text-lg font-bold mb-4">{t.common.edit} {variationName}</h3>
             {options.length > 0 ? (
               <select
                 value={newValue}
@@ -95,13 +97,13 @@ const ProductVariationEdit: React.FC<ProductVariationEditProps> = ({
                 className="py-2 px-4 border border-gray-400 rounded-lg text-gray-600 hover:bg-gray-100"
                 onClick={() => setModalOpen(false)}
               >
-                Anuluj
+                {t.common.cancel}
               </button>
               <button
                 className="py-2 px-4 bg-black text-white rounded-lg hover:bg-gray-900"
                 onClick={handleSave}
               >
-                Zapisz
+                {t.common.save}
               </button>
             </div>
           </div>

@@ -270,8 +270,8 @@ const Koszyk: React.FC = () => {
 
         <div className="mt-16">
           <Bestsellers
-            title="Produkty, które mogą Ci się spodobać"
-            description="Sprawdź produkty, które idealnie pasują z wybranym produktem."
+            title={t.cart.recommendations.title}
+            description={t.cart.recommendations.description}
           />
         </div>
       </section>

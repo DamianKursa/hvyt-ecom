@@ -87,7 +87,7 @@ export const fetchProductsByCategoryId = async (
     if(params.lang) {
       params.currency = getCurrencySlugByLocale(lang)
     }
-
+    
     const response = await WooCommerceAPI.get('/products', { params });
 
     return {

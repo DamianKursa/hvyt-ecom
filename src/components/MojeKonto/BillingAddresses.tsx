@@ -221,9 +221,9 @@ const BillingAddresses: React.FC = () => {
                     }}
                     className="flex-shrink-0 text-black border border-black px-4 py-2 rounded-full flex items-center"
                   >
-                    <span className="md:hidden">Edytuj</span>
-                    <span className="hidden md:inline">Edytuj dane</span>
-                    <img src="/icons/edit.svg" alt="Edytuj" className="w-4 h-4 ml-2" />
+                    <span className="md:hidden">{t.common.edit}</span>
+                    <span className="hidden md:inline">{t.account.editContactData}</span>
+                    <img src="/icons/edit.svg" alt={t.common.edit} className="w-4 h-4 ml-2" />
                   </button>
                 </div>
               ) : (

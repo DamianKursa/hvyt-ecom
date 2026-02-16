@@ -46,7 +46,8 @@ export const pl = {
       newProductsMessage: 'Nowi najlepsi przyjaciele Twojego domu',
       reviewsTitle: 'Klienci o HVYT',
       reviewsMessage: 'Sprawdź co mówią osoby, które kupiły nasze produkty lub podziel się swoją opinią.',
-      notifyAvailable: 'Powiadom o dostępności'
+      notifyAvailable: 'Powiadom o dostępności',
+      variationNoOptions: 'Brak dostępnych opcji',
     },
     // === INFORMACJE O SERWISIE (stopka) ===
     serviceInfo: {
@@ -125,7 +126,7 @@ export const pl = {
       error: 'Błąd',
       save: 'Zapisz',
       cancel: 'Anuluj',
-      edit: 'edytuj',
+      edit: 'Edytuj',
       delete: 'Usuń',
       remove: 'Usuń',
       close: 'Zamknij',

@@ -46,7 +46,8 @@ export const en: Translations = {
       newProductsMessage: 'Your home\'s new best friends',
       reviewsTitle: 'Customers about HVYT',
       reviewsMessage: 'Check out what people who have bought our products say or share your opinion.',      
-      notifyAvailable: 'Notify when availabilable'
+      notifyAvailable: 'Notify when availabilable',
+      variationNoOptions: 'No options available',
     },
     // === SERVICE INFO (footer) ===
     serviceInfo: {
