@@ -194,7 +194,7 @@ const Checkout: React.FC = () => {
 
     if (missingFields.length > 0) {
       alert(
-        `Proszę uzupełnić wymagane pola: ${missingFields
+        `${t.modal.messageFillAllRequiredFieldsShort}: ${missingFields
           .map((field) => `\n• ${field}`)
           .join('')}`,
       );
@@ -567,7 +567,7 @@ const Checkout: React.FC = () => {
                   href={`/logowanie?redirect=${encodeURIComponent(router.asPath)}`}
                   className="text-black underline md:border md:border-black md:px-4 md:py-2 rounded-full flex items-center text-sm mt-0 mb-4 md:mb-0 md:mt-0"
                 >
-                  Masz już konto? Zaloguj się
+                {t.checkout.personalData.loginPrompt}
                   <img
                     src="/icons/user.svg"
                     alt="User"

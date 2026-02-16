@@ -522,7 +522,8 @@ export const pl = {
       saving: 'Zapisywanie...',
       saveChanges: 'Zapisz zmiany',
       editPassword: 'Edytuj Hasło',
-
+      messageAcceptance: 'Zakładając konto, akceptujesz nasz',
+      messageReadPrivacyPolicy: 'Przeczytaj naszą'
     },
     // === FORMULARZ / POLA ===
     form: {
@@ -628,6 +629,9 @@ export const pl = {
       messageWaitLoading: 'Proszę czekać, trwa ładowanie danych...',
       messageWaitForRedirection: 'Za chwilę przekierujemy Cię do Twojego konta',
       messageAcceptTerms: '*Potwierdzam, że zapoznałam/em się z treścią Regulaminu i Polityki Prywatności oraz akceptuję ich postanowienia.',
+      messageFillAllRequiredFields: 'Proszę wypełnić wszystkie wymagane pola.',
+      messageFillAllRequiredFieldsShort: 'Proszę uzupełnić wymagane pola',
+      messageRedirectingPleaseWait: 'Trwa przekierowanie... Proszę czekać.',      
     }
   };
 

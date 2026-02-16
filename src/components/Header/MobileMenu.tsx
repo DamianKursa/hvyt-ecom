@@ -321,7 +321,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                   className="font-bold flex items-center"
                 >
                   <img src="/icons/user.svg" alt="User" className="h-6 mr-3" />
-                  Zaloguj się
+                  {t.auth.login}
                 </a>
               </Link>
             )}

@@ -49,7 +49,7 @@ const Logowanie = () => {
                       onClick={() => setIsRegistering(false)}
                       className="w-full py-3 px-6 border-2 border-black text-black rounded-full"
                     >
-                      Zaloguj się
+                      {t.auth.login}
                     </button>
                   )}
                 </div>

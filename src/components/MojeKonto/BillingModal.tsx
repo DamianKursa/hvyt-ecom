@@ -52,7 +52,7 @@ const BillingModal: React.FC<BillingModalProps> = ({
 
   const handleSave = () => {
     if (!isFormValid) {
-      alert('Proszę wypełnić wszystkie wymagane pola.');
+      alert(t.modal.messageFillAllRequiredFields);
       return;
     }
     onSave({

@@ -522,7 +522,9 @@ export const en: Translations = {
     changePassword: 'Change password',
     saving: 'Saving...',
     saveChanges: 'Save changes',
-    editPassword: 'Edit password',    
+    editPassword: 'Edit password',  
+    messageAcceptance: 'By creating an account, you accept our',
+    messageReadPrivacyPolicy: 'Read our'      
   },
 
   // === FORM FIELDS ===
@@ -632,5 +634,8 @@ export const en: Translations = {
       messageWaitLoading: 'Please wait, loading...',
       messageWaitForRedirection: 'We will redirect you to your account in a moment', 
       messageAcceptTerms: '*I confirm that I have read the Regulations and Privacy Policy and accept their provisions.',      
+      messageFillAllRequiredFields: 'Please fill all required fields.',
+      messageFillAllRequiredFieldsShort: 'Please fill the required fields',
+      messageRedirectingPleaseWait: 'Redirecting... Please wait.',
     }  
 };

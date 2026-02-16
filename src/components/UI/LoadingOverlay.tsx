@@ -1,11 +1,13 @@
 // components/LoadingOverlay.tsx
+import { useI18n } from '@/utils/hooks/useI18n';
 import React from 'react';
 
 const LoadingOverlay: React.FC = () => {
+  const {t} = useI18n();
   return (
     <div id="loading-overlay" style={overlayStyle}>
       <div style={spinnerStyle} />
-      <div style={textStyle}>Trwa przekierowanie... Proszę czekać.</div>
+      <div style={textStyle}>{t.modal.messageRedirectingPleaseWait}</div>
       <style jsx global>{`
         @keyframes spin {
           0% {

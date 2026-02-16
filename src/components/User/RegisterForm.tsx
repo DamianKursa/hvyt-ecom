@@ -187,11 +187,11 @@ const RegisterForm: React.FC = () => {
       </div>
 
       <p className="text-[14px] ml-[8px] font-light mt-4">
-        Zakładając konto, akceptujesz nasz{' '}
+        {`${t.auth.messageAcceptance} `}
         <Link href="/regulamin" className="underline">
           {t.legal.terms}
         </Link>
-        . Przeczytaj naszą{' '}
+        {`.  ${t.auth.messageReadPrivacyPolicy} `}
         <Link href="/polityka-prywatnosci" className="underline">
           {t.legal.privacy}
         </Link>
