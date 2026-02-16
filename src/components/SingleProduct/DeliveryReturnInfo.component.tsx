@@ -25,6 +25,7 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
   const isCustomDeliveryProduct = productId
     ? CUSTOM_DELIVERY_PRODUCT_IDS.has(String(productId))
     : false;
+  const customDeliveryText = 'Czas realizacji 4-6 tygodni';
   const items = [
     {
       icon: '/icons/zwrot.svg',
@@ -63,10 +64,10 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
           <span className="text-black font-medium">
             {typeof stock === 'number' && stock > 0
               ? stock >= 50
-                ? `Ponad 50 szt. na stanie. ${isCustomDeliveryProduct ? 'Wysyłka po 15.01' : 'Wysyłka w 24h!'}`
-                : `Tylko ${stock} szt. na stanie. ${isCustomDeliveryProduct ? 'Wysyłka po 15.01' : 'Wysyłka w 24h!'}`
+                ? `Ponad 50 szt. na stanie. ${isCustomDeliveryProduct ? customDeliveryText : 'Wysyłka w 24h!'}`
+                : `Tylko ${stock} szt. na stanie. ${isCustomDeliveryProduct ? customDeliveryText : 'Wysyłka w 24h!'}`
               : stockStatus === 'instock'
-                ? `Na stanie. ${isCustomDeliveryProduct ? 'Wysyłka po 15.01' : 'Wysyłka w 24h!'}`
+                ? `Na stanie. ${isCustomDeliveryProduct ? customDeliveryText : 'Wysyłka w 24h!'}`
                 : null}
           </span>
         </div>
