@@ -20,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const cacheKey = `category:slug=${slug}:page=${page}:perPage=${perPage}:sort=${sortingOption}:filters=${filters || 'none'}:lang=${lang}`;
   try {
-    const cached = await getCache(cacheKey);
+    // const cached = await getCache(cacheKey);
     if (cached) {
       return res.status(200).json(cached);
     }

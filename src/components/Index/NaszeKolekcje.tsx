@@ -4,8 +4,12 @@ import Link from 'next/link';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import IconRenderer from '@/components/UI/IconRenderer';
 import SkeletonNaszeKolekcje from '@/components/Skeletons/SkeletonNaszeKolekcje';
+import { useRouter } from 'next/router';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const NaszeKolekcje = () => {
+  const {t} = useI18n();
+  const router = useRouter();
   const [kolekcjePosts, setKolekcjePosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -14,7 +18,7 @@ const NaszeKolekcje = () => {
     const fetchKolekcje = async () => {
       try {
         const res = await fetch(
-          '/api/woocommerce?action=fetchKolekcjePostsWithImages',
+          `/api/woocommerce?action=fetchKolekcjePostsWithImages&lang=${router.locale}`,
         );
         if (!res.ok) {
           throw new Error('Failed to fetch Kolekcje posts');
@@ -69,7 +73,7 @@ const NaszeKolekcje = () => {
         <div className="hidden md:grid grid-cols-4 gap-6">
           {kolekcjePosts.slice(0, 4).map((kolekcja) => (
             <Link
-              href={`/kolekcje/${kolekcja.slug}`}
+              href={`/${t.links.categories.collections.slug}/${kolekcja.slug}`}
               key={kolekcja.id}
               className="relative w-full"
               style={{ height: '445px' }}

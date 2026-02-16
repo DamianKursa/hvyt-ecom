@@ -7,9 +7,11 @@ import IconRenderer from '@/components/UI/IconRenderer';
 import Head from 'next/head';
 import { getCurrentLanguage, getSiteUrl } from '@/utils/i18n/config';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { useRouter } from 'next/router';
 
 const KolekcjePage = () => {
   const {t} = useI18n();
+  const router = useRouter();
   const lang = getCurrentLanguage();
   const [kolekcjePosts, setKolekcjePosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +41,7 @@ const KolekcjePage = () => {
     };
 
     fetchKolekcje();
-  }, []);
+  }, [router.locale]);
 
   return (
     <Layout title="Hvyt | Kolekcje">
@@ -49,7 +51,7 @@ const KolekcjePage = () => {
           rel="canonical"
           href={`${process.env.NEXT_PUBLIC_SITE_URL}/kolekcje`}
         />
-        <link rel="alternate" hrefLang="en" href={`${getSiteUrl('en')}/${t.links.categories.collections}`} />
+        <link rel="alternate" hrefLang="en" href={`${getSiteUrl('en')}/${t.links.categories.collections.slug}`} />
         <link rel="alternate" hrefLang="x-default" href={`${getSiteUrl('pl')}/kolekcje`} />        
       </Head>
       <section className="w-full px-4 lg:px-0 mt-[115px] mb-[150px]">
@@ -57,11 +59,11 @@ const KolekcjePage = () => {
           {/* Page Title and Text Section */}
           <div className="text-left mb-8">
             <h1 className="text-[48px] pt-[24px] md:text-[48px] font-bold text-dark-pastel-red">
-              Kolekcje
+              {t.collection.collections}
             </h1>
           </div>
           {/* On mobile, display text in one column; on desktop, two columns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          {lang === 'pl' && <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             <div>
               <p className="text-[18px] font-light text-black">
                 <span className="font-bold">Zanurz się</span> w piękno
@@ -90,7 +92,31 @@ const KolekcjePage = () => {
                 </Link>
               </p>
             </div>
-          </div>
+          </div> }
+          {lang !== 'pl' && <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div>
+              <p className="text-[18px] font-light text-black">
+                <span className="font-bold">Immerse yourself</span> in the beauty of minimalist lines, geometric shapes,
+                <br className="hidden md:block" /> and elegant finishes that will easily complement your interior.
+              </p>
+              <p className="text-[18px] font-light text-black">
+                <span className="font-bold">Discover handles</span> made from the highest quality materials, such as solid brass, stainless steel, and aluminum.
+              </p>
+            </div>
+            <div>
+              <p className="text-[18px] font-light text-black">
+                Whether you prefer sleek and modern designs or eclectic and ornate styles,
+              </p>
+              <p className="text-[18px] font-light text-black">
+                our collections offer a variety of options to suit every taste and aesthetic.
+              </p>
+              <p className="text-dark-pastel-red text-[18px] font-light underline">
+                <Link href="#">
+                  See what we have recently added for you.
+                </Link>
+              </p>
+            </div>
+          </div>}
           {loading ? (
             <SkeletonKolekcjePage />
           ) : (

@@ -1,8 +1,6 @@
 import axios from 'axios';
 import { Kolekcja } from '../functions/interfaces';
 import { NowosciPost } from '../functions/interfaces';
-import { get } from 'lodash';
-import { getCurrency } from '../i18n/config';
 import { getCurrencyByLocale, getCurrencySlugByLocale } from '@/config/currencies';
 
 const WooCommerceAPI = axios.create({
@@ -107,14 +105,14 @@ export const fetchMediaById = async (mediaId: number) => {
   }
 };
 
-export const fetchKolekcjePostsWithImages = async () => {
+export const fetchKolekcjePostsWithImages = async (lang: string) => {
   try {
     console.log('kolekcjeurl', `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`);
     
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`,
       {
-        params: { per_page: 50 },
+        params: { per_page: 50, lang: lang },
       },
     );
 

@@ -94,6 +94,14 @@ export const en: Translations = {
         account: {label: 'My account', slug: 'my-account'},
       },
     },    
+    // === COLLECTIONS ===
+    collection: {
+      collection: 'Collection',
+      collections: 'Collections',
+      labelDescription: 'Collection Description.',
+      labelDefaultCollectionTitle: 'Default collection title',
+
+    },    
     // === NEWSLETTER ===
     newsletter: {
       title: 'Subscribe to our newsletter to stay up to date with news and promotions.',

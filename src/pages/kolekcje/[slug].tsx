@@ -62,7 +62,7 @@ const CollectionPage = () => {
 
         // Fetch products for that category
         const productsRes = await fetch(
-          `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryData.id}&page=${currentPage}&perPage=${categoryData.product_count || 12}`,
+          `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryData.id}&page=${currentPage}&perPage=${categoryData.product_count || 12}&lang=${router.locale}`,
         );
         if (!productsRes.ok) throw new Error('Error fetching products');
         const productsJson = await productsRes.json();
@@ -70,7 +70,7 @@ const CollectionPage = () => {
 
         // Fetch Kolekcje posts with images (already optimized)
         const kolekcjeRes = await fetch(
-          `/api/woocommerce?action=fetchKolekcjePostsWithImages`,
+          `/api/woocommerce?action=fetchKolekcjePostsWithImages&lang=${router.locale}`,
         );
         if (!kolekcjeRes.ok) throw new Error('Error fetching Kolekcje posts');
         const kolekcjeJson = await kolekcjeRes.json();
@@ -81,7 +81,7 @@ const CollectionPage = () => {
           (kolekcja: Kolekcja) => kolekcja.slug === slugString,
         );
         setContent(
-          stripHTML(currentKolekcja?.content.rendered || 'Opis kolekcji.'),
+          stripHTML(currentKolekcja?.content.rendered || t.collection.labelDescription),
         );
 
         setFeaturedImage(currentKolekcja?.imageUrl || '/placeholder.jpg');
@@ -94,7 +94,8 @@ const CollectionPage = () => {
       }
     };
     fetchData();
-  }, [slugString, currentPage]);
+  }, [slugString, currentPage, router.locale]);
+console.log(kolekcjeData);
 
   const currentKolekcja = kolekcjeData?.find(
     (kolekcja: Kolekcja) => kolekcja.slug === slugString,
@@ -102,7 +103,7 @@ const CollectionPage = () => {
   const seoTitle =
     currentKolekcja?.yoast_head_json?.title ||
     currentKolekcja?.title.rendered ||
-    `Hvyt | Kolekcja`;
+    `Hvyt | ${t.collection.collection}`;
 
   const seoDescription =
     currentKolekcja?.yoast_head_json?.description ||
@@ -111,7 +112,7 @@ const CollectionPage = () => {
 
   const handleCollectionClick = (kolekcjaSlug: string) => {
     setLoading(true);
-    router.push(`/kolekcje/${kolekcjaSlug}`);
+    router.push(`/${t.links.categories.collections.slug}/${kolekcjaSlug}`);
   };
 
   if (loading) {
@@ -124,7 +125,7 @@ const CollectionPage = () => {
 
   if (errorMessage) {
     return (
-      <Layout title="Error">
+      <Layout title={t.common.error}>
         <div className="container mx-auto px-4">
           <p className="text-red-500">{errorMessage}</p>
         </div>
@@ -140,7 +141,7 @@ const CollectionPage = () => {
         <link
           id="meta-canonical"
           rel="canonical"
-          href={`${process.env.NEXT_PUBLIC_SITE_URL}/kolekcje/${slug}`}
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}/${t.links.categories.collections.slug}/${slug}`}
         />
       </Head>
       <section className="w-full py-16 mt-[115px]">
@@ -178,7 +179,7 @@ const CollectionPage = () => {
                 </div>
               )}
               <h1 className="font-size-h1 capitalize mb-[32px] font-bold text-dark-pastel-red">
-                {currentKolekcja?.title.rendered || 'Domyślny Tytuł Kolekcji'}
+                {currentKolekcja?.title.rendered || t.collection.labelDefaultCollectionTitle}
               </h1>
               <p className="font-size-text-medium mb-[48px] text-neutral-darkest">
                 {content}

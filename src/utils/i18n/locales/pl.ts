@@ -94,6 +94,14 @@ export const pl = {
         account: {label: 'Moje konto', slug: 'moje-konto'},
       },
     },
+    // === KOLEKCJE ===
+    collection: {
+      collection: 'Kolekcja',
+      collections: 'Kolekcje',
+      labelDescription: 'Opis kolekcji.',
+      labelDefaultCollectionTitle: 'Domyślny Tytuł Kolekcji',
+
+    },
     // === NEWSLETTER ===
     newsletter: {
       title: 'Zapisz się do newslettera, aby być na bieżąco z nowościami i promocjami.',

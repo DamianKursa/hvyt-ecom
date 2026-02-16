@@ -24,6 +24,7 @@ const CACHE_TTL = 3600;
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { action, lang } = req.query;
 
+  
   try {
     switch (action) {
       case 'fetchCategoryBySlug': {
@@ -141,11 +142,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       case 'fetchKolekcjePostsWithImages': {
-        const cacheKey = 'fetchKolekcjePostsWithImages';
-        const cached = await getCache(cacheKey);
+        const cacheKey = `fetchKolekcjePostsWithImages_${lang as string}`;
+        const cached = await getCache(cacheKey); 
         if (cached) return res.status(200).json(cached);
 
-        const result = await fetchKolekcjePostsWithImages();
+        const result = await fetchKolekcjePostsWithImages(lang as string);
         await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }
@@ -207,7 +208,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           return res.status(400).json({ error: 'Invalid productId' });
         }
 
-        const cacheKey = `fetchCrossSellProducts:${productId}_${lang}`;deleteCache(cacheKey);
+        const cacheKey = `fetchCrossSellProducts:${productId}_${lang}`;
         const cached = await getCache(cacheKey);
         if (cached) return res.status(200).json(cached);
         
