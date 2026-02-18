@@ -192,6 +192,22 @@ kształtów i pomóc odnaleźć prawdziwych wnętrzarskich przyjaciół.</p>
 HVYT – nowi najlepsi przyjaciele Twojego domu.</p>`,
     },
   ],
+
+  // JĘZYK EN
+  "handles": [
+    {
+      "title": "Furniture Handles",
+      "content": "<p>Has your furniture handle broken and you want to replace it with a new one? Or maybe the old one just doesn't meet your expectations? No problem! HVYT furniture handles come in shapes, colors, and sizes that philosophers never even dreamed of. The ones contemplating interior design, of course!</p>"
+    },
+    {
+      "title": "Designer Furniture Handles",
+      "content": "<p>Hey, hey! Are there any aesthetes out there? Our designer furniture handles were created with you in mind. Each one corresponds to a different style, is meticulously crafted, and has a unique character. We've checked the meaning of the word 'designer' in the dictionary many times, and we are sure we rose to the challenge when creating them.</p>\n<p>A designer furniture handle should have:</p>\n<ul>\n<li><strong>An interesting artistic form</strong>, see: <a href=\"/uchwyt-retro\">RETRO SZTUĆCE Handle</a></li>\n<li><strong>Interesting design</strong>, see: <a href=\"/uchwyt-tilos\">TILOS OLD GOLD Handle</a></li>\n<li><strong>Non-obvious solutions</strong>, see: <a href=\"/uchwyt-coco\">COCO GOLD EDGE Handle</a></li>\n</ul>\n<p>But it doesn't end there, because besides being designer, HVYT handles are stylish and modern. They work well in interiors with soul, where every element is thought out, but also where there is artistic disorder. By modern furniture handles, we mean their original shapes and metallic luster. We see them in minimalist, glamour, and industrial interiors. Stylish furniture handles, on the other hand, are those that have a characteristic finish corresponding to the aesthetic norms accepted in a given period or region. They will fit perfectly into retro, Provencal, and Scandinavian styles.</p>"
+    },
+    {
+      "title": "Decorative Furniture Handles",
+      "content": "<p>Imagine a situation where you are faced with choosing a furniture handle. You're standing, although you're actually sitting comfortably on the couch, browsing our site. Your attention is drawn to the FRIDA EDGE Handle, because its form is not obvious, and the very idea of installing an edge handle seems innovative. We'll let you in on a secret: it's a solution as old as the hills, but we agree on one thing – this handle is exceptional. Decorative furniture handles have the advantage over 'ordinary' ones in that they attract attention. Thanks to them, when you invite the family for the holidays, you will never again hear: 'Oh boy, you could at least paint these handles' or 'Honey, maybe I'll send you a transfer so you could buy yourself new handles.'</p>\n<p>Need a furniture handle right away? Check out our offer and choose a product tailored to your interior. A set of filters will help you with this, allowing you to specify the style, material, color, and price range. Don't think too long and go <strong>for HVYT furniture handles!</strong></p>\n<p>Also see <a href=\"\">door handles</a> in our offer.</p>"
+    }
+  ]  
 };
 
 export type { Section };

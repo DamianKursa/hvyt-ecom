@@ -100,7 +100,9 @@ export const pl = {
       collections: 'Kolekcje',
       labelDescription: 'Opis kolekcji.',
       labelDefaultCollectionTitle: 'Domyślny Tytuł Kolekcji',
-
+      sectionTitle: 'Sprawdź nasze kolekcje',
+      sectionSubtitle: 'Zobacz co ostatnio nowego dodaliśmy dla Ciebie.', 
+      seeAll: 'Zobacz wszystkie kolekcje',     
     },
     // === NEWSLETTER ===
     newsletter: {
@@ -128,6 +130,12 @@ export const pl = {
       heroDescriptionMobile: 'HVYT powstał z miłości do designu i dodatków. Wierzymy, że to właśnie one są odpowiedzialne za indywidualny charakter każdego wnętrza. Sami jesteśmy całkiem zakręceni, dlatego nasza nazwa to alternatywny zapis słowa „chwyt". Staramy się aby nasza oferta była różnorodna i każdy mógł znaleźć coś dla siebie.',
       heroDescriptionDesktop: 'HVYT powstał z miłości do designu i dodatków. Wierzymy, że to właśnie one są odpowiedzialne za indywidualny charakter każdego wnętrza. Sami jesteśmy całkiem zakręceni, dlatego nasza nazwa to alternatywny zapis słowa „chwyt". Staramy się aby nasza oferta była różnorodna i każdy mógł znaleźć coś dla siebie.',
       contactButton: 'Kontakt →',
+      slides: {
+        title_1: 'Jeśli właśnie się urządzasz i chcesz wyróżnić swoje wnętrze to dobrze trafiłeś!',
+        title_2: 'Pstrokata gałka, nowoczesny uchwyt czy elegancka klamka są w stanie zmienić obraz całego mieszkania',
+        title_3: 'Jeśli natomiast masz już dość „starych” mebli. Gałki i uchwyty meblowe to doskonały pomysł na odświeżenie starej komody, szafki nocnej czy kuchni',
+        title_4: 'Jeśli nie wiesz, który model jest dla Ciebie odpowiedni – napisz do nas.',
+      },
     },
     // === WSPÓLNE ===
     common: {
@@ -523,7 +531,12 @@ export const pl = {
       saveChanges: 'Zapisz zmiany',
       editPassword: 'Edytuj Hasło',
       messageAcceptance: 'Zakładając konto, akceptujesz nasz',
-      messageReadPrivacyPolicy: 'Przeczytaj naszą'
+      messageReadPrivacyPolicy: 'Przeczytaj naszą',
+      messageResetEmailSent: 'Jeśli ten adres e-mail jest w bazie, to wysłaliśmy na niego link do zmiany hasła.',
+      emailNotSent: 'Nie dotarł do Ciebie mail?',
+      emailNotSentStep1: 'Zajrzyj do folderu ze spamem.',
+      emailNotSentStep2: 'Sprawdź czy podany adres jest poprawny.',
+      emailNotSentStep3: 'Odczekaj 15 minut i spróbuj ponownie.',
     },
     // === FORMULARZ / POLA ===
     form: {
@@ -568,6 +581,8 @@ export const pl = {
     },    
     // === STRONA GŁÓWNA / INDEX ===
     index: {
+      pageTitle: 'Nowoczesne gałki i uchwyty do mebli, klamki i wieszaki',
+      pageDescription: 'W naszej ofercie znajduje się szeroki wybór gałek i uchwytów meblowych, klamek do drzwi oraz wieszaków ściennych.',
       seeHandles: 'Zobacz uchwyty',
       seeKnobs: 'Zobacz gałki',
       seeAllCollections: 'Zobacz wszystkie kolekcje →',
@@ -579,6 +594,30 @@ export const pl = {
       recentlyAdded: 'Zobacz co ostatnio nowego dodaliśmy dla Ciebie.',
       title: 'Tworzymy meble, które żyją razem z Tobą.',
       description: 'Wnętrza to nie tylko ściany i metry. To codzienność. Kawa wypita w biegu, pilot schowany pod poduszką, pies, który postanowił coś zbroić.',      
+      maintenanceTitle: 'Zmieniamy się dla Was!',
+      maintenanceDescription: 'Aktualnie przeprowadzamy zmiany i pracujemy nad nową, ulepszoną wersją naszej strony internetowej. Dziękujemy za cierpliwość i już wkrótce zapraszamy na naszą nową stronę!',
+      maintenanceContact: 'W sprawie zamowień lub innych pytań prosimy o kontakt',
+      choose: 'Wybierz',
+      your: 'swój',
+      chooseHVYT: 'Wybierz swój HVYT',
+      chooseSloganMobile: 'Od eleganckich, nowoczesnych wzorów uchwytów meblowych po ponadczasowe klasyki. Sprawdź jak nasze Hvyt’y mogą odmienić Twoje wnętrze.',
+      bestsellers: 'Bestsellers',
+      bestsellersSlogan: 'Poznaj nasze najchętniej kupowane produkty.',
+      chooseColorTitle: 'Wybierz kolor, który lubisz',
+      chooseColorDescription: 'Diabeł tkwi w szczegółach, niech kolor podkręci Twoje wnętrze!',
+      chooseColorCheck: 'Sprawdź wszystkie kolory',
+      chooseColorSilver: 'Srebro',
+      chooseColorBlack: 'Czerń',
+      chooseColorGold: 'Złoto',
+      chooseColorsColors: 'Kolory',
+      fitTitle: 'Pasujemy wszędzie',
+      fitDescritpion: 'Dobierz uchwyt do swojego wnętrza',
+      fitSeeAll: 'Zobacz wszystkie',
+      fitChildrensFurniture: 'Meble dziecięce',
+      fitLivingRoomFurniture: 'Meble pokojowe',
+      fitKitchenFurniture: 'Meble kuchenne',
+      fitWardrobes: 'Szafy',
+      
     },
     // === WYSZUKIWANIE ===
     search: {

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 export interface WybierzHvytItem {
     id?: number;
@@ -54,12 +55,13 @@ const imageVariants = {
 };
 
 const WybierzHvyt: React.FC<WybierzHvytProps> = ({ items, useInViewTrigger = false }) => {
+    const {t, getPath} = useI18n();
     const sectionRef = useRef<HTMLElement | null>(null);
     const { ref: inViewRef, inView } = useInView({ threshold: 1, triggerOnce: true });
     const combinedRef = mergeRefs(sectionRef, inViewRef);
 
     if (!items || items.length < 4) {
-        return <p>Dodaj co najmniej 4 obrazy do sekcji „Wybierz swój HVYT”.</p>;
+        return <p>{t.index.addAtLeast4Images}</p>;
     }
 
     const animationTrigger = useInViewTrigger ? inView : false;
@@ -73,22 +75,22 @@ const WybierzHvyt: React.FC<WybierzHvytProps> = ({ items, useInViewTrigger = fal
         >
             {/* Mobile View */}
             <div className="px-[16px] flex flex-col items-start mb-8 md:hidden">
-                <h2 className="font-size-h2 font-bold text-neutral-darkest">Wybierz<br />swój HVYT</h2>
+                <h2 className="font-size-h2 font-bold text-neutral-darkest">{t.index.choose}<br />{t.index.your} HVYT</h2>
                 <p className="font-size-text-medium text-neutral-darkest mt-2">
-                    Od eleganckich, nowoczesnych wzorów uchwytów meblowych po ponadczasowe klasyki. Sprawdź jak nasze Hvyt’y mogą odmienić Twoje wnętrze.
+                    {t.index.chooseSloganMobile}
                 </p>
                 <div className="mt-4 flex gap-3 flex-wrap">
                     <Link
-                        href="/kategoria/uchwyty-meblowe"
+                        href={getPath('/kategoria/uchwyty-meblowe')}
                         className="px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
                     >
-                        Zobacz uchwyty
+                        {t.index.seeHandles}
                     </Link>
                     <Link
-                        href="/kategoria/uchwyty-meblowe?pa_rodzaj=galki&pa_rodzaj=t-bary"
+                        href={getPath('/kategoria/uchwyty-meblowe?pa_rodzaj=galki&pa_rodzaj=t-bary')}
                         className="px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
                     >
-                        Zobacz gałki
+                        {t.index.seeKnobs}
                     </Link>
                 </div>
             </div>
@@ -183,23 +185,23 @@ const WybierzHvyt: React.FC<WybierzHvytProps> = ({ items, useInViewTrigger = fal
                         className="absolute z-20 left-0 p-4"
                     >
                         <h2 className="font-size-h2 font-bold text-neutral-darkest">
-                            Wybierz swój HVYT
+                            {t.index.chooseHVYT}
                         </h2>
                         <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
-                            Od eleganckich, nowoczesnych wzorów uchwytów meblowych po ponadczasowe klasyki. Sprawdź jak nasze Hvyt’y mogą odmienić Twoje wnętrze.
+                            {t.index.chooseSloganMobile}
                         </p>
                         <div className="mt-[40px] flex gap-3 flex-wrap">
                             <Link
-                                href="/kategoria/uchwyty-meblowe"
+                                href={getPath('/kategoria/uchwyty-meblowe')}
                                 className="inline-block px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
                             >
-                                Zobacz uchwyty
+                                {t.index.seeHandles}
                             </Link>
                             <Link
-                                href="/kategoria/uchwyty-meblowe?pa_rodzaj=galki&pa_rodzaj=t-bary"
+                                href={getPath('/kategoria/uchwyty-meblowe?pa_rodzaj=galki&pa_rodzaj=t-bary')}
                                 className="inline-block px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
                             >
-                                Zobacz gałki
+                                {t.index.seeKnobs}
                             </Link>
                         </div>
                     </motion.div>

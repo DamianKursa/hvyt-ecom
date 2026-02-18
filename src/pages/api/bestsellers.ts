@@ -15,6 +15,8 @@ export default async function handler(
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
+  const {lang} = req.query;
+
   // Parse perPage from query (default = 12)
   const perPageRaw = Array.isArray(req.query.perPage)
     ? req.query.perPage[0]
@@ -22,7 +24,7 @@ export default async function handler(
   const perPage = parseInt(perPageRaw, 10) || 12;
 
   // Build a cache key that includes perPage
-  const cacheKey = `bestsellers:${perPage}`;
+  const cacheKey = `bestsellers:${perPage}_${lang}`;
 
   // 1) Try returning from cache
   try {
@@ -76,6 +78,7 @@ export default async function handler(
         per_page: perPage,
         orderby: 'popularity', // sort by total_sales descending
         status: 'publish',
+        lang: lang
       },
     });
 

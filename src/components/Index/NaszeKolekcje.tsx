@@ -35,7 +35,7 @@ const NaszeKolekcje = () => {
     };
 
     fetchKolekcje();
-  }, []);
+  }, [router.locale]);
 
   if (loading) {
     return <SkeletonNaszeKolekcje />;
@@ -55,17 +55,17 @@ const NaszeKolekcje = () => {
         <div className="px-[16px] lg:px-0 flex flex-col items-start mb-8 md:flex-row md:justify-between md:items-center">
           <div>
             <h2 className="font-size-h2 font-bold text-neutral-darkest">
-              Sprawdź nasze kolekcje
+              {t.collection.sectionTitle}
             </h2>
             <p className="font-size-text-medium text-neutral-darkest mt-[10px]">
-              Zobacz co ostatnio nowego dodaliśmy dla Ciebie.
+              {t.collection.sectionSubtitle}
             </p>
           </div>
           <Link
             href="/kolekcje"
             className="block w-full md:w-auto px-6 py-3 mt-6 md:mt-0 text-black text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
           >
-            Zobacz wszystkie kolekcje →
+            {t.collection.seeAll} →
           </Link>
         </div>
 

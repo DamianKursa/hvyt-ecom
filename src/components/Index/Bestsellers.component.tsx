@@ -5,6 +5,8 @@ import useSWR from 'swr';
 import ProductPreview from '../Product/ProductPreview.component';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import SkeletonProduct from '@/components/Skeletons/SkeletonProduct';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { useRouter } from 'next/router';
 
 interface Product {
   id: number | string;
@@ -34,8 +36,12 @@ const Bestsellers: React.FC<BestsellersProps> = ({
   description,
   perPage = 12,
 }) => {
+
+  const {t} = useI18n();
+  const router = useRouter();
+
   // SWR will call our updated API route
-  const apiUrl = `/api/bestsellers?perPage=${perPage}`;
+  const apiUrl = `/api/bestsellers?perPage=${perPage}&lang=${router.locale}`;
 
   const { data, error } = useSWR(apiUrl, fetcher, {
     refreshInterval: 3_600_000, // revalidate every hour
@@ -70,10 +76,10 @@ const Bestsellers: React.FC<BestsellersProps> = ({
       <div className="flex justify-between mb-[40px]">
         <div className="flex px-[16px] lg:px-0 flex-col h-full">
           <h2 className="font-size-h2 font-bold text-neutral-darkest">
-            {title || 'Bestsellers'}
+            {title || t.index.bestsellers}
           </h2>
           <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
-            {description || 'Poznaj nasze najchętniej kupowane produkty.'}
+            {description || t.index.bestsellersSlogan}
           </p>
         </div>
         {/* Desktop navigation arrows */}

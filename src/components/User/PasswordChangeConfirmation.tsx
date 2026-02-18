@@ -30,18 +30,17 @@ const PasswordChangeConfirmation: React.FC<{ onBackToLogin: () => void }> = ({
             className="w-6 h-6"
           />
           <span className="font-light text-[14px] text-[#fff]">
-            Jeśli ten adres e-mail jest w bazie, to wysłaliśmy na niego link do
-            zmiany hasła.
+            {t.auth.messageResetEmailSent}
           </span>
         </div>
 
         {/* Additional Information */}
         <p className="text-[16px] font-light text-black mb-6 w-full">
-          Nie dotarł do Ciebie mail?
+          {t.auth.emailNotSent}
           <ol className="list-decimal list-inside text-[16px] mt-2">
-            <li>Zajrzyj do folderu ze spamem.</li>
-            <li>Sprawdź czy podany adres jest poprawny.</li>
-            <li>Odczekaj 15 minut i spróbuj ponownie.</li>
+            <li>{t.auth.emailNotSentStep1}</li>
+            <li>{t.auth.emailNotSentStep2}</li>
+            <li>{t.auth.emailNotSentStep3}</li>
           </ol>
         </p>
 

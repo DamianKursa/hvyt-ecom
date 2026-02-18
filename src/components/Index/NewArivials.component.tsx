@@ -69,7 +69,7 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
     triggerOnce: true,
   });
 
-  const {t} = useI18n();
+  const {t, getPath} = useI18n();
 
   const combinedRef = mergeRefs(sectionRef, inViewRef);
 
@@ -118,7 +118,7 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
           {t.product.newProductsMessage}
         </p>
         <Link
-          href="/kategoria/meble"
+          href={getPath('/kategoria/meble')}
           className="mt-4 px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
         >
           {t.index.seeFurniture} →
@@ -239,7 +239,7 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
               {t.product.newProductsMessage}
             </p>
             <Link
-              href="/kategoria/meble"
+              href={getPath('/kategoria/meble')}
               className="mt-[40px] inline-block px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
             >
               {t.index.seeFurniture} →

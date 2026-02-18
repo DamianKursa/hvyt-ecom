@@ -1,32 +1,30 @@
+import { useI18n } from '@/utils/hooks/useI18n';
 import { useState } from 'react';
 
 const CustomSlider = () => {
+  const {t} = useI18n();
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
     {
       id: 1,
       image: '/images/1.png',
-      title:
-        'Jeśli właśnie się urządzasz i chcesz wyróżnić swoje wnętrze to dobrze trafiłeś!',
+      title: t.aboutUs.slides.title_1,
     },
     {
       id: 2,
       image: '/images/2.png',
-      title:
-        'Pstrokata gałka, nowoczesny uchwyt czy elegancka klamka są w stanie zmienić obraz całego mieszkania',
+      title: t.aboutUs.slides.title_2,
     },
     {
       id: 3,
       image: '/images/3.png',
-      title:
-        'Jeśli natomiast masz już dość „starych” mebli. Gałki i uchwyty meblowe to doskonały pomysł na odświeżenie starej komody, szafki nocnej czy kuchni',
+      title: t.aboutUs.slides.title_3,
     },
     {
       id: 4,
       image: '/images/4-onas.png',
-      title:
-        'Jeśli nie wiesz, który model jest dla Ciebie odpowiedni – napisz do nas.',
+      title: t.aboutUs.slides.title_4,
     },
   ];
 

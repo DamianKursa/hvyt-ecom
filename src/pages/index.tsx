@@ -36,13 +36,9 @@ const Index: NextPage = () => {
           alt="Logo"
           style={{ width: '200px', marginBottom: '20px' }}
         />
-        <h1>Zmieniamy się dla Was!</h1>
-        <p>
-          Aktualnie przeprowadzamy zmiany i pracujemy nad nową, ulepszoną wersją
-          naszej strony internetowej. Dziękujemy za cierpliwość i już wkrótce
-          zapraszamy na naszą nową stronę!
-        </p>
-        <p>W sprawie zamowień lub innych pytań prosimy o kontakt</p>
+        <h1>{t.index.maintenanceTitle}</h1>
+        <p>{t.index.maintenanceDescription}</p>
+        <p>{t.index.maintenanceContact}</p>
         <a href="mailto:hello@hvyt.pl">
           <h3>hello@hvyt.pl</h3>
         </a>
@@ -52,8 +48,8 @@ const Index: NextPage = () => {
 
   return (
     <Layout
-      title="Nowoczesne gałki i uchwyty do mebli, klamki i wieszaki | HVYT"
-      description="W naszej ofercie znajduje się szeroki wybór gałek i uchwytów meblowych, klamek do drzwi oraz wieszaków ściennych."
+      title={`${t.index.pageTitle} | HVYT`}
+      description={t.index.pageDescription}
     >
       <Head>
         <link

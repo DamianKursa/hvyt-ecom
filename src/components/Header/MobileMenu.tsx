@@ -42,7 +42,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
         <ul className="space-y-4 text-xl">
           {/* Category links with hover/active styles */}
           <li className="font-bold">
-            <Link href="/kategoria/uchwyty-meblowe" legacyBehavior>
+            <Link href={getPath('/kategoria/uchwyty-meblowe')} legacyBehavior>
               <a
                 onClick={toggleMenu}
                 className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/uchwyty-meblowe'
@@ -67,7 +67,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             </Link>
           </li>
           <li className="font-bold">
-            <Link href="/kategoria/klamki" legacyBehavior>
+            <Link href={getPath('/kategoria/klamki')} legacyBehavior>
               <a
                 onClick={toggleMenu}
                 className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/klamki'
@@ -92,7 +92,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             </Link>
           </li>
           <li className="font-bold">
-            <Link href="/kategoria/wieszaki" legacyBehavior>
+            <Link href={getPath('/kategoria/wieszaki')} legacyBehavior>
               <a
                 onClick={toggleMenu}
                 className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/wieszaki'
@@ -100,7 +100,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                   : ''
                   }`}
               >
-                <span className="p-2">Wieszaki</span>
+                <span className="p-2">{t.links.categories.wallHooks.label}</span>
                 <span
                   className={`ml-2 ${currentPath === '/kategoria/wieszaki'
                     ? 'inline'
@@ -117,7 +117,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             </Link>
           </li>
           <li className="font-bold">
-            <Link href="/kategoria/meble" legacyBehavior>
+            <Link href={getPath('/kategoria/meble')} legacyBehavior>
               <a
                 onClick={toggleMenu}
                 className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/meble'
@@ -143,7 +143,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           </li>
           {/* Non-category links with same active/hover styles */}
           <li className="font-bold">
-            <Link href="/kolekcje" legacyBehavior>
+            <Link href={getPath('/kolekcje')} legacyBehavior>
               <a
                 onClick={toggleMenu}
                 className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kolekcje'
@@ -156,7 +156,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             </Link>
           </li>
           <li className="font-bold">
-            <Link href="/o-nas" legacyBehavior>
+            <Link href={getPath('/o-nas')} legacyBehavior>
               <a
                 onClick={toggleMenu}
                 className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/o-nas'

@@ -100,7 +100,9 @@ export const en: Translations = {
       collections: 'Collections',
       labelDescription: 'Collection Description.',
       labelDefaultCollectionTitle: 'Default collection title',
-
+      sectionTitle: 'Check out our collections',
+      sectionSubtitle: 'See what we\'ve recently added for you.', 
+      seeAll: 'See all collections',   
     },    
     // === NEWSLETTER ===
     newsletter: {
@@ -128,6 +130,12 @@ export const en: Translations = {
       heroDescriptionMobile: 'HVYT was born from a love of design and accessories. We believe that these are what give each interior its individual character. We are quite quirky ourselves, which is why our name is an alternative spelling of the word "grip". We strive to make our offer diverse so everyone can find something for themselves.',
       heroDescriptionDesktop: 'HVYT was born from a love of design and accessories. We believe that these are what give each interior its individual character. We are quite quirky ourselves, which is why our name is an alternative spelling of the word "grip". We strive to make our offer diverse so everyone can find something for themselves.',
       contactButton: 'Contact →',
+      slides: {
+        title_1: 'If you\'re just getting ready, you want to make your interior stand out so you\'re in the right place!',
+        title_2: 'A colorful knob, a modern handle or an elegant door handle can change the look of the entire apartment.',
+        title_3: 'If you\'re tired of your "old" furniture, furniture knobs and handles are a great way to freshen up an old dresser, nightstand, or kitchen cabinet.',
+        title_4: 'If you don\'t know which model is right for you, write to us.',
+      },      
     },
     // === COMMON ===
     common: {
@@ -524,7 +532,12 @@ export const en: Translations = {
     saveChanges: 'Save changes',
     editPassword: 'Edit password',  
     messageAcceptance: 'By creating an account, you accept our',
-    messageReadPrivacyPolicy: 'Read our'      
+    messageReadPrivacyPolicy: 'Read our',
+    messageResetEmailSent: 'If this email address is in our database, we have sent you a link to change your password.',
+    emailNotSent: 'Didn\'t receive email?',
+    emailNotSentStep1: 'Check your spam folder.',
+    emailNotSentStep2: 'Please check if provided address is correct.',
+    emailNotSentStep3: 'Please wait 15 minutes and try again.',        
   },
 
   // === FORM FIELDS ===
@@ -572,6 +585,8 @@ export const en: Translations = {
   },
   // === INDEX / HOME PAGE ===
   index: {
+    pageTitle: 'Modern furniture knobs and handles, door handles and hangers',
+    pageDescription: 'Our offer includes a wide selection of furniture knobs and handles, door handles and wall hangers.',    
     seeHandles: 'See handles',
     seeKnobs: 'See knobs',
     seeAllCollections: 'See all collections →',
@@ -583,6 +598,29 @@ export const en: Translations = {
     recentlyAdded: 'See what we have recently added for you.',
     title: 'We create furniture that lives with you.',
     description: 'Interiors aren\'t just walls and meters. They\'re everyday life. Coffee drunk on the run, the remote hidden under the pillow, a dog that\'s decided to do something naughty.',
+    maintenanceTitle: 'We are changing for you!',
+    maintenanceDescription: 'We\'re currently making changes and working on a new, improved version of our website. Thank you for your patience, and we look forward to welcoming you to our new website soon!',
+    maintenanceContact: 'For orders or other questions, please contact us',
+    choose: 'Choose',
+    your: 'your',
+    chooseHVYT: 'Choose your HVYT',
+    chooseSloganMobile: 'From elegant, modern furniture handle designs to timeless classics, see how our Hvyts can transform your interior.',    
+    bestsellers: 'Bestsellers',
+    bestsellersSlogan: 'Discover our most frequently purchased products.',
+    chooseColorTitle: 'Choose the color you like',
+    chooseColorDescription: 'The devil is in the details, let color enhance your interior!',
+    chooseColorCheck: 'Check all colors',
+    chooseColorSilver: 'Silver',
+    chooseColorBlack: 'Black',
+    chooseColorGold: 'Gold',
+    chooseColorsColors: 'Colors',
+    fitTitle: 'We fit in everywhere',
+    fitDescritpion: 'Choose a handle that suits your interior',
+    fitSeeAll: 'See all',    
+    fitChildrensFurniture: 'Children\'s furniture',
+    fitLivingRoomFurniture: 'Living room furniture',
+    fitKitchenFurniture: 'Kitchen furniture',
+    fitWardrobes: 'Wardrobes',
   },
 
   // === SEARCH ===

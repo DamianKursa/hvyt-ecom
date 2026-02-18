@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import ResponsiveSlider from '@/components/Slider/ResponsiveSlider';
 import { useAnimateOnScroll } from '../Animations/useAnimateOnScroll';
 import 'swiper/css';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface PasujemyWszedzieItem {
   src: string;
@@ -13,33 +14,34 @@ interface PasujemyWszedzieItem {
 }
 
 const PasujemyWszedzie = () => {
+  const {t, getPath} = useI18n();
   const sectionRef = useRef(null);
   const isVisible = useAnimateOnScroll(sectionRef);
 
   const pasujemyItems: PasujemyWszedzieItem[] = [
     {
       src: '/images/6_2.png',
-      alt: 'Meble dziecięce',
-      title: 'Meble dziecięce',
-      href: '/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-dzieciecych',
+      alt: t.index.fitChildrensFurniture,
+      title: t.index.fitChildrensFurniture,
+      href: `${getPath('/kategoria/uchwyty-meblowe')}?pa_przeznaczenie=do-mebli-dzieciecych`,
     },
     {
       src: '/images/5_1.png',
-      alt: 'Meble pokojowe',
-      title: 'Meble pokojowe',
-      href: '/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-pokojowych',
+      alt: t.index.fitLivingRoomFurniture,
+      title: t.index.fitLivingRoomFurniture,
+      href: `${getPath('/kategoria/uchwyty-meblowe')}?pa_przeznaczenie=do-mebli-pokojowych`,
     },
     {
       src: '/images/4_1.png',
-      alt: 'Meble kuchenne',
-      title: 'Meble kuchenne',
-      href: '/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-kuchennych',
+      alt: t.index.fitKitchenFurniture,
+      title: t.index.fitKitchenFurniture,
+      href: `${getPath('/kategoria/uchwyty-meblowe')}?pa_przeznaczenie=do-mebli-kuchennych`,
     },
     {
       src: '/images/6_3.png',
-      alt: 'Szafy',
-      title: 'Szafy',
-      href: '/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-szaf',
+      alt: t.index.fitWardrobes,
+      title: t.index.fitWardrobes,
+      href: `${getPath('/kategoria/uchwyty-meblowe')}?pa_przeznaczenie=do-szaf`,
     },
   ];
 
@@ -52,17 +54,17 @@ const PasujemyWszedzie = () => {
       <div className="flex flex-col items-start mb-8 md:flex-row md:justify-between md:items-center md:px-0 px-4">
         <div className="flex flex-col mb-4 md:mb-0">
           <h2 className="font-size-h2 font-bold text-neutral-darkest">
-            Pasujemy wszędzie
+            {t.index.fitTitle}
           </h2>
           <p className="font-size-text-medium text-neutral-darkest mt-[10px] md:mt-0">
-            Dobierz uchwyt do swojego wnętrza
+            {t.index.fitDescritpion}
           </p>
         </div>
         <Link
-          href="/kategoria/uchwyty-meblowe"
+          href={getPath('/kategoria/uchwyty-meblowe')}
           className="px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all self-start md:self-auto"
         >
-          Zobacz wszystkie →
+          {t.index.seeAll} →
         </Link>
       </div>
 
@@ -77,12 +79,12 @@ const PasujemyWszedzie = () => {
               <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-dzieciecych">
                 <Image
                   src="/images/6_2.png"
-                  alt="Meble dziecięce"
+                  alt={t.index.fitChildrensFurniture}
                   fill
                   className="object-cover rounded-lg"
                 />
                 <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                  Meble dziecięce
+                  {t.index.fitChildrensFurniture}
                 </div>
               </Link>
             </div>
@@ -93,12 +95,12 @@ const PasujemyWszedzie = () => {
               <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-pokojowych">
                 <Image
                   src="/images/5_1.png"
-                  alt="Meble pokojowe"
+                  alt={t.index.fitLivingRoomFurniture}
                   fill
                   className="object-cover rounded-lg"
                 />
                 <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                  Meble pokojowe
+                  {t.index.fitLivingRoomFurniture}
                 </div>
               </Link>
             </div>
@@ -112,12 +114,12 @@ const PasujemyWszedzie = () => {
               <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-mebli-kuchennych">
                 <Image
                   src="/images/4_1.png"
-                  alt="Meble kuchenne"
+                  alt={t.index.fitKitchenFurniture}
                   fill
                   className="object-cover rounded-lg"
                 />
                 <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                  Meble kuchenne
+                  {t.index.fitKitchenFurniture}
                 </div>
               </Link>
             </div>
@@ -128,12 +130,12 @@ const PasujemyWszedzie = () => {
               <Link href="/kategoria/uchwyty-meblowe?pa_przeznaczenie=do-szaf">
                 <Image
                   src="/images/6_3.png"
-                  alt="Szafy"
+                  alt={t.index.fitWardrobes}
                   fill
                   className="object-cover rounded-lg"
                 />
                 <div className="absolute bottom-4 left-4 bg-white px-4 py-2 rounded-full font-bold text-neutral-darkest">
-                  Szafy
+                  {t.index.fitWardrobes}
                 </div>
               </Link>
             </div>
