@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import PasswordChangeConfirmation from '@/components/User/PasswordChangeConfirmation';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { useRouter } from 'next/router';
 
 const ForgotPassword: React.FC<{ onBackToLogin: () => void }> = ({
   onBackToLogin,
 }) => {
   const { t } = useI18n();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [message, setMessage] = useState(false);
@@ -21,7 +23,7 @@ const ForgotPassword: React.FC<{ onBackToLogin: () => void }> = ({
       const response = await fetch('/api/auth/resetpassword', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, lang: router.locale }),
       });
 
       if (!response.ok) {

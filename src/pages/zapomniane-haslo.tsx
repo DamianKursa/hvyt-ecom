@@ -39,7 +39,7 @@ const ResetPassword: React.FC = () => {
       const response = await fetch('/api/auth/resetpassword', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key, login, password }),
+        body: JSON.stringify({ key, login, password, lang: router.locale }),
       });
 
       if (response.ok) {

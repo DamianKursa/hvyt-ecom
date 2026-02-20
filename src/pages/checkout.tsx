@@ -214,6 +214,7 @@ const Checkout: React.FC = () => {
             last_name: billingData.lastName,
             email,
             password,
+            lang: router.locale
           });
           console.log('Account created successfully');
         } catch (err) {

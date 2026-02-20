@@ -7,12 +7,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  const { first_name, last_name, email, password } = req.body;
+  const { first_name, last_name, email, password, lang } = req.body;
 
   try {
     const response = await axios.post(
       `${process.env.WORDPRESS_API_URL}/wp-json/custom/v1/register`,
-      { first_name, last_name, email, password }
+      { first_name, last_name, email, password, lang }
     );
 
     res.status(201).json(response.data);

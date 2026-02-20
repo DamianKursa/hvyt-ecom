@@ -5,11 +5,14 @@ import { useI18n } from '@/utils/hooks/useI18n';
 
 const RegisterForm: React.FC = () => {
   const { t } = useI18n();
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
     email: '',
     password: '',
+    lang: router.locale
   });
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -17,7 +20,7 @@ const RegisterForm: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState('');
-  const router = useRouter();
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

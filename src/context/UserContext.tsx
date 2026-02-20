@@ -101,7 +101,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ username, email, password, lang: router.locale }),
       });
 
       if (!response.ok) {

@@ -7,7 +7,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     if (method === 'POST') {
 
-      const { email } = req.body;
+      const { email, lang } = req.body;
 
       if (!email) {
         return res.status(400).json({ message: 'Email is required.' });
@@ -15,7 +15,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       const response = await axios.post(
         `${process.env.WORDPRESS_API_URL}/wp-json/custom/v1/reset-password`,
-        { email }
+        { email, lang }
       );
 
       return res.status(response.status).json({
