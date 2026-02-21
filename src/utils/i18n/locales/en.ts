@@ -92,6 +92,7 @@ export const en: Translations = {
         delivery: {label: 'Delivery', slug: 'delivery'},
         returns: {label: 'Returns and complaints', slug: 'returns-and-complaints'},
         account: {label: 'My account', slug: 'my-account'},
+        thankyou: {label: 'Thankyou', slug: 'thank-you'},        
       },
     },    
     // === COLLECTIONS ===
@@ -242,10 +243,11 @@ export const en: Translations = {
         removedSaleItems: 'Code does not apply to sale items — removed.',
       },
       errors: {
-        outOfStock: 'Product is out of stock.',
-        variantUnavailable: 'Selected variant is unavailable. Change the variant to continue.',
-        maxQuantity: 'Cannot add more than {count} pcs.',
+        outOfStock: 'Product "{product}" is out of stock.',
+        variantUnavailable: 'Selected variant for "{product}" is unavailable. Change the variant to continue.',
+        maxQuantity: 'Cannot add more than {count} pcs. for {product}.',
         loadingError: 'An error occurred. Please try again later.',
+        availabilityOrQuantity: 'Some items are out of stock or exceed stock: {names}. Please change variant or quantity to continue.',        
       },
       messages: {
         variationChanged: 'Product spacing for {name} has been changed',
@@ -352,7 +354,7 @@ export const en: Translations = {
         privacyLink: 'Privacy Policy',
         termsAcceptance: 'and I accept their provisions.',
         confirm: '*I confirm that I have read the',
-        regulamin: 'Terms and Conditions',
+        term: 'Terms and Conditions',
         and: 'and',
         privacyPolicy: 'Privacy Policy',
         accept: 'and I accept their provisions.',        
@@ -450,6 +452,14 @@ export const en: Translations = {
     discountCode: {
       placeholder: 'Enter discount code',
       noProductsMatch: 'No products match the code conditions.',
+      CodeNotExist: 'The given code does not exist.',
+      supplyCode: 'Enter discount code.',
+      codeExpired: 'This discount code has expired.',
+      codeLimitReached: 'Limit użycia tego kodu został osiągnięty.',
+      minAmount: 'Minimum order value is {amount} {currency}.',
+      noValidProducts: 'This code does not apply to any product in your cart.',
+      notForPromotions: 'The code does not work on promotional products.',
+      serverError: 'A server error occurred. Please try again later.',      
     },
   // === USER ACCOUNT ===
   account: {

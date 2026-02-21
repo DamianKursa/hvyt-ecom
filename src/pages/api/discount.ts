@@ -10,6 +10,14 @@ const WooCommerceAPI = axios.create({
   },
 });
 
+const CustomAPI = axios.create({
+  baseURL: process.env.REST_API_CUSTOM,
+  auth: {
+    username: process.env.WC_CONSUMER_KEY || '',
+    password: process.env.WC_CONSUMER_SECRET || '',
+  },
+});
+
 const toUniqueNumberArray = (input: unknown): number[] => {
   if (!Array.isArray(input)) {
     return [];
@@ -205,7 +213,7 @@ const hvytSiteUrl = (
 
 const couponRuleCache = new Map<string, any>();
 
-const fetchHvytCouponRule = async (code: string) => {
+const fetchHvytCouponRule = async (code: string, lang: string) => {
   const normalized = code.trim().toLowerCase();
   if (!normalized || !hvytSiteUrl) {
     return null;
@@ -218,7 +226,7 @@ const fetchHvytCouponRule = async (code: string) => {
   try {
     const response = await axios.get(
       `${hvytSiteUrl}/wp-json/hvyt/v1/coupon-rules`,
-      { params: { code: normalized } },
+      { params: { code: normalized, lang } },
     );
 
     if (response.data && Object.keys(response.data).length > 0) {
@@ -241,11 +249,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.setHeader('Allow', ['POST']);
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
-
-  const { code, cartTotal, items } = req.body;
+  
+  const { code, cartTotal, items, lang } = req.body;
 
   if (!code) {
-    return res.status(400).json({ valid: false, message: 'Wprowadź kod rabatowy.' });
+    return res.status(400).json({ valid: false, message: 'Wprowadź kod rabatowy.', messageCode: 'supplyCode' });
   }
 
   const ids = Array.isArray(items)
@@ -289,41 +297,48 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const response = await WooCommerceAPI.get('/coupons', {
-      params: { code },
+    const response = await CustomAPI.get('/coupon', {
+      params: { code, lang },
     });
 
     if (response.data.length === 0) {
       return res.status(404).json({
         valid: false,
         message: 'Podany kod rabatowy nie istnieje.',
+        messageCode: 'CodeNotExist',
       });
     }
 
     const coupon = response.data[0];
 
     const now = new Date();
-    if (coupon.date_expires && new Date(coupon.date_expires) < now) {
-      return res.status(400).json({
-        valid: false,
-        message: 'Ten kod rabatowy wygasł.',
-      });
-    }
+    
+    // if (coupon.date_expires && new Date(coupon.date_expires) < now) {
+    //   return res.status(400).json({
+    //     valid: false,
+    //     message: 'Ten kod rabatowy wygasł.',
+    //     messageCode: 'codeExpired',
+    //   });
+    // }
 
-    if (coupon.usage_limit && coupon.usage_count >= coupon.usage_limit) {
-      return res.status(400).json({
-        valid: false,
-        message: 'Limit użycia tego kodu został osiągnięty.',
-      });
-    }
+    // if (coupon.usage_limit && coupon.usage_count >= coupon.usage_limit) {
+    //   return res.status(400).json({
+    //     valid: false,
+    //     message: 'Limit użycia tego kodu został osiągnięty.',
+    //     messageCode: 'codeLimitReached',
+    //   });
+    // }
     if (
       coupon.minimum_amount &&
       cartTotal &&
       parseFloat(cartTotal) < parseFloat(coupon.minimum_amount)
-    ) {
+    ) { console.log('cartvalues', cartTotal, coupon.minimum_amount);
+    
       return res.status(400).json({
         valid: false,
         message: `Minimalna wartość zamówienia to ${parseFloat(coupon.minimum_amount).toFixed(2)} zł.`,
+        messageCode: 'minAmount',
+        messageParams: {amount: parseFloat(coupon.minimum_amount).toFixed(2)}
       });
     }
 
@@ -352,7 +367,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     let specialExcludeCategoriesOnSale: number[] = [];
 
-    const remoteRule = await fetchHvytCouponRule(normalizedCode);
+    const remoteRule = await fetchHvytCouponRule(normalizedCode, lang);
     if (remoteRule) {
       const [
         extraAllowedFromSlugs,
@@ -466,6 +481,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({
         valid: false,
         message: 'Ten kod nie obejmuje żadnego produktu w koszyku.',
+        messageCode: 'noValidProducts',
         debug: 'no_matching_products',
       });
     }
@@ -481,6 +497,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({
         valid: false,
         message: 'Kod nie działa na produkty z promocji.',
+        messageCode: 'notForPromotions',
         debug: 'only_sale_products_in_scope',
       });
     }
@@ -510,6 +527,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({
       valid: false,
       message: 'Wystąpił błąd serwera. Spróbuj ponownie później.',
+      messageCode: 'serverError',
     });
   }
 }

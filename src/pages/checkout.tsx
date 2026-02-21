@@ -71,7 +71,7 @@ const Checkout: React.FC = () => {
   const externalAnonId = useContext(ExternalIdContext);
   const { user } = useUserContext();
   const { cart } = useContext(CartContext);
-  const {t} = useI18n();
+  const {t, getPath} = useI18n();
 
   const mapCountry = (country: string): string => {
     const countryMapping: Record<string, string> = { Polska: 'PL' };
@@ -98,7 +98,7 @@ const Checkout: React.FC = () => {
         }
       } catch (error) {
         console.error('Error fetching shipping methods:', error);
-        alert('Nie udało się załadować metod dostawy.');
+        alert(t.checkout.errors.shippingLoadFailed);
       }
     };
 
@@ -147,36 +147,36 @@ const Checkout: React.FC = () => {
 
     if (!isTermsChecked) {
       alert(
-        '*Potwierdzam, że zapoznałam/em się z treścią Regulaminu i Polityki Prywatności oraz akceptuję ich postanowienia.',
+        t.checkout.validation.acceptTerms
       );
       setOrderDisabled(false);
       throw new Error('Validation error');
     }
     if (shippingMethod === 'paczkomaty_inpost' && !selectedLocker) {
-      alert('Wybierz paczkomat przed złożeniem zamówienia.');
+      alert(t.checkout.validation.selectLocker);
       setOrderDisabled(false);
       throw new Error('Validation error');
     }
 
     if (shippingMethod === 'punkty_gls' && !selectedGlsPoint) {
-      alert('Wybierz punkt GLS przed złożeniem zamówienia.');
+      alert(t.checkout.validation.selectGlsPoint);
       setOrderDisabled(false);
       throw new Error('Validation error');
     }
     if (!cart || cart.products.length === 0) {
-      alert('Koszyk jest pusty!');
+      alert(t.checkout.validation.emptyCart);
       setOrderDisabled(false);
       throw new Error('Validation error');
     }
 
     if (!shippingMethod) {
-      alert('Wybierz metodę dostawy.');
+      alert(t.checkout.validation.selectShipping);
       setOrderDisabled(false);
       throw new Error('Validation error');
     }
 
     if (!paymentMethod) {
-      alert('Wybierz metodę płatności.');
+      alert(t.checkout.validation.selectPayment);
       setOrderDisabled(false);
       throw new Error('Validation error');
     }
@@ -541,14 +541,14 @@ const Checkout: React.FC = () => {
         router.push(createdOrder.payment_url);
       } else if (createdOrder.id && createdOrder.order_key) {
         router.push(
-          `/dziekujemy?orderId=${createdOrder.id}&orderKey=${createdOrder.order_key}`,
+          `${getPath('/dziekujemy')}?orderId=${createdOrder.id}&orderKey=${createdOrder.order_key}`,
         );
       } else {
-        alert('Zamówienie utworzone, ale brakuje identyfikatora zamówienia.');
+        alert(t.checkout.validation.orderCreatedNoId);
       }
     } catch (error) {
       console.error('❌ Error creating order:', error);
-      alert('Wystąpił błąd podczas składania zamówienia. Spróbuj ponownie.');
+      alert(t.checkout.errors.orderCreationFailed);
     }
   };
 
@@ -609,7 +609,7 @@ const Checkout: React.FC = () => {
                       )}
                     </span>
                     <span className="text-sm leading-tight w-full">
-                      Stwórz konto
+                      {t.checkout.personalData.createAccount}
                     </span>
                   </label>
                 </div>
@@ -684,18 +684,18 @@ const Checkout: React.FC = () => {
                         )}
                       </span>
                       <span className="text-sm leading-tight w-full">
-                        <span className='text-red-500'>*</span>Potwierdzam, że zapoznałam/em się z treścią{' '}
-                        <Link className="underline" href="/regulamin">
-                          Regulaminu
+                        <span className='text-red-500'>*</span>{t.checkout.terms.confirm}{' '}
+                        <Link className="underline" href={getPath('/regulamin')}>
+                          {t.checkout.terms.term}
                         </Link>{' '}
-                        i{' '}
+                        {t.checkout.terms.and}{' '}
                         <Link
                           className="underline"
-                          href="/polityka-prywatnosci"
+                          href={getPath('/polityka-prywatnosci')}
                         >
-                          Polityki Prywatności
+                          {t.checkout.terms.privacyLink}
                         </Link>{' '}
-                        oraz akceptuję ich postanowienia.
+                        {t.checkout.terms.accept}
                       </span>
                     </label>
                   </div>

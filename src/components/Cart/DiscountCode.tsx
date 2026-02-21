@@ -1,6 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { CartContext } from '@/stores/CartProvider';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { getCurrencyByLocale, getCurrencySlugByLocale } from '@/config/currencies';
+import { useRouter } from 'next/router';
 
 const toNum = (v: any): number => {
   if (v === null || v === undefined) return NaN;
@@ -206,6 +208,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 }) => {
   const { applyCoupon, removeCoupon, cart } = useContext(CartContext);
   const { t } = useI18n();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [code, setCode] = useState(cart?.coupon?.code || '');
   const [codeError, setCodeError] = useState<string>('');
@@ -302,6 +305,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           code: sanitizedCode,
+          lang: router.locale,
           cartTotal,
           items: cart!.products.map((item) => ({
             id: item.productId,
@@ -315,13 +319,34 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
       const data = await response.json();
 
+      const replaceMessageParams = (message: string, params: Record<string, string>) => {
+        const keys = Object.keys(params);
+        if(!keys.length) {
+          return;
+        }
+
+        let updatedMessage = message;
+
+        keys.forEach(key => {
+          updatedMessage = updatedMessage.replaceAll(`{${key}}`, params[key])
+        })
+
+        // update currency
+        updatedMessage = updatedMessage.replaceAll('{currency}', getCurrencyByLocale(router.locale as string).symbol)
+
+        return updatedMessage
+      }
+
       if (!response.ok || !data.valid) {
-        console.log('Coupon debug:', data.debug);
+        console.log('Coupon debug:', data.debug, data);
         const msg =
           data?.debug === 'only_sale_products_in_scope'
             ? t.cart.discountCode.saleItemsError
             : data.message || t.cart.discountCode.invalidError;
-        setCodeError(msg);
+            
+        const errorMessage = replaceMessageParams(t.discountCode[data.messageCode as keyof typeof t.discountCode], data.messageParams || {});
+        
+        setCodeError(errorMessage || '');
         setSnackbar({ message: msg, type: 'error', visible: true });
         return;
       }

@@ -412,6 +412,7 @@ export const submitProductReview = async (
 
 export const validateDiscountCode = async (
   code: string,
+  lang: string,
 ): Promise<{
   valid: boolean;
   discountValue: number;
@@ -421,7 +422,7 @@ export const validateDiscountCode = async (
     const response = await fetch('/api/discount', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, lang }),
     });
 
     if (!response.ok) {

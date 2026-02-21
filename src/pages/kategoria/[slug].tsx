@@ -136,7 +136,6 @@ const CategoryPage = ({
       lang: currentLang,
     });
   }, []);
-console.log('thiscategory', category);
 
   const seoTitle =
     seoData && seoData.yoastTitle

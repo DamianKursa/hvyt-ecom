@@ -127,7 +127,7 @@ const Koszyk: React.FC = () => {
   useEffect(() => {
     if (invalidItems.length > 0) {
       const names = invalidItems.map((p: Product) => `„${p.name}”`).join(', ');
-      setCartErrorMessage(`Niektóre pozycje są niedostępne lub przekraczają stan: ${names}. Zmień wariant lub ilość, aby kontynuować.`);
+      setCartErrorMessage(t.cart.errors.availabilityOrQuantity.replace('{names}', names));
     } else if (cartErrorMessage) {
       setCartErrorMessage(null);
     }
@@ -141,16 +141,16 @@ const Koszyk: React.FC = () => {
     if (currentStock <= 0) {
       const hasVariations = Array.isArray(((product as any).baselinker_variations) || []) && ((product as any).baselinker_variations || []).length > 0;
       if (hasVariations) {
-        setCartErrorMessage(`Wariant wybrany dla "${product.name}" jest niedostępny. Zmień wariant, aby kontynuować.`);
+        setCartErrorMessage(t.cart.errors.variantUnavailable.replace('{product}', product.name));
       } else {
-        setCartErrorMessage(`Produkt "${product.name}" jest niedostępny.`);
+        setCartErrorMessage(t.cart.errors.outOfStock.replace('{product}', product.name));
       }
       return;
     }
 
     if (product.qty >= currentStock) {
       console.log(`Reached maximum stock for ${product.name}`);
-      setCartErrorMessage(`Nie można dodać więcej niż ${currentStock} szt. dla "${product.name}".`);
+      setCartErrorMessage(t.cart.errors.maxQuantity.replace('{count}', currentStock.toString()).replace('{product}', product.name));
       return;
     }
 
@@ -255,7 +255,7 @@ const Koszyk: React.FC = () => {
                 onDecreaseQuantity={handleDecreaseQuantity}
                 onRemoveItem={handleRemoveItem}
                 onVariationChange={(name: string) => {
-                  setVariationMessage(`Rozstaw produktu ${name} został zmieniony`);
+                  setVariationMessage(t.cart.messages.variationChanged.replace('{name}', name));
                   setCartErrorMessage(null);
                 }}
               />

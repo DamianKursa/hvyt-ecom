@@ -92,6 +92,7 @@ export const pl = {
         delivery: {label: 'Dostawa', slug: 'dostawa'},
         returns: {label: 'Zwroty i reklamacje', slug: 'zwroty-i-reklamacje'},
         account: {label: 'Moje konto', slug: 'moje-konto'},
+        thankyou: {label: 'Dziękujemy', slug: 'dziekujemy'},
       },
     },
     // === KOLEKCJE ===
@@ -242,10 +243,11 @@ export const pl = {
         removedSaleItems: 'Kod nie działa na produkty z promocji — usunięto.',
       },
       errors: {
-        outOfStock: 'Produkt jest niedostępny.',
-        variantUnavailable: 'Wariant wybrany dla tego produktu jest niedostępny. Zmień wariant, aby kontynuować.',
-        maxQuantity: 'Nie można dodać więcej niż {count} szt.',
+        outOfStock: 'Produkt "{product}" jest niedostępny.',
+        variantUnavailable: 'Wariant wybrany dla "{product}" jest niedostępny. Zmień wariant, aby kontynuować.',
+        maxQuantity: 'Nie można dodać więcej niż {count} szt. dla {product}.',
         loadingError: 'Wystąpił błąd. Spróbuj ponownie później.',
+        availabilityOrQuantity: 'Niektóre pozycje są niedostępne lub przekraczają stan: {names}. Zmień wariant lub ilość, aby kontynuować.',
       },
       messages: {
         variationChanged: 'Rozstaw produktu {name} został zmieniony',
@@ -353,7 +355,7 @@ export const pl = {
         privacyLink: 'Polityki Prywatności',
         termsAcceptance: 'oraz akceptuję ich postanowienia.',
         confirm: '*Potwierdzam, że zapoznałam/em się z treścią',
-        regulamin: 'Regulaminu',
+        term: 'Regulaminu',
         and: 'i',
         privacyPolicy: 'Polityki Prywatności',
         accept: 'oraz akceptuję ich postanowienia.',        
@@ -450,6 +452,14 @@ export const pl = {
     discountCode: {
       placeholder: 'Uzupełnij kod rabatowy',
       noProductsMatch: 'Brak produktów spełniających warunki kodu.',
+      CodeNotExist: 'Podany kod rabatowy nie istnieje.',
+      supplyCode: 'Wprowadź kod rabatowy.',
+      codeExpired: 'Ten kod rabatowy wygasł.',
+      codeLimitReached: 'Limit użycia tego kodu został osiągnięty.',
+      minAmount: 'Minimalna wartość zamówienia to {amount} {currency}.',
+      noValidProducts: 'Ten kod nie obejmuje żadnego produktu w koszyku.',
+      notForPromotions: 'Kod nie działa na produkty z promocji.',
+      serverError: 'Wystąpił błąd serwera. Spróbuj ponownie później.',
     },
     // === KONTO UŻYTKOWNIKA ===
     account: {
