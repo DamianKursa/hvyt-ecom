@@ -55,6 +55,7 @@ export interface CheckoutAddressFormProps {
   setIsShippingDifferent: React.Dispatch<React.SetStateAction<boolean>>;
   saveAddress: boolean;
   setSaveAddress: React.Dispatch<React.SetStateAction<boolean>>;
+  setSelectedZone: React.Dispatch<React.SetStateAction<string>>;
   user: any;
 }
 
@@ -67,6 +68,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   setIsShippingDifferent,
   saveAddress,
   setSaveAddress,
+  setSelectedZone,
   user,
 }) => {
   const { t } = useI18n();
@@ -350,12 +352,16 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             value={billingData.country}
             onFocus={() => setFocusedField('country')}
             onBlur={() => setFocusedField(null)}
-            onChange={(e) =>
-              setBillingData((prev) => ({ ...prev, country: e.target.value }))
+            onChange={
+              (e) => {
+                setBillingData((prev) => ({ ...prev, country: e.target.value })); 
+                setSelectedZone(e.target.value); console.log('shipping: ' , e.target.value); 
+              }
             }
             className="w-full text-[#363132] font-light border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
           >
-            <option value="Polska">{t.common.poland}</option>
+            <option value="poland">{t.checkout.shippingLocationPoland}</option>
+            <option value="other">{t.checkout.shippingLocationOther}</option>
           </select>
           <svg xmlns="http://www.w3.org/2000/svg" className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#969394] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -483,15 +489,17 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 value={shippingData.country}
                 onFocus={() => setFocusedField('country')}
                 onBlur={() => setFocusedField(null)}
-                onChange={(e) =>
-                  setShippingData((prev) => ({
-                    ...prev,
-                    country: e.target.value,
-                  }))
+                onChange={(e) => {
+                    setShippingData((prev) => ({
+                      ...prev,
+                      country: e.target.value,
+                    }));
+                  }
                 }
                 className="w-full font-light text-[#363132] border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
               >
-                <option value="Polska">{t.common.poland}</option>
+                <option value="poland">{t.checkout.shippingLocationPoland}</option>
+                <option value="other">{t.checkout.shippingLocationOther}</option>
               </select>
               <svg xmlns="http://www.w3.org/2000/svg" className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#969394] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

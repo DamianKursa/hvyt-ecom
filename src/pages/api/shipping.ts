@@ -14,7 +14,10 @@ const WooCommerceAPI = axios.create({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    const cacheKey = 'polandShippingData';
+
+    const { lang } = req.query;
+
+    const cacheKey = 'ShippingData';
 
     try {
 
@@ -52,14 +55,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const shippingData = await Promise.all(methodsPromises);
 
-      const polandShippingData = shippingData.filter((zone) =>
-        zone.zoneName.toLowerCase().includes('polska') ||
-        zone.zoneName.toLowerCase().includes('poland')
-      );
+      // const polandShippingData = shippingData.filter((zone) =>
+      //   zone.zoneName.toLowerCase().includes('polska') ||
+      //   zone.zoneName.toLowerCase().includes('poland')
+      // );
 
-      await setCache(cacheKey, polandShippingData, CACHE_TTL);
+      // await setCache(cacheKey, polandShippingData, CACHE_TTL);
+      await setCache(cacheKey, shippingData, CACHE_TTL);
 
-      return res.status(200).json(polandShippingData);
+      // return res.status(200).json(polandShippingData);
+      return res.status(200).json(shippingData);
     } catch (error: any) {
       console.error('Error fetching shipping methods:', error.message || error);
       return res.status(500).json({ error: 'Failed to fetch shipping methods' });

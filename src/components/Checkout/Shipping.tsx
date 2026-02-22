@@ -27,6 +27,7 @@ interface ShippingProps {
   cart: any;
   selectedGlsPoint: any;
   setSelectedGlsPoint: React.Dispatch<React.SetStateAction<any>>;
+  selectedZone: string,
 }
 
 // Extend the Window interface for TypeScript
@@ -180,6 +181,7 @@ const Shipping: React.FC<ShippingProps> = ({
   cart,
   selectedGlsPoint,
   setSelectedGlsPoint,
+  selectedZone,
 }) => {
   const { t } = useI18n();
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
@@ -202,6 +204,7 @@ const Shipping: React.FC<ShippingProps> = ({
     'punkty gls': '/icons/GLS_Logo_2021.svg',
     'zadbano (bez wniesienia)': '/icons/truck.svg',
     'zadbano z wniesieniem': '/icons/truck.svg',
+    'kurier gls (zagranica)': '/icons/GLS_Logo_2021.svg',
   };
 
   const router = useRouter();
@@ -209,6 +212,8 @@ const Shipping: React.FC<ShippingProps> = ({
 
   // ─── FETCH SHIPPING METHODS ──────────────────────────────────────────────
   useEffect(() => {
+    console.log('update shipping zones');
+    
     const fetchShippingMethods = async () => {
       try {
         setLoading(true);
@@ -244,6 +249,12 @@ const Shipping: React.FC<ShippingProps> = ({
         }
         const data = await response.json();
 
+        const selectedZoneData = data.filter((zone: ShippingZone) =>
+          selectedZone === 'poland' ? 
+            ( zone.zoneName.toLowerCase().includes('polska') || zone.zoneName.toLowerCase().includes('poland') ) :
+            ( ! zone.zoneName.toLowerCase().includes('polska') && ! zone.zoneName.toLowerCase().includes('poland') )
+        );
+      
         // Check if coupon has free shipping enabled OR specific coupons are applied
         const hasFreeShipCoupon =
           cart?.coupon?.freeShipping === true ||
@@ -289,7 +300,12 @@ const Shipping: React.FC<ShippingProps> = ({
                 restrictedIds.includes(String(product.variationId))),
           ) || false;
 
-        let updatedZones = data.map((zone: ShippingZone) => {
+        // update zones by contstrains (only for polish shipping methods)
+        let updatedZones = selectedZoneData.map((zone: ShippingZone) => {
+          if(zone.zoneName.toLocaleLowerCase() !== 'polska' && zone.zoneName.toLocaleLowerCase() !== 'poland') {
+            return zone;
+          }
+
           let filteredMethods = zone.methods.filter((method) => {
             // Filter out any 'flexible shipping' references
             if (method.title.toLowerCase().includes('flexible shipping')) {
@@ -387,7 +403,7 @@ const Shipping: React.FC<ShippingProps> = ({
       }
     };
     fetchShippingMethods();
-  }, [cart, cartTotal]);
+  }, [cart, cartTotal, router.locale, selectedZone]);
 
   // ─── HANDLING SHIPPING METHOD CHANGE ──────────────────────────────────────
   const handleShippingChange = (method: ShippingMethod) => {

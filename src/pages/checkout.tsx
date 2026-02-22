@@ -68,6 +68,8 @@ const Checkout: React.FC = () => {
     additionalInfo: '',
   });
 
+  const [selectedZone, setSelectedZone] = useState('poland');
+
   const [isShippingDifferent, setIsShippingDifferent] = useState(false);
   const externalAnonId = useContext(ExternalIdContext);
   const { user } = useUserContext();
@@ -391,7 +393,6 @@ const Checkout: React.FC = () => {
       payment_method: paymentMethod,
       // Optionally, include additional details such as payment type or billing info
     });
-    console.log('orderdata', orderData);
     
     try {
       const response = await axios.post('/api/create-order', orderData, {
@@ -637,6 +638,7 @@ const Checkout: React.FC = () => {
                 setIsShippingDifferent={setIsShippingDifferent}
                 saveAddress={saveAddress}
                 setSaveAddress={setSaveAddress}
+                setSelectedZone={setSelectedZone}
                 user={user}
               />
             </div>
@@ -656,6 +658,7 @@ const Checkout: React.FC = () => {
                   cart={cart}
                   selectedGlsPoint={selectedGlsPoint}
                   setSelectedGlsPoint={setSelectedGlsPoint}
+                  selectedZone={selectedZone}
                 />
 
                 <div className="mt-8">
