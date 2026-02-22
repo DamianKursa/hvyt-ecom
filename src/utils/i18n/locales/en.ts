@@ -422,6 +422,10 @@ export const en: Translations = {
     // === THANK YOU PAGE ===
     thankYou: {
       pageTitle: 'Thank you for your purchase!',
+      thankyouFor: 'Thank you for',
+      buyingInOurShop: 'shopping in our store!',
+      thankyouForOrder: 'Thank you for your order!',
+      processingPayment: 'We are currently processing your payment.',      
       hero: {
         title: 'Thank you for shopping at our store!',
         description: 'We have sent a purchase confirmation to your email address for order',

@@ -3,8 +3,11 @@ import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component';
 import CartProgress from '@/components/Cart/CartProgress';
 import Head from 'next/head';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const ZamowienieOtrzymane = () => {
+  const {t} = useI18n();
+
   return (
     <Layout title="Dziękujemy za zamówienie!">
       <Head>
@@ -23,12 +26,12 @@ const ZamowienieOtrzymane = () => {
       <div className="mx-4 xl:mx-0 hidden md:grid grid-cols-10 min-h-[750px] rounded-[24px] overflow-hidden mb-10">
         <div className="col-span-4 bg-[#F0E0CF] flex flex-col justify-center pl-[40px]">
           <h1 className="text-[48px] font-bold text-black leading-tight">
-            Dziękujemy za
-            <br /> zakupy w naszym sklepie!
+            {t.thankYou.thankyouFor}
+            <br /> {t.thankYou.buyingInOurShop}
           </h1>
           <p className="text-[18px] mt-8 font-light text-black">
-            Dziękujemy za zamówienie! <br />
-            Aktualnie przetwarzamy Twoją płatność.
+            {t.thankYou.thankyouForOrder} <br />
+            {t.thankYou.processingPayment}
           </p>
         </div>
         <div
@@ -43,11 +46,11 @@ const ZamowienieOtrzymane = () => {
       <div className="block md:hidden mb-10 mx-4 rounded-[24px] overflow-hidden">
         <div className="bg-[#F0E0CF] p-4">
           <h1 className="text-[36px] mt-4 font-bold text-black leading-tight">
-            Dziękujemy za
-            <br /> zakupy w naszym sklepie!
+            {t.thankYou.thankyouFor}
+            <br />{t.thankYou.buyingInOurShop}
           </h1>
           <p className="text-[18px] pb-8 mt-4 font-light text-black">
-            Aktualnie przetwarzamy Twoją płatność.
+            {t.thankYou.processingPayment}
           </p>
         </div>
         <div className="relative" style={{ height: '250px' }}>
@@ -70,7 +73,7 @@ const ZamowienieOtrzymane = () => {
             href="/"
             className="w-full px-8 py-4 bg-black text-neutral-white text-[24px] font-light rounded-full hover:bg-neutral-dark transition"
           >
-            Wróć na stronę główną
+            {t.thankYou.backToHome}
           </Link>
         </div>
       </div>

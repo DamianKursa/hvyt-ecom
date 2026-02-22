@@ -37,7 +37,7 @@ const Dziekujemy = () => {
       try {
         console.log(`🔍 Fetching order details: ${currentOrderId}`);
         const response = await axios.get(
-          `/api/orders/${currentOrderId}?orderKey=${currentOrderKey}`,
+          `/api/orders/${currentOrderId}?orderKey=${currentOrderKey}&lang=${router.locale}`,
         );
         const fetchedOrder = response.data;
 
@@ -72,6 +72,7 @@ const Dziekujemy = () => {
           },
           shipping_total: fetchedOrder.shipping_total || '0.00',
         };
+console.log('formatedorder', formattedOrder);
 
         setOrder(formattedOrder);
       } catch (err) {

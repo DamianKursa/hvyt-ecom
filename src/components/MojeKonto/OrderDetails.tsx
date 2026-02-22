@@ -3,9 +3,8 @@ import { Order } from '@/utils/functions/interfaces';
 
 import { useRouter } from 'next/router';
 import { CartContext } from '@/stores/CartProvider';
-import { getCurrency, Language } from '@/utils/i18n/config';
 import { useI18n } from '@/utils/hooks/useI18n';
-import { getCurrencyBySlug } from '@/config/currencies';
+import { getCurrencyByLocale } from '@/config/currencies';
 
 interface OrderDetailsProps {
   order: Order;
@@ -24,7 +23,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ order }) => {
     100
   ).toFixed(2);
 
-  const currency = getCurrencyBySlug(order.currency || '').symbol;
+  const currency = getCurrencyByLocale(router.locale as string).symbol;
 
   const { addCartItem } = React.useContext(CartContext);
 

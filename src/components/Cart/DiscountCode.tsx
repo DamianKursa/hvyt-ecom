@@ -589,7 +589,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         <div className="flex justify-between items-center">
           <span className="text-neutral-darkest font-medium text-[18px]">{t.cart.summary.discountValue}</span>
           <span className="font-semibold text-neutral-darkest">
-            - {Number(cart.coupon.discountValue).toFixed(2).replace('.', ',')} zł
+            - {Number(cart.coupon.discountValue).toFixed(2).replace('.', ',')} {getCurrencyByLocale(router.locale as string).symbol}
           </span>
         </div>
       )}

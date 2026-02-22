@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { orderId, orderKey } = req.query;
+  const { orderId, orderKey, lang } = req.query;
 
   if (!orderId || !orderKey) {
     return res.status(400).json({ error: 'Order ID and Order Key are required' });
@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const response = await axios.get(`${API_URL}/orders/${orderId}`, {
+    const response = await axios.get(`${API_URL}/orders/${orderId}?lang=${lang}`, {
       auth: {
         username: CONSUMER_KEY,
         password: CONSUMER_SECRET,

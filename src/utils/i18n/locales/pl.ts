@@ -422,6 +422,10 @@ export const pl = {
     },
     thankYou: {
       pageTitle: 'Dziękujemy za zakupy!',
+      thankyouFor: 'Dziękujemy za',
+      buyingInOurShop: 'zakupy w naszym sklepie!',
+      thankyouForOrder: 'Dziękujemy za zamówienie!',
+      processingPayment: 'Aktualnie przetwarzamy Twoją płatność.',
       hero: {
         title: 'Dziękujemy za zakupy w naszym sklepie!',
         description: 'Na podany adres e-mail wysłaliśmy potwierdzenie zakupu zamówienia',

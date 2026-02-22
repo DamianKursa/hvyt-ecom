@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Order } from '@/utils/functions/interfaces';
 import { useRouter } from 'next/router';
 import { useI18n } from '@/utils/hooks/useI18n';
-import { getCurrencyBySlug } from '@/config/currencies';
+import { getCurrencyByLocale, getCurrencyBySlug } from '@/config/currencies';
 
 interface OrderConfirmationProps {
   order: Order;
@@ -10,7 +10,8 @@ interface OrderConfirmationProps {
 
 const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ order }) => {
   const {t} = useI18n()
-  const currency = getCurrencyBySlug(order.currency || '').symbol;
+  const router = useRouter();
+  const currency = getCurrencyByLocale(router.locale as string).symbol;
 
   useEffect(() => {
     console.log('Fetched Order:', order);

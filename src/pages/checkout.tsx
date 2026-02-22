@@ -17,6 +17,7 @@ import { useUserContext } from '@/context/UserContext';
 import { pushGTMEvent } from '@/utils/gtm';
 import CreateAccount from '@/components/UI/CreateAccount';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { getCurrencySlugByLocale } from '@/config/currencies';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -291,6 +292,8 @@ const Checkout: React.FC = () => {
     }
 
     const orderData = {
+      lang: router.locale,
+      currency: getCurrencySlugByLocale(router.locale as string),
       payment_method: paymentMethod,
       payment_method_title:
         paymentMethod === 'pay_by_paynow_pl_pbl'
@@ -388,7 +391,8 @@ const Checkout: React.FC = () => {
       payment_method: paymentMethod,
       // Optionally, include additional details such as payment type or billing info
     });
-
+    console.log('orderdata', orderData);
+    
     try {
       const response = await axios.post('/api/create-order', orderData, {
         headers: { 'Content-Type': 'application/json' },
