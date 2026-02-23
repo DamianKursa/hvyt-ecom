@@ -89,6 +89,12 @@ const nextConfig = {
       { source: '/login/:path*', destination: '/logowanie/:path*' },
       { source: '/forgot-password/:path*', destination: '/zapomniane-haslo/:path*' },
       { source: '/confirm-email/:path*', destination: '/potwierdzenie-email/:path*' },      
+      { source: '/terms/:path*', destination: '/regulamin/:path*' },      
+      { source: '/order-received/:path*', destination: '/zamowienie-otrzymane/:path*' },      
+      { source: '/cooperation/:path*', destination: '/wspolpraca/:path*' },      
+      { source: '/delivery/:path*', destination: '/dostawa/:path*' },      
+      { source: '/returns/:path*', destination: '/zwroty-i-reklamacje/:path*' },      
+      { source: '/privacy-policy/:path*', destination: '/polityka-prywatnosci/:path*' },      
       // { source: '/en/about-us/:path*', destination: '/o-nas/:path*' },
                
       { source: '/_next/:path*', destination: '/_next/:path*' },

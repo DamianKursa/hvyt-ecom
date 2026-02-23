@@ -131,7 +131,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
 
   const handleUserClick = () => {
     if (!user) {
-      router.push('/logowanie');
+      router.push(getPath('/logowanie'));
     }
   };
 

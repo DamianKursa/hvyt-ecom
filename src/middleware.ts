@@ -34,7 +34,7 @@ const PATH_MAPPINGS: Record<string, string> = {
   'kontakt': 'contact',
   'wspolpraca': 'cooperation',
   'dostawa': 'delivery',
-  'zwroty-i-reklamacje': 'returns-and-complaints',
+  'zwroty-i-reklamacje': 'returns',
   'wygodne-zwroty': 'easy-returns',
   'regulamin': 'terms',
   'polityka-prywatnosci': 'privacy-policy',

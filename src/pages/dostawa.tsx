@@ -2,15 +2,17 @@ import React from 'react';
 import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
 import Head from 'next/head';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 const DostawaPage = () => {
+  const {getPath} = useI18n()
   return (
     <Layout title="Hvyt | Dostawa">
       <Head>
         <link
           id="meta-canonical"
           rel="canonical"
-          href={`${process.env.NEXT_PUBLIC_SITE_URL}/dostawa`}
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}${getPath('/dostawa')}`}
         />
       </Head>
       <section className="w-full py-16 px-4 md:px-0 bg-light-beige">

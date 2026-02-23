@@ -9,7 +9,7 @@ import Head from 'next/head';
 import { useI18n } from '@/utils/hooks/useI18n';
 
 const Kontakt = () => {
-  const {t} = useI18n();
+  const {t, getPath} = useI18n();
   const methods = useForm();
   const [isTermsChecked, setIsTermsChecked] = useState(false);
   const [termsError, setTermsError] = useState('');
@@ -43,11 +43,11 @@ const Kontakt = () => {
 
       const result = await res.json();
 
-      setSubmitMessage('Formularz został pomyślnie wysłany!');
+      setSubmitMessage(t.contact.messageSent);
       setSubmitMessageType('success');
     } catch (error) {
       setSubmitMessage(
-        'Formularz nie został wysłany! Spróbuj ponownie później.',
+        t.contact.messageSendingError,
       );
       setSubmitMessageType('error');
     }
@@ -58,12 +58,12 @@ const Kontakt = () => {
   };
 
   return (
-    <Layout title="Hvyt | Kontakt">
+    <Layout title={`Hvyt | ${t.contact.title}`}>
       <Head>
         <link
           id="meta-canonical"
           rel="canonical"
-          href={`${process.env.NEXT_PUBLIC_SITE_URL}/kontakt`}
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}${getPath('/kontakt')}`}
         />
       </Head>
       <section className="container mx-auto mt-[55px] px-4 md:px-0">
@@ -75,7 +75,7 @@ const Kontakt = () => {
           >
             <div className="w-full pt-4 mb-[32px]">
               <h1 className="text-[40px] md:text-[65px] md:pl-[48px] text-dark-pastel-red font-bold text-start md:text-left">
-                Kontakt
+                {t.contact.title}
               </h1>
             </div>
             <div className="grid grid-cols-2">
@@ -88,7 +88,7 @@ const Kontakt = () => {
                       className="mr-4 mt-1 md:w-6 h-6 w-8 h-8 "
                     />
                     <div className="text-left">
-                      <span className="block font-bold mb-2">Adres</span>
+                      <span className="block font-bold mb-2">{t.contact.address}</span>
                       <p>Głogoczów 996,</p>
                       <p>32-444 Głogoczów</p>
                     </div>
@@ -138,13 +138,13 @@ const Kontakt = () => {
           {/* Right Side (Contact Form) */}
           <div className="w-full md:w-8/12 bg-white py-[56px] px-[20px] md:px-0 md:pl-[72px] md:pr-[120px]">
             <h2 className="text-[24px] md:text-[40px] font-bold text-dark-pastel-red mb-6">
-              Napisz do nas
+              {t.contact.writeToUs}
             </h2>
 
             <FormProvider {...methods}>
               <form onSubmit={methods.handleSubmit(onSubmit, onError)}>
                 <InputField
-                  inputLabel="Imię i nazwisko"
+                  inputLabel={t.contact.nameSurname}
                   inputName="name"
                   customValidation={{ required: t.account.messageRequiredField }}
                   errors={methods.formState.errors}
@@ -157,7 +157,7 @@ const Kontakt = () => {
                   errors={methods.formState.errors}
                 />
                 <InputField
-                  inputLabel="Treść wiadomości"
+                  inputLabel={t.contact.message}
                   inputName="message"
                   type="textarea"
                   customValidation={{
@@ -165,7 +165,7 @@ const Kontakt = () => {
                     minLength: {
                       value: 10,
                       message:
-                        'Treść wiadomości musi mieć przynajmniej 10 znaków',
+                        t.contact.messageMinLength,
                     },
                   }}
                   errors={methods.formState.errors}
@@ -176,13 +176,13 @@ const Kontakt = () => {
                   onChange={() => setIsTermsChecked(!isTermsChecked)}
                   label={
                     <span>
-                      Akceptuję{' '}
+                      {`${t.contact.accept} `}
                       <span className="underline">
-                        <Link href="#">Regulamin</Link>
+                        <Link href="#">{t.contact.terms}</Link>
                       </span>{' '}
-                      oraz{' '}
+                      {`${t.contact.and} `}
                       <span className="underline">
-                        <Link href="#">Politykę Prywatności</Link>
+                        <Link href="#">{t.contact.privacyPolicy}</Link>
                       </span>
                     </span>
                   }
@@ -209,7 +209,7 @@ const Kontakt = () => {
                   type="submit"
                   className="w-full md:w-[240px] mt-8 py-3 font-light px-4 bg-black text-neutral-white rounded-full hover:bg-dark-pastel-red transition-all"
                 >
-                  Wyślij wiadomość
+                  {t.contact.sendMessage}
                 </button>
               </form>
             </FormProvider>

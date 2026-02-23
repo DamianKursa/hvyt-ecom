@@ -6,15 +6,15 @@ import Head from 'next/head';
 import { useI18n } from '@/utils/hooks/useI18n';
 
 const ZamowienieOtrzymane = () => {
-  const {t} = useI18n();
+  const {t, getPath } = useI18n();
 
   return (
-    <Layout title="Dziękujemy za zamówienie!">
+    <Layout title={t.thankYou.thankyouForOrder}>
       <Head>
         <link
           id="meta-canonical"
           rel="canonical"
-          href={`${process.env.NEXT_PUBLIC_SITE_URL}/zamowienie-otrzymane`}
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}${getPath('/zamowienie-otrzymane')}`}
         />
       </Head>
       {/* Cart Progress */}

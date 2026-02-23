@@ -22,7 +22,7 @@ const slugMap: Record<string, { pl: string; en: string }> = {
   'kontakt': { pl: 'kontakt', en: 'contact' },
   'wspolpraca': { pl: 'wspolpraca', en: 'cooperation' },
   'dostawa': { pl: 'dostawa', en: 'delivery' },
-  'zwroty-i-reklamacje': { pl: 'zwroty-i-reklamacje', en: 'returns-and-complaints' },
+  'zwroty-i-reklamacje': { pl: 'zwroty-i-reklamacje', en: 'returns' },
   'regulamin': { pl: 'regulamin', en: 'terms' },
   'polityka-prywatnosci': { pl: 'polityka-prywatnosci', en: 'privacy-policy' },
   'kolekcje': { pl: 'kolekcje', en: 'collections' },
@@ -37,6 +37,7 @@ const slugMap: Record<string, { pl: string; en: string }> = {
   'ulubione': { pl: 'ulubione', en: 'wishlist' },
   'dziekujemy': { pl: 'dziekujemy', en: 'thank-you' },
   'logowanie': { pl: 'logowanie', en: 'login' },
+  'zamowienie-otrzymane': { pl: 'zamowienie-otrzymane', en: 'order-received' },
 };
 
 /**

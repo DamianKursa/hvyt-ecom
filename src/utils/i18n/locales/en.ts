@@ -90,7 +90,7 @@ export const en: Translations = {
         contact: {label: 'Contact', slug: 'contact'},
         cooperation: {label: 'Cooperation', slug: 'cooperation'},
         delivery: {label: 'Delivery', slug: 'delivery'},
-        returns: {label: 'Returns and complaints', slug: 'returns-and-complaints'},
+        returns: {label: 'Returns and complaints', slug: 'returns'},
         account: {label: 'My account', slug: 'my-account'},
         thankyou: {label: 'Thankyou', slug: 'thank-you'},      
         passwordReset: {label: 'Forgot password', slug: 'forgot-password'},          
@@ -665,6 +665,22 @@ export const en: Translations = {
       noInvoiceData: 'No invoice data.',
       backToOrders: 'Back to orders',
     },
+    // === CONTACT ===
+    contact: {
+      title: 'Contact',
+      address: 'Address',
+      writeToUs: 'Write tu us',
+      nameSurname: 'Name and surname',
+      message: 'Message',
+      messageSent: 'The form has been successfully sent!',
+      accept: 'I accept',
+      terms: 'terms',
+      and: 'and',
+      privacyPolicy: 'Privacy Policy',
+      sendMessage: 'Send Message',
+      messageSendingError: 'The form has not been sent! Please try again later.',
+      messageMinLength: 'The message must be at least 10 characters long',
+    },   
   // === WISHLIST ===
   wishlist: {
     wishlist: 'Wishlist',

@@ -661,6 +661,22 @@ export const pl = {
       noInvoiceData: 'Brak danych do faktury.',
       backToOrders: 'Powrót do zamówień',
     },
+    // === CONTACT ===
+    contact: {
+      title: 'Kontakt',
+      address: 'Adres',
+      writeToUs: 'Napisz do nas',
+      nameSurname: 'Imię i nazwisko',
+      message: 'Treść wiadomości',
+      messageSent: 'Formularz został pomyślnie wysłany!',
+      accept: 'Akceptuję',
+      terms: 'Regulamin',
+      and: 'oraz',
+      privacyPolicy: 'Politykę Prywatności',
+      sendMessage: 'Wyślij wiadomość',
+      messageSendingError: 'Formularz nie został wysłany! Spróbuj ponownie później.',
+      messageMinLength: 'Treść wiadomości musi mieć przynajmniej 10 znaków',
+    },
     // === WISHLIST ===
     wishlist: {
       wishlist: 'Ulubione',
