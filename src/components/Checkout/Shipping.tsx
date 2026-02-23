@@ -212,8 +212,6 @@ const Shipping: React.FC<ShippingProps> = ({
 
   // ─── FETCH SHIPPING METHODS ──────────────────────────────────────────────
   useEffect(() => {
-    console.log('update shipping zones');
-    
     const fetchShippingMethods = async () => {
       try {
         setLoading(true);

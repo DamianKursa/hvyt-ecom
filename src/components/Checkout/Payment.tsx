@@ -28,6 +28,7 @@ const Payment: React.FC<PaymentProps> = ({
     '1': 'kurier_gls',
     '3': 'kurier_gls_pobranie',
     '13': 'paczkomaty_inpost',
+    '11': 'kurier_gls_zagranica',
     kurier_gls_pobranie: 'kurier_gls_pobranie', // For safety
   };
 
