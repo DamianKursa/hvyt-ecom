@@ -36,6 +36,7 @@ const slugMap: Record<string, { pl: string; en: string }> = {
   'moje-konto/dane-do-faktury': { pl: 'moje-konto/dane-do-faktury', en: 'my-account/billing-data' },
   'ulubione': { pl: 'ulubione', en: 'wishlist' },
   'dziekujemy': { pl: 'dziekujemy', en: 'thank-you' },
+  'logowanie': { pl: 'logowanie', en: 'login' },
 };
 
 /**

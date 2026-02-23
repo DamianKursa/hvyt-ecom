@@ -86,6 +86,9 @@ const nextConfig = {
       { source: '/wishlist/:path*', destination: '/ulubione/:path*' },
       { source: '/cart/:path*', destination: '/koszyk/:path*' },
       { source: '/thank-you/:path*', destination: '/dziekujemy/:path*' },
+      { source: '/login/:path*', destination: '/logowanie/:path*' },
+      { source: '/forgot-password/:path*', destination: '/zapomniane-haslo/:path*' },
+      { source: '/confirm-email/:path*', destination: '/potwierdzenie-email/:path*' },      
       // { source: '/en/about-us/:path*', destination: '/o-nas/:path*' },
                
       { source: '/_next/:path*', destination: '/_next/:path*' },

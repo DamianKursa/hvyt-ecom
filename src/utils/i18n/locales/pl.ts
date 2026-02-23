@@ -93,6 +93,7 @@ export const pl = {
         returns: {label: 'Zwroty i reklamacje', slug: 'zwroty-i-reklamacje'},
         account: {label: 'Moje konto', slug: 'moje-konto'},
         thankyou: {label: 'Dziękujemy', slug: 'dziekujemy'},
+        passwordReset: {label: 'Zapomniane hasło', slug: 'zapomniane-haslo'},
       },
     },
     // === KOLEKCJE ===

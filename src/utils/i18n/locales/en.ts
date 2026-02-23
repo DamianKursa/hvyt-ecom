@@ -92,7 +92,8 @@ export const en: Translations = {
         delivery: {label: 'Delivery', slug: 'delivery'},
         returns: {label: 'Returns and complaints', slug: 'returns-and-complaints'},
         account: {label: 'My account', slug: 'my-account'},
-        thankyou: {label: 'Thankyou', slug: 'thank-you'},        
+        thankyou: {label: 'Thankyou', slug: 'thank-you'},      
+        passwordReset: {label: 'Forgot password', slug: 'forgot-password'},          
       },
     },    
     // === COLLECTIONS ===

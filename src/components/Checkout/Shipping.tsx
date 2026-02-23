@@ -241,11 +241,12 @@ const Shipping: React.FC<ShippingProps> = ({
           return;
         }
 
-        const response = await fetch('/api/shipping');
+        const response = await fetch(`/api/shipping?lang=${router.locale}`);
         if (!response.ok) {
           throw new Error(t.checkout.shipping.errorLoading);
         }
         const data = await response.json();
+console.log('shippingdata', data);
 
         const selectedZoneData = data.filter((zone: ShippingZone) =>
           selectedZone === 'poland' ? 

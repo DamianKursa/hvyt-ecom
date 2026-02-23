@@ -90,7 +90,7 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     const fetchShippingMethods = async () => {
       try {
-        const response = await axios.get('/api/shipping');
+        const response = await axios.get('/api/shipping', {params: {lang: router.locale}});
         const shippingZones = response.data;
 
         if (shippingZones.length > 0) {
@@ -111,7 +111,7 @@ const Checkout: React.FC = () => {
   useEffect(() => {
     const fetchShippingTitle = async () => {
       try {
-        const response = await axios.get('/api/shipping');
+        const response = await axios.get('/api/shipping', {params: {lang: router.locale}});
         const shippingZones = response.data;
 
         const selectedMethod = shippingZones
@@ -570,7 +570,7 @@ const Checkout: React.FC = () => {
               </h2>
               {!user && (
                 <Link
-                  href={`/logowanie?redirect=${encodeURIComponent(router.asPath)}`}
+                  href={`${getPath('/logowanie')}?redirect=${encodeURIComponent(router.asPath)}`}
                   className="text-black underline md:border md:border-black md:px-4 md:py-2 rounded-full flex items-center text-sm mt-0 mb-4 md:mb-0 md:mt-0"
                 >
                 {t.checkout.personalData.loginPrompt}

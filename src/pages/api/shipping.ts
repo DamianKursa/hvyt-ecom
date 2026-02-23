@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
-import { getCache, setCache } from '../../lib/cache';
+import { deleteCache, getCache, setCache } from '../../lib/cache';
 
 const CACHE_TTL = 21600;
 
@@ -12,13 +12,21 @@ const WooCommerceAPI = axios.create({
   },
 });
 
+const CustomAPI = axios.create({
+  baseURL: process.env.REST_API_CUSTOM,
+  auth: {
+    username: process.env.WC_CONSUMER_KEY || '', 
+    password: process.env.WC_CONSUMER_SECRET || '', 
+  },
+});
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
 
     const { lang } = req.query;
 
-    const cacheKey = 'ShippingData';
-
+    const cacheKey = `ShippingData_${lang}`;
+    deleteCache(cacheKey);
     try {
 
       const cachedData = await getCache(cacheKey);
@@ -34,15 +42,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       const methodsPromises = zones.map(async (zone: any) => {
-        const methodsResponse = await WooCommerceAPI.get(`/shipping/zones/${zone.id}/methods`);
+        const methodsResponse = await CustomAPI.get(`/shipping/zones/${zone.id}/methods`, {
+          params: {lang: lang}
+        });
+
+        console.log('methodresp', methodsResponse.data.methods);
+        
+
         return {
           zoneName: zone.name,
-          methods: methodsResponse.data
+          methods: methodsResponse.data.methods
             .filter((method: any) => method.enabled)
             .map((method: any) => {
               const cost = method.title.toLowerCase() === 'kurier gls pobranie'
                 ? 25 
-                : Number(method.settings?.cost?.value);
+                // : Number(method.settings?.cost?.value);
+                : Number(method?.cost);
               return {
                 id: method.id,
                 title: method.title,
