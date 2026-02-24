@@ -13,7 +13,7 @@ const PotwierdzeniePage: React.FC = () => {
     <Layout title={t.account.confirmEmail}>
       <div className="md:mt-0 rounded-[25px] bg-white p-8 shadow-sm flex flex-col items-center justify-center">
         <img
-          src="/icons/email.svg"
+          src="/icons/email-icon.svg"
           alt={t.account.confirmEmail}
           className="w-28 h-28 mb-4"
         />

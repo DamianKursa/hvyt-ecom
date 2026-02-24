@@ -246,7 +246,6 @@ const Shipping: React.FC<ShippingProps> = ({
           throw new Error(t.checkout.shipping.errorLoading);
         }
         const data = await response.json();
-console.log('shippingdata', data);
 
         const selectedZoneData = data.filter((zone: ShippingZone) =>
           selectedZone === 'poland' ? 

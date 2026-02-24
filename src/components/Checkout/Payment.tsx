@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { useRouter } from 'next/router';
 
 interface PaymentProps {
   paymentMethod: string;
@@ -19,6 +20,7 @@ const Payment: React.FC<PaymentProps> = ({
   shippingMethod,
 }) => {
   const { t } = useI18n();
+  const router = useRouter();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +58,7 @@ const Payment: React.FC<PaymentProps> = ({
     };
 
     fetchPaymentMethods();
-  }, [t]);
+  }, [router.locale]);
 
   // Filter payment methods based on the selected shipping method
   const getFilteredPaymentMethods = () => {
