@@ -25,8 +25,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const { lang } = req.query;
 
-    const cacheKey = `ShippingData_${lang}`;
-    deleteCache(cacheKey);
+    const cacheKey = `ShippingData:${lang}`;
+
     try {
 
       const cachedData = await getCache(cacheKey);

@@ -1,14 +1,14 @@
-export const getPostsArchive = async (page: number = 1) => {
-  const response = await fetch(`/api/posts/posts?page=${page}`);
+export const getPostsArchive = async (page: number = 1, lang: string) => {
+  const response = await fetch(`/api/posts/posts?page=${page}&lang=${lang}`);
   if (!response.ok) throw new Error('Failed to fetch posts');
   return response.json();
 };
 
-export const getSinglePost = async (slug: string) => {
+export const getSinglePost = async (slug: string, lang: string) => {
   try {
     const url = `${process.env.WORDPRESS_API_URL}/wp-json/wp/v2/posts?slug=${encodeURIComponent(
       slug,
-    )}&_embed`;
+    )}&lang=${lang}&_embed`;
 
     const response = await fetch(url);
 

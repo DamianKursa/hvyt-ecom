@@ -96,6 +96,16 @@ export const pl = {
         passwordReset: {label: 'Zapomniane hasło', slug: 'zapomniane-haslo'},
       },
     },
+    // === BLOG ===
+    blog: {
+      newsFromTheInteriorWorld: 'Aktualności ze świata wnętrz',
+      folowOurBlog: 'Śledź naszego bloga i odkrywaj najnowsze trendy.',
+      noPosts: 'Brak artykułów',
+      readMore: 'Czytaj dalej',
+      postNotFount: 'Nie znaleziono artykułu',
+      postNotFoundDescription: 'Artykuł, którego szukasz, nie istnieje lub został usunięty.',      
+      shareThisArticle: 'Udostępnij ten artykuł',
+    },
     // === KOLEKCJE ===
     collection: {
       collection: 'Kolekcja',

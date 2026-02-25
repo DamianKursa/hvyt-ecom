@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { page = 1, per_page = 10 } = req.query; 
+  const { page = 1, per_page = 10, lang } = req.query; 
 
   try {
     
@@ -12,7 +12,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         params: {
           _embed: true,
           page, 
-          per_page, 
+          per_page,
+          lang
         },
       }
     );

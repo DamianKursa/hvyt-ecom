@@ -96,6 +96,16 @@ export const en: Translations = {
         passwordReset: {label: 'Forgot password', slug: 'forgot-password'},          
       },
     },    
+    // === BLOG ===
+    blog: {
+      newsFromTheInteriorWorld: 'News from the interior world',
+      folowOurBlog: 'Follow our blog and discover the latest trends.',
+      noPosts: 'No posts available',
+      readMore: 'Read more',
+      postNotFount: 'Post Not Found',
+      postNotFoundDescription: 'The post you are looking for does not exist or has been removed.',
+      shareThisArticle: 'Share this article',      
+    },    
     // === COLLECTIONS ===
     collection: {
       collection: 'Collection',

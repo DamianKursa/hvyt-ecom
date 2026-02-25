@@ -3,6 +3,9 @@ import { getSinglePost } from '@/utils/api/getPosts';
 import Layout from '@/components/Layout/Layout.component';
 import Image from 'next/image';
 import Head from 'next/head';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { useRouter } from 'next/router';
+import { getCurrentLanguage } from '@/utils/i18n/config';
 
 interface BlogPost {
   id: number;
@@ -24,13 +27,17 @@ interface BlogPostPageProps {
 }
 
 const BlogPostPage = ({ post }: BlogPostPageProps) => {
+
+  const {t, getPath} = useI18n();
+  const router = useRouter();
+
   if (!post) {
     return (
-      <Layout title="Post Not Found">
+      <Layout title={t.blog.postNotFount}>
         <div className="container mx-auto py-16 px-4">
-          <h1 className="text-[56px] font-bold text-black">Post Not Found</h1>
+          <h1 className="text-[56px] font-bold text-black">{t.blog.postNotFount}</h1>
           <p className="text-[18px] font-light text-black">
-            The post you are looking for does not exist or has been removed.
+            {t.blog.postNotFoundDescription}
           </p>
         </div>
       </Layout>
@@ -43,7 +50,7 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
         <link
           id="meta-canonical"
           rel="canonical"
-          href={`${process.env.NEXT_PUBLIC_SITE_URL}/blog/${post.slug}`}
+          href={`${process.env.NEXT_PUBLIC_SITE_URL}${getPath('/blog')}/${post.slug}`}
         />
       </Head>
       <div className="container mx-auto py-16 max-w-[1130px] px-4 md:px-0">
@@ -93,7 +100,7 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
           <div className="flex justify-between text-black items-center">
             {/* Share Text */}
             <div className="flex items-center">
-              <h4 className="text-[18px] font-bold">Udostępnij ten artykuł</h4>
+              <h4 className="text-[18px] font-bold">{t.blog.shareThisArticle}</h4>
             </div>
 
             {/* Social Media Links */}
@@ -140,10 +147,10 @@ const BlogPostPage = ({ post }: BlogPostPageProps) => {
 
 export default BlogPostPage;
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, locale }) => {
   const { slug } = params || {};
 
-  console.log('Received slug:', slug);
+  console.log('Received slug:', slug, 'lang:', locale);
 
   if (!slug) {
     return {
@@ -152,7 +159,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   }
 
   try {
-    const post = await getSinglePost(slug as string);
+    const post = await getSinglePost(slug as string, locale as string);
     console.log('Fetched post data for slug:', slug, post);
 
     if (!post) {

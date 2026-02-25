@@ -5,6 +5,8 @@ import Layout from '@/components/Layout/Layout.component';
 import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
 import Head from 'next/head';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const trimToWords = (text: string, wordLimit: number): string => {
   const words = text.split(' ');
@@ -23,7 +25,8 @@ const formatDate = (dateString: string): string => {
 };
 
 const BlogArchive = () => {
-  const {t} = useI18n();
+  const {t, getPath} = useI18n();
+  const router = useRouter();
   const [posts, setPosts] = useState<PostArchive[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -34,7 +37,7 @@ const BlogArchive = () => {
     const fetchPosts = async () => {
       setLoading(true);
       try {
-        const data = await getPostsArchive(1);
+        const data = await getPostsArchive(1, router.locale as string);
         setPosts(
           data.posts.map((post: any) => ({
             ...post,
@@ -51,13 +54,13 @@ const BlogArchive = () => {
       }
     };
     fetchPosts();
-  }, []);
+  }, [router.locale]);
 
   const loadMorePosts = async () => {
     if (page >= totalPages) return;
     setLoadingMore(true);
     try {
-      const data = await getPostsArchive(page + 1);
+      const data = await getPostsArchive(page + 1, router.locale as string);
       setPosts((prevPosts) => [
         ...prevPosts,
         ...data.posts.map((post: any) => ({
@@ -96,10 +99,10 @@ const BlogArchive = () => {
         {/* Header */}
         <header className="pt-[115px] mx-auto container max-w-grid-desktop px-4 md:px-0 py-6">
           <h1 className="text-[40px] md:text-[56px] font-bold text-black">
-            Aktualności ze świata wnętrz
+            {t.blog.newsFromTheInteriorWorld}
           </h1>
           <p className="text-black text-[18px] font-light mt-2">
-            Śledź naszego bloga i odkrywaj najnowsze trendy.
+            {t.blog.folowOurBlog}
           </p>
         </header>
 
@@ -108,7 +111,7 @@ const BlogArchive = () => {
           {posts.length === 0 && (
             <div className="text-center py-16">
               <h2 className="text-xl font-bold text-gray-700">
-                Brak artykułów
+                {t.blog.noPosts}
               </h2>
             </div>
           )}
@@ -137,17 +140,17 @@ const BlogArchive = () => {
                     __html: trimToWords(posts[0].excerpt?.rendered || '', 35),
                   }}
                 />
-                <a
-                  href={`/blog/${posts[0].slug}`}
+                <Link
+                  href={`${getPath('/blog')}/${posts[0].slug}`}
                   className="text-[16px] text-black font-light underline flex items-center gap-2"
                 >
-                  Czytaj dalej{' '}
+                  {`${t.blog.readMore} `}
                   <img
                     src="/icons/dalej.svg"
                     alt="Dalej icon"
                     className="w-4 h-4"
                   />
-                </a>
+                </Link>
               </div>
             </article>
           )}
@@ -177,17 +180,17 @@ const BlogArchive = () => {
                       __html: trimToWords(post.excerpt?.rendered || '', 15),
                     }}
                   />
-                  <a
-                    href={`/blog/${post.slug}`}
+                  <Link
+                    href={`${getPath('/blog')}/${post.slug}`}
                     className="text-[16px] font-light underline flex items-center gap-2 mt-4"
                   >
-                    Czytaj dalej{' '}
+                    {t.blog.readMore}
                     <img
                       src="/icons/dalej.svg"
                       alt="Dalej icon"
                       className="w-4 h-4"
                     />
-                  </a>
+                  </Link>
                 </div>
               </article>
             ))}
