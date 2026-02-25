@@ -1,5 +1,6 @@
 import React from 'react';
 import Filters from './Filters.component';
+import { useI18n } from '@/utils/hooks/useI18n';
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -31,7 +32,11 @@ const FilterModal: React.FC<FilterModalProps> = ({
   setTotalProducts,
   filterOrder,
 }) => {
+  
+  const {t} = useI18n();
+
   if (!isOpen) return null;
+
 
   const handleClearFilters = () => {
     onFilterChange([]);
@@ -45,7 +50,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
         {/* Modal Header */}
         <div className="p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-xl font-bold">Filtry</h3>
+            <h3 className="text-xl font-bold">{t.filters.filters}</h3>
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-red-500 text-2xl"
@@ -100,7 +105,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
               activeFilters.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            Wyczyść filtry
+            {t.filters.emptyFilter}
           </button>
           <button
             onClick={onApplyFilters}
@@ -111,9 +116,9 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 : ''
             }`}
           >
-            {`Pokaż ${
+            {`${t.filters.show} ${
               activeFilters.length > 0 ? productsCount : initialProductCount
-            } produktów`}
+            } ${t.filters.products}`}
           </button>
         </div>
       </div>

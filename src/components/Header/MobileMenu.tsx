@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useWishlist } from '@/context/WhishlistContext';
@@ -18,7 +18,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   const [accountDropdownOpen, setAccountDropdownOpen] = useState(false);
   const router = useRouter();
   const { t, getPath } = useI18n();
-  const currentPath = router.asPath.split('?')[0];
+  const [currentPath, setCurrentPath] = useState(router.asPath.split('?')[0]);
   const { wishlist } = useWishlist();
   const favoriteCount = wishlist.length;
 
@@ -31,6 +31,16 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
       toggleMenu();
     }
   };
+
+  const isCurrentPath = (path: string) => {
+    let cleanPath = path.startsWith('/en') ? path.replace('/en', '') : path;
+    
+    return cleanPath === currentPath;
+  }
+
+  useEffect(() => {
+    setCurrentPath(router.asPath.split('?')[0]);
+  },[router.locale]);
 
   return (
     <div
@@ -45,14 +55,14 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href={getPath('/kategoria/uchwyty-meblowe')} legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/uchwyty-meblowe'
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${isCurrentPath(getPath('/kategoria/uchwyty-meblowe'))
                   ? 'bg-beige-light text-dark-pastel-red'
                   : ''
                   }`}
               >
-                <span className="p-2">Uchwyty</span>
+                <span className="p-2">{t.links.categories.handles.label}</span>
                 <span
-                  className={`ml-2 ${currentPath === '/kategoria/uchwyty-meblowe'
+                  className={`ml-2 ${ isCurrentPath(getPath('/kategoria/uchwyty-meblowe'))
                     ? 'inline'
                     : 'hidden group-hover:inline'
                     }`}
@@ -70,14 +80,14 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href={getPath('/kategoria/klamki')} legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/klamki'
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${isCurrentPath(getPath('/kategoria/klamki'))
                   ? 'bg-beige-light text-dark-pastel-red'
                   : ''
                   }`}
               >
-                <span className="p-2">Klamki</span>
+                <span className="p-2">{t.links.categories.doorHandles.label}</span>
                 <span
-                  className={`ml-2 ${currentPath === '/kategoria/klamki'
+                  className={`ml-2 ${ isCurrentPath(getPath('/kategoria/klamki')) 
                     ? 'inline'
                     : 'hidden group-hover:inline'
                     }`}
@@ -95,14 +105,14 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href={getPath('/kategoria/wieszaki')} legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/wieszaki'
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${isCurrentPath(getPath('/kategoria/wieszaki'))
                   ? 'bg-beige-light text-dark-pastel-red'
                   : ''
                   }`}
               >
                 <span className="p-2">{t.links.categories.wallHooks.label}</span>
                 <span
-                  className={`ml-2 ${currentPath === '/kategoria/wieszaki'
+                  className={`ml-2 ${ isCurrentPath(getPath('/kategoria/wieszaki')) 
                     ? 'inline'
                     : 'hidden group-hover:inline'
                     }`}
@@ -120,14 +130,14 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href={getPath('/kategoria/meble')} legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kategoria/meble'
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${isCurrentPath(getPath('/kategoria/meble'))
                   ? 'bg-beige-light text-dark-pastel-red'
                   : ''
                   }`}
               >
-                <span className="p-2">Meble</span>
+                <span className="p-2">{t.links.categories.furniture.label}</span>
                 <span
-                  className={`ml-2 ${currentPath === '/kategoria/meble'
+                  className={`ml-2 ${ isCurrentPath(getPath('/kategoria/meble'))
                     ? 'inline'
                     : 'hidden group-hover:inline'
                     }`}
@@ -146,12 +156,12 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href={getPath('/kolekcje')} legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/kolekcje'
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${isCurrentPath(getPath('/kolekcje'))
                   ? 'bg-beige-light text-dark-pastel-red'
                   : ''
                   }`}
               >
-                <span className="p-2">Kolekcje</span>
+                <span className="p-2">{t.links.categories.collections.label}</span>
               </a>
             </Link>
           </li>
@@ -159,12 +169,12 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
             <Link href={getPath('/o-nas')} legacyBehavior>
               <a
                 onClick={toggleMenu}
-                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${currentPath === '/o-nas'
+                className={`group flex items-center justify-between rounded-[25px] transition-colors duration-200 hover:bg-beige-light hover:text-dark-pastel-red ${isCurrentPath(getPath('/o-nas'))
                   ? 'bg-beige-light text-dark-pastel-red'
                   : ''
                   }`}
               >
-                <span className="p-2">O nas</span>
+                <span className="p-2">{t.links.pages.about.label}</span>
               </a>
             </Link>
           </li>

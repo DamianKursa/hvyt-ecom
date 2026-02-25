@@ -3,9 +3,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { getCurrentLanguage } from '@/utils/i18n/config';
+import { useRouter } from 'next/router';
 
 const SearchComponent = ({ onClose }: { onClose: () => void }) => {
-  const { t } = useI18n();
+  const { t, getPath } = useI18n();
+  const router = useRouter();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -89,7 +91,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
 
     try {
       const res = await fetch(
-        `/api/woocommerce?action=searchProducts&query=${encodeURIComponent(normalizedQuery)}&lang=${getCurrentLanguage()}`,
+        `/api/woocommerce?action=searchProducts&query=${encodeURIComponent(normalizedQuery)}&lang=${router.locale}`,
       );
       if (!res.ok) {
         throw new Error('Error fetching search results');
@@ -150,7 +152,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {results.map((product) => (
                   <Link
-                    href={`/produkt/${product.slug}`}
+                    href={`${getPath('/produkt')}/${product.slug}`}
                     key={product.id}
                     passHref
                   >
@@ -196,10 +198,10 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
             {/* Top clicked products (before Kolekcje), same card style */}
             {topClicked && topClicked.length > 0 && (
               <div className="w-3/10">
-                <h3 className="text-sm font-semibold mb-2">Najczęściej wyszukiwane</h3>
+                <h3 className="text-sm font-semibold mb-2">{t.search.mostSearched}</h3>
                 <div className="grid grid-cols-3 gap-4">
                   {topClicked.slice(0, 3).map((p) => (
-                    <Link href={`/produkt/${p.slug}`} key={p.id} passHref>
+                    <Link href={`${getPath('/produkt')}/${p.slug}`} key={p.id} passHref>
                       <div
                         className="flex flex-col items-start text-start cursor-pointer"
                         onClick={() => {
@@ -228,7 +230,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
             <div className="w-3/10">
               <h3 className="text-sm font-semibold mb-2">{t.search.whatsNew}</h3>
               {latestKolekcja && (
-                <Link href={`/kolekcje/${latestKolekcja.slug}`} passHref>
+                <Link href={`${getPath('/kolekcje')}/${latestKolekcja.slug}`} passHref>
                   <div
                     className="flex flex-col items-start text-start cursor-pointer"
                     onClick={onClose}

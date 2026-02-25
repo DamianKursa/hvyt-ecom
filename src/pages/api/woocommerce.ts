@@ -219,17 +219,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       case 'searchProducts': {
-        const { query, perPage } = req.query;
+        const { query, perPage, lang } = req.query;
         const q = query as string;
         const pp = perPage ? parseInt(perPage as string, 10) : 10;
 
         if (!q) return res.status(400).json({ error: 'Invalid query' });
 
-        const cacheKey = `searchProducts:${q}:${pp}`;
+        const cacheKey = `searchProducts:${q}:${pp}:${lang}`;
         const cached = await getCache(cacheKey);
         if (cached) return res.status(200).json(cached);
 
-        const result = await searchProducts(q, pp, getCurrentLanguage());
+        const result = await searchProducts(q, pp, lang as string);
         await setCache(cacheKey, result, CACHE_TTL);
         return res.status(200).json(result);
       }

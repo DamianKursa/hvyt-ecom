@@ -591,6 +591,7 @@ export const en: Translations = {
     less: 'Less',
     more: 'More',
     removeFilter: 'Remove filter',
+    emptyFilter: 'Clear filters',
     showResults: 'Show',
     bestsellers: 'Bestsellers',
     newest: 'Newest products',
@@ -598,7 +599,9 @@ export const en: Translations = {
     lowestPrice: 'Lowest price',
     sorting: 'Sorting',
     choose: 'Choose',
-    apply: 'Apply'
+    apply: 'Apply',
+    show: 'Show',
+    products: 'products',
   },
   // === INDEX / HOME PAGE ===
   index: {
@@ -647,7 +650,8 @@ export const en: Translations = {
     noResults: 'No results for',
     noResultsDetails: 'Please try again using different spelling or keywords.',
     whatsNew: 'What\'s new?',
-    searchResults: 'Search results'
+    searchResults: 'Search results',
+    mostSearched: 'Most searched'
   },
     // === ZAMÓWIENIE ===
     order: {

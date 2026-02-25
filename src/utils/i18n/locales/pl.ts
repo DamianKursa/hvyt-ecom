@@ -587,6 +587,7 @@ export const pl = {
       less: 'Mniej',
       more: 'Więcej',
       removeFilter: 'Usuń filtr',
+      emptyFilter: 'Wyczyść filtry',
       showResults: 'Pokaż',
       bestsellers: 'Bestsellers',
       newest: 'Najnowsze produkty',
@@ -594,7 +595,9 @@ export const pl = {
       lowestPrice: 'Najniższa cena',
       sorting: 'Sortowanie',
       choose: 'Wybierz',
-      apply: 'Zastosuj'
+      apply: 'Zastosuj',
+      show: 'Pokaż',
+      products: 'produktów',
     },    
     // === STRONA GŁÓWNA / INDEX ===
     index: {
@@ -644,6 +647,7 @@ export const pl = {
       noResultsDetails: 'Spróbuj ponownie używając innej pisowni lub słów kluczowych.',
       whatsNew: 'Co nowego?',
       searchResults: 'Wyniki wyszukiwania',
+      mostSearched: 'Najczęściej wyszukiwane'
     },
     // === ZAMÓWIENIE ===
     order: {

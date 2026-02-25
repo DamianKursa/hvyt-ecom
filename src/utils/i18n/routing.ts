@@ -25,6 +25,8 @@ const slugMap: Record<string, { pl: string; en: string }> = {
   'zwroty-i-reklamacje': { pl: 'zwroty-i-reklamacje', en: 'returns' },
   'regulamin': { pl: 'regulamin', en: 'terms' },
   'polityka-prywatnosci': { pl: 'polityka-prywatnosci', en: 'privacy-policy' },
+  'produkty': { pl: 'produkty', en: 'products' },
+  'produkt': { pl: 'produkt', en: 'product' },
   'kolekcje': { pl: 'kolekcje', en: 'collections' },
   'blog': { pl: 'blog', en: 'blog' },
   'koszyk': { pl: 'koszyk', en: 'cart' },
