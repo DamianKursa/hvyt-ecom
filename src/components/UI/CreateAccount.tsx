@@ -1,3 +1,4 @@
+import { useI18n } from '@/utils/hooks/useI18n';
 import React, { useState } from 'react';
 
 interface CreateAccountProps {
@@ -5,6 +6,9 @@ interface CreateAccountProps {
 }
 
 const CreateAccount: React.FC<CreateAccountProps> = ({ onSave }) => {
+
+  const {t} = useI18n();
+
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState('');
@@ -15,7 +19,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onSave }) => {
     onSave({ password: value });
 
     if (value.length < 8) {
-      setPasswordError('Hasło musi mieć co najmniej 8 znaków.');
+      setPasswordError(t.auth.passwordMinLength);
     } else {
       setPasswordError('');
     }
@@ -25,8 +29,8 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onSave }) => {
     <div className="rounded-[16px] bg-[#E1DFE080] my-6 p-[12px]">
       <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-8">
         <div>
-          <h3 className="text-[20px] font-semibold mb-2">Stwórz konto</h3>
-          <p className="text-[18px]">I zaoszczędź przy kolejnym zamówieniu</p>
+          <h3 className="text-[20px] font-semibold mb-2">{t.checkout.createAccount}</h3>
+          <p className="text-[18px]">{t.checkout.createAccountMessage}</p>
         </div>
         <div className="text-center">
           <div className="relative">
@@ -35,7 +39,7 @@ const CreateAccount: React.FC<CreateAccountProps> = ({ onSave }) => {
               value={password}
               onChange={handlePasswordChange}
               className={`w-full border-b ${passwordError ? 'border-red-500' : 'border-black'} p-2 focus:outline-none placeholder:font-light placeholder:text-black bg-transparent`}
-              placeholder="Hasło"
+              placeholder={t.auth.password}
               required
             />
             <img

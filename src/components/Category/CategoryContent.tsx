@@ -207,7 +207,85 @@ HVYT – nowi najlepsi przyjaciele Twojego domu.</p>`,
       "title": "Decorative Furniture Handles",
       "content": "<p>Imagine a situation where you are faced with choosing a furniture handle. You're standing, although you're actually sitting comfortably on the couch, browsing our site. Your attention is drawn to the FRIDA EDGE Handle, because its form is not obvious, and the very idea of installing an edge handle seems innovative. We'll let you in on a secret: it's a solution as old as the hills, but we agree on one thing – this handle is exceptional. Decorative furniture handles have the advantage over 'ordinary' ones in that they attract attention. Thanks to them, when you invite the family for the holidays, you will never again hear: 'Oh boy, you could at least paint these handles' or 'Honey, maybe I'll send you a transfer so you could buy yourself new handles.'</p>\n<p>Need a furniture handle right away? Check out our offer and choose a product tailored to your interior. A set of filters will help you with this, allowing you to specify the style, material, color, and price range. Don't think too long and go <strong>for HVYT furniture handles!</strong></p>\n<p>Also see <a href=\"\">door handles</a> in our offer.</p>"
     }
-  ]  
+  ],
+  "door-handles": [
+      {
+        title: 'Door Handles',
+        content: `
+          <p>A door handle – an underappreciated yet crucial part of your home's equipment! It can take various shapes, be more or less elaborate, but its main characteristic must be functionality. For this reason, HVYT door handles have a rather classic form (with minor exceptions for those who like to go wild), feature a mechanism that assists the lock's operation, and are easy to match with various types of interiors. Additionally, they are available at an affordable price, which allows you to invest in slightly more expensive doors.</p>`,
+      },
+      {
+        title: 'Interior Door Handles',
+        content: `
+          <p>The topic of handles is a tricky one, where the final say always belongs to the woman. There's nothing wrong with that; just imagine a scenario where a man decides on the choice of interior door handles. He grabs the first one he sees, adds it to the cart, pays, the courier delivers the package, and then it turns out that his wife's vision for the room's decor was completely different. An argument is guaranteed, and stress makes you age faster. That's precisely why it's better to leave the choice of handle to the fairer sex. You'll live longer, and let's face it – gentlemen will forget it was even changed after a few hours anyway.</p>
+
+          <p>The matter is quite different when it comes to stylish interior door handles. Here, gentlemen, to impress their partners, can check current trends, learning from the mistakes of the previous replacement, and choose a handle that will be a true work of art. One such product is the NIKE Handle available in our offer. It's a high-quality brass handle manufactured by the renowned Italian company Frosio Bortolo. Its design refers to the retro style, but it will also work well in modernly decorated interiors. Once installed on your door, your home will feel like a palace, something your beloved is sure to appreciate.</p>`,
+      },
+      {
+        title: 'Room Door Handles – HVYT',
+        content: `
+  <p>Concluding these tales, we would simply like to convey that it's worth choosing HVYT handles. These are truly great handles for room doors, which can also be installed in the kitchen, bathroom, or living room. An affordable price and a modern design make our products real gems in the online store of diversity. The black GABI and INOX door handles deserve special attention; thanks to their galvanic coating, they are extremely durable and resistant to mechanical damage.</p>
+  <p>Each set includes two handles (right, left) and mounting accessories. Whether you're looking for a fairytale handle or an ordinary, practical one, we encourage you to check out our offer. We are here to meet the expectations of demanding wives, soothe the anxious hearts of husbands, and ensure the safety of the youngest by selling the highest quality door handles.</p>
+  <p>Also, check out our wall hooks in our offer.</p>`,
+      },
+    ],
+'wall-hooks': [
+    {
+      title: 'Wall Hooks',
+      content: `
+        <p>A wall hook should be durable, useful, and beautifully designed, serving not only its intended function but also becoming a decoration for the home. HVYT hallway wall hooks are unique products that not only hold the clothing items hung on them perfectly but also look great. They are available in various sizes and shapes, making it easy to match them to a specific spot on the wall.</p>`,
+    },
+    {
+      title: 'Hallway Wall Hooks',
+      content: `
+        <p>The hallway. A room where we may not spend too much time, but we pass through it every day. This is where we hurriedly throw on a coat on colder days and take it off even faster when returning home after a hard day's work. In summer, we limit ourselves to just hanging keys on the hook or energetically removing a handbag from it in search of a wallet, which doesn't change the fact that hallway wall hooks experience a true armageddon with us. Several times a day they are unloaded and occupied, which is why it's so important to choose ones that won't get offended after a month. Broken elements and loosened mountings are a common problem that can be easily solved.</p>
+<p>How to achieve this? By choosing modern HVYT hallway wall hooks. Most of our hooks are made from a zinc and aluminum alloy, which ensures their durability and unique shape. Zamak, as this material is commonly known, is characterized by extraordinary plasticity and, consequently, ease of processing. We utilize its properties in the production of our wall hooks, constantly devising newer forms that will fit perfectly into industrial, minimalist, and Scandinavian style interiors.</p>`,
+    },
+    {
+      title: 'Metal Wall-Mounted Clothes Hooks',
+      content: `
+<p>However, the HVYT brand is not only about designer products straight out of Hollywood. In our offer, we also have more down-to-earth options, such as the MODERN Hook, which resembles classic wall hooks and is made 100% from metal. A metal wall-mounted clothes hook not only holds items hung on it excellently but also looks great while not being too conspicuous. It's a bit like a forgotten friend we can always count on.</p>
+<p>Each set includes the hook and mounting screws. If you're looking for a wall hook that will endure a lot and still want to remain in your hallway, be sure to check out our offer. We are here to inspire passion for unobvious shapes and help you find true interior design friends.</p>
+<p>Also, check out our furniture knobs in our offer.</p>`,
+    },
+  ],
+'knobs': [
+    {
+      title: 'Furniture Knobs',
+      content: `
+        <p>Are you furnishing your apartment and don't know how to give it an individual character? Or maybe you're tired of the old one and looking for elements that will change something? We have a solution! HVYT furniture knobs are what you need. Unobvious shapes, vibrant colors, a variety of materials and sizes - that's who we are. A little bit crazy, just like our furniture knobs.</p>`,
+    },
+    {
+      title: 'Kitchen Cabinet Knobs',
+      content: `
+        <p>The kitchen is definitely the best space for gatherings. Both interpersonal and culinary. The aromas floating in the air can transport you to distant lands, making us forget our worries, even if just for a moment. Cooking together is a favorite form of entertainment for some, and kitchen cabinet knobs are the silent observers of these activities. Why are we writing about this? Because it's not at all obvious that small things have great power within them.</p>`,
+    },
+    {
+      title: 'Children\'s Furniture Knobs',
+      content: `
+<p>A children's room is an absolutely magical place. It's where family bonds are built, children's problems are solved, and you laugh until you can't breathe while looking for tickles. Furniture in a children's room acts as storage units that can hold everything: clothes, toys, and books. Children's furniture knobs must therefore have two functions: be handy and safe for little users.</p>`,
+    },
+  ],
+
+'furniture': [
+    {
+      title: 'HVYT Furniture – Your Home´s New Best Friends',
+      content: `
+        <p>Are you looking for furniture that isn´t just a backdrop for your interior, but its hero? With us, you´ll find pieces that have personality, character, and a sense of style. They not only look good but also perform excellently on a daily basis – no complaining, no squeaking, but with class. Because HVYT furniture is not just about design. It´s about your home´s new best friends.</p>`,
+    },
+    {
+      title: 'Emma, Jamie, Axel, Sol – Get to Know Them Better',
+      content: `
+        <p>Emma is a media console that knows how to make an impression – veneer, continuous grain, thick boards, and a click-clack system. Delivered fully assembled, ready to relax with you and your remote control. Jamie, on the other hand, is a bedside table with character – black veneer, a drawer that opens from the bottom, and an optional knob if you like classics with a twist. Axel – that little minimalist clever one – comes in natural or stained oak, as well as lacquered MDF in olive and chestnut. Simple, compact, but with a wow effect. And Sol? Now that´s a personality! Powder-coated steel in cream and a ball made of lacquered wood in a chestnut shade. Rounded forms, an unusual color combination, and lots of charm.</p>`,
+    },
+    {
+      title: 'Design That Stays Longer',
+      content: `
+<p>All our furniture is made in Poland from the best materials. They combine beauty with functionality and are ready to become part of your everyday life. They don´t require assembly, but they provide a lot of satisfaction – in daily use and in seeing how good they look.
+
+HVYT – Your Home´s New Best Friends.</p>`,
+    },
+  ],
 };
 
 export type { Section };

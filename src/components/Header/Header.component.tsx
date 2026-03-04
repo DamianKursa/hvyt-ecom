@@ -281,7 +281,7 @@ const Navbar: React.FC<IHeaderProps> = ({ title }) => {
               {/* Right Icons */}
               <div className="flex-none">
                 <div
-                  className="flex items-center space-x-4 px-6 py-2 rounded-full h-[50px]"
+                  className="flex items-center space-x-4 px-3 md:px-6 py-2 rounded-full h-[50px]"
                   style={{ backgroundColor: '#E9E5DFCC' }}
                 >
                   {isCompact ? (

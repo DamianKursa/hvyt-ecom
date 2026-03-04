@@ -149,6 +149,11 @@ export const pl = {
         title_4: 'Jeśli nie wiesz, który model jest dla Ciebie odpowiedni – napisz do nas.',
       },
     },
+    // === POLITYKA PRYWATNOSCI ===
+    privacyPolicy: {
+      title: 'Polityka Prywatnosci i plików cookies',
+      subtitle: 'Pełna treść Polityki Prywatności Sklepu Internetowego HVYT.',
+    },
     // === WSPÓLNE ===
     common: {
       error: 'Błąd',
@@ -395,6 +400,7 @@ export const pl = {
       deliveryAndPayment: 'Dostawa i płatność',
       hasAccount: 'Masz już konto? Zaloguj się',
       createAccount: 'Stwórz konto',
+      createAccountMessage: 'I zaoszczędź przy kolejnym zamówieniu',
       shippingAddress: {
         loadingAddresses: 'Ładowanie adresów...',
         streetName: 'Nazwa ulicy',

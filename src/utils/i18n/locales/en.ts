@@ -149,6 +149,11 @@ export const en: Translations = {
         title_4: 'If you don\'t know which model is right for you, write to us.',
       },      
     },
+    // === PRIVACY POLICY ===
+    privacyPolicy: {
+      title: 'Privacy Policy and Cookie Policy',
+      subtitle: 'Full text of the HVYT Online Store Privacy Policy.',
+    },    
     // === COMMON ===
     common: {
       error: 'Error',
@@ -303,7 +308,7 @@ export const en: Translations = {
         phone: 'Phone number',
         email: 'Email address',
         newsletterSubscribe: 'Subscribe to newsletter',
-        createAccount: 'Create account',
+        createAccount: 'Create account',     
       },
       address: {
         title: 'Address',
@@ -394,6 +399,7 @@ export const en: Translations = {
       deliveryAndPayment: 'Delivery & Payment',
       hasAccount: 'Already have an account? Sign in',
       createAccount: 'Create account',
+      createAccountMessage: 'And save on your next order',   
       shippingAddress: {
         loadingAddresses: 'Loading addresses...',
         streetName: 'Street name',
