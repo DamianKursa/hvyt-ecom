@@ -17,7 +17,7 @@ const SearchComponent = ({ onClose }: { onClose: () => void }) => {
     async function fetchTop() {
       try {
         const base = process.env.NEXT_PUBLIC_WORDPRESS_URL || 'https://wp.hvyt.pl';
-        const res = await fetch(`${base}/wp-json/hvyt/v1/top-clicked-products`);
+        const res = await fetch(`${base}/wp-json/hvyt/v1/top-clicked-products?lang=${router.locale}`);
         if (res.ok) {
           const data = await res.json();
           setTopClicked(Array.isArray(data) ? data : []);
