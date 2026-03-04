@@ -14,15 +14,18 @@ const WooCommerceAPI = axios.create({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
+
+    const { lang } = req.query;
+
     try {
-      const cacheKey = 'payment_methods';
+      const cacheKey = `payment_methods:${lang}`;
 
       let cachedPaymentMethods = await getCache(cacheKey);
       if (cachedPaymentMethods) {
         return res.status(200).json(cachedPaymentMethods);
       }
       
-      const paymentResponse = await WooCommerceAPI.get('/payment_gateways');
+      const paymentResponse = await WooCommerceAPI.get(`/payment_gateways?lang=${lang}`);
       const paymentMethods = paymentResponse.data;
 
       if (!paymentMethods || paymentMethods.length === 0) {

@@ -83,7 +83,7 @@ const Checkout: React.FC = () => {
 
   useEffect(() => {
     if (!cart || cart.products.length === 0) {
-      router.push('/koszyk');
+      router.push(getPath('/koszyk'));
     }
   }, [cart, router]);
 

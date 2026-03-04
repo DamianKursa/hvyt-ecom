@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useUserContext } from '@/context/UserContext';
 import { useI18n } from '@/utils/hooks/useI18n';
@@ -6,13 +6,14 @@ import { useI18n } from '@/utils/hooks/useI18n';
 const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
   onForgotPassword,
 }) => {
-  const { t } = useI18n();
-  const [formData, setFormData] = useState({ username: '', password: '' });
+  const { t, getPath } = useI18n();
+  const router = useRouter();
+  const [formData, setFormData] = useState({ username: '', password: '', lang: router.locale });
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter();
+
   const { setUser } = useUserContext();
   const { redirect } = router.query as { redirect?: string };
 
@@ -35,7 +36,7 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
-        router.push(redirect && redirect.length > 0 ? redirect : '/moje-konto/moje-zamowienia');
+        router.push(redirect && redirect.length > 0 ? redirect : getPath('/moje-konto/moje-zamowienia'));
       } else {
         const data = await response.json();
         const cleanedMessage =
@@ -50,6 +51,10 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setFormData((prev) => ({ ...prev, lang: router.locale }));
+  }, [router.locale]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

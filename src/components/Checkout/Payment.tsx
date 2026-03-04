@@ -40,7 +40,7 @@ const Payment: React.FC<PaymentProps> = ({
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch('/api/payment');
+        const response = await fetch(`/api/payment?lang=${router.locale}`);
         if (!response.ok) {
           throw new Error(t.checkout.payment.errorLoading);
         }

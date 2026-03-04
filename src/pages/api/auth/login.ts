@@ -8,11 +8,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: `Method ${req.method} Not Allowed` });
   }
 
-  const { username, password } = req.body;
+  const { username, password, lang } = req.body;
 
   try {
     const response = await axios.post(
-      `${process.env.WORDPRESS_API_URL}/wp-json/jwt-auth/v1/token`,
+      `${process.env.WORDPRESS_API_URL}/wp-json/jwt-auth/v1/token?lang=${lang}`,
       { username, password }
     );
 
