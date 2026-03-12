@@ -18,6 +18,7 @@ import { pushGTMEvent } from '@/utils/gtm';
 import CreateAccount from '@/components/UI/CreateAccount';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { getCurrencySlugByLocale } from '@/config/currencies';
+import { ShippingCountryItem } from '@/types/checkout';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -68,7 +69,9 @@ const Checkout: React.FC = () => {
     additionalInfo: '',
   });
 
-  const [selectedZone, setSelectedZone] = useState('poland');
+  const [selectedZone, setSelectedZone] = useState<number>(1);
+  const [selectedCountry, setSelectedCountry] = useState<ShippingCountryItem | null>({code: 'PL', name: 'Polska', zoneId: 1});
+  const [countryList, setCountryList] = useState<ShippingCountryItem[]>([]);
 
   const [isShippingDifferent, setIsShippingDifferent] = useState(false);
   const externalAnonId = useContext(ExternalIdContext);
@@ -105,6 +108,28 @@ const Checkout: React.FC = () => {
       }
     };
 
+    const fetchCoutriesWithShippingZones = async () => {
+      try {
+        const result = await fetch('/api/shipping?action=fetchShippingCountries&lang=' + router.locale);
+        if(!result.ok) {
+          throw new Error(`Failed to fetch countries: ${result.status}`);
+        }
+        const data = await result.json();
+        console.log('Fetched Shipping Countries:', data);
+
+        const countries = data.map((c: ShippingCountryItem) => ({
+          code: c.code,
+          name: c.name,
+          zoneId: c.zoneId
+        }));
+        
+        setCountryList(countries);        
+
+      } catch (err) {
+        console.error('Error fetching shipping countries:', err);
+      }
+    }
+    fetchCoutriesWithShippingZones();
     fetchShippingMethods();
   }, []);
 
@@ -640,6 +665,9 @@ const Checkout: React.FC = () => {
                 setSaveAddress={setSaveAddress}
                 setSelectedZone={setSelectedZone}
                 user={user}
+                countriesList={countryList}
+                selectedCountry={selectedCountry}
+                setSelectedCountry={setSelectedCountry}
               />
             </div>
             <div className="mt-8">

@@ -12,6 +12,7 @@ interface ShippingMethod {
 }
 
 interface ShippingZone {
+  zoneId: number;
   zoneName: string;
   methods: ShippingMethod[];
 }
@@ -27,7 +28,7 @@ interface ShippingProps {
   cart: any;
   selectedGlsPoint: any;
   setSelectedGlsPoint: React.Dispatch<React.SetStateAction<any>>;
-  selectedZone: string,
+  selectedZone: number,
 }
 
 // Extend the Window interface for TypeScript
@@ -230,7 +231,7 @@ const Shipping: React.FC<ShippingProps> = ({
 
         if (hasEmmaZadbano) {
           const zadbanoMethods = buildZadbanoMethods();
-          setShippingZones([{ zoneName: 'Zadbano', methods: zadbanoMethods }]);
+          setShippingZones([{ zoneName: 'Zadbano', methods: zadbanoMethods, zoneId: selectedZone }]);
           const defaultMethod = zadbanoMethods[0];
           if (defaultMethod) {
             setShippingMethod(defaultMethod.id);
@@ -247,11 +248,13 @@ const Shipping: React.FC<ShippingProps> = ({
         }
         const data = await response.json();
 
-        const selectedZoneData = data.filter((zone: ShippingZone) =>
-          selectedZone === 'poland' ? 
-            ( zone.zoneName.toLowerCase().includes('polska') || zone.zoneName.toLowerCase().includes('poland') ) :
-            ( ! zone.zoneName.toLowerCase().includes('polska') && ! zone.zoneName.toLowerCase().includes('poland') )
-        );
+        // const selectedZoneData = data.filter((zone: ShippingZone) =>
+        //   selectedZone === 'poland' ? 
+        //     ( zone.zoneName.toLowerCase().includes('polska') || zone.zoneName.toLowerCase().includes('poland') ) :
+        //     ( ! zone.zoneName.toLowerCase().includes('polska') && ! zone.zoneName.toLowerCase().includes('poland') )
+        // );
+
+        const selectedZoneData = data.filter((zone: ShippingZone) => zone.zoneId === selectedZone);
       
         // Check if coupon has free shipping enabled OR specific coupons are applied
         const hasFreeShipCoupon =
@@ -387,7 +390,6 @@ const Shipping: React.FC<ShippingProps> = ({
         });
 
         console.log('cartContainsRestricted:', cartContainsRestricted);
-        console.log('updatedZones:', updatedZones);
 
         setShippingZones(updatedZones);
       } catch (err) {

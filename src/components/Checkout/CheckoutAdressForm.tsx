@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Checkbox from '@/components/UI/Checkbox';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { getShippingCountries } from '@/utils/api/shipping';
+import { useRouter } from 'next/router';
+import { ShippingCountryItem } from '@/types/checkout';
 
 export interface CheckoutAddressFormProps {
   billingData: {
@@ -55,8 +58,12 @@ export interface CheckoutAddressFormProps {
   setIsShippingDifferent: React.Dispatch<React.SetStateAction<boolean>>;
   saveAddress: boolean;
   setSaveAddress: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelectedZone: React.Dispatch<React.SetStateAction<string>>;
+  // setSelectedZone: React.Dispatch<React.SetStateAction<string>>;
   user: any;
+  countriesList: ShippingCountryItem[];
+  selectedCountry: ShippingCountryItem | null;
+  setSelectedZone: React.Dispatch<React.SetStateAction<number>>;
+  setSelectedCountry: React.Dispatch<React.SetStateAction<ShippingCountryItem | null>>;
 }
 
 const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
@@ -70,8 +77,12 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   setSaveAddress,
   setSelectedZone,
   user,
+  countriesList = [],
+  selectedCountry,
+  setSelectedCountry,
 }) => {
   const { t } = useI18n();
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
   const [needVATInvoice, setNeedVATInvoice] = useState<boolean>(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -169,6 +180,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
     const fetchAddresses = async () => {
       setLoading(true);
       try {
+
         const response = await fetch('/api/moje-konto/adresy', {
           method: 'GET',
           credentials: 'include',
@@ -349,19 +361,24 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         <div className="relative w-full">
           <select
             required
-            value={billingData.country}
+            value={selectedCountry?.code || 'PL'}
             onFocus={() => setFocusedField('country')}
             onBlur={() => setFocusedField(null)}
             onChange={
               (e) => {
-                setBillingData((prev) => ({ ...prev, country: e.target.value })); 
-                setSelectedZone(e.target.value); console.log('shipping: ' , e.target.value); 
+                const selected = countriesList.find(c => c.code === e.target.value);
+                setBillingData((prev) => ({ ...prev, country: selected?.name || 'Brak' })); 
+                setSelectedZone(selected?.zoneId || 0);
+                setSelectedCountry(selected || null);
               }
             }
             className="w-full text-[#363132] font-light border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
           >
-            <option value="poland">{t.checkout.shippingLocationPoland}</option>
-            <option value="other">{t.checkout.shippingLocationOther}</option>
+            {countriesList.map((country) => (
+              <option key={country.code} value={country.code} selected={selectedCountry?.code === country.code}>
+                {country.name}
+              </option>
+            ))}
           </select>
           <svg xmlns="http://www.w3.org/2000/svg" className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#969394] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

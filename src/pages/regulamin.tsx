@@ -1,10 +1,41 @@
 // pages/regulamin.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Layout from '@/components/Layout/Layout.component';
 import ExpandableSection from '@/components/UI/ExpandableSection';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { useRouter } from 'next/router';
 
 const Regulamin = () => {
+
+  // const postID = {
+  //   pl: 0000000,
+  //   en: 0000000
+  // };
+
+  // const {t, getPath} = useI18n();
+  // const router = useRouter();
+
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [pageData, setPageData] = useState<any>(null);
+  
+  // useEffect(()=> {
+  //   const fetchPageData = async () => {
+  //     setIsLoading(true);
+  //     try {
+  //       const response = await fetch(`/api/pages/page?pageId=${postID[router.locale as keyof typeof postID]}`);
+  //       const data = await response.json();
+  //       setPageData(data);
+        
+  //     } catch (error) {
+  //       console.error('Error fetching page data:', error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+  //   fetchPageData();
+  // }, [router.locale]);
+
   const chapters = [
     {
       title: 'ROZDZIAŁ I – INFORMACJE OGÓLNE',
