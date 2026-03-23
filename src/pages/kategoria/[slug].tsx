@@ -213,7 +213,7 @@ const CategoryPage = ({
     if (activeFilters.length > 0) {
       return `/api/category?action=fetchProductsWithFilters&categoryId=${category.id}&lang=${getCurrentLanguage()}&filters=${encodeURIComponent(
         JSON.stringify(activeFilters),
-      )}&page=${currentPage}&perPage=12`;
+      )}&page=${currentPage}&perPage=12&lang=${router.locale}`;
     } else if (sortingOption.key !== 'sort') {
       const sortingMap: Record<string, { orderby: string; order: string }> = {
         'bestseller': { orderby: 'popularity', order: 'desc' },

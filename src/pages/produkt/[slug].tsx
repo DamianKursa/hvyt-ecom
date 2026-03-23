@@ -520,6 +520,9 @@ const ProductPage = () => {
       currency: currentCurrency.code,      // 'PLN' lub 'EUR'
       currencySymbol: currentCurrency.symbol, // 'zł' lub '€'
       lang: currentLang,                   // 'pl' lub 'en'
+
+      shipping_class: product.shipping_class,
+      shipping_class_id: product.shipping_class_id,
     };
 
     addCartItem(cartItem);

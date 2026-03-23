@@ -1,15 +1,10 @@
 import { getCurrency, Language } from '@/utils/i18n/config';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, Key } from 'react';
 import { useI18n } from '@/utils/hooks/useI18n';
-
-interface ShippingMethod {
-  id: string;
-  method_id?: string;
-  title: string;
-  cost: string | number | null; // Handle different types of cost
-  enabled: boolean;
-}
+import { ShippingMethod } from '@/types/checkout';
+import { Product } from '@/stores/CartProvider';
+import { getCurrencySlugByLocale } from '@/config/currencies';
 
 interface ShippingZone {
   zoneId: number;
@@ -18,8 +13,8 @@ interface ShippingZone {
 }
 
 interface ShippingProps {
-  shippingMethod: string;
-  setShippingMethod: React.Dispatch<React.SetStateAction<string>>;
+  shippingMethod: ShippingMethod;
+  setShippingMethod: React.Dispatch<React.SetStateAction<ShippingMethod>>;
   setShippingPrice: React.Dispatch<React.SetStateAction<number>>;
   setShippingTitle: React.Dispatch<React.SetStateAction<string>>;
   setSelectedLocker: React.Dispatch<React.SetStateAction<string>>;
@@ -148,28 +143,47 @@ const hasCoupon = (cart: any, code: string): boolean => {
   return false;
 };
 
-const EMMA_ZADBANO_PRODUCT_IDS = new Set([
-  '7563916',
-  '7564076',
-  '7564079',
-]);
+// ZADBANO SHIPPING METHODS IDS (synchronizacja z Woocommerce)
+/*
+  14 - Zadbano
+  16 - Zadbano z wniesieniem
+*/
+const ZADBANO_SHIPPING_METHODS_IDS = [14, 16];
 
-const buildZadbanoMethods = (): ShippingMethod[] => [
-  {
-    id: 'zadbano_bez_wniesienia',
-    method_id: 'free_shipping',
-    title: 'Zadbano (bez wniesienia)',
-    cost: 0,
-    enabled: true,
-  },
-  {
-    id: 'zadbano_z_wniesieniem',
-    method_id: 'flat_rate',
-    title: 'Zadbano z wniesieniem',
-    cost: 99,
-    enabled: true,
-  },
-];
+// SHIPPING METHODS WITHOUT FREE SHIPPING (synchronizacja z Woocommerce)
+/*
+  3 - GLS Pobranie
+*/
+const NON_FREE_SHIPPING_METHODS_IDS = [3];
+
+// FREE SHIPPING LIMITS
+const FREE_SHIPPING_LIMITS:Record<string, number> = {
+  PLN: 300,
+  EUR: 70,
+};
+
+// const EMMA_ZADBANO_PRODUCT_IDS = new Set([
+//   '7563916',
+//   '7564076',
+//   '7564079',
+// ]);
+
+// const buildZadbanoMethods = (): ShippingMethod[] => [
+//   {
+//     id: 'zadbano_bez_wniesienia',
+//     method_id: 'free_shipping',
+//     title: 'Zadbano (bez wniesienia)',
+//     cost: 0,
+//     enabled: true,
+//   },
+//   {
+//     id: 'zadbano_z_wniesieniem',
+//     method_id: 'flat_rate',
+//     title: 'Zadbano z wniesieniem',
+//     cost: 99,
+//     enabled: true,
+//   },
+// ];
 
 const Shipping: React.FC<ShippingProps> = ({
   shippingMethod,
@@ -185,6 +199,7 @@ const Shipping: React.FC<ShippingProps> = ({
   selectedZone,
 }) => {
   const { t } = useI18n();
+  const [cartShippingClassesIds, setcartShippingClassesIds] = useState<number[]>([]);
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -209,7 +224,40 @@ const Shipping: React.FC<ShippingProps> = ({
   };
 
   const router = useRouter();
-  const currency = getCurrency(router?.locale as Language ?? 'pl');
+  const currency_slug = getCurrencySlugByLocale(router.locale as string);
+
+  const getShippingClassesIdsFromCart = (cart: any): number[] => {
+    if (!cart?.products.length) {
+      return [];
+    }
+
+    return (cart.products as Product[]).map(cartItem => cartItem.shipping_class_id || 0);
+  }
+
+  const getMethodCost = (method: ShippingMethod): number => { 
+    let cost = 0;
+    
+    // sprawdź czy produkt nie należy do klasy wysyłkowej i wybierz najwyższy koszt dostawy
+    method.shipping_classes?.forEach(c => { 
+      if( !cartShippingClassesIds.includes(c.class_id) ||  !c.cost) {
+        return;
+      }
+
+      if(c.cost && Number(c.cost) > cost) {
+        cost = c.cost;
+      }
+    });
+
+    if(!cost || cost) {
+      cost = method.cost ? Number(method.cost) : 0;
+    }
+ 
+    return cost;
+  }
+
+  useEffect(() => {
+    setcartShippingClassesIds(getShippingClassesIdsFromCart(cart));
+  }, [cart])
 
   // ─── FETCH SHIPPING METHODS ──────────────────────────────────────────────
   useEffect(() => {
@@ -218,29 +266,35 @@ const Shipping: React.FC<ShippingProps> = ({
         setLoading(true);
         setError(null);
 
-        const hasEmmaZadbano = cart?.products?.some((product: any) => {
-          const productId = String(product?.productId ?? '');
-          const variationId = product?.variationId
-            ? String(product.variationId)
-            : null;
-          return (
-            EMMA_ZADBANO_PRODUCT_IDS.has(productId) ||
-            (variationId ? EMMA_ZADBANO_PRODUCT_IDS.has(variationId) : false)
-          );
-        });
+        // ZADBANO MEBLE - trzeba uwzględnić wniesienie obecnie w buildZadbanoMethods
 
-        if (hasEmmaZadbano) {
-          const zadbanoMethods = buildZadbanoMethods();
-          setShippingZones([{ zoneName: 'Zadbano', methods: zadbanoMethods, zoneId: selectedZone }]);
-          const defaultMethod = zadbanoMethods[0];
-          if (defaultMethod) {
-            setShippingMethod(defaultMethod.id);
-            setShippingTitle(defaultMethod.title);
-            setShippingPrice(Number(defaultMethod.cost) || 0);
-          }
-          setLoading(false);
-          return;
-        }
+        const hasZadbanoClass = cart?.products?.some((product: any) => {
+          return product?.shipping_class === 'zadbano';
+        });        
+
+        // const hasEmmaZadbano = cart?.products?.some((product: any) => {
+        //   const productId = String(product?.productId ?? '');
+        //   const variationId = product?.variationId
+        //     ? String(product.variationId)
+        //     : null;
+        //   return (
+        //     EMMA_ZADBANO_PRODUCT_IDS.has(productId) ||
+        //     (variationId ? EMMA_ZADBANO_PRODUCT_IDS.has(variationId) : false)
+        //   );
+        // });
+
+        // if (hasEmmaZadbano) {
+        //   const zadbanoMethods = buildZadbanoMethods();
+        //   setShippingZones([{ zoneName: 'Zadbano', methods: zadbanoMethods, zoneId: selectedZone }]);
+        //   const defaultMethod = zadbanoMethods[0];
+        //   if (defaultMethod) {
+        //     setShippingMethod(defaultMethod.id);
+        //     setShippingTitle(defaultMethod.title);
+        //     setShippingPrice(Number(defaultMethod.cost) || 0);
+        //   }
+        //   setLoading(false);
+        //   return;
+        // }
 
         const response = await fetch(`/api/shipping?lang=${router.locale}`);
         if (!response.ok) {
@@ -255,7 +309,7 @@ const Shipping: React.FC<ShippingProps> = ({
         // );
 
         const selectedZoneData = data.filter((zone: ShippingZone) => zone.zoneId === selectedZone);
-      
+
         // Check if coupon has free shipping enabled OR specific coupons are applied
         const hasFreeShipCoupon =
           cart?.coupon?.freeShipping === true ||
@@ -303,85 +357,117 @@ const Shipping: React.FC<ShippingProps> = ({
 
         // update zones by contstrains (only for polish shipping methods)
         let updatedZones = selectedZoneData.map((zone: ShippingZone) => {
-          if(zone.zoneName.toLocaleLowerCase() !== 'polska' && zone.zoneName.toLocaleLowerCase() !== 'poland') {
+          if (zone.zoneName.toLocaleLowerCase() !== 'polska' && zone.zoneName.toLocaleLowerCase() !== 'poland') {
             return zone;
           }
 
           let filteredMethods = zone.methods.filter((method) => {
+
+            // pozostaw Metody Zadbano dla koszyka z produktami Zadbano
+            if(hasZadbanoClass && ! ZADBANO_SHIPPING_METHODS_IDS.includes(Number(method.id)) ) {
+              return false;
+            }
+
+            // usuń Metody Zadbano dla koszyka bez Zadbano
+            if(!hasZadbanoClass && ZADBANO_SHIPPING_METHODS_IDS.includes(Number(method.id))) {
+              return false;
+            }
+
+            // usuń darmowe metody jeżeli nie spełniają wymagań
+            if(!hasZadbanoClass && cartTotal < FREE_SHIPPING_LIMITS[currency_slug] && method.method_id === 'free_shipping') {
+              return false;
+            }
+
+
             // Filter out any 'flexible shipping' references
             if (method.title.toLowerCase().includes('flexible shipping')) {
               return false;
             }
+
+
             // Filter out 'darmowa' if cartTotal < 300 and no free-shipping coupon
-            if (
-              method.title.toLowerCase().includes('darmowa') &&
-              cartTotal < 300 &&
-              !hasFreeShipCoupon
-            ) {
-              return false;
-            }
+            // if (
+            //   method.title.toLowerCase().includes('darmowa') &&
+            //   cartTotal < 300 &&
+            //   !hasFreeShipCoupon
+            // ) {
+            //   return false;
+            // }
             return true;
           });
 
-          // If cartTotal >= 300 or has free shipping coupon, show only a specific set and make appropriate ones free
-          if (cartTotal >= 300 || hasFreeShipCoupon) {
-            const allowed = new Set([
-              'kurier gls',
-              'kurier gls pobranie',
-              'kurier gls - darmowa wysyłka',
-              'darmowa dostawa',
-              'paczkomaty inpost',
-              'punkty gls',
-            ]);
-            // keep only the allowed methods
-            filteredMethods = filteredMethods.filter((method) =>
-              allowed.has(method.title.toLowerCase()),
-            );
-            // make the non-COD ones free
-            filteredMethods = filteredMethods.map((method) => {
-              const t = method.title.toLowerCase();
-              // Make all non-COD methods free (COD = pobranie)
-              const isCOD = t.includes('pobranie');
-              const makeFree = !isCOD;
-              return makeFree ? { ...method, cost: null } : method; // keep COD cost intact
+          // DARMOWA DOSTAWA dla kuponu lub zakupów powyżej FREE_SHIPPING_LIMIT
+          if(cartTotal >= FREE_SHIPPING_LIMITS[currency_slug]) {
+            filteredMethods = filteredMethods.map(method => {
+              return NON_FREE_SHIPPING_METHODS_IDS.includes(Number(method.id)) ?
+                method : {...method, cost: null}
             });
           }
+
+
+
+          // DARMOWA DOSTAWA DLA INPOST oraz Punkt GLS
+
+          // If cartTotal >= 300 or has free shipping coupon, show only a specific set and make appropriate ones free
+          // if (cartTotal >= 300 || hasFreeShipCoupon) {
+          //   const allowed = new Set([
+          //     'kurier gls',
+          //     'kurier gls pobranie',
+          //     'kurier gls - darmowa wysyłka',
+          //     'darmowa dostawa',
+          //     'paczkomaty inpost',
+          //     'punkty gls',
+          //   ]);
+          //   // keep only the allowed methods
+          //   filteredMethods = filteredMethods.filter((method) =>
+          //     allowed.has(method.title.toLowerCase()),
+          //   );
+          //   // make the non-COD ones free
+          //   filteredMethods = filteredMethods.map((method) => {
+          //     const t = method.title.toLowerCase();
+          //     // Make all non-COD methods free (COD = pobranie)
+          //     const isCOD = t.includes('pobranie');
+          //     const makeFree = !isCOD;
+          //     return makeFree ? { ...method, cost: null } : method; // keep COD cost intact
+          //   });
+          // }
 
           // Conditionally add Paczkomaty InPost
-          if (
-            !filteredMethods.some(
-              (method) => method.title.toLowerCase() === 'paczkomaty inpost',
-            ) &&
-            !cartContainsRestricted // add only if no restricted items
-          ) {
-            filteredMethods.push({
-              id: 'paczkomaty_inpost',
-              title: 'Paczkomaty InPost',
-              cost: cartTotal >= 300 || hasFreeShipCoupon ? null : 15,
-              enabled: true,
-            });
-          }
+          // if (
+          //   !filteredMethods.some(
+          //     (method) => method.title.toLowerCase() === 'paczkomaty inpost',
+          //   ) &&
+          //   !cartContainsRestricted // add only if no restricted items
+          // ) {
+          //   filteredMethods.push({
+          //     id: 'paczkomaty_inpost',
+          //     title: 'Paczkomaty InPost',
+          //     cost: cartTotal >= 300 || hasFreeShipCoupon ? null : 15,
+          //     enabled: true,
+          //   });
+          // }
 
           // Conditionally add Punkty GLS
-          if (
-            !filteredMethods.some(
-              (method) => method.title.toLowerCase() === 'punkty gls',
-            ) &&
-            !cartContainsRestricted // add only if no restricted items
-          ) {
-            filteredMethods.push({
-              id: 'punkty_gls',
-              title: 'Punkty GLS',
-              cost: cartTotal >= 300 || hasFreeShipCoupon ? null : 15,
-              enabled: true,
-            });
-          }
+          // if (
+          //   !filteredMethods.some(
+          //     (method) => method.title.toLowerCase() === 'punkty gls',
+          //   ) &&
+          //   !cartContainsRestricted // add only if no restricted items
+          // ) {
+          //   filteredMethods.push({
+          //     id: 'punkty_gls',
+          //     title: 'Punkty GLS',
+          //     cost: cartTotal >= 300 || hasFreeShipCoupon ? null : 15,
+          //     enabled: true,
+          //   });
+          // }
 
           // Final filter pass: remove if cartContainsRestricted
           if (cartContainsRestricted) {
             filteredMethods = filteredMethods.filter((method) => {
               return (
-                method.id !== 'paczkomaty_inpost' && method.id !== 'punkty_gls'
+                // method.id !== 'paczkomaty_inpost' && method.id !== 'punkty_gls'
+                method.title.toLowerCase() !== 'paczkomaty inpost' && method.title !== 'punkty gls'
               );
             });
           }
@@ -389,9 +475,9 @@ const Shipping: React.FC<ShippingProps> = ({
           return { ...zone, methods: filteredMethods };
         });
 
-        console.log('cartContainsRestricted:', cartContainsRestricted);
-
         setShippingZones(updatedZones);
+        console.log('updatedZones', updatedZones);
+
       } catch (err) {
         console.error('Error fetching shipping methods:', err);
         setError(t.checkout.shipping.retryMessage);
@@ -407,18 +493,20 @@ const Shipping: React.FC<ShippingProps> = ({
 
   // ─── HANDLING SHIPPING METHOD CHANGE ──────────────────────────────────────
   const handleShippingChange = (method: ShippingMethod) => {
-    setShippingMethod(method.id);
-    setShippingTitle(method.title || 'Paczkomaty InPost');
+    setShippingMethod(method);
+    // setShippingTitle(method.title || 'Paczkomaty InPost');
+    setShippingTitle(method.title);
     const price = Number(method.cost) || 0;
     setShippingPrice(price);
     // When switching away from "Punkty GLS", do not reinitialize the GLS map.
-    if (method.id !== 'punkty_gls') {
+    // if (method.id !== 'punkty_gls') {
+    if (method.title.toLowerCase() !== 'punkty gls') {
       setShowGlsMap(false);
     }
   };
 
   // ─── EASYPACK (InPost) INTEGRATION ───────────────────────────────────────────
-  useEffect(() => {
+  useEffect(() => {  
     const loadEasyPackScript = () => {
       if (!scriptLoadedRef.current) {
         scriptLoadedRef.current = true;
@@ -452,7 +540,7 @@ const Shipping: React.FC<ShippingProps> = ({
         });
       }
     };
-    if (shippingMethod === 'paczkomaty_inpost') {
+    if (Object.keys(shippingMethod).length !== 0 && shippingMethod?.title.toLowerCase() === 'paczkomaty inpost') {
       loadEasyPackScript();
     }
   }, [shippingMethod]);
@@ -582,7 +670,7 @@ const Shipping: React.FC<ShippingProps> = ({
           {zone.methods.map((method) => (
             <div key={method.id}>
               <label
-                className={`grid grid-cols-[60%_20%_20%] sm:grid-cols-3 items-center py-[16px] border-b ${shippingMethod === method.id
+                className={`grid grid-cols-[60%_20%_20%] sm:grid-cols-3 items-center py-[16px] border-b ${shippingMethod.id === method.id
                   ? 'border-dark-pastel-red'
                   : 'border-beige-dark'
                   }`}
@@ -592,13 +680,13 @@ const Shipping: React.FC<ShippingProps> = ({
                   <input
                     type="radio"
                     value={method.id}
-                    checked={shippingMethod === method.id}
+                    checked={shippingMethod.id === method.id}
                     onChange={() => handleShippingChange(method)}
                     className="hidden"
                     disabled={loading}
                   />
                   <span
-                    className={`w-5 h-5 rounded-full ${shippingMethod === method.id
+                    className={`w-5 h-5 rounded-full ${shippingMethod.id === method.id
                       ? 'border-4 border-dark-pastel-red'
                       : 'border-2 border-gray-400'
                       }`}
@@ -608,9 +696,10 @@ const Shipping: React.FC<ShippingProps> = ({
 
                 {/* Second Column: Price */}
                 <span className="text-sm text-gray-700 text-center w-full">
-                  {method.cost
+                  {getMethodCost(method)}
+                  {/* {method.cost
                     ? `${parseFloat(String(method.cost)).toFixed(2)} ${currency.symbol}`
-                    : t.checkout.shipping.free}
+                    : t.checkout.shipping.free} */}
                 </span>
 
                 {/* Third Column: Icon */}
@@ -626,8 +715,8 @@ const Shipping: React.FC<ShippingProps> = ({
                 </div>
               </label>
 
-              {method.id === 'paczkomaty_inpost' &&
-                shippingMethod === 'paczkomaty_inpost' && (
+              {method.title.toLowerCase() === 'paczkomaty inpost' &&
+                (Object.keys(shippingMethod).length !== 0 && shippingMethod.title.toLowerCase() === 'paczkomaty inpost') && (
                   <div>
                     <button
                       onClick={openInpostModal}
@@ -645,8 +734,8 @@ const Shipping: React.FC<ShippingProps> = ({
                   </div>
                 )}
 
-              {method.id === 'punkty_gls' &&
-                shippingMethod === 'punkty_gls' && (
+              {method.title.toLowerCase() === 'punkty gls' &&
+              (Object.keys(shippingMethod).length !== 0 && shippingMethod.title.toLowerCase() === 'punkty gls') && (
                   <div>
                     <button
                       onClick={() => {

@@ -66,19 +66,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               zoneName: zone.name,
               methods: methodsResponse.data.methods
                 .filter((method: any) => method.enabled)
-                .map((method: any) => {
-                  const cost = method.title.toLowerCase() === 'kurier gls pobranie'
-                    ? 25 
-                    // : Number(method.settings?.cost?.value);
-                    : Number(method?.cost);
-                  return {
-                    id: method.id,
-                    title: method.title,
-                    cost: isNaN(cost) ? 0 : cost,
-                    enabled: method.enabled,
-                    shipping_classes: method.shipping_classes || [],
-                  };
-                }),
+                // .map((method: any) => {
+                //   const cost = method.title.toLowerCase() === 'kurier gls pobranie'
+                //     ? 25 
+                //     // : Number(method.settings?.cost?.value);
+                //     : Number(method?.cost);
+                //   return {
+                //     id: method.id,
+                //     title: method.title,
+                //     cost: isNaN(cost) ? 0 : cost,
+                //     enabled: method.enabled,
+                //     shipping_classes: method.shipping_classes || [],
+                //   };
+                // }),
             };
           });
 

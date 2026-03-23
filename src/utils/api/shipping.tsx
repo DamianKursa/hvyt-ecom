@@ -1,6 +1,6 @@
 // lib/shipping.ts
 
-import { CountryShippingMethod, ShippingCountry } from "@/types/checkout";
+import { ShippingCountry, ShippingMethodWithoutClasses } from "@/types/checkout";
 import axios from "axios"
 
 const WooCommerceAPI = axios.create({
@@ -33,7 +33,7 @@ export async function getShippingCountries(lang = 'pl'): Promise<ShippingCountry
           
         // 2. Dla każdej strefy pobierz lokalizacje i metody równolegle
         const zonesData = await Promise.all(
-            zones.map(async (zone: any) => {
+            zones.map(async (zone: any) => { 
             const [locations, methods] = await Promise.all([
                 WooCommerceAPI.get(`/shipping/zones/${zone.id}/locations`),
                 CustomAPI.get(`/shipping/zones/${zone.id}/methods`, {params: {lang: lang}})
@@ -54,7 +54,8 @@ export async function getShippingCountries(lang = 'pl'): Promise<ShippingCountry
             // Pomiń strefę "Pozostałe lokalizacje" (id=0) jeśli nie chcesz jej pokazywać
             if (zone.id === 0) continue
 
-            const activeMethods: CountryShippingMethod[] = methods
+            const activeMethods: ShippingMethodWithoutClasses[] = methods
+            
             .filter((m: any) => m.enabled)
             .map((m: any) => ({
                 id:       m.instance_id,

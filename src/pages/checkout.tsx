@@ -18,14 +18,14 @@ import { pushGTMEvent } from '@/utils/gtm';
 import CreateAccount from '@/components/UI/CreateAccount';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { getCurrencySlugByLocale } from '@/config/currencies';
-import { ShippingCountryItem } from '@/types/checkout';
+import { ShippingCountryItem, ShippingMethod } from '@/types/checkout';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
   const [customerType, setCustomerType] = useState<'individual' | 'company'>(
     'individual',
   );
-  const [shippingMethod, setShippingMethod] = useState<string>('');
+  const [shippingMethod, setShippingMethod] = useState<ShippingMethod>({} as ShippingMethod);
   const [shippingPrice, setShippingPrice] = useState<number>(0);
   const [shippingTitle, setShippingTitle] = useState<string>('');
   const [selectedLocker, setSelectedLocker] = useState<string>('');
@@ -69,9 +69,12 @@ const Checkout: React.FC = () => {
     additionalInfo: '',
   });
 
+  const defaultLocation: ShippingCountryItem = {code: 'PL', name: 'Polska', zoneId: 1}; 
+
   const [selectedZone, setSelectedZone] = useState<number>(1);
-  const [selectedCountry, setSelectedCountry] = useState<ShippingCountryItem | null>({code: 'PL', name: 'Polska', zoneId: 1});
+  const [selectedCountry, setSelectedCountry] = useState<ShippingCountryItem | null>(defaultLocation);
   const [countryList, setCountryList] = useState<ShippingCountryItem[]>([]);
+  // const [shippingZonesWithMethods, setShippingZonesWithMethods] = useState<Map<number, ShippingMethod[]>|null>(null);
 
   const [isShippingDifferent, setIsShippingDifferent] = useState(false);
   const externalAnonId = useContext(ExternalIdContext);
@@ -89,6 +92,11 @@ const Checkout: React.FC = () => {
       router.push(getPath('/koszyk'));
     }
   }, [cart, router]);
+
+  // useEffect(() => {
+  //   console.log('zoneMethods', shippingZonesWithMethods?.get(selectedZone));
+     
+  // }, [cart, selectedZone])
 
   useEffect(() => {
     const fetchShippingMethods = async () => {
@@ -115,8 +123,8 @@ const Checkout: React.FC = () => {
           throw new Error(`Failed to fetch countries: ${result.status}`);
         }
         const data = await result.json();
-        console.log('Fetched Shipping Countries:', data);
 
+        // ustaw listę krajów dla select country
         const countries = data.map((c: ShippingCountryItem) => ({
           code: c.code,
           name: c.name,
@@ -124,6 +132,17 @@ const Checkout: React.FC = () => {
         }));
         
         setCountryList(countries);        
+
+        // ustaw metody wysyłek dla stref
+        // const uniqueZones: Map<number, ShippingMethod[]> = new Map();
+        // (data as ShippingCountry[]).forEach(c => {
+        //   if(uniqueZones.has(c.zoneId)) {
+        //     return;
+        //   }
+        //   uniqueZones.set(c.zoneId, [...c.methods]);
+        // });        
+        
+        // setShippingZonesWithMethods(uniqueZones);
 
       } catch (err) {
         console.error('Error fetching shipping countries:', err);
@@ -180,13 +199,13 @@ const Checkout: React.FC = () => {
       setOrderDisabled(false);
       throw new Error('Validation error');
     }
-    if (shippingMethod === 'paczkomaty_inpost' && !selectedLocker) {
+    if (shippingMethod.title.toLocaleLowerCase() === 'paczkomaty inpost' && !selectedLocker) {
       alert(t.checkout.validation.selectLocker);
       setOrderDisabled(false);
       throw new Error('Validation error');
     }
 
-    if (shippingMethod === 'punkty_gls' && !selectedGlsPoint) {
+    if (shippingMethod.title.toLocaleLowerCase() === 'punkty gls' && !selectedGlsPoint) {
       alert(t.checkout.validation.selectGlsPoint);
       setOrderDisabled(false);
       throw new Error('Validation error');
@@ -277,7 +296,7 @@ const Checkout: React.FC = () => {
 
     // Prepare shipping meta data (if any)
     const shippingMetaData = [];
-    if (shippingMethod === 'paczkomaty_inpost') {
+    if (shippingMethod.title.toLowerCase() === 'paczkomaty inpost') {
       shippingMetaData.push(
         { key: '_integration', value: 'paczkomaty' },
         { key: '_paczkomat_id', value: selectedLocker },
@@ -292,7 +311,7 @@ const Checkout: React.FC = () => {
         { key: 'delivery_point_city', value: shippingData.city },
       );
     }
-    if (shippingMethod === 'punkty_gls') {
+    if (shippingMethod.title.toLowerCase() === 'punkty gls') {
       shippingMetaData.push(
         { key: '_integration', value: 'gls' },
         {
@@ -693,7 +712,7 @@ const Checkout: React.FC = () => {
                   <Payment
                     paymentMethod={paymentMethod}
                     setPaymentMethod={setPaymentMethod}
-                    shippingMethod={shippingMethod}
+                    shippingMethod={shippingMethod.id}
                   />
                   {/* Terms and Privacy Checkbox */}
                   <div className="mt-6">

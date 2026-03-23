@@ -52,6 +52,10 @@ export interface Product {
   currency?: string;
   currencySymbol?: string;
   lang?: Language;
+
+  // Shipping class info
+  shipping_class?: string;
+	shipping_class_id?: number;
 }
 
 export interface Coupon {
@@ -271,6 +275,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
               variationId: translatedProduct.variationId,
               baselinker_variations: translatedProduct.baselinker_variations,
               variationOptions: translatedProduct.variationOptions,
+
+              shipping_class: translatedProduct.shipping_class,
+              shipping_class_id: translatedProduct.shipping_class_id,
             }
           } catch (error) {
             console.error(`Failed to update product ${item.productId}:`, error);
@@ -281,7 +288,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       
       //add updated products back to cart
       newCart.products = updatedProducts;
-
+ 
       setCart(recalculateCartTotals(newCart));
       
     } catch (error) {

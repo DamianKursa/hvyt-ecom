@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Checkbox from '@/components/UI/Checkbox';
 import { useI18n } from '@/utils/hooks/useI18n';
-import { getShippingCountries } from '@/utils/api/shipping';
 import { useRouter } from 'next/router';
 import { ShippingCountryItem } from '@/types/checkout';
 

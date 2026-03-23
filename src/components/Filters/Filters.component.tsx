@@ -150,7 +150,7 @@ const Filters: React.FC<FiltersProps> = ({
     if (updatedFilters.length === 0) {
       try {
         const res = await fetch(
-          `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryId}&page=1&perPage=12`,
+          `/api/category?action=fetchProductsByCategoryId&categoryId=${categoryId}&page=1&perPage=12&lang=${router.locale}`,
         );
         if (!res.ok) throw new Error('Error fetching default products');
         const data = await res.json();
@@ -164,7 +164,8 @@ const Filters: React.FC<FiltersProps> = ({
 
     const filtersParam = encodeURIComponent(JSON.stringify(updatedFilters));
     setIsFetchingProducts(true);
-    try {
+    try { console.log('cattfill', categoryId, filtersParam);
+    
       const res = await fetch(
         `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12&lang=${getCurrentLanguage()}`,
       );

@@ -222,7 +222,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
           >
             {formData.consent && <img src="/icons/check.svg" alt="check" />}
           </span>
-          <span>f
+          <span>
             {t.reviews.consentText.split('Regulaminu')[0]}
             <Link className="underline" href="/regulamin">
               {t.legal.terms}
