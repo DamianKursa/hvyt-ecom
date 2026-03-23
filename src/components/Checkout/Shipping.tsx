@@ -686,7 +686,7 @@ const Shipping: React.FC<ShippingProps> = ({
                     disabled={loading}
                   />
                   <span
-                    className={`w-5 h-5 rounded-full ${shippingMethod.id === method.id
+                    className={`flex-shrink-0 w-5 h-5 rounded-full ${shippingMethod.id === method.id
                       ? 'border-4 border-dark-pastel-red'
                       : 'border-2 border-gray-400'
                       }`}

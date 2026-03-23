@@ -87,6 +87,10 @@ const Checkout: React.FC = () => {
     return countryMapping[country] || country;
   };
 
+  useEffect(()=>{
+    setShippingMethod({} as ShippingMethod);
+  }, [selectedCountry]);
+
   useEffect(() => {
     if (!cart || cart.products.length === 0) {
       router.push(getPath('/koszyk'));
@@ -712,7 +716,7 @@ const Checkout: React.FC = () => {
                   <Payment
                     paymentMethod={paymentMethod}
                     setPaymentMethod={setPaymentMethod}
-                    shippingMethod={shippingMethod.id}
+                    shippingMethod={shippingMethod}
                   />
                   {/* Terms and Privacy Checkbox */}
                   <div className="mt-6">

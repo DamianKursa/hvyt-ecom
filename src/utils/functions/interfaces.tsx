@@ -155,6 +155,10 @@ export interface Product {
   }>;
   quantity?: number;
   totalPrice?: number;
+
+    // Shipping class info
+  shipping_class?: string;
+	shipping_class_id?: number;
 }
 
 export interface Kolekcja {

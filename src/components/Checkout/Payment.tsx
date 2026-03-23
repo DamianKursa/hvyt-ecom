@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { useRouter } from 'next/router';
+import { ShippingMethod } from '@/types/checkout';
 
 interface PaymentProps {
   paymentMethod: string;
   setPaymentMethod: React.Dispatch<React.SetStateAction<string>>;
-  shippingMethod: string; // Pass the shipping method to filter payment methods
+  shippingMethod: ShippingMethod; // Pass the shipping method to filter payment methods
 }
 
 interface PaymentMethod {
@@ -26,13 +27,13 @@ const Payment: React.FC<PaymentProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   // Shipping method mapping (adjust if needed)
-  const shippingMethodMapping: Record<string, string> = {
-    '1': 'kurier_gls',
-    '3': 'kurier_gls_pobranie',
-    '13': 'paczkomaty_inpost',
-    '11': 'kurier_gls_zagranica',
-    kurier_gls_pobranie: 'kurier_gls_pobranie', // For safety
-  };
+  // const shippingMethodMapping: Record<string, string> = {
+  //   '1': 'kurier_gls',
+  //   '3': 'kurier_gls_pobranie',
+  //   '13': 'paczkomaty_inpost',
+  //   '11': 'kurier_gls_zagranica',
+  //   kurier_gls_pobranie: 'kurier_gls_pobranie', // For safety
+  // };
 
   // Fetch payment methods on component mount, with auto-retry if error occurs
   useEffect(() => {
@@ -45,6 +46,8 @@ const Payment: React.FC<PaymentProps> = ({
           throw new Error(t.checkout.payment.errorLoading);
         }
         const data = await response.json();
+        console.log('payments', data);
+        
         setPaymentMethods(data);
       } catch (err) {
         console.error('Error fetching payment methods:', err);
@@ -62,12 +65,26 @@ const Payment: React.FC<PaymentProps> = ({
 
   // Filter payment methods based on the selected shipping method
   const getFilteredPaymentMethods = () => {
-    const mappedShippingMethod =
-      shippingMethodMapping[shippingMethod] || shippingMethod;
+    const mappedShippingMethod = Object.keys(shippingMethod).length !== 0 ? shippingMethod.title.toLowerCase() : '';
+    // const mappedShippingMethod =
+    //   shippingMethodMapping[shippingMethod] || shippingMethod;
+
+    // Pusta lista jeżeli nie wybrano metody Wysyłki
+    if(mappedShippingMethod === '') {
+      return [] as ShippingMethod[];
+    }
+   
 
     // For "Kurier GLS Pobranie" return only the COD option
-    if (mappedShippingMethod === 'kurier_gls_pobranie') {
+    if (mappedShippingMethod === 'kurier gls pobranie') {
       return paymentMethods.filter((method) => method.id === 'cod');
+    }
+
+    // Stripe dla wysyłek zagranicznych
+    console.log('isStripe', mappedShippingMethod.includes('standard snternational'), mappedShippingMethod);
+    
+    if(mappedShippingMethod.includes('standard international')) {
+      return paymentMethods.filter((method) => method.id === 'stripe');
     }
 
     // Otherwise, return only the PayNow method
@@ -77,14 +94,19 @@ const Payment: React.FC<PaymentProps> = ({
   };
 
   const availableMethods = getFilteredPaymentMethods();
+console.log('availableMethods', availableMethods, shippingMethod);
 
   // Set the default payment method based on the mapped shipping method
   useEffect(() => {
-    const mappedShippingMethod =
-      shippingMethodMapping[shippingMethod] || shippingMethod;
-    if (mappedShippingMethod === 'kurier_gls_pobranie') {
+    const mappedShippingMethod = Object.keys(shippingMethod).length !== 0 ? shippingMethod.title.toLowerCase() : '';
+    // const mappedShippingMethod =
+    //   shippingMethodMapping[shippingMethod] || shippingMethod;
+    if (mappedShippingMethod === 'kurier gls pobranie') {
       setPaymentMethod('cod');
-    } else {
+    } else if (mappedShippingMethod.includes('standard international')) {
+      setPaymentMethod('stripe');
+    }
+    else {
       setPaymentMethod('pay_by_paynow_pl_pbl');
     }
   }, [shippingMethod, setPaymentMethod]);
@@ -120,7 +142,7 @@ const Payment: React.FC<PaymentProps> = ({
                 className="hidden"
               />
               <span
-                className={`w-5 h-5 rounded-full ${paymentMethod === method.id
+                className={`flex-shrink-0 w-5 h-5 rounded-full ${paymentMethod === method.id
                     ? 'border-4 border-dark-pastel-red'
                     : 'border-2 border-gray-400'
                   }`}

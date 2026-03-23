@@ -371,7 +371,7 @@ export const en: Translations = {
         termsLink: 'Terms and Conditions',
         privacyLink: 'Privacy Policy',
         termsAcceptance: 'and I accept their provisions.',
-        confirm: '*I confirm that I have read the',
+        confirm: 'I confirm that I have read the',
         term: 'Terms and Conditions',
         and: 'and',
         privacyPolicy: 'Privacy Policy',
