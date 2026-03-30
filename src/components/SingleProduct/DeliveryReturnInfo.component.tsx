@@ -25,7 +25,7 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
   const isCustomDeliveryProduct = productId
     ? CUSTOM_DELIVERY_PRODUCT_IDS.has(String(productId))
     : false;
-  const customDeliveryText = 'Czas realizacji 4-6 tygodni';
+  const customDeliveryText = 'Wysyłka w 24h';
   const items = [
     {
       icon: '/icons/zwrot.svg',

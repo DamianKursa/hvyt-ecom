@@ -18,7 +18,7 @@ const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
   pricesMap = {},
   isCartPage = false,
 }) => {
-  const cleanedAttributeName = attributeName.replace(/^Atrybut produktu: /, '');
+  const cleanedAttributeName = attributeName.replace(/^(Atrybut produktu: |Product )/, '');
 
   // Map options to display with prices if available
   const displayOptions = options.map((option) => {

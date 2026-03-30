@@ -83,6 +83,7 @@ export interface Variation {
   regular_price?: string;
   sale_price?: string;
   on_sale?: boolean;
+  stock_quantity?: string;
   image?: {
     sourceUrl: string;
   };
