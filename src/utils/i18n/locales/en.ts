@@ -634,6 +634,7 @@ export const en: Translations = {
     apply: 'Apply',
     show: 'Show',
     products: 'products',
+    infoSpacing: 'Spacing is the distance between the screw holes on a handle or knob. It\'s an important measurement to ensure that the handle or knob will fit your furniture properly.',
   },
   // === INDEX / HOME PAGE ===
   index: {

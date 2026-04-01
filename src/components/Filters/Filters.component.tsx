@@ -167,7 +167,8 @@ const Filters: React.FC<FiltersProps> = ({
     try { console.log('cattfill', categoryId, filtersParam);
     
       const res = await fetch(
-        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12&lang=${getCurrentLanguage()}`,
+        // `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12&lang=${getCurrentLanguage()}`,
+        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12}`,
       );
       if (!res.ok) throw new Error('Error fetching filtered products');
       const data = await res.json();
@@ -199,7 +200,8 @@ const Filters: React.FC<FiltersProps> = ({
     setIsFetchingProducts(true);
     try {
       const res = await fetch(
-        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12&lang=${getCurrentLanguage()}`,
+        // `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12&lang=${getCurrentLanguage()}`,
+        `/api/category?action=fetchProductsWithFilters&categoryId=${categoryId}&filters=${filtersParam}&page=1&perPage=12}`,
       );
       if (!res.ok) throw new Error('Error applying price filter');
       const data = await res.json();

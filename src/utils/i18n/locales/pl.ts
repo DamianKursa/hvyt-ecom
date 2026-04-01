@@ -631,6 +631,7 @@ export const pl = {
       apply: 'Zastosuj',
       show: 'Pokaż',
       products: 'produktów',
+      infoSpacing: 'Rozstaw to odległość pomiędzy środkami otworów montażowych.'
     },    
     // === STRONA GŁÓWNA / INDEX ===
     index: {
