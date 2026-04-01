@@ -30,6 +30,7 @@ import { getCurrency, getCurrentLanguage, Language } from '@/utils/i18n/config';
 import { WooProductIds } from '@/types/woocommerce';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { get } from 'lodash';
+import { trimAttributeName } from '@/utils/functions/functions';
 
 const NajczęściejKupowaneRazem = dynamic(
   () => import('@/components/Product/CrossSell'),
@@ -493,8 +494,7 @@ const ProductPage = () => {
         });
       });
     });
-    // Zapisz informacje o walucie z aktualnego locale
-    // WAŻNE: Te pola są kluczowe dla poprawnego wyświetlania cen w koszyku
+
     const currentLang = getCurrentLanguage();
     const currentCurrency = getCurrency(currentLang as Language);
 
@@ -870,6 +870,7 @@ const ProductPage = () => {
                   <div className="flex-1">
                     {product?.baselinker_variations?.[0]?.attributes.map(
                       (attr) => {
+                      
                         const pricesMap = product.baselinker_variations?.reduce(
                           (map, variation) => {
                             const option = variation.attributes.find(
@@ -885,7 +886,7 @@ const ProductPage = () => {
                         return (
                           <AttributeSwitcher
                             key={attr.name}
-                            attributeName={attr.name}
+                            attributeName={trimAttributeName(attr.name)}
                             options={Array.from(
                               new Set(
                                 product?.baselinker_variations?.map(

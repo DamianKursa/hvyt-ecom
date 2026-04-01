@@ -26,6 +26,8 @@ export const en: Translations = {
       errorTryAgain: 'Payment failed. Please try again.',
       errorNeddsAuth: 'Payment requires additional authorization.',
       errorUnexpected: 'An unexpected error occurred',
+      errorLoading: 'Failed to prepare payment form',
+      errorInit: 'Failed to initialize payment',
     },    
     // === PRODUCT ===
     product: {  

@@ -55,12 +55,12 @@ export function PaymentFormWrapper({
         if (result.success && result.clientSecret) {
           setClientSecret(result.clientSecret);
         } else if (!result.success) {
-          setError(result.error || 'Błąd inicjalizacji płatności');
+          setError(result.error || t.stripePayment.errorInit);
         } else {
-          setError('Błąd inicjalizacji płatności')
+          setError(t.stripePayment.errorInit)
         }
       } catch (err) {
-        setError('Nie udało się przygotować formularza płatności');
+        setError(t.stripePayment.errorLoading);
         console.log('PaymentIntentError', err);
         
       }

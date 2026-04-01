@@ -27,6 +27,8 @@ export const pl = {
       errorTryAgain: 'Płatność nie powiodła się. Spróbuj ponownie.',
       errorNeddsAuth: 'Płatność wymaga dodatkowej autoryzacji.',
       errorUnexpected: 'Wystąpił nieoczekiwany błąd',
+      errorLoading: 'Nie udało się przygotować formularza płatności',
+      errorInit: 'Błąd inicjalizacji płatności',
     },
     // === PRODUKT ===
     product: {  

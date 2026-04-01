@@ -255,3 +255,8 @@ export const normalizeString = (text: string): string => {
 export const deepCopy = (obj: any) : any => {
   return JSON.parse(JSON.stringify(obj));
 }
+
+/*
+ * remove "Product " from the beginning of the attribute name to make it cleaner and more user-friendly
+ */
+export const trimAttributeName = (name: string) => name.replace(/^Product /, '');
