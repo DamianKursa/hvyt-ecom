@@ -30,7 +30,6 @@ import { getCurrency, getCurrentLanguage, Language } from '@/utils/i18n/config';
 import { WooProductIds } from '@/types/woocommerce';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { get } from 'lodash';
-import { trimAttributeName } from '@/utils/functions/functions';
 
 const NajczęściejKupowaneRazem = dynamic(
   () => import('@/components/Product/CrossSell'),
@@ -886,7 +885,7 @@ const ProductPage = () => {
                         return (
                           <AttributeSwitcher
                             key={attr.name}
-                            attributeName={trimAttributeName(attr.name)}
+                            attributeName={attr.name}
                             options={Array.from(
                               new Set(
                                 product?.baselinker_variations?.map(
