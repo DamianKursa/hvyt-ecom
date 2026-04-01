@@ -5,6 +5,7 @@
  * Struktura tego pliku definiuje typ Translations używany przez cały projekt
  */
 
+import { error } from "console";
 import { m } from "framer-motion";
 
 export const pl = {
@@ -12,6 +13,20 @@ export const pl = {
     slugs: {
       category: 'kategoria',
       product: 'produkt',
+    },
+    // === STRIPE PAYMENT ===
+    stripePayment: {
+      tryAgain: 'Spróbuj ponownie',
+      preparingForm: 'Przygotowywanie formularza płatności',
+      paymentSuccess: 'Płatność zakończona sukcesem!',
+      redirecting: 'Przekierowywanie do potwierdzenia zamówienia',
+      processing: 'Przetwarzanie',
+      pay: 'Zapłać',
+      paymentSecured: 'Płatność jest bezpieczna i szyfrowana przez Stripe',
+      errorNotReady: 'Stripe nie jest jeszcze gotowe. Spróbuj ponownie.',
+      errorTryAgain: 'Płatność nie powiodła się. Spróbuj ponownie.',
+      errorNeddsAuth: 'Płatność wymaga dodatkowej autoryzacji.',
+      errorUnexpected: 'Wystąpił nieoczekiwany błąd',
     },
     // === PRODUKT ===
     product: {  

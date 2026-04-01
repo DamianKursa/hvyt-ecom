@@ -19,6 +19,8 @@ import CreateAccount from '@/components/UI/CreateAccount';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { getCurrencySlugByLocale } from '@/config/currencies';
 import { ShippingCountryItem, ShippingMethod } from '@/types/checkout';
+import { PaymentFormWrapper } from '@/components/Checkout/PaymentForm';
+import { PaymentFormData, StripePaymentData } from '@/types/stripe';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -35,6 +37,17 @@ const Checkout: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<string>(
     'p24-online-payments',
   );
+
+  // stripe payment info
+  const [isStripeProcessing, setIsStripeProcessing] = useState<boolean>(false);
+  const [stripePaymentData, setStripePaymentData] = useState<StripePaymentData | null>({
+    id: null
+  });
+
+  const updateStripePaymentIntentId = (id: string | null) => {
+    setStripePaymentData(prev => ({...prev, id}))
+  }
+
   const [email, setEmail] = useState<string>('');
   const [subscribeNewsletter, setSubscribeNewsletter] =
     useState<boolean>(false);
@@ -57,6 +70,20 @@ const Checkout: React.FC = () => {
     city: '',
     postalCode: '',
     country: 'Polska',
+  });
+
+  const [paymentFormData, setPaymentFormData] = useState<PaymentFormData>({
+      email: '',
+      name: '',
+      phone: '',
+      address: {
+        line1: '',
+        line2: '',
+        city: '',
+        state: '',
+        postal_code: '',
+        country: ''
+      }
   });
 
   const [shippingData, setShippingData] = useState({
@@ -86,6 +113,50 @@ const Checkout: React.FC = () => {
     const countryMapping: Record<string, string> = { Polska: 'PL' };
     return countryMapping[country] || country;
   };
+
+  const getCountryCodeByName = (countryName: string): string => {
+    const country = countryList.find((c) => c.name.toLocaleLowerCase() === countryName.toLocaleLowerCase());
+    return country ? country.code : '';
+  };
+
+
+  useEffect(()=>{
+    if(paymentMethod === 'stripe' && !stripePaymentData?.id) {
+      setIsStripeProcessing(false);
+      setOrderDisabled(false);
+    } else if(paymentMethod === 'stripe' && stripePaymentData?.id) {
+      handleOrderSubmit();
+    }
+  }, [stripePaymentData])
+
+  useEffect(() => {
+    if(paymentMethod !== 'stripe') {
+      updateStripePaymentIntentId(null);
+      setIsStripeProcessing(false);
+      setOrderDisabled(false);
+    }
+  },[paymentMethod])
+
+  useEffect(()=>{
+
+    const mappedBillingCountry = getCountryCodeByName(billingData.country);
+
+    setPaymentFormData({
+      email: email,
+      name: `${billingData.firstName} ${billingData.lastName}`,
+      phone: billingData.phone,
+      address: {
+        line1: `${billingData.street} ${billingData.buildingNumber} ${billingData.apartmentNumber}`,
+        line2: '',
+        city: billingData.city,
+        state: '',
+        postal_code: billingData.postalCode,
+        country: mappedBillingCountry
+      }
+    })
+    console.log( 'formdata', paymentFormData);
+    
+  }, [billingData]);
 
   useEffect(()=>{
     setShippingMethod({} as ShippingMethod);
@@ -194,7 +265,6 @@ const Checkout: React.FC = () => {
 
   const handleOrderSubmit = async () => {
     setOrderDisabled(true);
-    setTimeout(() => setOrderDisabled(false), 10000);
 
     if (!isTermsChecked) {
       alert(
@@ -253,6 +323,8 @@ const Checkout: React.FC = () => {
       throw new Error('Validation error');
     }
 
+    // setTimeout(() => setOrderDisabled(false), 10000);
+
     // If user is not logged in and the "create account" checkbox is ticked, register the user first.
     if (!user && createAccount) {
       if (!password || password.length < 8) {
@@ -274,6 +346,14 @@ const Checkout: React.FC = () => {
         }
       }
     }
+
+    // enable Stripe payment form
+    if(paymentMethod === 'stripe' && !stripePaymentData?.id) {
+      setIsStripeProcessing(true);
+      return;
+    }
+
+
     // Map country names to codes
     const mappedBillingCountry = mapCountry(billingData.country);
     const mappedShippingCountry = mapCountry(shippingData.country);
@@ -352,6 +432,7 @@ const Checkout: React.FC = () => {
             paymentMethod === 'p24-online-payments'
             ? 'Przelewy24'
             : shippingTitle,
+      
       set_paid: false,
       billing: {
         first_name: billingData.firstName,
@@ -427,6 +508,16 @@ const Checkout: React.FC = () => {
       customer_note: shippingData.additionalInfo || '',
       customer_id: user?.id || undefined,
     };
+
+    // add stripe payment intent id to order data if paying with Stripe
+    if(paymentMethod === 'stripe' && stripePaymentData?.id) {
+      orderData.meta_data.push({
+        key: 'stripe_payment_intent_id',
+        value: stripePaymentData.id
+      });
+
+      orderData.set_paid = true; // Mark order as paid since Stripe payment was successful
+    }
 
     pushGTMEvent('add_shipping_info', {
       shipping_method: shippingMethod,
@@ -602,7 +693,8 @@ const Checkout: React.FC = () => {
     } catch (error) {
       console.error('❌ Error creating order:', error);
       alert(t.checkout.errors.orderCreationFailed);
-    }
+    } finally {
+      setOrderDisabled(false);}
   };
 
   return (
@@ -718,6 +810,12 @@ const Checkout: React.FC = () => {
                     setPaymentMethod={setPaymentMethod}
                     shippingMethod={shippingMethod}
                   />
+                  {isStripeProcessing && <PaymentFormWrapper 
+                    cart={cart}
+                    billingData={paymentFormData}
+                    updateStripePaymentIntentId={updateStripePaymentIntentId}
+                  />}
+                  
                   {/* Terms and Privacy Checkbox */}
                   <div className="mt-6">
                     <label className="flex items-center gap-3 text-sm cursor-pointer w-full">

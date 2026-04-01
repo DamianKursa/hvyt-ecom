@@ -13,6 +13,20 @@ export const en: Translations = {
       category: 'category',
       product: 'product',
     },
+    // === STRIPE PAYMENT ===
+    stripePayment: {
+      tryAgain: 'Try again',
+      preparingForm: 'Preparing payment form',
+      paymentSuccess: 'Payment completed successfully!',
+      redirecting: 'Redirecting to order confirmation',
+      processing: 'Processing',
+      pay: 'Pay',
+      paymentSecured: 'Payment is secure and encrypted by Stripe',
+      errorNotReady: 'Stripe is not ready yet. Please try again.',
+      errorTryAgain: 'Payment failed. Please try again.',
+      errorNeddsAuth: 'Payment requires additional authorization.',
+      errorUnexpected: 'An unexpected error occurred',
+    },    
     // === PRODUCT ===
     product: {  
       product: 'Product',

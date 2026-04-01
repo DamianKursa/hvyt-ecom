@@ -46,7 +46,6 @@ const Payment: React.FC<PaymentProps> = ({
           throw new Error(t.checkout.payment.errorLoading);
         }
         const data = await response.json();
-        console.log('payments', data);
         
         setPaymentMethods(data);
       } catch (err) {
@@ -65,6 +64,8 @@ const Payment: React.FC<PaymentProps> = ({
 
   // Filter payment methods based on the selected shipping method
   const getFilteredPaymentMethods = () => {
+    console.log(shippingMethod, paymentMethods);
+    
     const mappedShippingMethod = Object.keys(shippingMethod).length !== 0 ? shippingMethod.title.toLowerCase() : '';
     // const mappedShippingMethod =
     //   shippingMethodMapping[shippingMethod] || shippingMethod;
@@ -81,7 +82,6 @@ const Payment: React.FC<PaymentProps> = ({
     }
 
     // Stripe dla wysyłek zagranicznych
-    console.log('isStripe', mappedShippingMethod.includes('standard snternational'), mappedShippingMethod);
     
     if(mappedShippingMethod.includes('standard international')) {
       return paymentMethods.filter((method) => method.id === 'stripe');
@@ -94,7 +94,6 @@ const Payment: React.FC<PaymentProps> = ({
   };
 
   const availableMethods = getFilteredPaymentMethods();
-console.log('availableMethods', availableMethods, shippingMethod);
 
   // Set the default payment method based on the mapped shipping method
   useEffect(() => {
