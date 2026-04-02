@@ -264,7 +264,7 @@ const Filters: React.FC<FiltersProps> = ({
                   />
                   <div className="absolute left-full w-[160px] top-1/2 transform -translate-y-1/2 ml-2 bg-beige-dark text-black font-light text-[12px] rounded-[5px] px-4 py-2 hidden group-hover:block z-50 shadow-lg">
                     <div className="absolute -left-[6px] top-1/2 transform -translate-y-1/2 w-3 h-3 bg-beige-dark rotate-45"></div>
-                    Rozstaw to odległość pomiędzy środkami otworów montażowych.
+                    {t.filters.infoSpacing}
                   </div>
                 </div>
               )}

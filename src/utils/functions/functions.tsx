@@ -259,4 +259,4 @@ export const deepCopy = (obj: any) : any => {
 /*
  * remove "Product " from the beginning of the attribute name to make it cleaner and more user-friendly
  */
-export const trimAttributeName = (name: string) => name.replace(/^Product /, '');
+export const trimAttributeName = (name: string): string => name.replace(/^(Product |Atrybut produktu:)/, '');

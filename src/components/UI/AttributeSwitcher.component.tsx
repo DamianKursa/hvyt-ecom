@@ -2,6 +2,7 @@ import React from 'react';
 import CustomDropdown from '@/components/UI/CustomDropdown.component';
 import { useRouter } from 'next/router';
 import { getCurrency, Language } from '@/utils/i18n/config';
+import { trimAttributeName } from '@/utils/functions/functions';
 
 interface AttributeSwitcherProps {
   attributeName: string;
@@ -20,7 +21,7 @@ const AttributeSwitcher: React.FC<AttributeSwitcherProps> = ({
   pricesMap = {},
   isCartPage = false,
 }) => {
-  const cleanedAttributeName = attributeName.replace(/^Atrybut produktu: /, '');
+  const cleanedAttributeName = trimAttributeName(attributeName);
 
   const router = useRouter();
   const currency = getCurrency(router?.locale as Language ?? 'pl');
