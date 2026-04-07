@@ -241,7 +241,7 @@ function PaymentFormContent({
           {isProcessing ? (
             <>⏳ {t.stripePayment.processing}...</>
           ) : (
-            <>{t.stripePayment.pay} {cart?.totalProductsPrice} {currency.toUpperCase()}</>
+            <>{t.stripePayment.pay}</>
           )}
         </button>
         <button

@@ -6,9 +6,9 @@ import { useI18n } from '@/utils/hooks/useI18n';
 
 const PolitykaPrywatnosci = () => {
 
-  const postID = {
-    pl: 7576618,
-    en: 7576620
+  const postSlug = {
+    pl: 'polityka-prywatnosci-next',
+    en: 'privacy-policy-next'
   };
 
   const {t, getPath} = useI18n();
@@ -21,7 +21,7 @@ const PolitykaPrywatnosci = () => {
     const fetchPageData = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`/api/pages/page?pageId=${postID[router.locale as keyof typeof postID]}`);
+        const response = await fetch(`/api/pages/page?slug=${postSlug[router.locale as keyof typeof postSlug]}`);
         const data = await response.json();
         setPageData(data);
         
@@ -49,10 +49,12 @@ const PolitykaPrywatnosci = () => {
           href={`${process.env.NEXT_PUBLIC_SITE_URL}${getPath('/polityka-prywatnosci')}`}
         />
       </Head>
-      {pageData && ! isLoading?         <div 
-          className="page-content"
-          dangerouslySetInnerHTML={{ __html: pageData?.content?.rendered || '' }}
-        /> : (<p className="max-w-4xl mx-auto px-4 text-center">{t.modal.loading}...</p>)}
+      <div className="max-w-4xl mx-auto px-4">
+        {pageData && ! isLoading?         <div 
+            className="page-content"
+            dangerouslySetInnerHTML={{ __html: pageData?.content || '' }}
+          /> : (<p className="max-w-4xl mx-auto px-4 text-center">{t.modal.loading}...</p>)}
+      </div>
 
       <style>{`
         .policyList {

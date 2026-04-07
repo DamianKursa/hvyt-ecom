@@ -1,11 +1,43 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Layout from '@/components/Layout/Layout.component';
 import NaszeKolekcje from '@/components/Index/NaszeKolekcje';
 import Head from 'next/head';
+import { useI18n } from '@/utils/hooks/useI18n';
+import { useRouter } from 'next/router';
 
 const WspolpracaPage = () => {
+
+  const postSlug = {
+    pl: 'wspolpracuj-z-nami',
+    en: 'work-with-us'
+  };
+
+  const {t, getPath} = useI18n();
+  const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [pageData, setPageData] = useState<any>(null);
+  
+  useEffect(()=> {
+    const fetchPageData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/pages/page?slug=${postSlug[router.locale as keyof typeof postSlug]}`);
+        const data = await response.json();
+        setPageData(data);
+        
+      } catch (error) {
+        console.error('Error fetching page data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPageData();
+    
+  }, [router.locale]);
+
   const sectionRefs = {
     pracownie: useRef<HTMLDivElement>(null),
     partnerzy: useRef<HTMLDivElement>(null),
@@ -21,7 +53,7 @@ const WspolpracaPage = () => {
   };
 
   return (
-    <Layout title="Współpraca">
+    <Layout title={t.pageCooperation.title}>
       <Head>
         <link
           id="meta-canonical"
@@ -31,14 +63,14 @@ const WspolpracaPage = () => {
       </Head>
       <section className="w-full px-4 md:px-0">
         <div className="container max-w-grid-desktop mx-auto">
+          {pageData && ! isLoading? (<>
           {/* Header Section */}
           <div className="text-left mb-8 md:pt-0 pt-[64px]">
             <h1 className="text-[36px]  md:py-0 md:text-[56px] font-bold text-dark-pastel-red leading-tight mb-4">
-              Współpracuj z nami
+              { pageData?.acf?.title }
             </h1>
             <p className="text-[16px] md:text-[18px] font-light text-neutral-darkest leading-6 md:leading-8">
-              Dołącz do nas i twórz niezwykłe projekty! Oferujemy korzystne
-              warunki współpracy dla projektantów, przedsiębiorców i twórców.
+              { pageData?.acf?.subtitle }
             </p>
           </div>
 
@@ -62,24 +94,17 @@ const WspolpracaPage = () => {
               <div className="flex flex-col justify-between p-4 md:p-6">
                 <div>
                   <h3 className="text-[40px] font-bold text-black mb-4">
-                    Współpraca z Pracowniami Projektowymi
+                    { pageData?.acf?.s_lab.title }
                   </h3>
-                  <p className="text-[16px] font-light text-black leading-7 mb-6">
-                    Razem możemy stworzyć coś niesamowitego!
-                    <br />
-                    Jeśli prowadzisz pracownię projektową i chciałbyś z nami
-                    współpracować, daj nam znać! Jesteśmy otwarci na nowe
-                    pomysły i kolaboracje. Oferujemy specjalne warunki
-                    współpracy oraz preferencyjne ceny na próbki. Aby dowiedzieć
-                    się więcej, wyślij nam e-mail z danymi rejestrowymi Twojej
-                    firmy.
-                  </p>
+                  <p className="text-[16px] font-light text-black leading-7 mb-6"
+                  dangerouslySetInnerHTML={{ __html: pageData?.acf?.s_lab.content || '' }}
+                  />
                 </div>
                 <Link
                   href="mailto:hello@hvyt.pl"
                   className="text-[16px] md:text-[20px] font-light text-black flex items-center gap-2 underline"
                 >
-                  Wyślij mail: hello@hvyt.pl
+                  {t.pageCooperation.sendEmail}: hello@hvyt.pl
                   <Image
                     height={24}
                     width={24}
@@ -108,22 +133,17 @@ const WspolpracaPage = () => {
               <div className="flex flex-col justify-between p-4 md:p-6">
                 <div>
                   <h3 className="text-[40px] font-bold text-black mb-4">
-                    Współpraca ze stałymi partnerami
+                    { pageData?.acf?.s_partners.title }
                   </h3>
-                  <p className="text-[16px] font-light text-black leading-7 mb-6">
-                    Osiągajmy Razem Niesamowite Wyniki!
-                    <br /> Regularna współpraca z nami oznacza atrakcyjne rabaty
-                    na nasze produkty dla naszych stałych klientów. Aby
-                    skorzystać z naszych rabatów, skontaktuj się z nami i napisz
-                    kilka słów o swojej działalności. Chętnie omówimy dostępne
-                    opcje rabatowe.
-                  </p>
+                  <p className="text-[16px] font-light text-black leading-7 mb-6"
+                  dangerouslySetInnerHTML={{ __html: pageData?.acf?.s_partners.content || '' }}
+                  />
                 </div>
                 <Link
                   href="mailto:hello@hvyt.pl"
                   className="text-[16px] md:text-[20px] font-light text-black flex items-center gap-2 underline"
                 >
-                  Wyślij mail: hello@hvyt.pl
+                  {t.pageCooperation.sendEmail}: hello@hvyt.pl
                   <Image
                     height={24}
                     width={24}
@@ -152,22 +172,17 @@ const WspolpracaPage = () => {
               <div className="flex flex-col justify-between p-4 md:p-6">
                 <div>
                   <h3 className="text-[40px] font-bold text-black mb-4">
-                    Współpraca z Blogerami i Influencerami
+                    { pageData?.acf?.s_blogers.title }
                   </h3>
-                  <p className="text-[16px] font-light text-black leading-7 mb-6">
-                    Pasjonaci Wnętrz, Zapraszamy do Współpracy!
-                    <br /> Jeśli jesteś blogerem lub influencerem z zamiłowaniem
-                    do wnętrz, daj nam znać! Chętnie współpracujemy z osobami,
-                    które dzielą się swoimi pomysłami i inspiracjami dotyczącymi
-                    wnętrz. Wystarczy wysłać do nas wiadomość e-mail lub
-                    skontaktować się przez nasze media społecznościowe.
-                  </p>
+                  <p className="text-[16px] font-light text-black leading-7 mb-6"
+                  dangerouslySetInnerHTML={{ __html: pageData?.acf?.s_blogers.content || '' }}
+                  />
                 </div>
                 <Link
                   href="mailto:hello@hvyt.pl"
                   className="text-[16px] md:text-[20px] font-light text-black flex items-center gap-2 underline"
                 >
-                  Wyślij mail: hello@hvyt.pl
+                  {t.pageCooperation.sendEmail}: hello@hvyt.pl
                   <Image
                     height={24}
                     width={24}
@@ -185,19 +200,11 @@ const WspolpracaPage = () => {
             >
               <div className="order-2 md:order-none md:pr-[72px] px-4 md:px-0 md:pl-[24px]">
                 <h3 className="text-[40px] font-bold text-black mb-4">
-                  Poznaj nasze produkty
+                  { pageData?.acf?.s_products.title }
                 </h3>
-                <p className="text-[16px] font-light text-black leading-7 mb-6">
-                  Aby dowiedzieć się więcej o naszych produktach,
-                  <br /> zapraszamy do zapoznania się z naszym{' '}
-                  <Link
-                    href="/downloads/HVYT_katalog_light.pdf"
-                    className="underline"
-                  >
-                    katalogiem
-                  </Link>
-                  <br /> Dziękujemy za zainteresowanie naszą ofertą!
-                </p>
+                  <p className="text-[16px] font-light text-black leading-7 mb-6"
+                  dangerouslySetInnerHTML={{ __html: pageData?.acf?.s_products.content || '' }}
+                  />
               </div>
               <div className="h-[300px] md:h-[520px] overflow-hidden rounded-[24px] order-1 md:order-none">
                 <Image
@@ -210,7 +217,7 @@ const WspolpracaPage = () => {
                 />
               </div>
             </div>
-          </div>
+          </div> </> )  : (<p className="max-w-4xl mx-auto px-4 text-center">{t.modal.loading}...</p>) }
         </div>
       </section>
     </Layout>

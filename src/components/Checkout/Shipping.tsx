@@ -476,7 +476,7 @@ const Shipping: React.FC<ShippingProps> = ({
         });
 
         setShippingZones(updatedZones);
-        console.log('updatedZones', updatedZones);
+        // console.log('updatedZones', updatedZones);
 
       } catch (err) {
         console.error('Error fetching shipping methods:', err);
@@ -707,7 +707,7 @@ const Shipping: React.FC<ShippingProps> = ({
                   <img
                     src={
                       shippingIcons[method.title.toLowerCase()] ||
-                      '/icons/default.svg'
+                      '/icons/delivery.svg'
                     }
                     alt={`${method.title} Icon`}
                     className="w-[50px] sm:w-[55px] h-auto"

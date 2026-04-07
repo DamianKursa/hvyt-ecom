@@ -64,7 +64,7 @@ const Payment: React.FC<PaymentProps> = ({
 
   // Filter payment methods based on the selected shipping method
   const getFilteredPaymentMethods = () => {
-    console.log(shippingMethod, paymentMethods);
+    // console.log(shippingMethod, paymentMethods);
     
     const mappedShippingMethod = Object.keys(shippingMethod).length !== 0 ? shippingMethod.title.toLowerCase() : '';
     // const mappedShippingMethod =

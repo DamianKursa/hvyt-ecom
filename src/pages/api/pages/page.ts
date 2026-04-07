@@ -11,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     if(pageId) {
       
-      const cacheKey = `page:${pageId}`;
+      const cacheKey = `page_${pageId}`;
 
       const cached = await getCache(cacheKey);
       
@@ -28,7 +28,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
         );
 
-        await setCache(cacheKey, response, CACHE_TTL);
+        await setCache(cacheKey, response.data, CACHE_TTL);
+
+        res.status(200).json(response.data);
+    }
+    else if(slug) {      
+      const cacheKey = `page_${slug}`;
+
+      const cached = await getCache(cacheKey);
+      
+      // if (cached) {
+      //   return res.status(200).json(cached);
+      // }
+
+        const response = await axios.get(
+            `${process.env.REST_API_CUSTOM}/page-by-slug/${slug}`,
+            {
+                params: {}
+            }
+        );
+
+        await setCache(cacheKey, response.data, CACHE_TTL);
 
         res.status(200).json(response.data);
     }

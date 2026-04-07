@@ -6,37 +6,51 @@ import ExpandableSection from '@/components/UI/ExpandableSection';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { useRouter } from 'next/router';
 
+type Chapter = {
+   title: string; 
+   content: string
+}
+
 const Regulamin = () => {
 
-  // const postID = {
-  //   pl: 0000000,
-  //   en: 0000000
-  // };
+  const postSlug = {
+    pl: 'regulamin-next',
+    en: 'regulations-next'
+  };
 
-  // const {t, getPath} = useI18n();
-  // const router = useRouter();
+  const [chapters, setChapters] = useState<Chapter[]>([]);
 
-  // const [isLoading, setIsLoading] = useState(false);
-  // const [pageData, setPageData] = useState<any>(null);
+  const {t, getPath} = useI18n();
+  const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [pageData, setPageData] = useState<any>(null);
   
-  // useEffect(()=> {
-  //   const fetchPageData = async () => {
-  //     setIsLoading(true);
-  //     try {
-  //       const response = await fetch(`/api/pages/page?pageId=${postID[router.locale as keyof typeof postID]}`);
-  //       const data = await response.json();
-  //       setPageData(data);
+  useEffect(()=> {
+    const fetchPageData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/pages/page?slug=${postSlug[router.locale as keyof typeof postSlug]}`);
+        const data = await response.json();
+        setPageData(data);
+        console.log('sss', data);
         
-  //     } catch (error) {
-  //       console.error('Error fetching page data:', error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-  //   fetchPageData();
-  // }, [router.locale]);
+      } catch (error) {
+        console.error('Error fetching page data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPageData();
+  }, [router.locale]);
 
-  const chapters = [
+  useEffect(() => {
+    if(pageData?.acf) {      
+      setChapters(Object.values(pageData.acf) as Chapter[] || []);      
+    }
+  }, [pageData])
+
+  const chapters_old = [
     {
       title: 'ROZDZIAŁ I – INFORMACJE OGÓLNE',
       content: `
@@ -646,34 +660,15 @@ Dla danego Zamówienia wiążąca jest Cena z momentu złożenia Zamówienia.
           href={`${process.env.NEXT_PUBLIC_SITE_URL}/regulamin`}
         />
       </Head>
-      <div className=" max-w-4xl mx-auto">
-        <h1 className=" mb-4 text-4xl font-bold">
-          REGULAMIN SKLEPU INTERNETOWEGO
-        </h1>
-        <p className="mb-4 ">
-          Niniejszy Regulamin określa zasady składania i realizacji Zamówień
-          poprzez stronę internetową działającą pod adresem URL:{' '}
-          <a
-            href="https://hvyt.pl"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline"
-          >
-            https://hvyt.pl
-          </a>
-        </p>
-
-        <p className="mb-8">
-          <strong>
-            Użytkownik ma prawo przed złożeniem Zamówienia do negocjacji
-            warunków Umowy sprzedaży ze Sprzedającym. W przypadku zrezygnowania
-            przez Użytkownika z możliwości zawarcia Umowy sprzedaży na drodze
-            indywidualnych negocjacji, zastosowanie ma niniejszy Regulamin oraz
-            powszechnie obowiązujące przepisy prawa polskiego.
-          </strong>
-        </p>
+      {pageData && ! isLoading? (      
+      <div className="max-w-4xl mx-auto">
+        <div 
+            className="page-content"
+            dangerouslySetInnerHTML={{ __html: pageData?.content || '' }}
+        />
 
         {/* Expandable Rozdziały */}
+        
         {chapters.map((chap, idx) => (
           <ExpandableSection
             key={idx}
@@ -681,7 +676,7 @@ Dla danego Zamówienia wiążąca jest Cena z momentu złożenia Zamówienia.
             content={chap.content}
           />
         ))}
-      </div>
+      </div> ) : (<p className="max-w-4xl mx-auto px-4 text-center">{t.modal.loading}...</p>)}
     </Layout>
   );
 };

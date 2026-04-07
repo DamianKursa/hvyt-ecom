@@ -374,7 +374,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             className="w-full text-[#363132] font-light border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
           >
             {countriesList.map((country) => (
-              <option key={country.code} value={country.code} selected={selectedCountry?.code === country.code}>
+              <option key={country.code} value={country.code}>
                 {country.name}
               </option>
             ))}

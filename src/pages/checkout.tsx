@@ -154,7 +154,7 @@ const Checkout: React.FC = () => {
         country: mappedBillingCountry
       }
     })
-    console.log( 'formdata', paymentFormData);
+    // console.log( 'formdata', paymentFormData);
     
   }, [billingData]);
 

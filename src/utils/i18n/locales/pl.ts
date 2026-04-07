@@ -171,6 +171,20 @@ export const pl = {
       title: 'Polityka Prywatnosci i plików cookies',
       subtitle: 'Pełna treść Polityki Prywatności Sklepu Internetowego HVYT.',
     },
+    // === STRONA WSPÓŁPRACA ===
+    pageCooperation: {
+      title: 'Współpraca',
+      sendEmail: 'Wyślij mail',
+    },
+    // === STRONA DOSTAWA ===
+    pageDelivery: {
+      title: 'Dostawa',
+    },
+    // === STRONA ZWROTY ===
+    pageReturns: {
+      title: 'Zwroty',
+      layoutTitle: 'Zwroty i Reklamacje',
+    },
     // === WSPÓLNE ===
     common: {
       error: 'Błąd',

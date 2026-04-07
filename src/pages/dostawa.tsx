@@ -1,13 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Layout from '@/components/Layout/Layout.component';
 import Head from 'next/head';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { useRouter } from 'next/router';
 
 const DostawaPage = () => {
-  const {getPath} = useI18n()
+
+  const postSlug = {
+    pl: 'dostawa-next',
+    en: 'delivery-next'
+  };
+
+  const {t, getPath} = useI18n();
+  const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [pageData, setPageData] = useState<any>(null);
+  
+  useEffect(()=> {
+    const fetchPageData = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/pages/page?slug=${postSlug[router.locale as keyof typeof postSlug]}`);
+        const data = await response.json();
+        setPageData(data);
+        
+      } catch (error) {
+        console.error('Error fetching page data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchPageData();
+  }, [router.locale]);
+
+
   return (
-    <Layout title="Hvyt | Dostawa">
+    <Layout title={`Hvyt | ${t.pageDelivery.title}`}>
       <Head>
         <link
           id="meta-canonical"
@@ -24,181 +54,13 @@ const DostawaPage = () => {
               {/* Heading */}
               <div className="text-left mb-[40px]">
                 <h1 className="text-[40px] md:text-[56px] font-bold text-neutral-darkest">
-                  Dostawa
+                  {t.pageDelivery.title}
                 </h1>
               </div>
-              <div>
-                <h3 className="text-[20px] font-bold text-neutral-darkest mb-2">
-                  Wasze zamówienia realizujemy do 24h od momentu ich otrzymania.
-                </h3>
-                <p className="text-[18px] font-light text-neutral-darkest mb-2">
-                  Staramy się zawsze wysyłać jak najszybciej możemy, dlatego
-                  średni czas wysyłki jest o wiele krótszy. W weekend nie
-                  pracujemy, dlatego poniedziałki i kolejne dni robocze Po
-                  Świętach są u nas zawsze bardzo pracowite.
-                </p>
-                <p className="text-[18px] font-light text-neutral-darkest mb-[40px]"></p>
-
-                <div>
-                  <h3 className="text-[20px] font-bold text-neutral-darkest mb-6">
-                    Wysyłka możliwa jest:
-                  </h3>
-                  <ul className="space-y-8">
-                    <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
-                        <span className="text-[16px] text-neutral-darkest font-light">
-                          Kurierem InPost
-                        </span>
-                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
-                          <Image
-                            src="/icons/truck.svg"
-                            alt="Truck Icon"
-                            width={14}
-                            height={14}
-                          />
-                          <span className="text-[14px] ml-[8px] font-bold">
-                            InPost
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
-                        18,00 zł
-                      </span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
-                        <span className="text-[16px] text-neutral-darkest font-light">
-                          Paczkomaty InPost
-                        </span>
-                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
-                          <Image
-                            src="/icons/truck.svg"
-                            alt="Truck Icon"
-                            width={14}
-                            height={14}
-                          />
-                          <span className="text-[14px] ml-[8px] font-bold">
-                            InPost
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
-                        15,00 zł
-                      </span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
-                        <span className="text-[16px] text-neutral-darkest font-light">
-                          Punkty GLS
-                        </span>
-                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
-                          <Image
-                            src="/icons/truck.svg"
-                            alt="Truck Icon"
-                            width={14}
-                            height={14}
-                          />
-                          <span className="text-[14px] ml-[8px] font-bold">
-                            GLS
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
-                        15,00 zł
-                      </span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
-                        <span className="text-[16px] text-neutral-darkest font-light">
-                          Kurierem GLS
-                        </span>
-                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
-                          <Image
-                            src="/icons/truck.svg"
-                            alt="Truck Icon"
-                            width={14}
-                            height={14}
-                          />
-                          <span className="text-[14px] ml-[8px] font-bold">
-                            GLS
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
-                        15,00 zł
-                      </span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
-                        <span className="text-[16px] text-neutral-darkest font-light">
-                          Kurierem GLS Pobranie
-                        </span>
-                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
-                          <Image
-                            src="/icons/truck.svg"
-                            alt="Truck Icon"
-                            width={14}
-                            height={14}
-                          />
-                          <span className="text-[14px] ml-[8px] font-bold">
-                            GLS
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
-                        25,00 zł
-                      </span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
-                        <span className="text-[16px] text-neutral-darkest font-light">
-                          Kurierem GLS (powyżej 300 zł)
-                        </span>
-                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
-                          <Image
-                            src="/icons/truck.svg"
-                            alt="Truck Icon"
-                            width={14}
-                            height={14}
-                          />
-                          <span className="text-[14px] ml-[8px] font-bold">
-                            GLS
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
-                        0,00 zł
-                      </span>
-                    </li>
-                    <li className="flex justify-between items-center">
-                      <div className="w-[340px] flex flex-col items-start md:flex-row md:justify-between md:items-center md:space-x-4">
-                        <span className="text-[16px] text-neutral-darkest font-light">
-                          Paczkomaty InPost (powyżej 300 zł)
-                        </span>
-                        <div className="min-w-[97px] flex px-4 py-1 flex-row bg-white rounded-[8px]">
-                          <Image
-                            src="/icons/truck.svg"
-                            alt="Truck Icon"
-                            width={14}
-                            height={14}
-                          />
-                          <span className="text-[14px] ml-[8px] font-bold">
-                            InPost
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-[18px] font-bold min-w-[120px] md:text-start text-end whitespace-nowrap mt-2 md:mt-0">
-                        0,00 zł
-                      </span>
-                    </li>
-                  </ul>
-                  <p className="text-[18px] font-light text-neutral-darkest mt-10">
-                    Czas dostawy powyższych przewoźników to od{' '}
-                    <span className="font-bold">24h do 48h</span> od momentu
-                    wysłania przez nas przesyłki.
-                  </p>
-                </div>
-              </div>
+                {pageData && ! isLoading?         <div 
+                    className="page-content"
+                    dangerouslySetInnerHTML={{ __html: pageData?.content_raw || '' }}
+                  /> : (<p className="px-4">{t.modal.loading}...</p>)}
             </div>
 
             {/* Image Section */}

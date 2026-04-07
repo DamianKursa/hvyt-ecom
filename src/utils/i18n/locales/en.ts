@@ -170,6 +170,20 @@ export const en: Translations = {
       title: 'Privacy Policy and Cookie Policy',
       subtitle: 'Full text of the HVYT Online Store Privacy Policy.',
     },    
+    // === STRONA COOPERATION ===
+    pageCooperation: {
+      title: 'Cooperation',
+      sendEmail: 'Send email',
+    },    
+    // === PAGE DELIVERY ===
+    pageDelivery: {
+      title: 'Delivery',
+    },   
+    // === PAGE RETURNS ===
+    pageReturns: {
+      title: 'Returns',
+      layoutTitle: 'Returns and Claims',
+    },     
     // === COMMON ===
     common: {
       error: 'Error',
