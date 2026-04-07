@@ -812,6 +812,7 @@ const Checkout: React.FC = () => {
                   />
                   {isStripeProcessing && <PaymentFormWrapper 
                     cart={cart}
+                    shippingPrice={shippingPrice}
                     billingData={paymentFormData}
                     updateStripePaymentIntentId={updateStripePaymentIntentId}
                   />}

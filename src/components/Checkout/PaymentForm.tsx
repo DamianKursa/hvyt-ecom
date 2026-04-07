@@ -18,12 +18,14 @@ import { useI18n } from '@/utils/hooks/useI18n';
  */
 export function PaymentFormWrapper({ 
   cart, 
+  shippingPrice,
   billingData,
   updateStripePaymentIntentId
 }: { 
-  cart: Cart | null; 
-  billingData: PaymentFormData;
-  updateStripePaymentIntentId: React.Dispatch<string | null>;
+  cart: Cart | null
+  shippingPrice: number
+  billingData: PaymentFormData
+  updateStripePaymentIntentId: React.Dispatch<string | null>
 }) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export function PaymentFormWrapper({
         // Wywołanie Server Action do utworzenia Payment Intent
         const result = await createPaymentIntent(
           {
-          amount: cart?.totalProductsPrice || 0,
+          amount: (cart?.totalProductsPrice || 0) + shippingPrice,
           currency,
           metadata: {
             customer_email: billingData.email,
@@ -109,7 +111,7 @@ export function PaymentFormWrapper({
 
   return (
     <Elements stripe={stripePromise} options={elementsOptions}>
-      <PaymentFormContent cart={cart} billingData={billingData} currency={currency} updateStripePaymentIntentId={updateStripePaymentIntentId} />
+      <PaymentFormContent cart={cart} shippingPrice={shippingPrice} billingData={billingData} currency={currency} updateStripePaymentIntentId={updateStripePaymentIntentId} />
     </Elements>
   );
 }
@@ -119,14 +121,16 @@ export function PaymentFormWrapper({
  */
 function PaymentFormContent({ 
   cart, 
+  shippingPrice,
   billingData, 
   currency,
   updateStripePaymentIntentId
 }: { 
-  cart: Cart | null; 
-  billingData: PaymentFormData;
-  currency: string;
-  updateStripePaymentIntentId: React.Dispatch<string|null>;
+  cart: Cart | null
+  shippingPrice: number
+  billingData: PaymentFormData
+  currency: string
+  updateStripePaymentIntentId: React.Dispatch<string|null>
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -241,7 +245,7 @@ function PaymentFormContent({
           {isProcessing ? (
             <>⏳ {t.stripePayment.processing}...</>
           ) : (
-            <>{t.stripePayment.pay}</>
+            <>{t.stripePayment.pay} {(cart?.totalProductsPrice || 0) + shippingPrice} {currency.toUpperCase()}</>
           )}
         </button>
         <button
