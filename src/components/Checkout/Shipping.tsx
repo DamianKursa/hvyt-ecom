@@ -691,7 +691,7 @@ const Shipping: React.FC<ShippingProps> = ({
                       : 'border-2 border-gray-400'
                       }`}
                   ></span>
-                  <span className="truncate">{method.title}</span>
+                  <span>{method.title}</span>
                 </div>
 
                 {/* Second Column: Price */}
