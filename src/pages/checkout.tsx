@@ -483,7 +483,7 @@ const Checkout: React.FC = () => {
       shipping: shippingAddress,
       shipping_lines: [
         {
-          method_id: shippingMethod,
+          method_id: shippingMethod.method_id,
           method_title: shippingTitle || 'Paczkomaty InPost',
           total: (!isNaN(shippingPrice) ? shippingPrice : 0).toFixed(2),
           meta_data: shippingMetaData,
