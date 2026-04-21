@@ -110,6 +110,34 @@ const Checkout: React.FC = () => {
   }, [cart]);
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      if (user) {
+        try {
+          const response = await fetch('/api/moje-konto/moje-dane', {
+            method: 'GET',
+            credentials: 'include',
+          });
+
+          if (response.ok) {
+            const userData = await response.json();
+            
+            setEmail(userData.email || '');
+            setBillingData(prev => ({
+              ...prev,
+              firstName: userData.firstName || '',
+              lastName: userData.lastName || '',
+            }));
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+    };
+
+    fetchUserData();
+  }, [user]);
+
+  useEffect(() => {
     const fetchShippingTitle = async () => {
       try {
         const response = await axios.get('/api/shipping');
