@@ -64,24 +64,25 @@ export const en: Translations = {
       reviewsMessage: 'Check out what people who have bought our products say or share your opinion.',      
       notifyAvailable: 'Notify when availabilable',
       variationNoOptions: 'No options available',
+      omnibusMessage: 'Lowest price in the 30 days before the discount',
     },
     // === SERVICE INFO (footer) ===
     serviceInfo: {
       freeShipping: {
-        title: 'Free shipping',
-        desc: 'For orders over €50',
+        title: 'Free Shipping',
+        desc: 'For orders over 300 PLN',
       },
       shipping24h: {
-        title: 'Shipping within 24h',
+        title: '24h Dispatch',
         desc: 'On business days',
       },
       return30: {
-        title: '30 days return',
-        desc: 'From the day of receipt',
+        title: '30-Day Returns',
+        desc: 'From the date of delivery',
       },
       support: {
-        title: 'Lightning-fast support',
-        desc: 'Via form and social media',
+        title: 'Fast Support',
+        desc: 'Via contact form & social media',
       },
     },
     // === COMPANY DATA ===
@@ -93,9 +94,9 @@ export const en: Translations = {
     // === LINKS ===
     links: {
       categories: {
-        handles: {label: 'Handles', slug: 'handles'},
+        handles: {label: 'Cabinet handles', slug: 'handles'},
         doorHandles: {label: 'Door handles', slug: 'door-handles'},
-        wallHooks: {label: 'Wall hooks', slug: 'wall-hooks'},
+        wallHooks: {label: 'Hooks', slug: 'hooks'},
         knobs: {label: 'Knobs', slug: 'knobs'},
         furniture: {label: 'Furniture', slug: 'furniture'},
         collections: {label: 'Collections', slug: 'collections'},
@@ -257,7 +258,7 @@ export const en: Translations = {
       },
       item: {
         edit: 'edit',
-        editModalTitle: 'Edit product spacing',
+        editModalTitle: 'Edit product CC-size',
         editModalDescription: 'Products will be added to the cart with their current prices. Do you want to continue?',
       },
       summary: {
@@ -296,7 +297,7 @@ export const en: Translations = {
         availabilityOrQuantity: 'Some items are out of stock or exceed stock: {names}. Please change variant or quantity to continue.',        
       },
       messages: {
-        variationChanged: 'Product spacing for {name} has been changed',
+        variationChanged: 'Product CC-size for {name} has been changed',
       },
       recommendations: {
         title: 'Products you may like',
@@ -329,7 +330,7 @@ export const en: Translations = {
       personalData: {
         title: 'Personal details',
         loginPrompt: 'Already have an account? Log in',
-        customerTypeIndividual: 'Individual customer',
+        customerTypeIndividual: 'Private Customer',
         customerTypeCompany: 'Company',
         firstName: 'First name',
         lastName: 'Last name',
@@ -447,7 +448,7 @@ export const en: Translations = {
       },
       billingAddress: {
         loadingData: 'Loading billing data...',
-        individualCustomer: 'Individual customer',
+        individualCustomer: 'Private Customer ',
         company: 'Company',
         firstName: 'First name',
         lastName: 'Last name',
@@ -517,11 +518,11 @@ export const en: Translations = {
     },
   // === USER ACCOUNT ===
   account: {
-    myData: 'My data',
-    myOrders: 'My orders',
-    boughtProducts: 'Bought products',
-    billingData: 'Billing data',
-    myAddresses: 'My addresses',
+    myData: 'Account Details',
+    myOrders: 'My Orders',
+    boughtProducts: 'Previously Purchased',
+    billingData: 'Billing Information',
+    myAddresses: 'Address Book',
     logout: 'Logout',
     logoutFull: 'Log out',
     deleteAccount: 'Delete account',
@@ -649,7 +650,7 @@ export const en: Translations = {
     apply: 'Apply',
     show: 'Show',
     products: 'products',
-    infoSpacing: 'Spacing is the distance between the screw holes on a handle or knob. It\'s an important measurement to ensure that the handle or knob will fit your furniture properly.',
+    infoSpacing: 'CC-sizeis the distance between the screw holes on a handle or knob. It\'s an important measurement to ensure that the handle or knob will fit your furniture properly.',
   },
   // === INDEX / HOME PAGE ===
   index: {
@@ -672,7 +673,7 @@ export const en: Translations = {
     choose: 'Choose',
     your: 'your',
     chooseHVYT: 'Choose your HVYT',
-    chooseSloganMobile: 'From elegant, modern furniture handle designs to timeless classics, see how our Hvyts can transform your interior.',    
+    chooseSloganMobile: 'From elegant, modern cabinet handle designs to timeless classics, see how our Hvyts can transform your interior.',    
     bestsellers: 'Bestsellers',
     bestsellersSlogan: 'Discover our most frequently purchased products.',
     chooseColorTitle: 'Choose the color you like',
@@ -721,7 +722,7 @@ export const en: Translations = {
     contact: {
       title: 'Contact',
       address: 'Address',
-      writeToUs: 'Write tu us',
+      writeToUs: 'Contact Us',
       nameSurname: 'Name and surname',
       message: 'Message',
       messageSent: 'The form has been successfully sent!',

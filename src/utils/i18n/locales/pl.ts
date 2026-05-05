@@ -65,6 +65,7 @@ export const pl = {
       reviewsMessage: 'Sprawdź co mówią osoby, które kupiły nasze produkty lub podziel się swoją opinią.',
       notifyAvailable: 'Powiadom o dostępności',
       variationNoOptions: 'Brak dostępnych opcji',
+      omnibusMessage: 'Najniższa cena w okresie 30 dni przed obniżką',
     },
     // === INFORMACJE O SERWISIE (stopka) ===
     serviceInfo: {

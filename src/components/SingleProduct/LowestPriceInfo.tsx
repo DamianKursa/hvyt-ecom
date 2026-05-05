@@ -1,3 +1,4 @@
+import { useI18n } from '@/utils/hooks/useI18n';
 import { getCurrency, Language } from '@/utils/i18n/config';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -48,6 +49,9 @@ const LowestPriceInfo: React.FC<LowestPriceInfoProps> = ({
   product,
   selectedVariation = null,
 }) => {
+
+  const {t} = useI18n();
+
   const getNumber = (val: unknown): number =>
     typeof val === 'string' || typeof val === 'number'
       ? parseFloat(val as any) || 0
@@ -113,7 +117,7 @@ const LowestPriceInfo: React.FC<LowestPriceInfoProps> = ({
 
   return (
     <p className="w-full text-[16px] text-[#969394] mt-[-20px] mb-4">
-      Najniższa cena w okresie 30 dni przed obniżką: {regularPrice.toFixed(2)}{' '}
+      {t.product.omnibusMessage}: {regularPrice.toFixed(2)}{' '}
       {currency.symbol}
     </p>
   );

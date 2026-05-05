@@ -16,7 +16,7 @@ type AccountEndpoints = {
 
 const endpoints: AccountEndpoints[] = [
   {
-    key: 'orders',
+    key: 'moje-zamowienia',
     langKey: 'myOrders',    
     label: 'Moje zamówienia',
     path: '/moje-konto/moje-zamowienia',
@@ -113,7 +113,7 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
               <li key={endpoint.key}>
                 <Link href={getPath(endpoint.path)}>
                   <div
-                    className={` px-4 flex items-center py-2 rounded-[25px] cursor-pointer ${router.asPath === endpoint.path
+                    className={`px-4 flex items-center py-2 rounded-[25px] cursor-pointer ${router?.query?.section === endpoint.key
                       ? 'bg-beige-light text-dark-pastel-red'
                       : 'hover:bg-gray-100'
                       }`}

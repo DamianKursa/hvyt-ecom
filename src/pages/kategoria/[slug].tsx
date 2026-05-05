@@ -67,7 +67,7 @@ const filterOrder: Record<string, string[]> = {};
 //     'pa_przeznaczenie',
 //   ],
 //   'door-handles': ['Kształt rozety', 'Kolor', 'Materiał'],
-//   'wall-hooks': ['Kolor', 'Materiał'],
+//   'hooks': ['Kolor', 'Materiał'],
 //   'furniture': ['Rodzaj', 'Wykończenie', 'Styl'],
 //   'knobs': ['Kolor', 'Materiał'],
 // };
@@ -81,7 +81,7 @@ const icons: Record<string, string> = {
   // English slugs
   'handles': '/icons/uchwyty-kształty.svg',
   'door-handles': '/icons/klamki-kształty.svg',
-  'wall-hooks': '/icons/wieszaki-kształty.svg',
+  'hooks': '/icons/wieszaki-kształty.svg',
   'furniture': '/images/HVYT_meble_znak graficzny_burgundy.png',
 };
 
@@ -571,7 +571,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
     // English slugs
     { params: { slug: 'handles' } },
     { params: { slug: 'door-handles' } },
-    { params: { slug: 'wall-hooks' } },
+    { params: { slug: 'hooks' } },
     { params: { slug: 'furniture' } },
     { params: { slug: 'knobs' } },
   ];

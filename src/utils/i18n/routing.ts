@@ -13,7 +13,7 @@ const slugMap: Record<string, { pl: string; en: string }> = {
   // Categories
   'uchwyty-meblowe': { pl: 'uchwyty-meblowe', en: 'handles' },
   'klamki': { pl: 'klamki', en: 'door-handles' },
-  'wieszaki': { pl: 'wieszaki', en: 'wall-hooks' },
+  'wieszaki': { pl: 'wieszaki', en: 'hooks' },
   'galki': { pl: 'galki', en: 'knobs' },
   'meble': { pl: 'meble', en: 'furniture' },
   
@@ -60,8 +60,8 @@ export const categorySlugMapping: Record<string, { pl: string; en: string }> = {
   'handles': { pl: 'uchwyty-meblowe', en: 'handles' },
   'klamki': { pl: 'klamki', en: 'door-handles' },
   'door-handles': { pl: 'klamki', en: 'door-handles' },
-  'wieszaki': { pl: 'wieszaki', en: 'wall-hooks' },
-  'wall-hooks': { pl: 'wieszaki', en: 'wall-hooks' },
+  'wieszaki': { pl: 'wieszaki', en: 'hooks' },
+  'hooks': { pl: 'wieszaki', en: 'hooks' },
   'galki': { pl: 'galki', en: 'knobs' },
   'knobs': { pl: 'galki', en: 'knobs' },
   'meble': { pl: 'meble', en: 'furniture' },
@@ -227,7 +227,7 @@ export const getCategorySlug = (
   const categorySlugMap: Record<string, { pl: string; en: string }> = {
     Uchwyty: { pl: 'uchwyty-meblowe', en: 'handles' },
     Klamki: { pl: 'klamki', en: 'door-handles' },
-    Wieszaki: { pl: 'wieszaki', en: 'wall-hooks' },
+    Wieszaki: { pl: 'wieszaki', en: 'hooks' },
     Gałki: { pl: 'galki', en: 'knobs' },
   };
   
