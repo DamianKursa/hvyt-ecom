@@ -209,7 +209,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
   const isVariableProduct = hasNodeVariations || hasIdVariations;
 
   const productPrice = isVariableProduct
-    ? `od ${basePrice.toFixed(2)} ${currency.symbol}`
+    ? `${t.product.priceFrom} ${basePrice.toFixed(2)} ${currency.symbol}`
     : `${safeParse(product.price).toFixed(2)} ${currency.symbol}`;
 
   const hasNumericDiscount = resolvedSale < resolvedRegular;

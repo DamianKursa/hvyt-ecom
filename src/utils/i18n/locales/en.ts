@@ -65,6 +65,7 @@ export const en: Translations = {
       notifyAvailable: 'Notify when availabilable',
       variationNoOptions: 'No options available',
       omnibusMessage: 'Lowest price in the 30 days before the discount',
+      priceFrom: 'from',
     },
     // === SERVICE INFO (footer) ===
     serviceInfo: {

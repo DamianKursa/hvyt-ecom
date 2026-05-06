@@ -64,8 +64,8 @@ const Filters: React.FC<FiltersProps> = ({
       const orderedAttributes =
         filterOrder.length > 0
           ? filterOrder
-            .map((order) =>
-              initialAttributes.find((attr) => attr.name === order),
+            .map((order) => 
+              initialAttributes.find((attr) => attr.slug === order),
             )
             .filter((attr): attr is FilterAttribute => !!attr)
           : initialAttributes;

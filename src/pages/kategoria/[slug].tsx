@@ -40,7 +40,35 @@ interface CategoryPageProps {
   initialAttributes: any[];
   lang?: string;
 }
-const filterOrder: Record<string, string[]> = {};
+
+const filterOrder: Record<string, string[]> = {
+  'uchwyty-meblowe': [
+    'pa_rodzaj',
+    'pa_kolor',
+    'pa_rozstaw',
+    'pa_material',
+    'pa_styl',
+    'pa_kolekcja',
+    'pa_przeznaczenie',
+  ],
+  klamki: ['pa_ksztalt_rozety', 'pa_kolor', 'pa_material'],
+  wieszaki: ['pa_kolor', 'pa_material'],
+  meble: ['pa_rodzaj', 'pa_wykonczenie', 'pa_styl'],
+  'handles': [
+    'pa_rodzaj',
+    'pa_kolor',
+    'pa_rozstaw',
+    'pa_material',
+    'pa_styl',
+    'pa_kolekcja',
+    'pa_przeznaczenie',
+  ],
+  'door-handles': ['pa_ksztalt_rozety', 'pa_kolor', 'pa_material'],
+  'hooks': ['pa_kolor', 'pa_material'],
+  'furniture': ['pa_rodzaj', 'pa_wykonczenie', 'pa_styl'],
+};
+
+// const filterOrder: Record<string, string[]> = {};
 // const filterOrder: Record<string, string[]> = {
 //   // Polish slugs
 //   'uchwyty-meblowe': [
