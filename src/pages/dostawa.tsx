@@ -4,8 +4,6 @@ import Layout from '@/components/Layout/Layout.component';
 import Head from 'next/head';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { useRouter } from 'next/router';
-import { renderSafeHtml } from '@/utils/tailwindToStyle';
-
 const DostawaPage = () => {
 
   const postSlug = {
@@ -60,7 +58,7 @@ const DostawaPage = () => {
               </div>
                 {pageData && ! isLoading?         <div 
                     className="page-content"
-                    dangerouslySetInnerHTML={{ __html:  renderSafeHtml(pageData?.content_raw || '')  }}
+                    dangerouslySetInnerHTML={{ __html: pageData?.content_raw || '' }}
                   /> : (<p className="px-4">{t.modal.loading}...</p>)}
             </div>
 

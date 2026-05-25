@@ -1,6 +1,27 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/components/**/*.tsx', './src/pages/**/*.tsx'],
+  // Klasy używane w HTML z WordPressa (dangerouslySetInnerHTML) — nie są skanowane przez content
+  safelist: [
+    // layout
+    'flex', 'flex-col', 'flex-row', 'items-center', 'items-start', 'justify-between',
+    // typography
+    'font-bold', 'font-light', 'text-end', 'whitespace-nowrap',
+    // spacing (standard)
+    'px-4', 'py-1', 'mb-2', 'mb-6', 'mt-2', 'mt-10', 'space-y-8',
+    // colors
+    'bg-white', 'text-neutral-darkest',
+    // arbitrary values z treści CMS
+    'text-[14px]', 'text-[16px]', 'text-[18px]', 'text-[20px]',
+    'w-[340px]', 'min-w-[97px]', 'min-w-[120px]',
+    'mb-[40px]', 'ml-[8px]', 'rounded-[8px]',
+    // responsive
+    'md:flex-row', 'md:justify-between', 'md:items-center', 'md:space-x-4',
+    'md:text-start', 'md:mt-0',
+    // wzorce na przyszłe klasy z WordPressa (kolory z theme)
+    { pattern: /^text-neutral-(darkest|darker|dark|light|lighter|lightest|white)$/ },
+    { pattern: /^bg-(white|pastel-brown|pastel-azure|light-beige|beige|beige-light|beige-dark|neutral-white)$/ },
+  ],
   theme: {
     extend: {
       fontFamily: {
