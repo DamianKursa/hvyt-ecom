@@ -37,9 +37,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const cached = await getCache(cacheKey);
       
-      // if (cached) {
-      //   return res.status(200).json(cached);
-      // }
+      if (cached) {
+        return res.status(200).json(cached);
+      }
 
         const response = await axios.get(
             `${process.env.REST_API_CUSTOM}/page-by-slug/${slug}`,
