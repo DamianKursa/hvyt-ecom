@@ -4,20 +4,31 @@ module.exports = {
   // Klasy używane w HTML z WordPressa (dangerouslySetInnerHTML) — nie są skanowane przez content
   safelist: [
     // layout
-    'flex', 'flex-col', 'flex-row', 'items-center', 'items-start', 'justify-between',
+    'flex', 'flex-col', 'flex-row', 'flex-1', 'inline-flex',
+    'items-center', 'items-start', 'justify-between',
+    'w-full', 'relative', 'overflow-hidden',
     // typography
-    'font-bold', 'font-light', 'text-end', 'whitespace-nowrap',
+    'font-bold', 'font-light', 'text-end', 'whitespace-nowrap', 'not-italic',
+    'underline', 'list-disc', 'list-inside',
+    'text-black',
     // spacing (standard)
-    'px-4', 'py-1', 'mb-2', 'mb-6', 'mt-2', 'mt-10', 'space-y-8',
+    'px-4', 'py-1', 'py-2', 'mb-2', 'mb-6', 'mb-12', 'mt-2', 'mt-4', 'mt-10',
+    'ml-4', 'mr-2', 'mr-3', 'space-y-8', 'gap-8', 'gap-10',
     // colors
     'bg-white', 'text-neutral-darkest',
-    // arbitrary values z treści CMS
+    // arbitrary values — dostawa
     'text-[14px]', 'text-[16px]', 'text-[18px]', 'text-[20px]',
     'w-[340px]', 'min-w-[97px]', 'min-w-[120px]',
     'mb-[40px]', 'ml-[8px]', 'rounded-[8px]',
+    // arbitrary values — zwroty-i-reklamacje
+    'h-[400px]', 'md:h-[500px]', 'lg:h-[600px]',
+    'md:flex-[2]', 'md:flex-[3]',
+    'rounded-[16px]', 'rounded-lg',
     // responsive
     'md:flex-row', 'md:justify-between', 'md:items-center', 'md:space-x-4',
     'md:text-start', 'md:mt-0',
+    // hover
+    'hover:text-gray-700', 'hover:no-underline',
     // wzorce na przyszłe klasy z WordPressa (kolory z theme)
     { pattern: /^text-neutral-(darkest|darker|dark|light|lighter|lightest|white)$/ },
     { pattern: /^bg-(white|pastel-brown|pastel-azure|light-beige|beige|beige-light|beige-dark|neutral-white)$/ },
