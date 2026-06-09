@@ -1,5 +1,14 @@
 // lib/stripe.ts
-import { loadStripe, Stripe as StripeJS } from '@stripe/stripe-js';
+import { loadStripe, Stripe as StripeJS, StripeElementLocale } from '@stripe/stripe-js';
+
+const STRIPE_LOCALES: Record<string, StripeElementLocale> = {
+  pl: 'pl',
+  en: 'en',
+};
+
+export function getStripeLocale(locale?: string): StripeElementLocale {
+  return STRIPE_LOCALES[locale ?? ''] ?? 'pl';
+}
 
 // Funkcja pomocnicza do konwersji kwoty na najmniejszą jednostkę waluty
 // Stripe wymaga kwot w groszach (cents), nie w dolarach/złotych

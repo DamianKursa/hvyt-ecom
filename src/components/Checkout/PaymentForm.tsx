@@ -4,8 +4,7 @@ import React from 'react';
 
 import { useState, useEffect } from 'react';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { getStripeClient } from '@/lib/stripe';
-import { createPaymentIntent } from '@/lib/stripe';
+import { getStripeClient, createPaymentIntent, getStripeLocale } from '@/lib/stripe';
 // import { createWooCommerceOrder } from '@/app/actions/woocommerce';
 import type { PaymentFormData } from '@/types/stripe';
 import { Cart } from '@/stores/CartProvider';
@@ -31,9 +30,10 @@ export function PaymentFormWrapper({
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
-  const currency = getCurrencySlugByLocale(router.locale as string)
+  const currency = getCurrencySlugByLocale(router.locale as string);
+  const stripeLocale = getStripeLocale(router.locale);
 
-   const { t } = useI18n();
+  const { t } = useI18n();
 
   // Ładowanie Stripe.js (singleton)
   const stripePromise = getStripeClient();
@@ -94,6 +94,7 @@ export function PaymentFormWrapper({
   // Opcje dla Stripe Elements
   const elementsOptions = {
     clientSecret,
+    locale: stripeLocale,
     appearance: {
       theme: 'stripe' as const, // 'stripe', 'night', 'flat'
       variables: {
@@ -110,7 +111,7 @@ export function PaymentFormWrapper({
   };
 
   return (
-    <Elements stripe={stripePromise} options={elementsOptions}>
+    <Elements key={stripeLocale} stripe={stripePromise} options={elementsOptions}>
       <PaymentFormContent cart={cart} shippingPrice={shippingPrice} billingData={billingData} currency={currency} updateStripePaymentIntentId={updateStripePaymentIntentId} />
     </Elements>
   );

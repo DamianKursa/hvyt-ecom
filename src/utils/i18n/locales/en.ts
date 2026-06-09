@@ -248,7 +248,7 @@ export const en: Translations = {
       emptyCart: {
         title: 'Your cart is empty',
         description: 'Find a product in our store that will make your interior stand out!',
-        handlesButton: 'Handles',
+        handlesButton: 'Cabinet handles',
         homeButton: 'Home Page',
       },
       progress: {
