@@ -4,8 +4,7 @@ import { useI18n } from '@/utils/hooks/useI18n';
 
 // Product IDs that should show custom delivery text
 const CUSTOM_DELIVERY_PRODUCT_IDS = new Set([
-  '7564076',
-  '7575924'
+  ''
 ]);
 
 interface DeliveryReturnInfoProps {
@@ -27,6 +26,8 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
   const isCustomDeliveryProduct = productId
     ? CUSTOM_DELIVERY_PRODUCT_IDS.has(String(productId))
     : false;
+
+  const customDeliveryText = 'Wysyłka w 6 tygodni ';
   
   const items = [
     {

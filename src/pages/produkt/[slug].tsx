@@ -255,6 +255,7 @@ const ProductPage = () => {
                   regular_price: matchedVariation.regular_price.toString(),
                   sale_price: matchedVariation.sale_price.toString(),
                   on_sale: matchedVariation.on_sale,
+                  stock_quantity: matchedVariation.stock_quantity,
                   image: matchedVariation.image
                     ? { sourceUrl: matchedVariation.image.src }
                     : undefined,
@@ -702,10 +703,10 @@ const ProductPage = () => {
   }
 
   // Determine out‑of‑stock status based on availableStock
+  // !(availableStock > 0) also catches NaN (e.g. missing stock_quantity)
   const isOutOfStock =
-    availableStock !== null
-      ? availableStock === 0
-      : (product as any)?.stock_status === 'outofstock';
+    !(availableStock > 0) ||
+    (product as any)?.stock_status === 'outofstock';
 
   return (
     <Layout title={seoTitle}>

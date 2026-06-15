@@ -6,6 +6,7 @@ export default function Document(): JSX.Element {
     <Html lang="pl-PL">
       <Head>
         <meta name="p:domain_verify" content="dc185cd01a5d788baa1b5e3db0cd26a2" />
+        <meta name="google-site-verification" content="vy2-u0GFd0r-WiV7izIRc9O4Jbkw4reG28gZPZryZJA" />
         {/* Meta Tags */}
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
