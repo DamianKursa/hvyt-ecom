@@ -53,7 +53,7 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
     stockStatus === 'instock';
 
   const getStockText = () => {
-    const shippingText = isCustomDeliveryProduct ? t.product.shippingAfter : t.product.shippingIn24h;
+    const shippingText = isCustomDeliveryProduct ? t.checkout.delivery6weeks : t.checkout.delivery24h;
     
     if (typeof stock === 'number' && stock > 0) {
       if (stock >= 50) {
