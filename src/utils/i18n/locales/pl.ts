@@ -67,6 +67,7 @@ export const pl = {
       variationNoOptions: 'Brak dostępnych opcji',
       omnibusMessage: 'Najniższa cena w okresie 30 dni przed obniżką',
       priceFrom: 'od',
+      new: 'Nowość',
     },
     // === INFORMACJE O SERWISIE (stopka) ===
     serviceInfo: {

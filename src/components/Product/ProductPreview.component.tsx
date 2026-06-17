@@ -262,7 +262,7 @@ const ProductPreview: React.FC<ProductPreviewProps> = ({
           className="absolute top-2 left-2 px-2 py-1 rounded-full text-sm font-bold z-20"
           style={{ backgroundColor: '#217557', color: '#fff' }}
         >
-          Nowość
+          {t.product.new}
         </div>
       )}
       {/* Wishlist Button */}
