@@ -96,6 +96,14 @@ const nextConfig = {
       process.env.NEXT_PUBLIC_SITE_URL_PL || `https://${domainPl}`,
     NEXT_PUBLIC_SITE_URL_EN:
       process.env.NEXT_PUBLIC_SITE_URL_EN || `https://${domainEn}`,
+    MAINTENANCE_MODE:
+      process.env.MAINTENANCE_MODE ||
+      process.env.NEXT_PUBLIC_MAINTENANCE_MODE ||
+      'false',
+    NEXT_PUBLIC_MAINTENANCE_MODE:
+      process.env.NEXT_PUBLIC_MAINTENANCE_MODE ||
+      process.env.MAINTENANCE_MODE ||
+      'false',
   },
   
   async redirects() {

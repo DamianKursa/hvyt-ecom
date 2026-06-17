@@ -13,6 +13,8 @@ import LoadingOverlay from '@/components/UI/LoadingOverlay';
 import axios from 'axios';
 import type { AppProps } from 'next/app';
 import { ExternalIdProvider } from '@/context/ExternalIdContext';
+import { isMaintenanceMode } from '@/utils/maintenance';
+import MaintenanceScreen from '@/components/Maintenance/MaintenanceScreen';
 
 import '@/styles/globals.css';
 import 'nprogress/nprogress.css';
@@ -25,6 +27,9 @@ Router.events.on('routeChangeError', () => NProgress.done());
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   const [showOverlay, setShowOverlay] = useState(false);
+  const maintenanceActive = isMaintenanceMode();
+  const showMaintenance =
+    maintenanceActive && router.pathname !== '/maintenance';
 
   // Obsługa przekierowania na podstawie parametrów w URL (np. dla zamówień)
   useEffect(() => {
@@ -112,7 +117,11 @@ function MyApp({ Component, pageProps }: AppProps) {
             <ExternalIdProvider>
               <UserProvider>
                 <WishlistProvider>
-                  <Component {...pageProps} />
+                  {showMaintenance ? (
+                    <MaintenanceScreen />
+                  ) : (
+                    <Component {...pageProps} />
+                  )}
                 </WishlistProvider>
               </UserProvider>
             </ExternalIdProvider>

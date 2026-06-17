@@ -3,8 +3,16 @@ import type { NextRequest } from 'next/server';
 
 type Locale = 'pl' | 'en';
 
-const SUPPORTED_LOCALES: Locale[] = ['pl', 'en'];
 const DEFAULT_LOCALE: Locale = 'pl';
+const MAINTENANCE_PATH = '/maintenance';
+
+const isMaintenanceMode = (): boolean => {
+  const value =
+    process.env.NEXT_PUBLIC_MAINTENANCE_MODE ?? process.env.MAINTENANCE_MODE;
+  if (!value) return false;
+  const normalized = value.trim().toLowerCase();
+  return normalized === 'true' || normalized === '1' || normalized === 'yes';
+};
 
 const EXCLUDED_PATHS = [
   '/api',
@@ -18,10 +26,7 @@ const EXCLUDED_PATHS = [
   '/sitemap.xml',
 ];
 
-const AUTH_PATHS = [
-  '/moje-konto',
-  '/my-account',
-];
+const AUTH_PATHS = ['/moje-konto', '/my-account'];
 
 const parseHostname = (value: string | undefined, fallback: string): string => {
   if (!value?.trim()) return fallback;
@@ -51,7 +56,6 @@ const DOMAIN_EN = parseHostname(
   process.env.NEXT_PUBLIC_DOMAIN_EN || process.env.NEXT_PUBLIC_SITE_URL_EN,
   'hvyt.eu',
 );
-const SITE_URL_PL = buildSiteUrl(process.env.NEXT_PUBLIC_SITE_URL_PL, DOMAIN_PL);
 const SITE_URL_EN = buildSiteUrl(process.env.NEXT_PUBLIC_SITE_URL_EN, DOMAIN_EN);
 
 const hostnameMatchesDomain = (hostname: string, domain: string): boolean => {
@@ -93,7 +97,15 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Legacy subdirectory URLs (/en/...) → redirect to English domain
+  if (isMaintenanceMode() && pathname !== MAINTENANCE_PATH) {
+    const maintenanceUrl = request.nextUrl.clone();
+    maintenanceUrl.pathname = MAINTENANCE_PATH;
+    return NextResponse.rewrite(maintenanceUrl, {
+      status: 503,
+      headers: { 'Retry-After': '3600' },
+    });
+  }
+
   if (pathname === '/en' || pathname.startsWith('/en/')) {
     const legacyPath = pathname.replace(/^\/en/, '') || '/';
     const redirectUrl = new URL(legacyPath, SITE_URL_EN);
@@ -103,7 +115,6 @@ export function middleware(request: NextRequest) {
 
   const detectedLocale = detectLanguage(request);
 
-  // Auth guard for account pages
   if (isAuthPath(pathname)) {
     const token = request.cookies.get('token');
     if (!token) {

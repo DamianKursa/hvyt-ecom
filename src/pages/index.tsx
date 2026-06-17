@@ -15,36 +15,6 @@ import { useI18n } from '@/utils/hooks/useI18n';
 
 const Index: NextPage = () => {
   const {t} = useI18n();
-  const maintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true';
-
-  if (maintenanceMode) {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100vh',
-          textAlign: 'center',
-          padding: '0 20px',
-          backgroundColor: '#f8f8f8',
-        }}
-      >
-        <img
-          src="/images/Logo.svg"
-          alt="Logo"
-          style={{ width: '200px', marginBottom: '20px' }}
-        />
-        <h1>{t.index.maintenanceTitle}</h1>
-        <p>{t.index.maintenanceDescription}</p>
-        <p>{t.index.maintenanceContact}</p>
-        <a href="mailto:hello@hvyt.pl">
-          <h3>hello@hvyt.pl</h3>
-        </a>
-      </div>
-    );
-  }
 
   return (
     <Layout
