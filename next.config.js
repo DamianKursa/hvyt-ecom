@@ -1,4 +1,27 @@
 /** @type {import('next').NextConfig} */
+
+const parseHostname = (value, fallback) => {
+  if (!value?.trim()) return fallback;
+  const trimmed = value.trim();
+  try {
+    if (trimmed.includes('://')) {
+      return new URL(trimmed).hostname.toLowerCase();
+    }
+  } catch {
+    // fall through
+  }
+  return trimmed.split('/')[0].split(':')[0].toLowerCase();
+};
+
+const domainPl = parseHostname(
+  process.env.NEXT_PUBLIC_DOMAIN_PL || process.env.NEXT_PUBLIC_SITE_URL_PL,
+  'hvyt.pl',
+);
+const domainEn = parseHostname(
+  process.env.NEXT_PUBLIC_DOMAIN_EN || process.env.NEXT_PUBLIC_SITE_URL_EN,
+  'hvyt.eu',
+);
+
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -26,6 +49,11 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'hvyt.eu',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
         hostname: 'wp.hvyt.pl',
         pathname: '/wp-content/uploads/**',
       },
@@ -45,13 +73,29 @@ const nextConfig = {
     locales: ['pl', 'en'],
     defaultLocale: 'pl',
     localeDetection: false,
+    domains: [
+      {
+        domain: domainPl,
+        defaultLocale: 'pl',
+        locales: ['pl'],
+      },
+      {
+        domain: domainEn,
+        defaultLocale: 'en',
+        locales: ['en'],
+      },
+    ],
   },
 
   // Environment variables exposed to the browser
   env: {
     NEXT_PUBLIC_DEFAULT_LOCALE: process.env.NEXT_PUBLIC_DEFAULT_LOCALE || 'pl',
-    NEXT_PUBLIC_SITE_URL_PL: process.env.NEXT_PUBLIC_SITE_URL_PL || 'https://hvyt.pl',
-    NEXT_PUBLIC_SITE_URL_EN: process.env.NEXT_PUBLIC_SITE_URL_EN || 'https://hvyt.eu',
+    NEXT_PUBLIC_DOMAIN_PL: domainPl,
+    NEXT_PUBLIC_DOMAIN_EN: domainEn,
+    NEXT_PUBLIC_SITE_URL_PL:
+      process.env.NEXT_PUBLIC_SITE_URL_PL || `https://${domainPl}`,
+    NEXT_PUBLIC_SITE_URL_EN:
+      process.env.NEXT_PUBLIC_SITE_URL_EN || `https://${domainEn}`,
   },
   
   async redirects() {

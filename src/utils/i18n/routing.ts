@@ -1,6 +1,7 @@
 /**
  * URL routing and path localization
- * Maps Polish slugs to English slugs and vice versa
+ * Maps Polish slugs to English slugs and vice versa.
+ * Paths are domain-scoped (no /en prefix) — language comes from hostname.
  */
 
 import { Language } from './config';
@@ -16,7 +17,7 @@ const slugMap: Record<string, { pl: string; en: string }> = {
   'wieszaki': { pl: 'wieszaki', en: 'hooks' },
   'galki': { pl: 'galki', en: 'knobs' },
   'meble': { pl: 'meble', en: 'furniture' },
-  
+
   // Pages
   'o-nas': { pl: 'o-nas', en: 'about-us' },
   'kontakt': { pl: 'kontakt', en: 'contact' },
@@ -53,7 +54,6 @@ Object.keys(slugMap).forEach((key) => {
 
 /**
  * Category slug mapping: PL ↔ EN for category pages
- * Used primarily for server-side rendering and API calls
  */
 export const categorySlugMapping: Record<string, { pl: string; en: string }> = {
   'uchwyty-meblowe': { pl: 'uchwyty-meblowe', en: 'handles' },
@@ -69,192 +69,106 @@ export const categorySlugMapping: Record<string, { pl: string; en: string }> = {
   'sale': { pl: 'sale', en: 'sale' },
 };
 
-/**
- * Get Polish slug from any slug (PL or EN)
- * Used for fetching data from WooCommerce which uses Polish slugs
- */
 export const getPolishCategorySlug = (slug: string): string => {
   const mapping = categorySlugMapping[slug];
   return mapping ? mapping.pl : slug;
 };
 
-/**
- * Get English slug from any slug (PL or EN)
- */
 export const getEnglishCategorySlug = (slug: string): string => {
   const mapping = categorySlugMapping[slug];
   return mapping ? mapping.en : slug;
 };
 
-/**
- * Check if a slug is an English category slug
- */
 export const isEnglishCategorySlug = (slug: string): boolean => {
   const mapping = categorySlugMapping[slug];
   return mapping ? mapping.en === slug && mapping.pl !== slug : false;
 };
 
-/**
- * Get localized category slug based on language
- */
 export const getLocalizedCategorySlug = (slug: string, lang: Language): string => {
   const mapping = categorySlugMapping[slug];
   if (!mapping) return slug;
   return lang === 'en' ? mapping.en : mapping.pl;
 };
 
-/**
- * Check if we're in multi-domain mode (production: hvyt.pl / hvyt.eu)
- * vs subdirectory mode (staging: staging.hvyt.pl / staging.hvyt.pl/en)
- */
-const isMultiDomainMode = (): boolean => {
-  if (typeof window === 'undefined') {
-    // Server-side: check environment variables
-    const siteUrlEn = process.env.NEXT_PUBLIC_SITE_URL_EN || '';
-    return siteUrlEn.includes('hvyt.eu') || siteUrlEn.includes('.eu');
-  }
-  
-  // Client-side: check hostname
-  const hostname = window.location.hostname;
-  return hostname.includes('hvyt.eu') || hostname.includes('.eu');
-};
-
-/**
- * Get localized path for a given route
- */
-export const getLocalizedPath = (
-  path: string,
-  lang?: Language
-): string => {
-  const currentLang = lang || getCurrentLanguage();
-  const isEn = currentLang === 'en';
-  const isMultiDomain = isMultiDomainMode();
-  
-  // Remove leading slash and /en prefix for processing
+/** Strip legacy /en prefix from paths (subdirectory mode migration). */
+const stripLegacyEnPrefix = (path: string): string => {
   let cleanPath = path.startsWith('/') ? path.slice(1) : path;
-  
-  // Remove query params and hash
   cleanPath = cleanPath.split('?')[0].split('#')[0];
-  
-  // Remove /en prefix if present
+
   if (cleanPath.startsWith('en/')) {
-    cleanPath = cleanPath.replace('en/', '');
+    cleanPath = cleanPath.replace(/^en\//, '');
   } else if (cleanPath === 'en') {
     cleanPath = '';
   }
-  
-  // Handle root path
+
+  return cleanPath;
+};
+
+/**
+ * Get localized path for a given route (domain-scoped, no locale prefix in URL).
+ */
+export const getLocalizedPath = (path: string, lang?: Language): string => {
+  const currentLang = lang || getCurrentLanguage();
+  const isEn = currentLang === 'en';
+
+  const cleanPath = stripLegacyEnPrefix(path);
+
   if (cleanPath === '' || cleanPath === '/') {
-    if (isMultiDomain) {
-      return '/';
-    } else {
-      return isEn ? '/en' : '/';
-    }
+    return '/';
   }
-  
-  // Handle category routes: /kategoria/slug or /category/slug
+
   if (cleanPath.startsWith('kategoria/') || cleanPath.startsWith('category/')) {
     const isCategoryRoute = cleanPath.startsWith('category/');
     const slug = cleanPath.replace('kategoria/', '').replace('category/', '');
-    
-    // Find mapping: if EN slug, find PL equivalent; if PL slug, find EN equivalent
-    const mapped = slugMap[slug] || (isCategoryRoute && reverseSlugMap[slug] ? slugMap[reverseSlugMap[slug]] : null);
-    
+    const mapped =
+      slugMap[slug] ||
+      (isCategoryRoute && reverseSlugMap[slug] ? slugMap[reverseSlugMap[slug]] : null);
+
     if (mapped) {
-      if (isMultiDomain) {
-        return isEn ? `/category/${mapped.en}` : `/kategoria/${mapped.pl}`;
-      } else {
-        return isEn ? `/en/category/${mapped.en}` : `/kategoria/${mapped.pl}`;
-      }
+      return isEn ? `/category/${mapped.en}` : `/kategoria/${mapped.pl}`;
     }
-    
-    // Fallback: keep original slug
-    if (isMultiDomain) {
-      return isEn ? `/category/${slug}` : `/kategoria/${slug}`;
-    } else {
-      return isEn ? `/en/category/${slug}` : `/kategoria/${slug}`;
-    }
+
+    return isEn ? `/category/${slug}` : `/kategoria/${slug}`;
   }
-  
-  // Handle product routes: /produkt/slug or /product/slug
+
   if (cleanPath.startsWith('produkt/') || cleanPath.startsWith('product/')) {
     const productSlug = cleanPath.replace('produkt/', '').replace('product/', '');
-    
-    if (isMultiDomain) {
-      return isEn ? `/product/${productSlug}` : `/produkt/${productSlug}`;
-    } else {
-      return isEn ? `/en/product/${productSlug}` : `/produkt/${productSlug}`;
-    }
-  }  
-  
-  // Handle regular pages
+    return isEn ? `/product/${productSlug}` : `/produkt/${productSlug}`;
+  }
+
   let mapped = slugMap[cleanPath];
   if (!mapped && reverseSlugMap[cleanPath]) {
     mapped = slugMap[reverseSlugMap[cleanPath]];
   }
 
   if (mapped) {
-    if (isMultiDomain) {
-      return isEn ? `/${mapped.en}` : `/${mapped.pl}`;
-    } else {
-      return isEn ? `/en/${mapped.en}` : `/${mapped.pl}`;
-    }
+    return isEn ? `/${mapped.en}` : `/${mapped.pl}`;
   }
-  
-  // If path already has language prefix, return as is
-  if (cleanPath.startsWith('en/')) {
-    return `/${cleanPath}`;
-  }
-  
-  // Default: add language prefix for EN only in subdirectory mode
-  if (isMultiDomain) {
-    return isEn ? `/${cleanPath}` : `/${cleanPath}`;
-  } else {
-    return isEn ? `/en/${cleanPath}` : `/${cleanPath}`;
-  }
+
+  return `/${cleanPath}`;
 };
 
-/**
- * Get category slug for current language
- */
-export const getCategorySlug = (
-  categoryKey: string,
-  lang?: Language
-): string => {
+export const getCategorySlug = (categoryKey: string, lang?: Language): string => {
   const currentLang = lang || getCurrentLanguage();
   const isEn = currentLang === 'en';
-  
+
   const categorySlugMap: Record<string, { pl: string; en: string }> = {
     Uchwyty: { pl: 'uchwyty-meblowe', en: 'handles' },
     Klamki: { pl: 'klamki', en: 'door-handles' },
     Wieszaki: { pl: 'wieszaki', en: 'hooks' },
     Gałki: { pl: 'galki', en: 'knobs' },
   };
-  
+
   const mapped = categorySlugMap[categoryKey];
   if (!mapped) return '';
-  
+
   return isEn ? mapped.en : mapped.pl;
 };
 
-/**
- * Get category path (full URL path)
- */
-export const getCategoryPath = (
-  categoryKey: string,
-  lang?: Language
-): string => {
+export const getCategoryPath = (categoryKey: string, lang?: Language): string => {
   const slug = getCategorySlug(categoryKey, lang);
   const currentLang = lang || getCurrentLanguage();
   const isEn = currentLang === 'en';
-  const isMultiDomain = isMultiDomainMode();
-  
-  if (isMultiDomain) {
-    // Multi-domain: no /en prefix
-    return isEn ? `/category/${slug}` : `/kategoria/${slug}`;
-  } else {
-    // Subdirectory: add /en prefix for EN
-    return isEn ? `/en/category/${slug}` : `/kategoria/${slug}`;
-  }
-};
 
+  return isEn ? `/category/${slug}` : `/kategoria/${slug}`;
+};

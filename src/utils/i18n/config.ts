@@ -1,7 +1,13 @@
 /**
  * i18n Configuration
- * Centralized language and URL management
+ * Centralized language and URL management (domain-based)
  */
+
+import {
+  getDefaultLanguage,
+  getLanguageFromHostname,
+  getSiteUrlForLanguage,
+} from './domains';
 
 export type Language = 'pl' | 'en';
 
@@ -14,48 +20,30 @@ export interface I18nConfig {
 }
 
 /**
- * Get current language from environment or URL
+ * Get current language from hostname (domain-based i18n).
+ * Optional hostname for server/middleware; falls back to NEXT_PUBLIC_DEFAULT_LOCALE.
  */
-export const getCurrentLanguage = (): Language => {
-  // Server-side: check environment variable
-  if (typeof window === 'undefined') {
-    const defaultLang = process.env.NEXT_PUBLIC_DEFAULT_LOCALE as Language;
-    return defaultLang || 'pl';
+export const getCurrentLanguage = (hostname?: string): Language => {
+  if (hostname) {
+    const fromDomain = getLanguageFromHostname(hostname);
+    if (fromDomain) return fromDomain;
+    return getDefaultLanguage();
   }
 
-  // Client-side: check URL path or hostname
-  const pathname = window.location.pathname;
-  const hostname = window.location.hostname;
-
-  // Subdirectory mode: staging.hvyt.pl/en
-  if (pathname.startsWith('/en')) {
-    return 'en';
+  if (typeof window !== 'undefined') {
+    const fromDomain = getLanguageFromHostname(window.location.hostname);
+    if (fromDomain) return fromDomain;
   }
 
-  // Multi-domain mode: hvyt.eu
-  if (hostname.includes('hvyt.eu') || hostname.includes('.eu')) {
-    return 'en';
-  }
-
-  // Default: PL
-  return 'pl';
+  return getDefaultLanguage();
 };
 
 /**
- * Get site URL for current language
+ * Get site URL for a language (full origin, e.g. https://hvyt.pl).
  */
 export const getSiteUrl = (lang?: Language): string => {
   const currentLang = lang || getCurrentLanguage();
-  
-  if (currentLang === 'en') {
-    return process.env.NEXT_PUBLIC_SITE_URL_EN || 
-           process.env.NEXT_PUBLIC_SITE_URL || 
-           'https://hvyt.eu';
-  }
-  
-  return process.env.NEXT_PUBLIC_SITE_URL_PL || 
-         process.env.NEXT_PUBLIC_SITE_URL || 
-         'https://hvyt.pl';
+  return getSiteUrlForLanguage(currentLang);
 };
 
 /**
@@ -63,8 +51,6 @@ export const getSiteUrl = (lang?: Language): string => {
  */
 export const getApiUrl = (): string => {
   const baseUrl = process.env.WORDPRESS_API_URL || 'https://hvyt.pl';
-  
-  // Multi-domain mode: same API, different language param
   return `${baseUrl}/wp-json/wc/v3`;
 };
 
@@ -73,11 +59,11 @@ export const getApiUrl = (): string => {
  */
 export const getCurrency = (lang?: Language): { code: string; symbol: string } => {
   const currentLang = lang || getCurrentLanguage();
-  
+
   if (currentLang === 'en') {
     return { code: 'EUR', symbol: '€' };
   }
-  
+
   return { code: 'PLN', symbol: 'zł' };
 };
 
@@ -87,7 +73,7 @@ export const getCurrency = (lang?: Language): { code: string; symbol: string } =
 export const getI18nConfig = (lang?: Language): I18nConfig => {
   const currentLang = lang || getCurrentLanguage();
   const currency = getCurrency(currentLang);
-  
+
   return {
     language: currentLang,
     siteUrl: getSiteUrl(currentLang),
@@ -96,4 +82,3 @@ export const getI18nConfig = (lang?: Language): I18nConfig => {
     currencySymbol: currency.symbol,
   };
 };
-

@@ -33,10 +33,10 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
   };
 
   const isCurrentPath = (path: string) => {
-    let cleanPath = path.startsWith('/en') ? path.replace('/en', '') : path;
-    
-    return cleanPath === currentPath;
-  }
+    const normalizedPath = path.replace(/^\/en(?=\/|$)/, '') || '/';
+    const normalizedCurrent = currentPath.replace(/^\/en(?=\/|$)/, '') || '/';
+    return normalizedPath === normalizedCurrent;
+  };
 
   useEffect(() => {
     setCurrentPath(router.asPath.split('?')[0]);
