@@ -21,6 +21,7 @@ import { getCurrencySlugByLocale } from '@/config/currencies';
 import { ShippingCountryItem, ShippingMethod } from '@/types/checkout';
 import { PaymentFormWrapper } from '@/components/Checkout/PaymentForm';
 import { PaymentFormData, StripePaymentData } from '@/types/stripe';
+import { resolveCountryCode } from '@/utils/countryCode';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -69,7 +70,7 @@ const Checkout: React.FC = () => {
     apartmentNumber: '',
     city: '',
     postalCode: '',
-    country: 'Polska',
+    country: 'PL',
   });
 
   const [paymentFormData, setPaymentFormData] = useState<PaymentFormData>({
@@ -92,7 +93,7 @@ const Checkout: React.FC = () => {
     apartmentNumber: '',
     city: '',
     postalCode: '',
-    country: 'Polska',
+    country: 'PL',
     additionalInfo: '',
   });
 
@@ -109,16 +110,8 @@ const Checkout: React.FC = () => {
   const { cart } = useContext(CartContext);
   const {t, getPath} = useI18n();
 
-  const mapCountry = (country: string): string => {
-    const countryMapping: Record<string, string> = { Polska: 'PL' };
-    return countryMapping[country] || country;
-  };
-
-  const getCountryCodeByName = (countryName: string): string => {
-    const country = countryList.find((c) => c.name.toLocaleLowerCase() === countryName.toLocaleLowerCase());
-    return country ? country.code : '';
-  };
-
+  const toCountryCode = (country: string) =>
+    resolveCountryCode(country, countryList) || 'PL';
 
   useEffect(()=>{
     if(paymentMethod === 'stripe' && !stripePaymentData?.id) {
@@ -139,7 +132,7 @@ const Checkout: React.FC = () => {
 
   useEffect(()=>{
 
-    const mappedBillingCountry = getCountryCodeByName(billingData.country);
+    const mappedBillingCountry = toCountryCode(billingData.country);
 
     setPaymentFormData({
       email: email,
@@ -156,7 +149,27 @@ const Checkout: React.FC = () => {
     })
     // console.log( 'formdata', paymentFormData);
     
-  }, [billingData]);
+  }, [billingData, countryList, email]);
+
+  useEffect(() => {
+    if (!countryList.length) return;
+
+    setBillingData((prev) => {
+      const code = resolveCountryCode(prev.country, countryList);
+      if (!code || code === prev.country) return prev;
+      return { ...prev, country: code };
+    });
+
+    setShippingData((prev) => {
+      const code = resolveCountryCode(prev.country, countryList);
+      if (!code || code === prev.country) return prev;
+      return { ...prev, country: code };
+    });
+
+    const billingCode = resolveCountryCode(billingData.country, countryList) || 'PL';
+    const match = countryList.find((c) => c.code === billingCode);
+    if (match) setSelectedCountry(match);
+  }, [countryList]);
 
   useEffect(()=>{
     setShippingMethod({} as ShippingMethod);
@@ -355,8 +368,10 @@ const Checkout: React.FC = () => {
 
 
     // Map country names to codes
-    const mappedBillingCountry = mapCountry(billingData.country);
-    const mappedShippingCountry = mapCountry(shippingData.country);
+    const mappedBillingCountry = toCountryCode(billingData.country);
+    const mappedShippingCountry = isShippingDifferent
+      ? toCountryCode(shippingData.country)
+      : mappedBillingCountry;
 
     const shippingAddress = isShippingDifferent
       ? {
@@ -664,7 +679,7 @@ const Checkout: React.FC = () => {
         phone: billingData.phone,
         postalCode: billingData.postalCode,
         city: billingData.city,
-        country: mapCountry(billingData.country),
+        country: toCountryCode(billingData.country),
       };
 
       // fire-and-forget so it won’t block the redirect

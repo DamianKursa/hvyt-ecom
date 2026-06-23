@@ -3,6 +3,7 @@ import Checkbox from '@/components/UI/Checkbox';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { useRouter } from 'next/router';
 import { ShippingCountryItem } from '@/types/checkout';
+import { resolveCountryCode } from '@/utils/countryCode';
 
 export interface CheckoutAddressFormProps {
   billingData: {
@@ -154,7 +155,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
       apartmentNumber,
       city: addr.city || '',
       postalCode: addr.postalCode || '',
-      country: addr.country || 'Polska',
+      country: resolveCountryCode(addr.country, countriesList) || 'PL',
       additionalInfo: addr.additionalInfo || '',
     };
   };
@@ -360,13 +361,13 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         <div className="relative w-full">
           <select
             required
-            value={selectedCountry?.code || 'PL'}
+            value={billingData.country || 'PL'}
             onFocus={() => setFocusedField('country')}
             onBlur={() => setFocusedField(null)}
             onChange={
               (e) => {
                 const selected = countriesList.find(c => c.code === e.target.value);
-                setBillingData((prev) => ({ ...prev, country: selected?.name || 'Brak' })); 
+                setBillingData((prev) => ({ ...prev, country: selected?.code || 'PL' })); 
                 setSelectedZone(selected?.zoneId || 0);
                 setSelectedCountry(selected || null);
               }
@@ -502,7 +503,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             <div className="relative w-full">
               <select
                 required
-                value={shippingData.country}
+                value={shippingData.country || 'PL'}
                 onFocus={() => setFocusedField('country')}
                 onBlur={() => setFocusedField(null)}
                 onChange={(e) => {
@@ -514,8 +515,11 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 }
                 className="w-full font-light text-[#363132] border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
               >
-                <option value="poland">{t.checkout.shippingLocationPoland}</option>
-                <option value="other">{t.checkout.shippingLocationOther}</option>
+                {countriesList.map((country) => (
+                  <option key={country.code} value={country.code}>
+                    {country.name}
+                  </option>
+                ))}
               </select>
               <svg xmlns="http://www.w3.org/2000/svg" className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#969394] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

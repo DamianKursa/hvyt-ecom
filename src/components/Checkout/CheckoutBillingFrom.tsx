@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CreateAccount from '@/components/UI/CreateAccount';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { resolveCountryCode } from '@/utils/countryCode';
 
 export interface CheckoutBillingFormProps {
   customerType: 'individual' | 'company';
@@ -97,7 +98,7 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             apartmentNumber: address.apartmentNumber || '',
             city: address.city || '',
             postalCode: address.postalCode || '',
-            country: address.country || 'Polska',
+            country: resolveCountryCode(address.country) || 'PL',
           });
 
           if (address.email) {
