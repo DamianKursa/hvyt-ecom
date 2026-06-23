@@ -21,7 +21,7 @@ import { getCurrencySlugByLocale } from '@/config/currencies';
 import { ShippingCountryItem, ShippingMethod } from '@/types/checkout';
 import { PaymentFormWrapper } from '@/components/Checkout/PaymentForm';
 import { PaymentFormData, StripePaymentData } from '@/types/stripe';
-import { resolveCountryCode } from '@/utils/countryCode';
+import { resolveCountryCode, localizeCountryList } from '@/utils/countryCode';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -213,11 +213,15 @@ const Checkout: React.FC = () => {
         const data = await result.json();
 
         // ustaw listę krajów dla select country
-        const countries = data.map((c: ShippingCountryItem) => ({
-          code: c.code,
-          name: c.name,
-          zoneId: c.zoneId
-        }));
+        const locale = (router.locale === 'en' ? 'en' : 'pl') as 'pl' | 'en';
+        const countries = localizeCountryList<ShippingCountryItem>(
+          data.map((c: ShippingCountryItem) => ({
+            code: c.code,
+            name: c.name,
+            zoneId: c.zoneId,
+          })),
+          locale,
+        );
         
         setCountryList(countries);        
 
@@ -238,7 +242,7 @@ const Checkout: React.FC = () => {
     }
     fetchCoutriesWithShippingZones();
     fetchShippingMethods();
-  }, []);
+  }, [router.locale]);
 
   useEffect(() => {
     const fetchShippingTitle = async () => {

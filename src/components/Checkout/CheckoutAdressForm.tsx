@@ -3,7 +3,7 @@ import Checkbox from '@/components/UI/Checkbox';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { useRouter } from 'next/router';
 import { ShippingCountryItem } from '@/types/checkout';
-import { resolveCountryCode } from '@/utils/countryCode';
+import { resolveCountryCode, getCountryDisplayName } from '@/utils/countryCode';
 
 export interface CheckoutAddressFormProps {
   billingData: {
@@ -81,7 +81,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   selectedCountry,
   setSelectedCountry,
 }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
   const [needVATInvoice, setNeedVATInvoice] = useState<boolean>(false);
@@ -376,7 +376,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
           >
             {countriesList.map((country) => (
               <option key={country.code} value={country.code}>
-                {country.name}
+                {getCountryDisplayName(country.code, language, country.name)}
               </option>
             ))}
           </select>
@@ -517,7 +517,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
               >
                 {countriesList.map((country) => (
                   <option key={country.code} value={country.code}>
-                    {country.name}
+                    {getCountryDisplayName(country.code, language, country.name)}
                   </option>
                 ))}
               </select>

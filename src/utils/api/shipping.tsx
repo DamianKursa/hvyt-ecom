@@ -43,7 +43,9 @@ export async function getShippingCountries(lang = 'pl'): Promise<ShippingCountry
         );
 
         // 3. Pobierz pełną listę krajów (nazwy) z WC Data API
-        const allCountriesResponse = await WooCommerceAPI.get('/data/countries');
+        const allCountriesResponse = await WooCommerceAPI.get('/data/countries', {
+          params: { lang },
+        });
         const allCountries: { code: string; name: string }[] = allCountriesResponse.data;
         const countryMap = Object.fromEntries(allCountries.map(c => [c.code, c.name]));
 
@@ -78,7 +80,10 @@ export async function getShippingCountries(lang = 'pl'): Promise<ShippingCountry
 
                 // Obsługa kontynentów (type === 'continent') — rozwiń na kraje
                 if (location.type === 'continent') {
-                    const continentCountries = await WooCommerceAPI.get(`/data/continents/${location.code.toLowerCase()}`)
+                    const continentCountries = await WooCommerceAPI.get(
+                      `/data/continents/${location.code.toLowerCase()}`,
+                      { params: { lang } },
+                    )
                     for (const country of continentCountries.data.countries ?? []) {
                     result.push({
                         code:     country.code,
