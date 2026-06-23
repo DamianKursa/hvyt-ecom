@@ -64,8 +64,6 @@ export const fetchProductById = async (id: number | string, lang: string) => {
       timeout: 5000,
     });
 
-    // console.log('fetched product ', lang, `/products/${id}?currency=${currency.name.toUpperCase()}` , response.data);
-    
     return response.data;
   } catch (error) {
     console.error('Error fetching product by id:', error);
