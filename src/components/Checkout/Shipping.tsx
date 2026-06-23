@@ -1,5 +1,4 @@
 import { getCurrency, Language } from '@/utils/i18n/config';
-import { useRouter } from 'next/router';
 import React, { useEffect, useState, useRef, Key } from 'react';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { ShippingMethod } from '@/types/checkout';
@@ -198,7 +197,7 @@ const Shipping: React.FC<ShippingProps> = ({
   setSelectedGlsPoint,
   selectedZone,
 }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [cartShippingClassesIds, setcartShippingClassesIds] = useState<number[]>([]);
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
   const [loading, setLoading] = useState(true);
@@ -223,8 +222,7 @@ const Shipping: React.FC<ShippingProps> = ({
     'kurier gls (zagranica)': '/icons/GLS_Logo_2021.svg',
   };
 
-  const router = useRouter();
-  const currency_slug = getCurrencySlugByLocale(router.locale as string);
+  const currency_slug = getCurrencySlugByLocale(language);
 
   const getShippingClassesIdsFromCart = (cart: any): number[] => {
     if (!cart?.products.length) {
@@ -296,7 +294,7 @@ const Shipping: React.FC<ShippingProps> = ({
         //   return;
         // }
 
-        const response = await fetch(`/api/shipping?lang=${router.locale}`);
+        const response = await fetch(`/api/shipping?lang=${language}`);
         if (!response.ok) {
           throw new Error(t.checkout.shipping.errorLoading);
         }
@@ -476,7 +474,20 @@ const Shipping: React.FC<ShippingProps> = ({
         });
 
         setShippingZones(updatedZones);
-        // console.log('updatedZones', updatedZones);
+
+        const availableMethods = updatedZones.flatMap(
+          (zone: ShippingZone) => zone.methods,
+        );
+        const currentMethodStillValid = availableMethods.some(
+          (method: ShippingMethod) => method.id === shippingMethod?.id,
+        );
+
+        if (!currentMethodStillValid && availableMethods.length > 0) {
+          const defaultMethod = availableMethods[0];
+          setShippingMethod(defaultMethod);
+          setShippingTitle(defaultMethod.title);
+          setShippingPrice(Number(defaultMethod.cost) || 0);
+        }
 
       } catch (err) {
         console.error('Error fetching shipping methods:', err);
@@ -489,7 +500,7 @@ const Shipping: React.FC<ShippingProps> = ({
       }
     };
     fetchShippingMethods();
-  }, [cart, cartTotal, router.locale, selectedZone]);
+  }, [cart, cartTotal, language, selectedZone]);
 
   // ─── HANDLING SHIPPING METHOD CHANGE ──────────────────────────────────────
   const handleShippingChange = (method: ShippingMethod) => {

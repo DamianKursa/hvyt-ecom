@@ -3,7 +3,7 @@ import Checkbox from '@/components/UI/Checkbox';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { useRouter } from 'next/router';
 import { ShippingCountryItem } from '@/types/checkout';
-import { resolveCountryCode, getCountryDisplayName } from '@/utils/countryCode';
+import { resolveCountryCode, getCountryDisplayName, getDefaultCountryCode } from '@/utils/countryCode';
 
 export interface CheckoutAddressFormProps {
   billingData: {
@@ -83,6 +83,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
 }) => {
   const { t, language } = useI18n();
   const router = useRouter();
+  const defaultCountryCode = getDefaultCountryCode(language, countriesList) || 'PL';
   const [loading, setLoading] = useState<boolean>(true);
   const [needVATInvoice, setNeedVATInvoice] = useState<boolean>(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -155,7 +156,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
       apartmentNumber,
       city: addr.city || '',
       postalCode: addr.postalCode || '',
-      country: resolveCountryCode(addr.country, countriesList) || 'PL',
+      country: resolveCountryCode(addr.country, countriesList) || defaultCountryCode,
       additionalInfo: addr.additionalInfo || '',
     };
   };
@@ -361,13 +362,13 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         <div className="relative w-full">
           <select
             required
-            value={billingData.country || 'PL'}
+            value={billingData.country || defaultCountryCode}
             onFocus={() => setFocusedField('country')}
             onBlur={() => setFocusedField(null)}
             onChange={
               (e) => {
                 const selected = countriesList.find(c => c.code === e.target.value);
-                setBillingData((prev) => ({ ...prev, country: selected?.code || 'PL' })); 
+                setBillingData((prev) => ({ ...prev, country: selected?.code || defaultCountryCode })); 
                 setSelectedZone(selected?.zoneId || 0);
                 setSelectedCountry(selected || null);
               }
@@ -503,7 +504,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             <div className="relative w-full">
               <select
                 required
-                value={shippingData.country || 'PL'}
+                value={shippingData.country || defaultCountryCode}
                 onFocus={() => setFocusedField('country')}
                 onBlur={() => setFocusedField(null)}
                 onChange={(e) => {

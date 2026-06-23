@@ -101,6 +101,28 @@ export const resolveCountryCode = (
   return '';
 };
 
+export const isPolandCountryCode = (code: string): boolean =>
+  code.trim().toUpperCase() === 'PL';
+
+/** EN storefront ships internationally only — hide Poland from country selectors. */
+export const filterCountriesForLocale = <T extends CountryLookup>(
+  countries: T[],
+  locale: string,
+): T[] => {
+  if (locale !== 'en') return countries;
+  return countries.filter((country) => !isPolandCountryCode(country.code));
+};
+
+export const getDefaultCountryCode = (
+  locale: string,
+  countries: CountryLookup[] = [],
+): string => {
+  if (locale === 'en') {
+    return filterCountriesForLocale(countries, 'en')[0]?.code.toUpperCase() ?? '';
+  }
+  return 'PL';
+};
+
 /** Build checkout country options with labels in the active storefront language. */
 export const localizeCountryList = <T extends CountryLookup>(
   countries: T[],
@@ -108,10 +130,13 @@ export const localizeCountryList = <T extends CountryLookup>(
 ): T[] => {
   const lang = locale === 'en' ? 'en' : 'pl';
 
-  return countries
-    .map((country) => ({
-      ...country,
-      name: getCountryDisplayName(country.code, lang, country.name),
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name, lang));
+  return filterCountriesForLocale(
+    countries
+      .map((country) => ({
+        ...country,
+        name: getCountryDisplayName(country.code, lang, country.name),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name, lang)),
+    locale,
+  );
 };

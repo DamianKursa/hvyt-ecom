@@ -21,7 +21,7 @@ import { getCurrencySlugByLocale } from '@/config/currencies';
 import { ShippingCountryItem, ShippingMethod } from '@/types/checkout';
 import { PaymentFormWrapper } from '@/components/Checkout/PaymentForm';
 import { PaymentFormData, StripePaymentFormHandle } from '@/types/stripe';
-import { resolveCountryCode, localizeCountryList } from '@/utils/countryCode';
+import { resolveCountryCode, localizeCountryList, getDefaultCountryCode } from '@/utils/countryCode';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -100,10 +100,12 @@ const Checkout: React.FC = () => {
   const externalAnonId = useContext(ExternalIdContext);
   const { user } = useUserContext();
   const { cart } = useContext(CartContext);
-  const {t, getPath} = useI18n();
+  const {t, getPath, language} = useI18n();
+
+  const defaultCountryCode = getDefaultCountryCode(language, countryList);
 
   const toCountryCode = (country: string) =>
-    resolveCountryCode(country, countryList) || 'PL';
+    resolveCountryCode(country, countryList) || defaultCountryCode || 'PL';
 
   useEffect(()=>{
 
@@ -131,20 +133,40 @@ const Checkout: React.FC = () => {
 
     setBillingData((prev) => {
       const code = resolveCountryCode(prev.country, countryList);
-      if (!code || code === prev.country) return prev;
-      return { ...prev, country: code };
+      const fallback = getDefaultCountryCode(language, countryList);
+      const resolved =
+        language === 'en' && (code === 'PL' || !code)
+          ? fallback
+          : code || fallback;
+      if (!resolved || resolved === prev.country) return prev;
+      return { ...prev, country: resolved };
     });
 
     setShippingData((prev) => {
       const code = resolveCountryCode(prev.country, countryList);
-      if (!code || code === prev.country) return prev;
-      return { ...prev, country: code };
+      const fallback = getDefaultCountryCode(language, countryList);
+      const resolved =
+        language === 'en' && (code === 'PL' || !code)
+          ? fallback
+          : code || fallback;
+      if (!resolved || resolved === prev.country) return prev;
+      return { ...prev, country: resolved };
     });
 
-    const billingCode = resolveCountryCode(billingData.country, countryList) || 'PL';
-    const match = countryList.find((c) => c.code === billingCode);
-    if (match) setSelectedCountry(match);
-  }, [countryList]);
+    const resolvedCountryCode = (() => {
+      const code = resolveCountryCode(billingData.country, countryList);
+      if (code && countryList.some((c) => c.code === code)) return code;
+      return getDefaultCountryCode(language, countryList);
+    })();
+
+    const match =
+      countryList.find((c) => c.code === resolvedCountryCode) ?? countryList[0];
+
+    if (match) {
+      setSelectedCountry(match);
+      setSelectedZone(match.zoneId);
+    }
+  }, [countryList, language]);
 
   useEffect(()=>{
     setShippingMethod({} as ShippingMethod);
@@ -162,33 +184,17 @@ const Checkout: React.FC = () => {
   // }, [cart, selectedZone])
 
   useEffect(() => {
-    const fetchShippingMethods = async () => {
-      try {
-        const response = await axios.get('/api/shipping', {params: {lang: router.locale}});
-        const shippingZones = response.data;
-
-        if (shippingZones.length > 0) {
-          const defaultMethod = shippingZones[0].methods[0];
-          setShippingMethod(defaultMethod.id);
-          setShippingPrice(Number(defaultMethod.cost) || 0);
-          setShippingTitle(defaultMethod.title);
-        }
-      } catch (error) {
-        console.error('Error fetching shipping methods:', error);
-        alert(t.checkout.errors.shippingLoadFailed);
-      }
-    };
-
     const fetchCoutriesWithShippingZones = async () => {
       try {
-        const result = await fetch('/api/shipping?action=fetchShippingCountries&lang=' + router.locale);
-        if(!result.ok) {
+        const result = await fetch(
+          '/api/shipping?action=fetchShippingCountries&lang=' + language,
+        );
+        if (!result.ok) {
           throw new Error(`Failed to fetch countries: ${result.status}`);
         }
         const data = await result.json();
 
-        // ustaw listę krajów dla select country
-        const locale = (router.locale === 'en' ? 'en' : 'pl') as 'pl' | 'en';
+        const locale = (language === 'en' ? 'en' : 'pl') as 'pl' | 'en';
         const countries = localizeCountryList<ShippingCountryItem>(
           data.map((c: ShippingCountryItem) => ({
             code: c.code,
@@ -197,37 +203,28 @@ const Checkout: React.FC = () => {
           })),
           locale,
         );
-        
-        setCountryList(countries);        
 
-        // ustaw metody wysyłek dla stref
-        // const uniqueZones: Map<number, ShippingMethod[]> = new Map();
-        // (data as ShippingCountry[]).forEach(c => {
-        //   if(uniqueZones.has(c.zoneId)) {
-        //     return;
-        //   }
-        //   uniqueZones.set(c.zoneId, [...c.methods]);
-        // });        
-        
-        // setShippingZonesWithMethods(uniqueZones);
-
+        setCountryList(countries);
       } catch (err) {
         console.error('Error fetching shipping countries:', err);
       }
-    }
+    };
+
     fetchCoutriesWithShippingZones();
-    fetchShippingMethods();
-  }, [router.locale]);
+    setShippingMethod({} as ShippingMethod);
+  }, [language]);
 
   useEffect(() => {
     const fetchShippingTitle = async () => {
       try {
-        const response = await axios.get('/api/shipping', {params: {lang: router.locale}});
+        const response = await axios.get('/api/shipping', {
+          params: { lang: language },
+        });
         const shippingZones = response.data;
 
         const selectedMethod = shippingZones
           .flatMap((zone: any) => zone.methods)
-          .find((method: any) => method.id === shippingMethod);
+          .find((method: any) => method.id === shippingMethod.id);
 
         if (selectedMethod) {
           setShippingTitle(selectedMethod.title);
@@ -238,8 +235,8 @@ const Checkout: React.FC = () => {
       }
     };
 
-    if (shippingMethod) fetchShippingTitle();
-  }, [shippingMethod]);
+    if (shippingMethod?.id) fetchShippingTitle();
+  }, [shippingMethod, language, selectedZone]);
 
   useEffect(() => {
     if (cart && cart.products && cart.products.length > 0) {
