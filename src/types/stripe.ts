@@ -22,6 +22,10 @@ export interface CartItem {
   variation_id?: number;
 }
 
+  export interface StripePaymentFormHandle {
+    confirmPayment: () => Promise<string | null>;
+  }
+
   export interface StripePaymentData {
     id: string | null
   }

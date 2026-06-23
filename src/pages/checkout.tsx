@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -20,7 +20,7 @@ import { useI18n } from '@/utils/hooks/useI18n';
 import { getCurrencySlugByLocale } from '@/config/currencies';
 import { ShippingCountryItem, ShippingMethod } from '@/types/checkout';
 import { PaymentFormWrapper } from '@/components/Checkout/PaymentForm';
-import { PaymentFormData, StripePaymentData } from '@/types/stripe';
+import { PaymentFormData, StripePaymentFormHandle } from '@/types/stripe';
 import { resolveCountryCode, localizeCountryList } from '@/utils/countryCode';
 
 const Checkout: React.FC = () => {
@@ -39,15 +39,7 @@ const Checkout: React.FC = () => {
     'p24-online-payments',
   );
 
-  // stripe payment info
-  const [isStripeProcessing, setIsStripeProcessing] = useState<boolean>(false);
-  const [stripePaymentData, setStripePaymentData] = useState<StripePaymentData | null>({
-    id: null
-  });
-
-  const updateStripePaymentIntentId = (id: string | null) => {
-    setStripePaymentData(prev => ({...prev, id}))
-  }
+  const stripeFormRef = useRef<StripePaymentFormHandle>(null);
 
   const [email, setEmail] = useState<string>('');
   const [subscribeNewsletter, setSubscribeNewsletter] =
@@ -112,23 +104,6 @@ const Checkout: React.FC = () => {
 
   const toCountryCode = (country: string) =>
     resolveCountryCode(country, countryList) || 'PL';
-
-  useEffect(()=>{
-    if(paymentMethod === 'stripe' && !stripePaymentData?.id) {
-      setIsStripeProcessing(false);
-      setOrderDisabled(false);
-    } else if(paymentMethod === 'stripe' && stripePaymentData?.id) {
-      handleOrderSubmit();
-    }
-  }, [stripePaymentData])
-
-  useEffect(() => {
-    if(paymentMethod !== 'stripe') {
-      updateStripePaymentIntentId(null);
-      setIsStripeProcessing(false);
-      setOrderDisabled(false);
-    }
-  },[paymentMethod])
 
   useEffect(()=>{
 
@@ -364,12 +339,14 @@ const Checkout: React.FC = () => {
       }
     }
 
-    // enable Stripe payment form
-    if(paymentMethod === 'stripe' && !stripePaymentData?.id) {
-      setIsStripeProcessing(true);
-      return;
+    let stripePaymentIntentId: string | null = null;
+    if (paymentMethod === 'stripe') {
+      stripePaymentIntentId = (await stripeFormRef.current?.confirmPayment()) ?? null;
+      if (!stripePaymentIntentId) {
+        setOrderDisabled(false);
+        throw new Error('Stripe payment failed');
+      }
     }
-
 
     // Map country names to codes
     const mappedBillingCountry = toCountryCode(billingData.country);
@@ -529,13 +506,13 @@ const Checkout: React.FC = () => {
     };
 
     // add stripe payment intent id to order data if paying with Stripe
-    if(paymentMethod === 'stripe' && stripePaymentData?.id) {
+    if (paymentMethod === 'stripe' && stripePaymentIntentId) {
       orderData.meta_data.push({
         key: 'stripe_payment_intent_id',
-        value: stripePaymentData.id
+        value: stripePaymentIntentId,
       });
 
-      orderData.set_paid = true; // Mark order as paid since Stripe payment was successful
+      orderData.set_paid = true;
     }
 
     pushGTMEvent('add_shipping_info', {
@@ -829,12 +806,14 @@ const Checkout: React.FC = () => {
                     setPaymentMethod={setPaymentMethod}
                     shippingMethod={shippingMethod}
                   />
-                  {isStripeProcessing && <PaymentFormWrapper 
-                    cart={cart}
-                    shippingPrice={shippingPrice}
-                    billingData={paymentFormData}
-                    updateStripePaymentIntentId={updateStripePaymentIntentId}
-                  />}
+                  {paymentMethod === 'stripe' && (
+                    <PaymentFormWrapper
+                      ref={stripeFormRef}
+                      cart={cart}
+                      shippingPrice={shippingPrice}
+                      billingData={paymentFormData}
+                    />
+                  )}
                   
                   {/* Terms and Privacy Checkbox */}
                   <div className="mt-6">
