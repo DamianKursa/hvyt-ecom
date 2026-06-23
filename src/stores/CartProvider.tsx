@@ -474,9 +474,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     });
   };
 
-  const clearCart = () => {
-    setCart(createEmptyCart());
-  };
+  const clearCart = useCallback(() => {
+    setCart((prev) => {
+      if (prev.products.length === 0 && !prev.coupon) {
+        return prev;
+      }
+      return createEmptyCart();
+    });
+  }, []);
 
   const applyCoupon = (coupon: Coupon) => {
     setCart((prevCart) => {

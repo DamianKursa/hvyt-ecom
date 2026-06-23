@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useRef } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import Link from 'next/link';
@@ -16,11 +16,12 @@ const Dziekujemy = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Import clearCart from your CartContext
   const { clearCart } = useContext(CartContext);
+  const cartClearedRef = useRef(false);
 
-  // Clear the cart when the component mounts
   useEffect(() => {
+    if (cartClearedRef.current) return;
+    cartClearedRef.current = true;
     clearCart();
   }, [clearCart]);
 
