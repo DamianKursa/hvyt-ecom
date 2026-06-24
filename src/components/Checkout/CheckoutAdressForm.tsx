@@ -369,7 +369,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
               (e) => {
                 const selected = countriesList.find(c => c.code === e.target.value);
                 setBillingData((prev) => ({ ...prev, country: selected?.code || defaultCountryCode })); 
-                setSelectedZone(selected?.zoneId || 0);
+                setSelectedZone(Number(selected?.zoneId) || 0);
                 setSelectedCountry(selected || null);
               }
             }
@@ -508,12 +508,16 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 onFocus={() => setFocusedField('country')}
                 onBlur={() => setFocusedField(null)}
                 onChange={(e) => {
-                    setShippingData((prev) => ({
-                      ...prev,
-                      country: e.target.value,
-                    }));
+                  const selected = countriesList.find((c) => c.code === e.target.value);
+                  setShippingData((prev) => ({
+                    ...prev,
+                    country: selected?.code || e.target.value,
+                  }));
+                  if (selected) {
+                    setSelectedZone(Number(selected.zoneId));
+                    setSelectedCountry(selected);
                   }
-                }
+                }}
                 className="w-full font-light text-[#363132] border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
               >
                 {countriesList.map((country) => (

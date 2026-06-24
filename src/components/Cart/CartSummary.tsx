@@ -7,6 +7,7 @@ import { useI18n } from '@/utils/hooks/useI18n';
 interface CartSummaryProps {
   totalProductsPrice: number;
   shippingPrice?: number;
+  shippingLoading?: boolean;
   onCheckout: () => Promise<void> | void;
   isCheckoutPage?: boolean;
   disabled?: boolean; // Add this line
@@ -15,6 +16,7 @@ interface CartSummaryProps {
 const CartSummary: React.FC<CartSummaryProps> = ({
   totalProductsPrice,
   shippingPrice = 0,
+  shippingLoading = false,
   onCheckout,
   isCheckoutPage = false,
   disabled = false,
@@ -31,15 +33,15 @@ const CartSummary: React.FC<CartSummaryProps> = ({
   useEffect(() => {
     setLoading(true);
     const timeout = setTimeout(() => {
-      const updatedTotal = totalProductsPrice; // Only products total (without shipping)
-      setTotalPrice(updatedTotal);
-
-      setTotalPrice(updatedTotal);
+      setTotalPrice(totalProductsPrice);
       setLoading(false);
     }, 500);
 
     return () => clearTimeout(timeout);
-  }, [totalProductsPrice, shippingPrice, isCheckoutPage]);
+  }, [totalProductsPrice]);
+
+  const showShippingLoader = isCheckoutPage && shippingLoading;
+  const showTotalLoader = loading || showShippingLoader;
 
   const formatPrice = (price: number) =>
     price.toFixed(2).replace('.', ',') + ` ${currency.symbol}`;
@@ -105,7 +107,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
             {t.cart.summary.shipping}
           </span>
           <span className="font-semibold text-neutral-darkest">
-            {loading ? (
+            {showShippingLoader ? (
               <div className="loader-pulse w-16 h-6 rounded"></div>
             ) : shippingPrice > 0 ? (
               formatPrice(shippingPrice)
@@ -121,7 +123,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({
           <span className=" text-neutral-darkest font-medium text-[18px]">{t.cart.summary.total}</span>
         </div>
         <span className="text-2xl font-bold text-dark-pastel-red">
-          {loading ? (
+          {showTotalLoader ? (
             <div className="loader-pulse w-20 h-8 rounded"></div>
           ) : (
             <p className="text-end">

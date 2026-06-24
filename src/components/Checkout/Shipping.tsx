@@ -2,8 +2,12 @@ import { getCurrency, Language } from '@/utils/i18n/config';
 import React, { useEffect, useState, useRef, Key } from 'react';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { ShippingMethod } from '@/types/checkout';
-import { Product } from '@/stores/CartProvider';
 import { getCurrencySlugByLocale } from '@/config/currencies';
+import {
+  getShippingClassesFromCart,
+  type CartShippingClassRef,
+  resolveShippingMethodCost,
+} from '@/utils/shippingCost';
 
 interface ShippingZone {
   zoneId: number;
@@ -22,7 +26,9 @@ interface ShippingProps {
   cart: any;
   selectedGlsPoint: any;
   setSelectedGlsPoint: React.Dispatch<React.SetStateAction<any>>;
-  selectedZone: number,
+  selectedZone: number;
+  shippingContextReady: boolean;
+  onCostsReadyChange?: (ready: boolean) => void;
 }
 
 // Extend the Window interface for TypeScript
@@ -196,11 +202,14 @@ const Shipping: React.FC<ShippingProps> = ({
   selectedGlsPoint,
   setSelectedGlsPoint,
   selectedZone,
+  shippingContextReady,
+  onCostsReadyChange,
 }) => {
   const { t, language } = useI18n();
-  const [cartShippingClassesIds, setcartShippingClassesIds] = useState<number[]>([]);
+  const [cartShippingClasses, setCartShippingClasses] = useState<CartShippingClassRef[]>([]);
   const [shippingZones, setShippingZones] = useState<ShippingZone[]>([]);
   const [loading, setLoading] = useState(true);
+  const [costsReady, setCostsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedLockerData, setSelectedLockerData] = useState<any>(null);
   const scriptLoadedRef = useRef(false);
@@ -224,51 +233,70 @@ const Shipping: React.FC<ShippingProps> = ({
 
   const currency_slug = getCurrencySlugByLocale(language);
 
-  const getShippingClassesIdsFromCart = (cart: any): number[] => {
-    if (!cart?.products.length) {
-      return [];
-    }
+  const getShippingClassesFromCartState = (cart: any): CartShippingClassRef[] =>
+    getShippingClassesFromCart(cart?.products);
 
-    return (cart.products as Product[]).map(cartItem => cartItem.shipping_class_id || 0);
-  }
-
-  const getMethodCost = (method: ShippingMethod): number => {
-    let classCost = 0;
-
-    method.shipping_classes?.forEach((shippingClass) => {
-      if (
-        !cartShippingClassesIds.includes(shippingClass.class_id) ||
-        shippingClass.cost == null
-      ) {
-        return;
-      }
-
-      const value = Number(shippingClass.cost);
-      if (value > classCost) {
-        classCost = value;
-      }
-    });
-
-    if (classCost > 0) {
-      return classCost;
-    }
-
-    if (method.cost == null || method.cost === '') {
-      return 0;
-    }
-
-    return Number(method.cost) || 0;
-  };
+  const getMethodCost = (method: ShippingMethod): number =>
+    resolveShippingMethodCost(method, cartShippingClasses);
 
   useEffect(() => {
-    setcartShippingClassesIds(getShippingClassesIdsFromCart(cart));
-  }, [cart])
+    setCartShippingClasses(getShippingClassesFromCartState(cart));
+  }, [cart]);
+
+  useEffect(() => {
+    if (!shippingContextReady || loading) {
+      setCostsReady(false);
+      onCostsReadyChange?.(false);
+      return;
+    }
+
+    if (!shippingMethod?.id || shippingZones.length === 0) {
+      setCostsReady(false);
+      onCostsReadyChange?.(false);
+      return;
+    }
+
+    const availableMethods = shippingZones.flatMap((zone) => zone.methods);
+    if (availableMethods.length === 0) {
+      setCostsReady(true);
+      onCostsReadyChange?.(true);
+      return;
+    }
+
+    const methodFromZones = availableMethods.find(
+      (method) => method.id === shippingMethod.id,
+    );
+    const resolvedMethod = methodFromZones ?? shippingMethod;
+    const resolvedCost = resolveShippingMethodCost(resolvedMethod, cartShippingClasses);
+
+    setShippingPrice(resolvedCost);
+    setCostsReady(true);
+    onCostsReadyChange?.(true);
+  }, [
+    cartShippingClasses,
+    shippingMethod?.id,
+    shippingZones,
+    loading,
+    shippingContextReady,
+    onCostsReadyChange,
+  ]);
 
   // ─── FETCH SHIPPING METHODS ──────────────────────────────────────────────
   useEffect(() => {
+    if (!shippingContextReady) {
+      setLoading(true);
+      setCostsReady(false);
+      setShippingZones([]);
+      onCostsReadyChange?.(false);
+      return;
+    }
+
     const fetchShippingMethods = async () => {
       try {
         setLoading(true);
+        setCostsReady(false);
+        setShippingZones([]);
+        onCostsReadyChange?.(false);
         setError(null);
 
         // ZADBANO MEBLE - trzeba uwzględnić wniesienie obecnie w buildZadbanoMethods
@@ -313,7 +341,9 @@ const Shipping: React.FC<ShippingProps> = ({
         //     ( ! zone.zoneName.toLowerCase().includes('polska') && ! zone.zoneName.toLowerCase().includes('poland') )
         // );
 
-        const selectedZoneData = data.filter((zone: ShippingZone) => zone.zoneId === selectedZone);
+        const selectedZoneData = data.filter(
+          (zone: ShippingZone) => Number(zone.zoneId) === Number(selectedZone),
+        );
 
         // Check if coupon has free shipping enabled OR specific coupons are applied
         // const hasFreeShipCoupon =
@@ -498,7 +528,6 @@ const Shipping: React.FC<ShippingProps> = ({
           const defaultMethod = availableMethods[0];
           setShippingMethod(defaultMethod);
           setShippingTitle(defaultMethod.title);
-          setShippingPrice(getMethodCost(defaultMethod));
         }
 
       } catch (err) {
@@ -512,7 +541,7 @@ const Shipping: React.FC<ShippingProps> = ({
       }
     };
     fetchShippingMethods();
-  }, [cart, cartTotal, language, selectedZone]);
+  }, [cart, cartTotal, language, selectedZone, shippingContextReady]);
 
   // ─── HANDLING SHIPPING METHOD CHANGE ──────────────────────────────────────
   const handleShippingChange = (method: ShippingMethod) => {
@@ -676,17 +705,19 @@ const Shipping: React.FC<ShippingProps> = ({
     };
   }, [showGlsMap]);
 
-  if (loading) {
-    return <p>{t.checkout.shipping.loading}</p>;
-  }
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
+  const showShippingMethods = shippingContextReady && !loading && costsReady;
+
   return (
     <div>
       <h2 className="text-[20px] font-bold mb-6 text-neutral-darkest">
         {t.checkout.shipping.title}
       </h2>
+      {error ? (
+        <p className="text-red-500">{error}</p>
+      ) : !showShippingMethods ? (
+        <p className="py-4 text-neutral-dark">{t.checkout.shipping.loading}</p>
+      ) : (
+        <>
       {shippingZones.map((zone) => (
         <div key={zone.zoneName}>
           {zone.methods.map((method) => (
@@ -792,6 +823,8 @@ const Shipping: React.FC<ShippingProps> = ({
           ))}
         </div>
       ))}
+        </>
+      )}
     </div>
   );
 };

@@ -21,7 +21,7 @@ import { getCurrencySlugByLocale } from '@/config/currencies';
 import { ShippingCountryItem, ShippingMethod } from '@/types/checkout';
 import { PaymentFormWrapper } from '@/components/Checkout/PaymentForm';
 import { PaymentFormData, StripePaymentFormHandle } from '@/types/stripe';
-import { resolveCountryCode, localizeCountryList, getDefaultCountryCode } from '@/utils/countryCode';
+import { resolveCountryCode, localizeCountryList, getDefaultCountryCode, dedupeShippingCountriesByCode } from '@/utils/countryCode';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -30,6 +30,7 @@ const Checkout: React.FC = () => {
   );
   const [shippingMethod, setShippingMethod] = useState<ShippingMethod>({} as ShippingMethod);
   const [shippingPrice, setShippingPrice] = useState<number>(0);
+  const [shippingCostsReady, setShippingCostsReady] = useState(false);
   const [shippingTitle, setShippingTitle] = useState<string>('');
   const [selectedLocker, setSelectedLocker] = useState<string>('');
   const [lockerSize, setLockerSize] = useState<string>('');
@@ -107,6 +108,26 @@ const Checkout: React.FC = () => {
   const toCountryCode = (country: string) =>
     resolveCountryCode(country, countryList) || defaultCountryCode || 'PL';
 
+  const deliveryCountryCode = toCountryCode(
+    isShippingDifferent ? shippingData.country : billingData.country,
+  );
+
+  const deliveryZone = countryList.find((country) => country.code === deliveryCountryCode);
+  const isShippingContextReady =
+    countryList.length > 0 &&
+    deliveryZone != null &&
+    Number(selectedZone) === Number(deliveryZone.zoneId) &&
+    (language === 'pl' || deliveryCountryCode !== 'PL');
+
+  const syncZoneForDeliveryCountry = (countryCode: string) => {
+    if (!countryList.length) return;
+    const match = countryList.find((country) => country.code === countryCode);
+    if (match) {
+      setSelectedCountry(match);
+      setSelectedZone(Number(match.zoneId));
+    }
+  };
+
   useEffect(()=>{
 
     const mappedBillingCountry = toCountryCode(billingData.country);
@@ -164,9 +185,17 @@ const Checkout: React.FC = () => {
 
     if (match) {
       setSelectedCountry(match);
-      setSelectedZone(match.zoneId);
+      setSelectedZone(Number(match.zoneId));
     }
   }, [countryList, language]);
+
+  useEffect(() => {
+    setShippingCostsReady(false);
+  }, [deliveryCountryCode, selectedZone, language]);
+
+  useEffect(() => {
+    syncZoneForDeliveryCountry(deliveryCountryCode);
+  }, [deliveryCountryCode, countryList]);
 
   useEffect(()=>{
     setShippingMethod({} as ShippingMethod);
@@ -196,11 +225,13 @@ const Checkout: React.FC = () => {
 
         const locale = (language === 'en' ? 'en' : 'pl') as 'pl' | 'en';
         const countries = localizeCountryList<ShippingCountryItem>(
-          data.map((c: ShippingCountryItem) => ({
-            code: c.code,
-            name: c.name,
-            zoneId: c.zoneId,
-          })),
+          dedupeShippingCountriesByCode(
+            data.map((c: ShippingCountryItem) => ({
+              code: c.code,
+              name: c.name,
+              zoneId: Number(c.zoneId),
+            })),
+          ),
           locale,
         );
 
@@ -228,7 +259,7 @@ const Checkout: React.FC = () => {
 
         if (selectedMethod) {
           setShippingTitle(selectedMethod.title);
-          setShippingPrice(Number(selectedMethod.cost) || 0);
+          // Cena wysyłki jest liczona w Shipping.tsx (koszt klasy wysyłkowej + WCML).
         }
       } catch (error) {
         console.error('Error updating shipping title:', error);
@@ -801,6 +832,8 @@ const Checkout: React.FC = () => {
                   selectedGlsPoint={selectedGlsPoint}
                   setSelectedGlsPoint={setSelectedGlsPoint}
                   selectedZone={selectedZone}
+                  shippingContextReady={isShippingContextReady}
+                  onCostsReadyChange={setShippingCostsReady}
                 />
 
                 <div className="mt-8">
@@ -870,10 +903,11 @@ const Checkout: React.FC = () => {
               <OrderItems />
               <CartSummary
                 shippingPrice={shippingPrice}
+                shippingLoading={!shippingCostsReady}
                 totalProductsPrice={cart?.totalProductsPrice || 0}
                 onCheckout={handleOrderSubmit}
                 isCheckoutPage={true}
-                disabled={orderDisabled || !shippingMethod}
+                disabled={orderDisabled || !shippingMethod?.id || !shippingCostsReady}
               />
             </div>
           </div>

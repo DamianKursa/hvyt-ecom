@@ -43,6 +43,7 @@ export interface ShippingZoneWithMethods {
 
 export interface ShippingClass {
   class_id: number
+  class_slug?: string
   class_name: string
   slass_slug: string
   cost: number | null

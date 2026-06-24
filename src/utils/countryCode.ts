@@ -104,6 +104,23 @@ export const resolveCountryCode = (
 export const isPolandCountryCode = (code: string): boolean =>
   code.trim().toUpperCase() === 'PL';
 
+/** Keep the last zone mapping per country (matches later WC zones overriding earlier ones). */
+export const dedupeShippingCountriesByCode = <
+  T extends CountryLookup & { zoneId?: number },
+>(
+  countries: T[],
+): T[] => {
+  const byCode = new Map<string, T>();
+
+  for (const country of countries) {
+    const code = country.code.trim().toUpperCase();
+    if (!code) continue;
+    byCode.set(code, country);
+  }
+
+  return Array.from(byCode.values());
+};
+
 /** EN storefront ships internationally only — hide Poland from country selectors. */
 export const filterCountriesForLocale = <T extends CountryLookup>(
   countries: T[],
