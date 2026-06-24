@@ -145,9 +145,9 @@ const hasCoupon = (cart: any, code: string): boolean => {
 // ZADBANO SHIPPING METHODS IDS (synchronizacja z Woocommerce)
 /*
   14 - Zadbano
-  16 - Zadbano z wniesieniem
+  22 - Zadbano z wniesieniem
 */
-const ZADBANO_SHIPPING_METHODS_IDS = [14, 16];
+const ZADBANO_SHIPPING_METHODS_IDS = [14, 22];
 
 // SHIPPING METHODS WITHOUT FREE SHIPPING (synchronizacja z Woocommerce)
 /*
@@ -232,26 +232,33 @@ const Shipping: React.FC<ShippingProps> = ({
     return (cart.products as Product[]).map(cartItem => cartItem.shipping_class_id || 0);
   }
 
-  const getMethodCost = (method: ShippingMethod): number => { 
-    let cost = 0;
-    
-    // sprawdź czy produkt nie należy do klasy wysyłkowej i wybierz najwyższy koszt dostawy
-    method.shipping_classes?.forEach(c => { 
-      if( !cartShippingClassesIds.includes(c.class_id) ||  !c.cost) {
+  const getMethodCost = (method: ShippingMethod): number => {
+    let classCost = 0;
+
+    method.shipping_classes?.forEach((shippingClass) => {
+      if (
+        !cartShippingClassesIds.includes(shippingClass.class_id) ||
+        shippingClass.cost == null
+      ) {
         return;
       }
 
-      if(c.cost && Number(c.cost) > cost) {
-        cost = c.cost;
+      const value = Number(shippingClass.cost);
+      if (value > classCost) {
+        classCost = value;
       }
     });
 
-    if(!cost || cost) {
-      cost = method.cost ? Number(method.cost) : 0;
+    if (classCost > 0) {
+      return classCost;
     }
- 
-    return cost;
-  }
+
+    if (method.cost == null || method.cost === '') {
+      return 0;
+    }
+
+    return Number(method.cost) || 0;
+  };
 
   useEffect(() => {
     setcartShippingClassesIds(getShippingClassesIdsFromCart(cart));
@@ -309,13 +316,13 @@ const Shipping: React.FC<ShippingProps> = ({
         const selectedZoneData = data.filter((zone: ShippingZone) => zone.zoneId === selectedZone);
 
         // Check if coupon has free shipping enabled OR specific coupons are applied
-        const hasFreeShipCoupon =
-          cart?.coupon?.freeShipping === true ||
-          hasCoupon(cart, 'comeback') ||
-          hasCoupon(cart, 'cudodostawa');
+        // const hasFreeShipCoupon =
+        //   cart?.coupon?.freeShipping === true ||
+        //   hasCoupon(cart, 'comeback') ||
+        //   hasCoupon(cart, 'cudodostawa');
 
-        console.log('DEBUG Shipping - cart.coupon:', cart?.coupon);
-        console.log('DEBUG Shipping - hasFreeShipCoupon:', hasFreeShipCoupon);
+        // console.log('DEBUG Shipping - cart.coupon:', cart?.coupon);
+        // console.log('DEBUG Shipping - hasFreeShipCoupon:', hasFreeShipCoupon);
 
         // Define restricted IDs
         const restrictedIds = [
@@ -394,12 +401,17 @@ const Shipping: React.FC<ShippingProps> = ({
             return true;
           });
 
-          // DARMOWA DOSTAWA dla kuponu lub zakupów powyżej FREE_SHIPPING_LIMIT
-          if(cartTotal >= FREE_SHIPPING_LIMITS[currency_slug]) {
-            filteredMethods = filteredMethods.map(method => {
-              return NON_FREE_SHIPPING_METHODS_IDS.includes(Number(method.id)) ?
-                method : {...method, cost: null}
-            });
+          // Darmowa dostawa powyżej progu — nie dotyczy zamówień Zadbano
+          if (
+            !hasZadbanoClass &&
+            cartTotal >= FREE_SHIPPING_LIMITS[currency_slug]
+          ) {
+            filteredMethods = filteredMethods.map((method) =>
+              NON_FREE_SHIPPING_METHODS_IDS.includes(Number(method.id)) ||
+              ZADBANO_SHIPPING_METHODS_IDS.includes(Number(method.id))
+                ? method
+                : { ...method, cost: null },
+            );
           }
 
 
@@ -486,7 +498,7 @@ const Shipping: React.FC<ShippingProps> = ({
           const defaultMethod = availableMethods[0];
           setShippingMethod(defaultMethod);
           setShippingTitle(defaultMethod.title);
-          setShippingPrice(Number(defaultMethod.cost) || 0);
+          setShippingPrice(getMethodCost(defaultMethod));
         }
 
       } catch (err) {
@@ -507,8 +519,7 @@ const Shipping: React.FC<ShippingProps> = ({
     setShippingMethod(method);
     // setShippingTitle(method.title || 'Paczkomaty InPost');
     setShippingTitle(method.title);
-    const price = Number(method.cost) || 0;
-    setShippingPrice(price);
+    setShippingPrice(getMethodCost(method));
     // When switching away from "Punkty GLS", do not reinitialize the GLS map.
     // if (method.id !== 'punkty_gls') {
     if (method.title.toLowerCase() !== 'punkty gls') {
