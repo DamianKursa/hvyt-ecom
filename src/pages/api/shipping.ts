@@ -122,11 +122,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             return res.status(200).json(result);
         }
         default: {
-          const cacheKey = `ShippingData:v8:${lang}`;
-          // const cachedData = await getCache(cacheKey);
-          // if (cachedData) {
-          //   return res.status(200).json(cachedData);
-          // }
+          const cacheKey = `ShippingData:v9:${lang}`;
+          const cachedData = await getCache(cacheKey);
+          if (cachedData) {
+            return res.status(200).json(cachedData);
+          }
 
           const langParam = typeof lang === 'string' ? lang : 'pl';
           const fallbackLang = langParam !== 'pl' ? 'pl' : null;
