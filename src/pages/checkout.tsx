@@ -190,16 +190,8 @@ const Checkout: React.FC = () => {
   }, [countryList, language]);
 
   useEffect(() => {
-    setShippingCostsReady(false);
-  }, [deliveryCountryCode, selectedZone, language]);
-
-  useEffect(() => {
     syncZoneForDeliveryCountry(deliveryCountryCode);
   }, [deliveryCountryCode, countryList]);
-
-  useEffect(()=>{
-    setShippingMethod({} as ShippingMethod);
-  }, [selectedCountry]);
 
   useEffect(() => {
     if (!cart || cart.products.length === 0) {
@@ -242,7 +234,7 @@ const Checkout: React.FC = () => {
     };
 
     fetchCoutriesWithShippingZones();
-    setShippingMethod({} as ShippingMethod);
+    setShippingCostsReady(false);
   }, [language]);
 
   useEffect(() => {

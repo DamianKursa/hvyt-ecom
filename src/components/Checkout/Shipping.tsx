@@ -215,8 +215,10 @@ const Shipping: React.FC<ShippingProps> = ({
   const scriptLoadedRef = useRef(false);
   // State to control GLS map visibility
   const [showGlsMap, setShowGlsMap] = useState(false);
-  // Ref for the GLS map container
   const glsMapRef = useRef<HTMLDivElement>(null);
+  const requestFlightRef = useRef(0);
+  const shippingMethodRef = useRef(shippingMethod);
+  shippingMethodRef.current = shippingMethod;
 
   const shippingIcons: Record<string, string> = {
     'kurier gls': '/icons/GLS_Logo_2021.svg',
@@ -239,65 +241,74 @@ const Shipping: React.FC<ShippingProps> = ({
   const getMethodCost = (method: ShippingMethod): number =>
     resolveShippingMethodCost(method, cartShippingClasses);
 
+  const applyShippingCost = (
+    zones: ShippingZone[],
+    method: ShippingMethod | undefined,
+    cartClasses: CartShippingClassRef[],
+  ) => {
+    if (!method?.id) return;
+
+    const methodFromZones = zones
+      .flatMap((zone) => zone.methods)
+      .find((entry) => String(entry.id) === String(method.id));
+    const resolvedMethod = methodFromZones ?? method;
+    const resolvedCost = resolveShippingMethodCost(resolvedMethod, cartClasses);
+
+    setShippingPrice(resolvedCost);
+    setCostsReady(true);
+    onCostsReadyChange?.(true);
+  };
+
+  const resolveMethodForZone = (
+    availableMethods: ShippingMethod[],
+    currentMethod: ShippingMethod | undefined,
+  ): ShippingMethod | undefined => {
+    if (availableMethods.length === 0) return undefined;
+
+    const currentId = currentMethod?.id;
+    if (
+      currentId &&
+      availableMethods.some((method) => String(method.id) === String(currentId))
+    ) {
+      return availableMethods.find((method) => String(method.id) === String(currentId));
+    }
+
+    return availableMethods[0];
+  };
+
   useEffect(() => {
     setCartShippingClasses(getShippingClassesFromCartState(cart));
   }, [cart]);
 
   useEffect(() => {
-    if (!shippingContextReady || loading) {
-      setCostsReady(false);
-      onCostsReadyChange?.(false);
-      return;
-    }
-
-    if (!shippingMethod?.id || shippingZones.length === 0) {
-      setCostsReady(false);
-      onCostsReadyChange?.(false);
-      return;
-    }
-
-    const availableMethods = shippingZones.flatMap((zone) => zone.methods);
-    if (availableMethods.length === 0) {
-      setCostsReady(true);
-      onCostsReadyChange?.(true);
-      return;
-    }
-
-    const methodFromZones = availableMethods.find(
-      (method) => method.id === shippingMethod.id,
-    );
-    const resolvedMethod = methodFromZones ?? shippingMethod;
-    const resolvedCost = resolveShippingMethodCost(resolvedMethod, cartShippingClasses);
-
-    setShippingPrice(resolvedCost);
-    setCostsReady(true);
-    onCostsReadyChange?.(true);
-  }, [
-    cartShippingClasses,
-    shippingMethod?.id,
-    shippingZones,
-    loading,
-    shippingContextReady,
-    onCostsReadyChange,
-  ]);
+    if (!costsReady || !shippingMethod?.id || shippingZones.length === 0) return;
+    applyShippingCost(shippingZones, shippingMethod, cartShippingClasses);
+  }, [cartShippingClasses]);
 
   // ─── FETCH SHIPPING METHODS ──────────────────────────────────────────────
   useEffect(() => {
-    if (!shippingContextReady) {
+    const flightId = ++requestFlightRef.current;
+    const isStale = () => flightId !== requestFlightRef.current;
+
+    const beginLoading = () => {
       setLoading(true);
       setCostsReady(false);
       setShippingZones([]);
       onCostsReadyChange?.(false);
+      setError(null);
+    };
+
+    if (!shippingContextReady) {
+      beginLoading();
       return;
     }
 
+    beginLoading();
+
     const fetchShippingMethods = async () => {
+      const zoneIdAtFetch = selectedZone;
+
       try {
-        setLoading(true);
-        setCostsReady(false);
-        setShippingZones([]);
-        onCostsReadyChange?.(false);
-        setError(null);
 
         // ZADBANO MEBLE - trzeba uwzględnić wniesienie obecnie w buildZadbanoMethods
 
@@ -330,10 +341,13 @@ const Shipping: React.FC<ShippingProps> = ({
         // }
 
         const response = await fetch(`/api/shipping?lang=${language}`);
+        if (isStale()) return;
+
         if (!response.ok) {
           throw new Error(t.checkout.shipping.errorLoading);
         }
         const data = await response.json();
+        if (isStale()) return;
 
         // const selectedZoneData = data.filter((zone: ShippingZone) =>
         //   selectedZone === 'poland' ? 
@@ -342,8 +356,9 @@ const Shipping: React.FC<ShippingProps> = ({
         // );
 
         const selectedZoneData = data.filter(
-          (zone: ShippingZone) => Number(zone.zoneId) === Number(selectedZone),
+          (zone: ShippingZone) => Number(zone.zoneId) === Number(zoneIdAtFetch),
         );
+        if (isStale()) return;
 
         // Check if coupon has free shipping enabled OR specific coupons are applied
         // const hasFreeShipCoupon =
@@ -515,40 +530,91 @@ const Shipping: React.FC<ShippingProps> = ({
           return { ...zone, methods: filteredMethods };
         });
 
+        if (isStale()) return;
+
         setShippingZones(updatedZones);
 
         const availableMethods = updatedZones.flatMap(
           (zone: ShippingZone) => zone.methods,
         );
-        const currentMethodStillValid = availableMethods.some(
-          (method: ShippingMethod) => method.id === shippingMethod?.id,
+        const cartClasses = getShippingClassesFromCart(cart?.products);
+        const methodToUse = resolveMethodForZone(
+          availableMethods,
+          shippingMethodRef.current,
         );
 
-        if (!currentMethodStillValid && availableMethods.length > 0) {
-          const defaultMethod = availableMethods[0];
-          setShippingMethod(defaultMethod);
-          setShippingTitle(defaultMethod.title);
+        if (isStale()) return;
+
+        if (availableMethods.length === 0) {
+          setCostsReady(true);
+          onCostsReadyChange?.(true);
+        } else if (methodToUse) {
+          setShippingMethod(methodToUse);
+          setShippingTitle(methodToUse.title);
+          applyShippingCost(updatedZones, methodToUse, cartClasses);
         }
 
       } catch (err) {
+        if (isStale()) return;
         console.error('Error fetching shipping methods:', err);
         setError(t.checkout.shipping.retryMessage);
         setTimeout(() => {
-          fetchShippingMethods();
+          if (flightId === requestFlightRef.current) {
+            fetchShippingMethods();
+          }
         }, 5000);
       } finally {
-        setLoading(false);
+        if (!isStale()) {
+          setLoading(false);
+        }
       }
     };
     fetchShippingMethods();
   }, [cart, cartTotal, language, selectedZone, shippingContextReady]);
 
+  // Recovery: ensure method + price are set after fetch when state was cleared mid-flight.
+  useEffect(() => {
+    if (loading || !shippingContextReady || shippingZones.length === 0) return;
+
+    const availableMethods = shippingZones.flatMap((zone) => zone.methods);
+    if (availableMethods.length === 0) {
+      if (!costsReady) {
+        setCostsReady(true);
+        onCostsReadyChange?.(true);
+      }
+      return;
+    }
+
+    const methodToUse = resolveMethodForZone(availableMethods, shippingMethod);
+    if (!methodToUse) return;
+
+    const hasValidSelection =
+      shippingMethod?.id &&
+      availableMethods.some(
+        (method) => String(method.id) === String(shippingMethod.id),
+      );
+
+    if (hasValidSelection && costsReady) return;
+
+    setShippingMethod(methodToUse);
+    setShippingTitle(methodToUse.title);
+    applyShippingCost(shippingZones, methodToUse, cartShippingClasses);
+  }, [
+    loading,
+    shippingContextReady,
+    shippingZones,
+    shippingMethod?.id,
+    costsReady,
+    cartShippingClasses,
+  ]);
+
   // ─── HANDLING SHIPPING METHOD CHANGE ──────────────────────────────────────
   const handleShippingChange = (method: ShippingMethod) => {
     setShippingMethod(method);
-    // setShippingTitle(method.title || 'Paczkomaty InPost');
     setShippingTitle(method.title);
     setShippingPrice(getMethodCost(method));
+    setCostsReady(true);
+    onCostsReadyChange?.(true);
     // When switching away from "Punkty GLS", do not reinitialize the GLS map.
     // if (method.id !== 'punkty_gls') {
     if (method.title.toLowerCase() !== 'punkty gls') {
