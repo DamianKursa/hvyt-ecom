@@ -338,6 +338,12 @@ const Checkout: React.FC = () => {
 
     let stripePaymentIntentId: string | null = null;
     if (paymentMethod === 'stripe') {
+      if (language !== 'en') {
+        setOrderDisabled(false);
+        alert(t.checkout.validation.selectPayment);
+        return;
+      }
+
       stripePaymentIntentId = (await stripeFormRef.current?.confirmPayment()) ?? null;
       if (!stripePaymentIntentId) {
         setOrderDisabled(false);
@@ -802,8 +808,11 @@ const Checkout: React.FC = () => {
                     paymentMethod={paymentMethod}
                     setPaymentMethod={setPaymentMethod}
                     shippingMethod={shippingMethod}
+                    deliveryCountryCode={toCountryCode(
+                      isShippingDifferent ? shippingData.country : billingData.country,
+                    )}
                   />
-                  {paymentMethod === 'stripe' && (
+                  {paymentMethod === 'stripe' && language === 'en' && (
                     <PaymentFormWrapper
                       ref={stripeFormRef}
                       cart={cart}

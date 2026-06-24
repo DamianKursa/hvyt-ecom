@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useI18n } from '@/utils/hooks/useI18n';
-import { useRouter } from 'next/router';
 import { ShippingMethod } from '@/types/checkout';
+import { isPolandCountryCode } from '@/utils/countryCode';
 
 interface PaymentProps {
   paymentMethod: string;
   setPaymentMethod: React.Dispatch<React.SetStateAction<string>>;
-  shippingMethod: ShippingMethod; // Pass the shipping method to filter payment methods
+  shippingMethod: ShippingMethod;
+  deliveryCountryCode: string;
 }
 
 interface PaymentMethod {
@@ -15,13 +16,30 @@ interface PaymentMethod {
   enabled: boolean;
 }
 
+const COD_METHOD_ID = 'cod';
+const STRIPE_METHOD_ID = 'stripe';
+const ONLINE_TRANSFER_METHOD_IDS = [
+  'pay_by_paynow_pl_pbl',
+  'przelewy24',
+  'p24-online-payments',
+] as const;
+
+const pickOnlineTransferMethod = (
+  methods: PaymentMethod[],
+): PaymentMethod | undefined =>
+  methods.find((method) =>
+    ONLINE_TRANSFER_METHOD_IDS.includes(
+      method.id as (typeof ONLINE_TRANSFER_METHOD_IDS)[number],
+    ),
+  );
+
 const Payment: React.FC<PaymentProps> = ({
   paymentMethod,
   setPaymentMethod,
   shippingMethod,
+  deliveryCountryCode,
 }) => {
-  const { t } = useI18n();
-  const router = useRouter();
+  const { t, language } = useI18n();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +59,7 @@ const Payment: React.FC<PaymentProps> = ({
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`/api/payment?lang=${router.locale}`);
+        const response = await fetch(`/api/payment?lang=${language}`);
         if (!response.ok) {
           throw new Error(t.checkout.payment.errorLoading);
         }
@@ -60,55 +78,62 @@ const Payment: React.FC<PaymentProps> = ({
     };
 
     fetchPaymentMethods();
-  }, [router.locale]);
+  }, [language, t]);
 
-  // Filter payment methods based on the selected shipping method
+  const getShippingTitle = () =>
+    Object.keys(shippingMethod).length !== 0
+      ? shippingMethod.title.toLowerCase()
+      : '';
+
+  const resolveDefaultPaymentMethodId = (): string | null => {
+    const shippingTitle = getShippingTitle();
+    if (!shippingTitle) return null;
+
+    if (shippingTitle === 'kurier gls pobranie') {
+      return COD_METHOD_ID;
+    }
+
+    if (language === 'en') {
+      return STRIPE_METHOD_ID;
+    }
+
+    if (!isPolandCountryCode(deliveryCountryCode)) {
+      return pickOnlineTransferMethod(paymentMethods)?.id ?? 'pay_by_paynow_pl_pbl';
+    }
+
+    return 'pay_by_paynow_pl_pbl';
+  };
+
   const getFilteredPaymentMethods = () => {
-    // console.log(shippingMethod, paymentMethods);
-    
-    const mappedShippingMethod = Object.keys(shippingMethod).length !== 0 ? shippingMethod.title.toLowerCase() : '';
-    // const mappedShippingMethod =
-    //   shippingMethodMapping[shippingMethod] || shippingMethod;
-
-    // Pusta lista jeżeli nie wybrano metody Wysyłki
-    if(mappedShippingMethod === '') {
-      return [] as ShippingMethod[];
-    }
-   
-
-    // For "Kurier GLS Pobranie" return only the COD option
-    if (mappedShippingMethod === 'kurier gls pobranie') {
-      return paymentMethods.filter((method) => method.id === 'cod');
+    const shippingTitle = getShippingTitle();
+    if (shippingTitle === '') {
+      return [] as PaymentMethod[];
     }
 
-    // Stripe dla wysyłek zagranicznych
-    
-    if(mappedShippingMethod.includes('standard international')) {
-      return paymentMethods.filter((method) => method.id === 'stripe');
+    if (shippingTitle === 'kurier gls pobranie') {
+      return paymentMethods.filter((method) => method.id === COD_METHOD_ID);
     }
 
-    // Otherwise, return only the PayNow method
-    return paymentMethods.filter(
-      (method) => method.id === 'pay_by_paynow_pl_pbl',
-    );
+    if (language === 'en') {
+      return paymentMethods.filter((method) => method.id === STRIPE_METHOD_ID);
+    }
+
+    if (!isPolandCountryCode(deliveryCountryCode)) {
+      const onlineTransfer = pickOnlineTransferMethod(paymentMethods);
+      return onlineTransfer ? [onlineTransfer] : [];
+    }
+
+    return paymentMethods.filter((method) => method.id === 'pay_by_paynow_pl_pbl');
   };
 
   const availableMethods = getFilteredPaymentMethods();
 
-  // Set the default payment method based on the mapped shipping method
   useEffect(() => {
-    const mappedShippingMethod = Object.keys(shippingMethod).length !== 0 ? shippingMethod.title.toLowerCase() : '';
-    // const mappedShippingMethod =
-    //   shippingMethodMapping[shippingMethod] || shippingMethod;
-    if (mappedShippingMethod === 'kurier gls pobranie') {
-      setPaymentMethod('cod');
-    } else if (mappedShippingMethod.includes('standard international')) {
-      setPaymentMethod('stripe');
+    const defaultMethodId = resolveDefaultPaymentMethodId();
+    if (defaultMethodId) {
+      setPaymentMethod(defaultMethodId);
     }
-    else {
-      setPaymentMethod('pay_by_paynow_pl_pbl');
-    }
-  }, [shippingMethod, setPaymentMethod]);
+  }, [shippingMethod, deliveryCountryCode, language, paymentMethods, setPaymentMethod]);
 
   if (loading) {
     return <p>{t.checkout.payment.loading}</p>;
