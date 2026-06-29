@@ -6,6 +6,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
 import Header from '@/components/Header/Header.component';
 import Footer from '@/components/Footer/Footer.component';
+import { isFullWidthHeroRoute } from '@/utils/i18n/routing';
 
 import { CartContext } from '@/stores/CartProvider';
 
@@ -19,22 +20,7 @@ const Layout: React.FC<ILayoutProps> = ({ children, title, description }) => {
   const { cart, addCartItem } = useContext(CartContext);
   const router = useRouter();
 
-  const noMarginPages = ['/', '/o-nas', '/hvyt-objects', '/blog', '/kolekcje'];
-  const fullWidthCategories = [
-    'uchwyty-meblowe',
-    'klamki',
-    'wieszaki',
-    'produkt',
-    'meble',
-    'galki',
-  ];
-  const isCollectionRoute = router.pathname.startsWith('/kolekcje');
-  const isCategoryRoute = router.pathname.startsWith('/kategoria');
-  const isFullWidthHero =
-    noMarginPages.includes(router.pathname) ||
-    isCategoryRoute ||
-    isCollectionRoute || 
-    fullWidthCategories.some((slug) => router.asPath.includes(`/${slug}`));
+  const isFullWidthHero = isFullWidthHeroRoute(router.pathname, router.asPath);
 
   useEffect(() => {
     if (!cart) {

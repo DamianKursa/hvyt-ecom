@@ -172,3 +172,59 @@ export const getCategoryPath = (categoryKey: string, lang?: Language): string =>
 
   return isEn ? `/category/${slug}` : `/kategoria/${slug}`;
 };
+
+const FULL_WIDTH_PAGE_PATHNAMES = [
+  '/',
+  '/o-nas',
+  '/hvyt-objects',
+  '/blog',
+  '/kolekcje',
+] as const;
+
+const FULL_WIDTH_AS_PATH_PREFIXES = [
+  '/about-us',
+  '/collections',
+  '/category/',
+  '/product/',
+] as const;
+
+const getFullWidthCategorySlugs = (): string[] => {
+  const slugs = new Set<string>();
+
+  Object.values(categorySlugMapping).forEach((mapping) => {
+    slugs.add(mapping.pl);
+    slugs.add(mapping.en);
+  });
+
+  slugs.add('produkt');
+  slugs.add('product');
+
+  return Array.from(slugs);
+};
+
+/** Whether the page should use full-width hero layout (no container margin). */
+export const isFullWidthHeroRoute = (pathname: string, asPath: string): boolean => {
+  if (FULL_WIDTH_PAGE_PATHNAMES.includes(pathname as (typeof FULL_WIDTH_PAGE_PATHNAMES)[number])) {
+    return true;
+  }
+
+  if (
+    pathname.startsWith('/kategoria') ||
+    pathname.startsWith('/kolekcje') ||
+    pathname.startsWith('/produkt')
+  ) {
+    return true;
+  }
+
+  const cleanAsPath = asPath.split('?')[0].split('#')[0];
+
+  if (
+    FULL_WIDTH_AS_PATH_PREFIXES.some(
+      (prefix) => cleanAsPath === prefix.replace(/\/$/, '') || cleanAsPath.startsWith(prefix),
+    )
+  ) {
+    return true;
+  }
+
+  return getFullWidthCategorySlugs().some((slug) => cleanAsPath.includes(`/${slug}`));
+};
