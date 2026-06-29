@@ -84,6 +84,12 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
   const { t, language } = useI18n();
   const router = useRouter();
   const defaultCountryCode = getDefaultCountryCode(language, countriesList) || 'PL';
+  const billingCountryValue =
+    language === 'en' ? billingData.country || '' : billingData.country || defaultCountryCode;
+  const shippingCountryValue =
+    language === 'en' ? shippingData.country || '' : shippingData.country || defaultCountryCode;
+  const showBillingCountryOverlay = language !== 'en' && !billingData.country;
+  const showShippingCountryOverlay = language !== 'en' && !shippingData.country;
   const [loading, setLoading] = useState<boolean>(true);
   const [needVATInvoice, setNeedVATInvoice] = useState<boolean>(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -156,7 +162,8 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
       apartmentNumber,
       city: addr.city || '',
       postalCode: addr.postalCode || '',
-      country: resolveCountryCode(addr.country, countriesList) || defaultCountryCode,
+      country: resolveCountryCode(addr.country, countriesList) ||
+        (language === 'en' ? '' : defaultCountryCode),
       additionalInfo: addr.additionalInfo || '',
     };
   };
@@ -362,19 +369,32 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
         <div className="relative w-full">
           <select
             required
-            value={billingData.country || defaultCountryCode}
+            value={billingCountryValue}
             onFocus={() => setFocusedField('country')}
             onBlur={() => setFocusedField(null)}
             onChange={
               (e) => {
-                const selected = countriesList.find(c => c.code === e.target.value);
-                setBillingData((prev) => ({ ...prev, country: selected?.code || defaultCountryCode })); 
+                const value = e.target.value;
+                if (!value) {
+                  setBillingData((prev) => ({ ...prev, country: '' }));
+                  setSelectedCountry(null);
+                  return;
+                }
+
+                const selected = countriesList.find((c) => c.code === value);
+                setBillingData((prev) => ({
+                  ...prev,
+                  country: selected?.code || value,
+                }));
                 setSelectedZone(Number(selected?.zoneId) || 0);
                 setSelectedCountry(selected || null);
               }
             }
             className="w-full text-[#363132] font-light border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
           >
+            {language === 'en' && (
+              <option value="">{t.checkout.address.chooseCountry}</option>
+            )}
             {countriesList.map((country) => (
               <option key={country.code} value={country.code}>
                 {getCountryDisplayName(country.code, language, country.name)}
@@ -385,7 +405,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
           <span
-            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${billingData.country ? 'opacity-0' : 'opacity-100'}`}
+            className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${showBillingCountryOverlay ? 'opacity-100' : 'opacity-0'}`}
           >
             {t.checkout.shippingAddress.country}<span className="text-red-500">*</span>
           </span>
@@ -504,14 +524,20 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
             <div className="relative w-full">
               <select
                 required
-                value={shippingData.country || defaultCountryCode}
+                value={shippingCountryValue}
                 onFocus={() => setFocusedField('country')}
                 onBlur={() => setFocusedField(null)}
                 onChange={(e) => {
-                  const selected = countriesList.find((c) => c.code === e.target.value);
+                  const value = e.target.value;
+                  if (!value) {
+                    setShippingData((prev) => ({ ...prev, country: '' }));
+                    return;
+                  }
+
+                  const selected = countriesList.find((c) => c.code === value);
                   setShippingData((prev) => ({
                     ...prev,
-                    country: selected?.code || e.target.value,
+                    country: selected?.code || value,
                   }));
                   if (selected) {
                     setSelectedZone(Number(selected.zoneId));
@@ -520,6 +546,9 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 }}
                 className="w-full font-light text-[#363132] border-b border-[#969394] p-2 pr-8 bg-white focus:outline-none appearance-none"
               >
+                {language === 'en' && (
+                  <option value="">{t.checkout.address.chooseCountry}</option>
+                )}
                 {countriesList.map((country) => (
                   <option key={country.code} value={country.code}>
                     {getCountryDisplayName(country.code, language, country.name)}
@@ -530,7 +559,7 @@ const CheckoutAddressForm: React.FC<CheckoutAddressFormProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
               <span
-                className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${shippingData.country ? 'opacity-0' : 'opacity-100'
+                className={`absolute left-2 top-2 text-[#363132] font-light pointer-events-none transition-all duration-200 ${showShippingCountryOverlay ? 'opacity-100' : 'opacity-0'
                   }`}
               >
                 {t.checkout.shippingAddress.country}<span className="text-red-500">*</span>

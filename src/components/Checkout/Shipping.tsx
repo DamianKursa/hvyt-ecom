@@ -28,6 +28,7 @@ interface ShippingProps {
   setSelectedGlsPoint: React.Dispatch<React.SetStateAction<any>>;
   selectedZone: number;
   shippingContextReady: boolean;
+  isDeliveryCountrySelected: boolean;
   onCostsReadyChange?: (ready: boolean) => void;
 }
 
@@ -203,6 +204,7 @@ const Shipping: React.FC<ShippingProps> = ({
   setSelectedGlsPoint,
   selectedZone,
   shippingContextReady,
+  isDeliveryCountrySelected,
   onCostsReadyChange,
 }) => {
   const { t, language } = useI18n();
@@ -772,6 +774,9 @@ const Shipping: React.FC<ShippingProps> = ({
   }, [showGlsMap]);
 
   const showShippingMethods = shippingContextReady && !loading && costsReady;
+  const shippingStatusMessage = !isDeliveryCountrySelected
+    ? t.checkout.shipping.selectCountryForShipping
+    : t.checkout.shipping.loading;
 
   return (
     <div>
@@ -781,7 +786,7 @@ const Shipping: React.FC<ShippingProps> = ({
       {error ? (
         <p className="text-red-500">{error}</p>
       ) : !showShippingMethods ? (
-        <p className="py-4 text-neutral-dark">{t.checkout.shipping.loading}</p>
+        <p className="py-4 text-neutral-dark">{shippingStatusMessage}</p>
       ) : (
         <>
       {shippingZones.map((zone) => (

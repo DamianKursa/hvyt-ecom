@@ -21,10 +21,20 @@ import { getCurrencySlugByLocale } from '@/config/currencies';
 import { ShippingCountryItem, ShippingMethod } from '@/types/checkout';
 import { PaymentFormWrapper } from '@/components/Checkout/PaymentForm';
 import { PaymentFormData, StripePaymentFormHandle } from '@/types/stripe';
-import { resolveCountryCode, localizeCountryList, getDefaultCountryCode, dedupeShippingCountriesByCode } from '@/utils/countryCode';
+import {
+  resolveCountryCode,
+  localizeCountryList,
+  getDefaultCountryCode,
+  dedupeShippingCountriesByCode,
+  getInitialCheckoutCountryCode,
+  isCountrySelected,
+} from '@/utils/countryCode';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
+  const initialCountryCode = getInitialCheckoutCountryCode(
+    router.locale === 'en' ? 'en' : 'pl',
+  );
   const [customerType, setCustomerType] = useState<'individual' | 'company'>(
     'individual',
   );
@@ -63,7 +73,7 @@ const Checkout: React.FC = () => {
     apartmentNumber: '',
     city: '',
     postalCode: '',
-    country: 'PL',
+    country: initialCountryCode,
   });
 
   const [paymentFormData, setPaymentFormData] = useState<PaymentFormData>({
@@ -86,14 +96,18 @@ const Checkout: React.FC = () => {
     apartmentNumber: '',
     city: '',
     postalCode: '',
-    country: 'PL',
+    country: initialCountryCode,
     additionalInfo: '',
   });
 
   const defaultLocation: ShippingCountryItem = {code: 'PL', name: 'Polska', zoneId: 1}; 
 
-  const [selectedZone, setSelectedZone] = useState<number>(1);
-  const [selectedCountry, setSelectedCountry] = useState<ShippingCountryItem | null>(defaultLocation);
+  const [selectedZone, setSelectedZone] = useState<number>(
+    initialCountryCode ? 1 : 0,
+  );
+  const [selectedCountry, setSelectedCountry] = useState<ShippingCountryItem | null>(
+    initialCountryCode ? defaultLocation : null,
+  );
   const [countryList, setCountryList] = useState<ShippingCountryItem[]>([]);
   // const [shippingZonesWithMethods, setShippingZonesWithMethods] = useState<Map<number, ShippingMethod[]>|null>(null);
 
@@ -103,10 +117,12 @@ const Checkout: React.FC = () => {
   const { cart } = useContext(CartContext);
   const {t, getPath, language} = useI18n();
 
-  const defaultCountryCode = getDefaultCountryCode(language, countryList);
-
-  const toCountryCode = (country: string) =>
-    resolveCountryCode(country, countryList) || defaultCountryCode || 'PL';
+  const toCountryCode = (country: string) => {
+    if (language === 'en' && !isCountrySelected(country)) return '';
+    const resolved = resolveCountryCode(country, countryList);
+    if (resolved) return resolved;
+    return language === 'en' ? '' : 'PL';
+  };
 
   const deliveryCountryCode = toCountryCode(
     isShippingDifferent ? shippingData.country : billingData.country,
@@ -115,12 +131,13 @@ const Checkout: React.FC = () => {
   const deliveryZone = countryList.find((country) => country.code === deliveryCountryCode);
   const isShippingContextReady =
     countryList.length > 0 &&
+    isCountrySelected(deliveryCountryCode) &&
     deliveryZone != null &&
     Number(selectedZone) === Number(deliveryZone.zoneId) &&
     (language === 'pl' || deliveryCountryCode !== 'PL');
 
   const syncZoneForDeliveryCountry = (countryCode: string) => {
-    if (!countryList.length) return;
+    if (!countryList.length || !isCountrySelected(countryCode)) return;
     const match = countryList.find((country) => country.code === countryCode);
     if (match) {
       setSelectedCountry(match);
@@ -153,23 +170,23 @@ const Checkout: React.FC = () => {
     if (!countryList.length) return;
 
     setBillingData((prev) => {
+      if (language === 'en' && !isCountrySelected(prev.country)) return prev;
+
       const code = resolveCountryCode(prev.country, countryList);
-      const fallback = getDefaultCountryCode(language, countryList);
+      const fallback = language === 'pl' ? 'PL' : getDefaultCountryCode(language, countryList);
       const resolved =
-        language === 'en' && (code === 'PL' || !code)
-          ? fallback
-          : code || fallback;
+        language === 'en' && code === 'PL' ? '' : code || fallback;
       if (!resolved || resolved === prev.country) return prev;
       return { ...prev, country: resolved };
     });
 
     setShippingData((prev) => {
+      if (language === 'en' && !isCountrySelected(prev.country)) return prev;
+
       const code = resolveCountryCode(prev.country, countryList);
-      const fallback = getDefaultCountryCode(language, countryList);
+      const fallback = language === 'pl' ? 'PL' : getDefaultCountryCode(language, countryList);
       const resolved =
-        language === 'en' && (code === 'PL' || !code)
-          ? fallback
-          : code || fallback;
+        language === 'en' && code === 'PL' ? '' : code || fallback;
       if (!resolved || resolved === prev.country) return prev;
       return { ...prev, country: resolved };
     });
@@ -177,12 +194,16 @@ const Checkout: React.FC = () => {
     const resolvedCountryCode = (() => {
       const code = resolveCountryCode(billingData.country, countryList);
       if (code && countryList.some((c) => c.code === code)) return code;
-      return getDefaultCountryCode(language, countryList);
+      if (language === 'en' && !isCountrySelected(billingData.country)) return '';
+      return language === 'pl' ? 'PL' : getDefaultCountryCode(language, countryList);
     })();
 
-    const match =
-      countryList.find((c) => c.code === resolvedCountryCode) ?? countryList[0];
+    if (!isCountrySelected(resolvedCountryCode)) {
+      setSelectedCountry(null);
+      return;
+    }
 
+    const match = countryList.find((c) => c.code === resolvedCountryCode);
     if (match) {
       setSelectedCountry(match);
       setSelectedZone(Number(match.zoneId));
@@ -235,6 +256,16 @@ const Checkout: React.FC = () => {
 
     fetchCoutriesWithShippingZones();
     setShippingCostsReady(false);
+
+    if (language === 'en') {
+      setBillingData((prev) =>
+        prev.country === 'PL' ? { ...prev, country: '' } : prev,
+      );
+      setShippingData((prev) =>
+        prev.country === 'PL' ? { ...prev, country: '' } : prev,
+      );
+      setSelectedCountry(null);
+    }
   }, [language]);
 
   useEffect(() => {
@@ -324,6 +355,18 @@ const Checkout: React.FC = () => {
     if (!billingData.buildingNumber) missingFields.push(t.checkout.address.buildingNumber);
     if (!billingData.city) missingFields.push(t.checkout.address.city);
     if (!billingData.postalCode) missingFields.push(t.checkout.address.postalCode);
+
+    if (language === 'en' && !isCountrySelected(billingData.country)) {
+      missingFields.push(t.checkout.validation.selectCountry);
+    }
+
+    if (
+      isShippingDifferent &&
+      language === 'en' &&
+      !isCountrySelected(shippingData.country)
+    ) {
+      missingFields.push(t.checkout.validation.selectCountry);
+    }
 
     if (missingFields.length > 0) {
       alert(
@@ -825,6 +868,7 @@ const Checkout: React.FC = () => {
                   setSelectedGlsPoint={setSelectedGlsPoint}
                   selectedZone={selectedZone}
                   shippingContextReady={isShippingContextReady}
+                  isDeliveryCountrySelected={isCountrySelected(deliveryCountryCode)}
                   onCostsReadyChange={setShippingCostsReady}
                 />
 

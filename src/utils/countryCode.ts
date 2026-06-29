@@ -130,6 +130,15 @@ export const filterCountriesForLocale = <T extends CountryLookup>(
   return countries.filter((country) => !isPolandCountryCode(country.code));
 };
 
+export const EMPTY_COUNTRY_CODE = '';
+
+export const isCountrySelected = (
+  countryCode: string | undefined | null,
+): boolean => Boolean(countryCode?.trim());
+
+export const getInitialCheckoutCountryCode = (locale: string): string =>
+  locale === 'en' ? EMPTY_COUNTRY_CODE : 'PL';
+
 export const getDefaultCountryCode = (
   locale: string,
   countries: CountryLookup[] = [],
