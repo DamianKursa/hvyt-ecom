@@ -77,7 +77,7 @@ const Footer = () => {
                 title: t.serviceInfo.support.title,
                 desc: t.serviceInfo.support.desc,
               },
-            ].map((item, index) => (
+            ].map((item, index) => ( !isEn || (isEn && index !== 0) ? (
               <div key={index} className="text-left">
                 <img src={item.src} alt={item.title} className="h-6 mb-2" />
                 <span className="block font-semibold font-size-text-small">
@@ -87,7 +87,7 @@ const Footer = () => {
                   {item.desc}
                 </span>
               </div>
-            ))}
+            ) : null))}
           </div>
         </div>
 
