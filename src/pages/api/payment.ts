@@ -2,7 +2,17 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 import { getCache, setCache } from '../../lib/cache'; 
 
-const CACHE_TTL = 86400; 
+const CACHE_TTL = 86400;
+
+const PAYMENT_TITLE_OVERRIDES: Record<string, string> = {
+  pay_by_paynow_pl_pbl: 'Paynow (BLIK, szybkie przelewy, karty, Google Pay)',
+};
+
+const applyPaymentTitleOverrides = (methods: any[]) =>
+  methods.map((method) => ({
+    ...method,
+    title: PAYMENT_TITLE_OVERRIDES[method.id] ?? method.title,
+  }));
 
 const WooCommerceAPI = axios.create({
   baseURL: process.env.REST_API, 
@@ -22,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       let cachedPaymentMethods = await getCache(cacheKey);
       if (cachedPaymentMethods) {
-        return res.status(200).json(cachedPaymentMethods);
+        return res.status(200).json(applyPaymentTitleOverrides(cachedPaymentMethods));
       }
       
       const paymentResponse = await WooCommerceAPI.get(`/payment_gateways?lang=${lang}`);
@@ -33,7 +43,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
 
-      const enabledMethods = paymentMethods.filter((method: any) => method.enabled);
+      const enabledMethods = applyPaymentTitleOverrides(
+        paymentMethods.filter((method: any) => method.enabled),
+      );
 
       await setCache(cacheKey, enabledMethods, CACHE_TTL);
 

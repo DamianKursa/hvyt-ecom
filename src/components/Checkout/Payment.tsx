@@ -33,6 +33,10 @@ const pickOnlineTransferMethod = (
     ),
   );
 
+const paymentIcons: Record<string, string> = {
+  pay_by_paynow_pl_pbl: '/icons/paynow.png',
+};
+
 const Payment: React.FC<PaymentProps> = ({
   paymentMethod,
   setPaymentMethod,
@@ -153,25 +157,36 @@ const Payment: React.FC<PaymentProps> = ({
           {availableMethods.map((method) => (
             <label
               key={method.id}
-              className={`flex items-center py-[16px] border-b ${paymentMethod === method.id
+              className={`grid grid-cols-[1fr_auto] sm:grid-cols-[80%_20%] items-center py-[16px] border-b ${paymentMethod === method.id
                   ? 'border-dark-pastel-red'
                   : 'border-beige-dark'
                 }`}
             >
-              <input
-                type="radio"
-                value={method.id}
-                checked={paymentMethod === method.id}
-                onChange={() => setPaymentMethod(method.id)}
-                className="hidden"
-              />
-              <span
-                className={`flex-shrink-0 w-5 h-5 rounded-full ${paymentMethod === method.id
-                    ? 'border-4 border-dark-pastel-red'
-                    : 'border-2 border-gray-400'
-                  }`}
-              ></span>
-              <span className="ml-2">{method.title}</span>
+              <div className="flex items-center min-w-0">
+                <input
+                  type="radio"
+                  value={method.id}
+                  checked={paymentMethod === method.id}
+                  onChange={() => setPaymentMethod(method.id)}
+                  className="hidden"
+                />
+                <span
+                  className={`flex-shrink-0 w-5 h-5 rounded-full ${paymentMethod === method.id
+                      ? 'border-4 border-dark-pastel-red'
+                      : 'border-2 border-gray-400'
+                    }`}
+                ></span>
+                <span className="ml-2">{method.title}</span>
+              </div>
+              {paymentIcons[method.id] && (
+                <div className="flex justify-start w-full">
+                  <img
+                    src={paymentIcons[method.id]}
+                    alt={`${method.title} Icon`}
+                    className="w-[50px] sm:w-[55px] h-auto"
+                  />
+                </div>
+              )}
             </label>
           ))}
         </div>
