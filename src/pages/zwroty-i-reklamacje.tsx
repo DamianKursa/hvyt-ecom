@@ -71,7 +71,7 @@ const ZwrotyReklamacjePage = () => {
                   className="mr-2"
                 />
                 <Link
-                  href="/wygodne-zwroty"
+                  href="https://hvyt.pl/wygodne-zwroty"
                   className="text-black underline hover:text-gray-700 hover:no-underline"
                 >
                   Wygodnych Zwrotów
