@@ -8,12 +8,14 @@ import Document, {
 } from 'next/document';
 import Script from 'next/script';
 import type { Language } from '@/utils/i18n/config';
-import { getDefaultLanguage, getLanguageFromHostname } from '@/utils/i18n/domains';
 
 const FACEBOOK_DOMAIN_VERIFICATION: Record<Language, string> = {
   pl: 't3ojuyqbn81ecfp2vg7hi9e76z6dku',
   en: '56g5xj3u7om9cl3z709s8fvqtl105g',
 };
+
+const resolveLanguage = (locale?: string): Language =>
+  locale === 'en' || locale === 'pl' ? locale : 'pl';
 
 interface MyDocumentProps extends DocumentInitialProps {
   facebookDomainVerification: string;
@@ -22,8 +24,8 @@ interface MyDocumentProps extends DocumentInitialProps {
 export default class MyDocument extends Document<MyDocumentProps> {
   static async getInitialProps(ctx: DocumentContext): Promise<MyDocumentProps> {
     const initialProps = await Document.getInitialProps(ctx);
-    const host = ctx.req?.headers.host?.split(':')[0] ?? '';
-    const language = getLanguageFromHostname(host) ?? getDefaultLanguage();
+    const language = resolveLanguage(ctx.locale);
+console.log('language xxx', language);
 
     return {
       ...initialProps,
