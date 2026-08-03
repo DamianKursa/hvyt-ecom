@@ -755,11 +755,24 @@ const Checkout: React.FC = () => {
       } else {
         alert(t.checkout.validation.orderCreatedNoId);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Error creating order:', error);
-      alert(t.checkout.errors.orderCreationFailed);
+      const details = error?.response?.data?.details;
+      const detailsText =
+        typeof details === 'string'
+          ? details
+          : typeof details?.message === 'string'
+            ? details.message
+            : JSON.stringify(details || '');
+
+      if (/coupon|rabat|discount|kupon|expired|wygas/i.test(detailsText)) {
+        alert(t.checkout.errors.couponInvalid || t.checkout.errors.orderCreationFailed);
+      } else {
+        alert(t.checkout.errors.orderCreationFailed);
+      }
     } finally {
-      setOrderDisabled(false);}
+      setOrderDisabled(false);
+    }
   };
 
   return (

@@ -250,7 +250,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
   
-  const { code, cartTotal, items, lang } = req.body;
+  const { code: rawCode, cartTotal, items, lang } = req.body;
+  const code = typeof rawCode === 'string' ? rawCode.trim() : String(rawCode ?? '').trim();
 
   if (!code) {
     return res.status(400).json({ valid: false, message: 'Wprowadź kod rabatowy.', messageCode: 'supplyCode' });
@@ -297,11 +298,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const response = await CustomAPI.get('/coupon', {
-      params: { code, lang },
-    });
+    let response;
+    try {
+      response = await CustomAPI.get('/coupon', {
+        params: { code, lang },
+      });
+    } catch (couponError: any) {
+      const status = couponError?.response?.status;
+      // No HTTP response → real infrastructure failure
+      if (!couponError?.response) {
+        console.error('Coupon lookup network error:', couponError?.message || couponError);
+        return res.status(500).json({
+          valid: false,
+          message: 'Wystąpił błąd serwera. Spróbuj ponownie później.',
+          messageCode: 'serverError',
+        });
+      }
 
-    if (response.data.length === 0) {
+      // Upstream often returns 4xx/5xx for missing or awkward codes (e.g. with spaces)
+      console.warn('Coupon lookup rejected:', { status, code });
       return res.status(404).json({
         valid: false,
         message: 'Podany kod rabatowy nie istnieje.',
@@ -309,36 +324,78 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    const coupon = response.data[0];
+    const coupons = Array.isArray(response.data)
+      ? response.data
+      : response.data && typeof response.data === 'object' && !Array.isArray(response.data)
+        ? response.data.code || response.data.id
+          ? [response.data]
+          : []
+        : [];
 
+    if (coupons.length === 0) {
+      return res.status(404).json({
+        valid: false,
+        message: 'Podany kod rabatowy nie istnieje.',
+        messageCode: 'CodeNotExist',
+      });
+    }
+
+    const coupon = coupons[0];
+    if (!coupon || typeof coupon !== 'object') {
+      return res.status(404).json({
+        valid: false,
+        message: 'Podany kod rabatowy nie istnieje.',
+        messageCode: 'CodeNotExist',
+      });
+    }
     const now = new Date();
-    
-    // if (coupon.date_expires && new Date(coupon.date_expires) < now) {
-    //   return res.status(400).json({
-    //     valid: false,
-    //     message: 'Ten kod rabatowy wygasł.',
-    //     messageCode: 'codeExpired',
-    //   });
-    // }
 
-    // if (coupon.usage_limit && coupon.usage_count >= coupon.usage_limit) {
-    //   return res.status(400).json({
-    //     valid: false,
-    //     message: 'Limit użycia tego kodu został osiągnięty.',
-    //     messageCode: 'codeLimitReached',
-    //   });
-    // }
+    const couponStatus = String(coupon.status || 'publish').toLowerCase();
+    if (couponStatus && couponStatus !== 'publish') {
+      return res.status(400).json({
+        valid: false,
+        message: 'Ten kod rabatowy jest nieaktywny.',
+        messageCode: 'codeInactive',
+      });
+    }
+
+    const expiresRaw = coupon.date_expires_gmt || coupon.date_expires;
+    if (expiresRaw) {
+      const expiresAt = new Date(expiresRaw);
+      if (!Number.isNaN(expiresAt.getTime()) && expiresAt < now) {
+        return res.status(400).json({
+          valid: false,
+          message: 'Ten kod rabatowy wygasł.',
+          messageCode: 'codeExpired',
+        });
+      }
+    }
+
+    const usageLimit = Number(coupon.usage_limit);
+    const usageCount = Number(coupon.usage_count);
+    if (
+      Number.isFinite(usageLimit) &&
+      usageLimit > 0 &&
+      Number.isFinite(usageCount) &&
+      usageCount >= usageLimit
+    ) {
+      return res.status(400).json({
+        valid: false,
+        message: 'Limit użycia tego kodu został osiągnięty.',
+        messageCode: 'codeLimitReached',
+      });
+    }
+
     if (
       coupon.minimum_amount &&
       cartTotal &&
       parseFloat(cartTotal) < parseFloat(coupon.minimum_amount)
-    ) { console.log('cartvalues', cartTotal, coupon.minimum_amount);
-    
+    ) {
       return res.status(400).json({
         valid: false,
         message: `Minimalna wartość zamówienia to ${parseFloat(coupon.minimum_amount).toFixed(2)} zł.`,
         messageCode: 'minAmount',
-        messageParams: {amount: parseFloat(coupon.minimum_amount).toFixed(2)}
+        messageParams: { amount: parseFloat(coupon.minimum_amount).toFixed(2) },
       });
     }
 

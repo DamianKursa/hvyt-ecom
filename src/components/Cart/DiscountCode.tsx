@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { CartContext } from '@/stores/CartProvider';
 import { useI18n } from '@/utils/hooks/useI18n';
-import { getCurrencyByLocale, getCurrencySlugByLocale } from '@/config/currencies';
+import { getCurrencyByLocale } from '@/config/currencies';
 import { useRouter } from 'next/router';
 
 const toNum = (v: any): number => {
@@ -240,6 +240,40 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     [cart?.products, coupon, couponRules],
   );
 
+  const resolveDiscountErrorMessage = React.useCallback(
+    (
+      messageCode?: string,
+      messageParams?: Record<string, string>,
+      fallbackMessage?: string,
+    ): string => {
+      const catalog = t.discountCode as Record<string, string>;
+      const template =
+        (messageCode && catalog[messageCode]) ||
+        fallbackMessage ||
+        t.cart.discountCode.invalidError;
+
+      if (!template || typeof template !== 'string') {
+        return t.cart.discountCode.invalidError;
+      }
+
+      const params =
+        messageParams && typeof messageParams === 'object' ? messageParams : {};
+      let updatedMessage = template;
+
+      Object.keys(params).forEach((key) => {
+        const value = params[key];
+        if (value == null) return;
+        updatedMessage = updatedMessage.replaceAll(`{${key}}`, String(value));
+      });
+
+      return updatedMessage.replaceAll(
+        '{currency}',
+        getCurrencyByLocale(router.locale as string).symbol,
+      );
+    },
+    [router.locale, t],
+  );
+
   useEffect(() => {
     if (!cart?.coupon) return;
     if (productsMatchingRules.length > 0) return;
@@ -276,6 +310,69 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
     t,
   ]);
 
+  // Re-validate persisted coupon (e.g. expired/inactive since it was applied)
+  useEffect(() => {
+    const existingCode = cart?.coupon?.code;
+    if (!existingCode || !cart?.products?.length) return;
+
+    let cancelled = false;
+    const discountBack = Number(cart.coupon?.discountValue ?? 0);
+    const productsSnapshot = cart.products;
+    const cartTotalForValidation = cart.totalProductsPrice + discountBack;
+
+    const revalidate = async () => {
+      try {
+        const response = await fetch('/api/discount', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: existingCode,
+            lang: router.locale,
+            cartTotal: cartTotalForValidation,
+            items: productsSnapshot.map((item) => ({
+              id: item.productId,
+              price: item.price,
+              quantity: item.qty,
+              categories: item.categories?.map((c) => c.id) || [],
+            })),
+          }),
+        });
+
+        const data = await response.json().catch(() => null);
+        if (cancelled) return;
+
+        if (!response.ok || !data?.valid) {
+          const message = resolveDiscountErrorMessage(
+            data?.messageCode,
+            data?.messageParams,
+            data?.message || t.cart.discountCode.invalidError,
+          );
+          removeCoupon();
+          setCode('');
+          if (discountBack) {
+            setCartTotal((prev) => Math.max(prev + discountBack, 0));
+          }
+          setIsOpen(true);
+          setCodeError(message);
+          setSnackbar({ message, type: 'error', visible: true });
+          setTimeout(
+            () => setSnackbar((prev) => ({ ...prev, visible: false })),
+            4000,
+          );
+        }
+      } catch (error) {
+        console.error('Coupon revalidation failed:', error);
+      }
+    };
+
+    revalidate();
+    return () => {
+      cancelled = true;
+    };
+    // Re-check when the applied code or locale changes (not on every cart edit)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart?.coupon?.code, router.locale, resolveDiscountErrorMessage]);
+
   // Start editing: restore totals, clear coupon, open input with current code
   const handleStartEditing = () => {
     const back = Number(cart?.coupon?.discountValue ?? 0);
@@ -296,6 +393,19 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
 
     const sanitizedCode = code.trim();
 
+    // One coupon at a time — reject comma/semicolon-separated lists
+    if (/[,;]/.test(sanitizedCode)) {
+      const multiMsg = t.discountCode.multipleCodes || t.cart.discountCode.invalidError;
+      setCodeError(multiMsg);
+      setSnackbar({ message: multiMsg, type: 'error', visible: true });
+      return;
+    }
+
+    if (!cart?.products?.length) {
+      setCodeError(t.cart.discountCode.noMatchingProductsError);
+      return;
+    }
+
     setIsLoading(true);
     setSnackbar((prev) => ({ ...prev, visible: false }));
 
@@ -307,7 +417,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
           code: sanitizedCode,
           lang: router.locale,
           cartTotal,
-          items: cart!.products.map((item) => ({
+          items: cart.products.map((item) => ({
             id: item.productId,
             price: item.price,
             quantity: item.qty,
@@ -317,37 +427,25 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         }),
       });
 
-      const data = await response.json();
-
-      const replaceMessageParams = (message: string, params: Record<string, string>) => {
-        const keys = Object.keys(params);
-        if(!keys.length) {
-          return;
-        }
-
-        let updatedMessage = message;
-
-        keys.forEach(key => {
-          updatedMessage = updatedMessage.replaceAll(`{${key}}`, params[key])
-        })
-
-        // update currency
-        updatedMessage = updatedMessage.replaceAll('{currency}', getCurrencyByLocale(router.locale as string).symbol)
-
-        return updatedMessage
+      let data: any = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = null;
       }
 
-      if (!response.ok || !data.valid) {
-        console.log('Coupon debug:', data.debug, data);
-        const msg =
+      if (!response.ok || !data?.valid) {
+        console.log('Coupon debug:', data?.debug, data);
+        const errorMessage = resolveDiscountErrorMessage(
+          data?.messageCode,
+          data?.messageParams,
           data?.debug === 'only_sale_products_in_scope'
             ? t.cart.discountCode.saleItemsError
-            : data.message || t.cart.discountCode.invalidError;
-            
-        const errorMessage = replaceMessageParams(t.discountCode[data.messageCode as keyof typeof t.discountCode], data.messageParams || {});
-        
-        setCodeError(errorMessage || '');
-        setSnackbar({ message: msg, type: 'error', visible: true });
+            : data?.message || t.cart.discountCode.invalidError,
+        );
+
+        setCodeError(errorMessage);
+        setSnackbar({ message: errorMessage, type: 'error', visible: true });
         return;
       }
 
@@ -355,11 +453,11 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
       const rulesFromApi = buildRulesFromCouponData(data);
 
       const eligibleProducts = filterEligibleProducts(
-        cart!.products,
+        cart.products,
         rulesFromApi,
       );
       const eligibleProductsIgnoringSale = filterEligibleProducts(
-        cart!.products,
+        cart.products,
         rulesFromApi,
         { ignoreSale: true },
       );
@@ -501,7 +599,7 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
   return (
     <>
       <div
-        className={`border border-[#DAD3C8] rounded-[24px] px-4 py-3 transition-all duration-300 ease-in-out mb-[33px] ${cart?.coupon ? 'bg-beige' : isOpen ? 'bg-white' : 'bg-beige'}`}
+        className={`border rounded-[24px] px-4 py-3 transition-all duration-300 ease-in-out mb-[33px] ${codeError ? 'border-[#A83232]' : 'border-[#DAD3C8]'} ${cart?.coupon ? 'bg-beige' : isOpen ? 'bg-white' : 'bg-beige'}`}
       >
         {/* Dropdown Header */}
         <button
@@ -594,12 +692,21 @@ const DiscountCode: React.FC<DiscountCodeProps> = ({
         </div>
       )}
 
-      {/* Inline Message for Success only */}
-      {snackbar.visible && snackbar.type === 'success' && (
+      {snackbar.visible && (
         <div
-          className="mt-4 mb-4 px-4 py-2 rounded-lg flex items-center bg-[#2A5E45] text-white"
+          className={`mt-4 mb-4 px-4 py-2 rounded-lg flex items-center text-white ${
+            snackbar.type === 'success' ? 'bg-[#2A5E45]' : 'bg-[#A83232]'
+          }`}
         >
-          <img src="/icons/circle-check.svg" alt="Success" className="w-4 h-4 mr-2" />
+          <img
+            src={
+              snackbar.type === 'success'
+                ? '/icons/circle-check.svg'
+                : '/icons/Warning_Circle_Warning.svg'
+            }
+            alt={snackbar.type === 'success' ? 'Success' : 'Error'}
+            className="w-4 h-4 mr-2"
+          />
           <span>{snackbar.message}</span>
         </div>
       )}

@@ -475,6 +475,8 @@ export const en: Translations = {
       },
       errors: {
         orderCreationFailed: 'An error occurred while placing your order. Please try again.',
+        couponInvalid:
+          'The discount code is inactive, expired, or cannot be applied. Remove it from the cart and try again.',
         shippingLoadFailed: 'Failed to load shipping methods.',
         orderCreatedNoId: 'Order created, but order ID is missing.',
       },
@@ -520,11 +522,13 @@ export const en: Translations = {
       CodeNotExist: 'The given code does not exist.',
       supplyCode: 'Enter discount code.',
       codeExpired: 'This discount code has expired.',
-      codeLimitReached: 'Limit użycia tego kodu został osiągnięty.',
+      codeInactive: 'This discount code is inactive.',
+      codeLimitReached: 'This discount code has reached its usage limit.',
+      multipleCodes: 'You can use only one discount code at a time.',
       minAmount: 'Minimum order value is {amount} {currency}.',
       noValidProducts: 'This code does not apply to any product in your cart.',
       notForPromotions: 'The code does not work on promotional products.',
-      serverError: 'A server error occurred. Please try again later.',      
+      serverError: 'A server error occurred. Please try again later.',
     },
   // === USER ACCOUNT ===
   account: {

@@ -477,6 +477,8 @@ export const pl = {
       },
       errors: {
         orderCreationFailed: 'Wystąpił błąd podczas składania zamówienia. Spróbuj ponownie.',
+        couponInvalid:
+          'Kod rabatowy jest nieaktywny, wygasł lub nie może zostać zastosowany. Usuń go z koszyka i spróbuj ponownie.',
         shippingLoadFailed: 'Nie udało się załadować metod dostawy.',
         orderCreatedNoId: 'Zamówienie utworzone, ale brakuje identyfikatora zamówienia.',
       },
@@ -521,7 +523,9 @@ export const pl = {
       CodeNotExist: 'Podany kod rabatowy nie istnieje.',
       supplyCode: 'Wprowadź kod rabatowy.',
       codeExpired: 'Ten kod rabatowy wygasł.',
+      codeInactive: 'Ten kod rabatowy jest nieaktywny.',
       codeLimitReached: 'Limit użycia tego kodu został osiągnięty.',
+      multipleCodes: 'Możesz użyć tylko jednego kodu rabatowego naraz.',
       minAmount: 'Minimalna wartość zamówienia to {amount} {currency}.',
       noValidProducts: 'Ten kod nie obejmuje żadnego produktu w koszyku.',
       notForPromotions: 'Kod nie działa na produkty z promocji.',
