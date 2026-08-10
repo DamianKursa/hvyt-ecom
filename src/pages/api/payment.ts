@@ -5,6 +5,8 @@ import { getCache, setCache } from '../../lib/cache';
 const CACHE_TTL = 86400;
 
 const PAYMENT_TITLE_OVERRIDES: Record<string, string> = {
+  pay_by_paynow_pl_paywall:
+    'Paynow (BLIK, szybkie przelewy, karty, Google Pay)',
   pay_by_paynow_pl_pbl: 'Paynow (BLIK, szybkie przelewy, karty, Google Pay)',
 };
 

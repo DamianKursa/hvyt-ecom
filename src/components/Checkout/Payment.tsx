@@ -18,23 +18,35 @@ interface PaymentMethod {
 
 const COD_METHOD_ID = 'cod';
 const STRIPE_METHOD_ID = 'stripe';
+const PAYNOW_PAYWALL_ID = 'pay_by_paynow_pl_paywall';
+const PAYNOW_PBL_ID = 'pay_by_paynow_pl_pbl';
+const PAYNOW_GATEWAY_IDS = [PAYNOW_PAYWALL_ID, PAYNOW_PBL_ID] as const;
 const ONLINE_TRANSFER_METHOD_IDS = [
-  'pay_by_paynow_pl_pbl',
+  ...PAYNOW_GATEWAY_IDS,
   'przelewy24',
   'p24-online-payments',
 ] as const;
 
+/** Prefer paywall when Woo exposes it; otherwise use the enabled Paynow gateway (usually PBL). */
+const pickPaynowMethod = (
+  methods: PaymentMethod[],
+): PaymentMethod | undefined =>
+  methods.find((method) => method.id === PAYNOW_PAYWALL_ID) ??
+  methods.find((method) => method.id === PAYNOW_PBL_ID);
+
 const pickOnlineTransferMethod = (
   methods: PaymentMethod[],
 ): PaymentMethod | undefined =>
-  methods.find((method) =>
+  pickPaynowMethod(methods) ??
+  methods.find((entry) =>
     ONLINE_TRANSFER_METHOD_IDS.includes(
-      method.id as (typeof ONLINE_TRANSFER_METHOD_IDS)[number],
+      entry.id as (typeof ONLINE_TRANSFER_METHOD_IDS)[number],
     ),
   );
 
 const paymentIcons: Record<string, string> = {
-  pay_by_paynow_pl_pbl: '/icons/paynow.png',
+  [PAYNOW_PAYWALL_ID]: '/icons/paynow.png',
+  [PAYNOW_PBL_ID]: '/icons/paynow.png',
 };
 
 const Payment: React.FC<PaymentProps> = ({
@@ -102,10 +114,10 @@ const Payment: React.FC<PaymentProps> = ({
     }
 
     if (!isPolandCountryCode(deliveryCountryCode)) {
-      return pickOnlineTransferMethod(paymentMethods)?.id ?? 'pay_by_paynow_pl_pbl';
+      return pickOnlineTransferMethod(paymentMethods)?.id ?? PAYNOW_PBL_ID;
     }
 
-    return 'pay_by_paynow_pl_pbl';
+    return pickPaynowMethod(paymentMethods)?.id ?? PAYNOW_PBL_ID;
   };
 
   const getFilteredPaymentMethods = () => {
@@ -127,7 +139,8 @@ const Payment: React.FC<PaymentProps> = ({
       return onlineTransfer ? [onlineTransfer] : [];
     }
 
-    return paymentMethods.filter((method) => method.id === 'pay_by_paynow_pl_pbl');
+    const paynow = pickPaynowMethod(paymentMethods);
+    return paynow ? [paynow] : [];
   };
 
   const availableMethods = getFilteredPaymentMethods();
