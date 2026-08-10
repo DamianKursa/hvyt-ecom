@@ -97,10 +97,6 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
             postalCode: address.postalCode || '',
             country: address.country || 'Polska',
           });
-
-          if (address.email) {
-            setEmail(address.email);
-          }
         }
         else {
           if (user?.user_email) setEmail(user.user_email);
