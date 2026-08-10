@@ -14,27 +14,33 @@ const FACEBOOK_DOMAIN_VERIFICATION: Record<Language, string> = {
   en: '56g5xj3u7om9cl3z709s8fvqtl105g',
 };
 
+const GTM_CONTAINER_ID: Record<Language, string> = {
+  pl: 'GTM-PJNDR4N',
+  en: 'GTM-P2XBWH3Q',
+};
+
 const resolveLanguage = (locale?: string): Language =>
   locale === 'en' || locale === 'pl' ? locale : 'pl';
 
 interface MyDocumentProps extends DocumentInitialProps {
   facebookDomainVerification: string;
+  gtmId: string;
 }
 
 export default class MyDocument extends Document<MyDocumentProps> {
   static async getInitialProps(ctx: DocumentContext): Promise<MyDocumentProps> {
     const initialProps = await Document.getInitialProps(ctx);
     const language = resolveLanguage(ctx.locale);
-console.log('language xxx', language);
 
     return {
       ...initialProps,
       facebookDomainVerification: FACEBOOK_DOMAIN_VERIFICATION[language],
+      gtmId: GTM_CONTAINER_ID[language],
     };
   }
 
   render(): JSX.Element {
-    const { facebookDomainVerification } = this.props;
+    const { facebookDomainVerification, gtmId } = this.props;
 
     return (
       <Html lang="pl-PL">
@@ -114,7 +120,7 @@ console.log('language xxx', language);
               j.async=true;
               j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
               f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-PJNDR4N');
+            })(window,document,'script','dataLayer','${gtmId}');
           `}
           </Script>
         </Head>
@@ -122,7 +128,7 @@ console.log('language xxx', language);
           {/* --- Google Tag Manager (noscript) fallback --- */}
           <noscript>
             <iframe
-              src="https://www.googletagmanager.com/ns.html?id=GTM-PJNDR4N"
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
               height="0"
               width="0"
               style={{ display: 'none', visibility: 'hidden' }}
