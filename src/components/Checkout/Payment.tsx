@@ -27,12 +27,12 @@ const ONLINE_TRANSFER_METHOD_IDS = [
   'p24-online-payments',
 ] as const;
 
-/** Prefer paywall when Woo exposes it; otherwise use the enabled Paynow gateway (usually PBL). */
+/** Prefer PBL (Pay-By-Link); fallback to paywall if PBL is not available. */
 const pickPaynowMethod = (
   methods: PaymentMethod[],
 ): PaymentMethod | undefined =>
-  methods.find((method) => method.id === PAYNOW_PAYWALL_ID) ??
-  methods.find((method) => method.id === PAYNOW_PBL_ID);
+  methods.find((method) => method.id === PAYNOW_PBL_ID) ??
+  methods.find((method) => method.id === PAYNOW_PAYWALL_ID);
 
 const pickOnlineTransferMethod = (
   methods: PaymentMethod[],
