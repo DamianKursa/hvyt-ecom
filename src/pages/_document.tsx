@@ -8,7 +8,6 @@ import Document, {
 } from 'next/document';
 import Script from 'next/script';
 import type { Language } from '@/utils/i18n/config';
-import { hostnameMatchesDomain } from '@/utils/i18n/domains';
 
 const FACEBOOK_DOMAIN_VERIFICATION: Record<Language, string> = {
   pl: 't3ojuyqbn81ecfp2vg7hi9e76z6dku',
@@ -20,40 +19,28 @@ const GTM_CONTAINER_ID: Record<Language, string> = {
   en: 'GTM-P2XBWH3Q',
 };
 
-const CLARITY_PROJECT_ID = 'xxj3jhn7q9';
-
-const PRODUCTION_ANALYTICS_DOMAINS = ['hvyt.pl', 'hvyt.eu'] as const;
-
 const resolveLanguage = (locale?: string): Language =>
   locale === 'en' || locale === 'pl' ? locale : 'pl';
-
-const isProductionAnalyticsHost = (hostname: string): boolean =>
-  PRODUCTION_ANALYTICS_DOMAINS.some((domain) =>
-    hostnameMatchesDomain(hostname, domain),
-  );
 
 interface MyDocumentProps extends DocumentInitialProps {
   facebookDomainVerification: string;
   gtmId: string;
-  enableAnalytics: boolean;
 }
 
 export default class MyDocument extends Document<MyDocumentProps> {
   static async getInitialProps(ctx: DocumentContext): Promise<MyDocumentProps> {
     const initialProps = await Document.getInitialProps(ctx);
     const language = resolveLanguage(ctx.locale);
-    const host = ctx.req?.headers.host?.split(':')[0] ?? '';
 
     return {
       ...initialProps,
       facebookDomainVerification: FACEBOOK_DOMAIN_VERIFICATION[language],
       gtmId: GTM_CONTAINER_ID[language],
-      enableAnalytics: isProductionAnalyticsHost(host),
     };
   }
 
   render(): JSX.Element {
-    const { facebookDomainVerification, gtmId, enableAnalytics } = this.props;
+    const { facebookDomainVerification, gtmId } = this.props;
 
     return (
       <Html lang="pl-PL">
@@ -100,11 +87,9 @@ export default class MyDocument extends Document<MyDocumentProps> {
             content="a6786718d22d0c370bdbd44d3a3f44ee"
           />
 
-          {enableAnalytics && (
-            <>
-              {/* --- Google Consent Mode v2 Default Settings --- */}
-              <Script id="ga-consent" strategy="beforeInteractive">
-                {`
+          {/* --- Google Consent Mode v2 Default Settings --- */}
+          <Script id="ga-consent" strategy="beforeInteractive">
+            {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){ dataLayer.push(arguments); }
             // Ustaw domyślny stan zgody (np. 'denied' dla nie‑istotnych danych)
@@ -122,11 +107,11 @@ export default class MyDocument extends Document<MyDocumentProps> {
             gtag('set', 'ads_data_redaction', true);
             gtag('set', 'url_passthrough', false);
           `}
-              </Script>
+          </Script>
 
-              {/* --- Google Tag Manager (GTM) Script --- */}
-              <Script id="gtm-script" strategy="afterInteractive">
-                {`
+          {/* --- Google Tag Manager (GTM) Script --- */}
+          <Script id="gtm-script" strategy="afterInteractive">
+            {`
             (function(w,d,s,l,i){
               w[l]=w[l]||[];
               w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
@@ -137,29 +122,25 @@ export default class MyDocument extends Document<MyDocumentProps> {
               f.parentNode.insertBefore(j,f);
             })(window,document,'script','dataLayer','${gtmId}');
           `}
-              </Script>
-
-              <Script id="clarity-script" strategy="afterInteractive">
-                {`(function(c,l,a,r,i,t,y){
+          </Script>
+          <Script id="clarity-script" strategy="afterInteractive">
+            {`(function(c,l,a,r,i,t,y){
                 c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
                 t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
                 y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "${CLARITY_PROJECT_ID}");`}
-              </Script>
-            </>
-          )}
+            })(window, document, "clarity", "script", "xxj3jhn7q9");`}
+          </Script>
         </Head>
         <body className="bg-beige-light">
-          {enableAnalytics && (
-            <noscript>
-              <iframe
-                src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-                height="0"
-                width="0"
-                style={{ display: 'none', visibility: 'hidden' }}
-              ></iframe>
-            </noscript>
-          )}
+          {/* --- Google Tag Manager (noscript) fallback --- */}
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height="0"
+              width="0"
+              style={{ display: 'none', visibility: 'hidden' }}
+            ></iframe>
+          </noscript>
           <Main />
           <NextScript />
           {/* --- Allekurier Banner Script --- */}
