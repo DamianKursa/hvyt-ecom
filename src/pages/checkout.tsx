@@ -491,13 +491,17 @@ const Checkout: React.FC = () => {
       currency: getCurrencySlugByLocale(router.locale as string),
       payment_method: paymentMethod,
       payment_method_title:
-        paymentMethod === 'pay_by_paynow_pl_paywall' ||
-        paymentMethod === 'pay_by_paynow_pl_pbl'
-          ? 'paynow.pl - Online payments'
-          : paymentMethod === 'przelewy24' ||
-            paymentMethod === 'p24-online-payments'
-            ? 'Przelewy24'
-            : shippingTitle,
+          String(paymentMethod || '')
+            .toLowerCase()
+            .includes('bacs')
+            ? 'Faktura proforma'
+            : paymentMethod === 'pay_by_paynow_pl_paywall' ||
+                paymentMethod === 'pay_by_paynow_pl_pbl'
+              ? 'paynow.pl - Online payments'
+              : paymentMethod === 'przelewy24' ||
+                  paymentMethod === 'p24-online-payments'
+                ? 'Przelewy24'
+                : shippingTitle,
       
       set_paid: false,
       billing: {

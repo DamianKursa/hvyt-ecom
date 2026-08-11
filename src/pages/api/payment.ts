@@ -11,10 +11,16 @@ const PAYMENT_TITLE_OVERRIDES: Record<string, string> = {
 };
 
 const applyPaymentTitleOverrides = (methods: any[]) =>
-  methods.map((method) => ({
-    ...method,
-    title: PAYMENT_TITLE_OVERRIDES[method.id] ?? method.title,
-  }));
+  methods.map((method) => {
+    const id = String(method?.id || '').toLowerCase();
+    if (id === 'bacs' || id.includes('bacs')) {
+      return { ...method, title: 'Faktura proforma' };
+    }
+    return {
+      ...method,
+      title: PAYMENT_TITLE_OVERRIDES[method.id] ?? method.title,
+    };
+  });
 
 const WooCommerceAPI = axios.create({
   baseURL: process.env.REST_API, 
@@ -30,11 +36,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { lang } = req.query;
 
     try {
-      const cacheKey = `payment_methods:${lang}`;
+      // Wersjonowanie cache: pozwala ominąć stare wpisy z poprzedniej logiki filtrowania.
+      const cacheKey = `payment_methods:v2:${lang}`;
 
       let cachedPaymentMethods = await getCache(cacheKey);
       if (cachedPaymentMethods) {
-        return res.status(200).json(applyPaymentTitleOverrides(cachedPaymentMethods));
+        const hasBacsInCache = Array.isArray(cachedPaymentMethods)
+          ? cachedPaymentMethods.some((m: any) => String(m?.id || '').toLowerCase().includes('bacs'))
+          : false;
+
+        // Jeśli cache nie zawiera BACS, to prawdopodobnie został zbudowany w „starym” wariancie logiki
+        // (np. z filtrem `enabled`). Wtedy pobieramy świeże dane z Woo.
+        if (hasBacsInCache) {
+          return res
+            .status(200)
+            .json(applyPaymentTitleOverrides(cachedPaymentMethods));
+        }
       }
       
       const paymentResponse = await WooCommerceAPI.get(`/payment_gateways?lang=${lang}`);
@@ -45,9 +62,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
 
-      const enabledMethods = applyPaymentTitleOverrides(
-        paymentMethods.filter((method: any) => method.enabled),
-      );
+      // Woo REST potrafi zwrócić `enabled: false` dla bramek offline zależnie od kontekstu (np. dostępność dla wysyłki).
+      // Żeby umożliwić obsługę „Faktury proforma” (BACS) po stronie frontu, nie filtrujemy BACS przez `enabled`.
+      const normalizedMethods = paymentMethods.filter((method: any) => {
+        const id = String(method?.id || '').toLowerCase();
+        return Boolean(method?.enabled) || id.includes('bacs');
+      });
+
+      const enabledMethods = applyPaymentTitleOverrides(normalizedMethods);
 
       await setCache(cacheKey, enabledMethods, CACHE_TTL);
 

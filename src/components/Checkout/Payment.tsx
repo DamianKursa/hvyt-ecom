@@ -18,6 +18,7 @@ interface PaymentMethod {
 
 const COD_METHOD_ID = 'cod';
 const STRIPE_METHOD_ID = 'stripe';
+const PROFORMA_METHOD_ID = 'bacs';
 const PAYNOW_PAYWALL_ID = 'pay_by_paynow_pl_paywall';
 const PAYNOW_PBL_ID = 'pay_by_paynow_pl_pbl';
 const PAYNOW_GATEWAY_IDS = [PAYNOW_PAYWALL_ID, PAYNOW_PBL_ID] as const;
@@ -117,7 +118,11 @@ const Payment: React.FC<PaymentProps> = ({
       return pickOnlineTransferMethod(paymentMethods)?.id ?? PAYNOW_PBL_ID;
     }
 
-    return pickPaynowMethod(paymentMethods)?.id ?? PAYNOW_PBL_ID;
+    const proforma = paymentMethods.find((method) => {
+      const id = String(method.id || '').toLowerCase();
+      return id === PROFORMA_METHOD_ID || id.includes(PROFORMA_METHOD_ID);
+    });
+    return pickPaynowMethod(paymentMethods)?.id ?? proforma?.id ?? PAYNOW_PBL_ID;
   };
 
   const getFilteredPaymentMethods = () => {
@@ -139,8 +144,19 @@ const Payment: React.FC<PaymentProps> = ({
       return onlineTransfer ? [onlineTransfer] : [];
     }
 
+    // For PL deliveries, allow both:
+    // - paynow (current behavior)
+    // - bacs as "Faktura proforma" (except "kurier gls pobranie", handled above)
     const paynow = pickPaynowMethod(paymentMethods);
-    return paynow ? [paynow] : [];
+    const proforma = paymentMethods.find((method) => {
+      const id = String(method.id || '').toLowerCase();
+      return id === PROFORMA_METHOD_ID || id.includes(PROFORMA_METHOD_ID);
+    });
+
+    const methods: PaymentMethod[] = [];
+    if (paynow) methods.push(paynow);
+    if (proforma) methods.push(proforma);
+    return methods;
   };
 
   const availableMethods = getFilteredPaymentMethods();
