@@ -98,8 +98,12 @@ function MyApp({ Component, pageProps }: AppProps) {
           fbq('track', 'PageView');
         `}
       </Script>
-      {/* Ładowanie Cookiebot tylko w środowisku produkcyjnym */}
-      {process.env.NODE_ENV === 'production' && (
+      {/* Cookiebot dla domeny PL — ładowany bezpośrednio, bo kontener
+          GTM-PJNDR4N nie ma taga Cookiebot CMP.
+          Domena EN (hvyt.eu) ma własny tag w GTM-P2XBWH3Q z ID grupy "EN",
+          więc tutaj NIE wolno go odpalać — dwie instancje uc.js blokują się
+          nawzajem i baner nie wychodzi. */}
+      {process.env.NODE_ENV === 'production' && router.locale === 'pl' && (
         <Script
           id="Cookiebot"
           strategy="afterInteractive"
