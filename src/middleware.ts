@@ -91,7 +91,19 @@ const detectLanguage = (request: NextRequest): Locale => {
 };
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Paynow (and other WC gateways) POST status notifications to /?wc-api=...
+  // Next.js pages only accept GET, so proxy POST webhooks to WordPress.
+  if (
+    request.method === 'POST' &&
+    searchParams.has('wc-api') &&
+    !pathname.startsWith('/api')
+  ) {
+    const proxyUrl = new URL('/api/wc-gateway-proxy', request.url);
+    proxyUrl.search = request.nextUrl.search;
+    return NextResponse.rewrite(proxyUrl);
+  }
 
   if (shouldExcludePath(pathname)) {
     return NextResponse.next();

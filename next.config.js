@@ -180,17 +180,6 @@ const nextConfig = {
       { source: '/zapomniane-haslo/:path*', destination: '/zapomniane-haslo/:path*' },
       { source: '/zwroty-i-reklamacje/:path*', destination: '/zwroty-i-reklamacje/:path*' },
       { source: '/wp-json/:path*', destination: 'https://wp.hvyt.pl/wp-json/:path*' },
-      {
-        source: '/',
-        has: [
-          {
-            type: 'query',
-            key: 'wc-api',
-            value: '(.*)',
-          },
-        ],
-        destination: 'https://wp.hvyt.pl/',
-      },
 
       {
         source: '/:path((?!_next|api|static|wp-json|wp-admin|auth|moje-konto|orders|posts|blog|kategoria|kolekcje|category|contact|create-order|payment-webhooks|payment|reviews|shipping|waiting-list|woocommerce|checkout|dostawa|dziekujemy|hvyt-objects|kase|koszyk|logowanie|o-nas|polityka-prywatnosci|potwierdzenie-email|regulamin|ulubione|wspolpraca|wygodne-zwroty|zapomniane-haslo|zwroty-i-reklamacje|produkt).+)',
