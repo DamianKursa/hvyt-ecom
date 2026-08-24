@@ -154,8 +154,18 @@ const Payment: React.FC<PaymentProps> = ({
       return;
     }
 
+    // Prefer any non-proforma option from the visible list; never auto-pick bacs.
+    const preferredVisible =
+      availableMethods.find((method) => method.id !== PROFORMA_METHOD_ID)?.id ??
+      resolveDefaultPaymentMethodId();
+
+    if (preferredVisible && preferredVisible !== PROFORMA_METHOD_ID) {
+      setPaymentMethod(preferredVisible);
+      return;
+    }
+
     const defaultMethodId = resolveDefaultPaymentMethodId();
-    if (defaultMethodId) {
+    if (defaultMethodId && defaultMethodId !== PROFORMA_METHOD_ID) {
       setPaymentMethod(defaultMethodId);
     }
   }, [

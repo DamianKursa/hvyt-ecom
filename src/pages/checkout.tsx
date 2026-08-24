@@ -489,7 +489,7 @@ const Checkout: React.FC = () => {
     const orderData = {
       lang: router.locale,
       currency: getCurrencySlugByLocale(router.locale as string),
-      payment_method: paymentMethod,
+      payment_method: String(paymentMethod || '').trim(),
       payment_method_title:
           paymentMethod === 'bacs'
             ? 'Faktura proforma'
@@ -499,7 +499,11 @@ const Checkout: React.FC = () => {
               : paymentMethod === 'przelewy24' ||
                   paymentMethod === 'p24-online-payments'
                 ? 'Przelewy24'
-                : shippingTitle,
+                : paymentMethod === 'cod'
+                  ? 'Za pobraniem'
+                  : paymentMethod === 'stripe'
+                    ? 'Stripe'
+                    : shippingTitle,
       
       set_paid: false,
       billing: {
@@ -606,6 +610,24 @@ const Checkout: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
       });
       const createdOrder = response.data;
+
+      console.info('✅ Order created', {
+        id: createdOrder.id,
+        requestedPaymentMethod: orderData.payment_method,
+        savedPaymentMethod: createdOrder.payment_method,
+        savedPaymentTitle: createdOrder.payment_method_title,
+      });
+
+      if (
+        orderData.payment_method &&
+        createdOrder.payment_method &&
+        createdOrder.payment_method !== orderData.payment_method
+      ) {
+        console.error('❌ Checkout payment method mismatch', {
+          requested: orderData.payment_method,
+          saved: createdOrder.payment_method,
+        });
+      }
 
       // ── Fire‑and‑forget address save (never blocks checkout) ───────────────
       if (user && saveAddress) {

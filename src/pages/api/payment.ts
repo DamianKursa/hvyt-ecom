@@ -4,6 +4,17 @@ import { getCache, setCache } from '../../lib/cache';
 
 const CACHE_TTL = 86400;
 
+/** Only gateways the storefront checkout can show / select. */
+const STOREFRONT_GATEWAY_IDS = new Set([
+  'cod',
+  'bacs',
+  'pay_by_paynow_pl_pbl',
+  'pay_by_paynow_pl_paywall',
+  'stripe',
+  'przelewy24',
+  'p24-online-payments',
+]);
+
 const PAYMENT_TITLE_OVERRIDES: Record<string, string> = {
   pay_by_paynow_pl_paywall:
     'Paynow (BLIK, szybkie przelewy, karty, Google Pay)',
@@ -30,8 +41,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { lang } = req.query;
 
     try {
-      // v4: exact bacs match only (v2 wrongly included stripe_bacs_debit via includes('bacs')).
-      const cacheKey = `payment_methods:v4:${lang}`;
+      // v5: whitelist storefront gateways only (never stripe_bacs_debit etc.).
+      const cacheKey = `payment_methods:v5:${lang}`;
 
       const cachedPaymentMethods = await getCache(cacheKey);
       if (cachedPaymentMethods) {
@@ -49,11 +60,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ error: 'No payment methods available' });
       }
 
-      // Keep real BACS even if Woo marks it oddly; never include stripe_bacs_debit.
       const normalizedMethods = paymentMethods.filter((method: any) => {
         const id = String(method?.id || '').toLowerCase();
+        if (!STOREFRONT_GATEWAY_IDS.has(id)) return false;
+        // Keep exact BACS even if Woo marks it disabled in REST context.
         return Boolean(method?.enabled) || id === 'bacs';
       });
+
+      // Ensure exact `bacs` is present when force-include is needed.
+      const hasExactBacs = normalizedMethods.some(
+        (method: any) => String(method?.id || '').toLowerCase() === 'bacs',
+      );
+      if (!hasExactBacs) {
+        try {
+          const bacsResponse = await WooCommerceAPI.get(
+            `/payment_gateways/bacs?lang=${lang}`,
+          );
+          if (bacsResponse.data?.id === 'bacs') {
+            normalizedMethods.push(bacsResponse.data);
+          }
+        } catch (bacsError: any) {
+          console.warn(
+            'Could not fetch exact bacs gateway:',
+            bacsError?.message || bacsError,
+          );
+        }
+      }
 
       const enabledMethods = applyPaymentTitleOverrides(normalizedMethods);
 
