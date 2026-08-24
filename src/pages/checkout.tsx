@@ -45,9 +45,9 @@ const Checkout: React.FC = () => {
   const [selectedLocker, setSelectedLocker] = useState<string>('');
   const [lockerSize, setLockerSize] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  // Updated default to new payment method ID
+  // Default: Paynow PBL. Payment.tsx overrides for COD / EN / non-PL.
   const [paymentMethod, setPaymentMethod] = useState<string>(
-    'p24-online-payments',
+    'pay_by_paynow_pl_pbl',
   );
 
   const stripeFormRef = useRef<StripePaymentFormHandle>(null);
@@ -491,9 +491,7 @@ const Checkout: React.FC = () => {
       currency: getCurrencySlugByLocale(router.locale as string),
       payment_method: paymentMethod,
       payment_method_title:
-          String(paymentMethod || '')
-            .toLowerCase()
-            .includes('bacs')
+          paymentMethod === 'bacs'
             ? 'Faktura proforma'
             : paymentMethod === 'pay_by_paynow_pl_paywall' ||
                 paymentMethod === 'pay_by_paynow_pl_pbl'

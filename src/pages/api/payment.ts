@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
-import { getCache, setCache } from '../../lib/cache'; 
+import { getCache, setCache } from '../../lib/cache';
 
 const CACHE_TTL = 86400;
 
@@ -8,65 +8,51 @@ const PAYMENT_TITLE_OVERRIDES: Record<string, string> = {
   pay_by_paynow_pl_paywall:
     'Paynow (BLIK, szybkie przelewy, karty, Google Pay)',
   pay_by_paynow_pl_pbl: 'Paynow (BLIK, szybkie przelewy, karty, Google Pay)',
+  bacs: 'Faktura proforma',
 };
 
 const applyPaymentTitleOverrides = (methods: any[]) =>
-  methods.map((method) => {
-    const id = String(method?.id || '').toLowerCase();
-    if (id === 'bacs' || id.includes('bacs')) {
-      return { ...method, title: 'Faktura proforma' };
-    }
-    return {
-      ...method,
-      title: PAYMENT_TITLE_OVERRIDES[method.id] ?? method.title,
-    };
-  });
+  methods.map((method) => ({
+    ...method,
+    title: PAYMENT_TITLE_OVERRIDES[method.id] ?? method.title,
+  }));
 
 const WooCommerceAPI = axios.create({
-  baseURL: process.env.REST_API, 
+  baseURL: process.env.REST_API,
   auth: {
-    username: process.env.WC_CONSUMER_KEY || '', 
-    password: process.env.WC_CONSUMER_SECRET || '', 
+    username: process.env.WC_CONSUMER_KEY || '',
+    password: process.env.WC_CONSUMER_SECRET || '',
   },
 });
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-
     const { lang } = req.query;
 
     try {
-      // Wersjonowanie cache: pozwala ominąć stare wpisy z poprzedniej logiki filtrowania.
-      const cacheKey = `payment_methods:v2:${lang}`;
+      // v4: exact bacs match only (v2 wrongly included stripe_bacs_debit via includes('bacs')).
+      const cacheKey = `payment_methods:v4:${lang}`;
 
-      let cachedPaymentMethods = await getCache(cacheKey);
+      const cachedPaymentMethods = await getCache(cacheKey);
       if (cachedPaymentMethods) {
-        const hasBacsInCache = Array.isArray(cachedPaymentMethods)
-          ? cachedPaymentMethods.some((m: any) => String(m?.id || '').toLowerCase().includes('bacs'))
-          : false;
-
-        // Jeśli cache nie zawiera BACS, to prawdopodobnie został zbudowany w „starym” wariancie logiki
-        // (np. z filtrem `enabled`). Wtedy pobieramy świeże dane z Woo.
-        if (hasBacsInCache) {
-          return res
-            .status(200)
-            .json(applyPaymentTitleOverrides(cachedPaymentMethods));
-        }
+        return res
+          .status(200)
+          .json(applyPaymentTitleOverrides(cachedPaymentMethods));
       }
-      
-      const paymentResponse = await WooCommerceAPI.get(`/payment_gateways?lang=${lang}`);
+
+      const paymentResponse = await WooCommerceAPI.get(
+        `/payment_gateways?lang=${lang}`,
+      );
       const paymentMethods = paymentResponse.data;
 
       if (!paymentMethods || paymentMethods.length === 0) {
         return res.status(404).json({ error: 'No payment methods available' });
       }
 
-
-      // Woo REST potrafi zwrócić `enabled: false` dla bramek offline zależnie od kontekstu (np. dostępność dla wysyłki).
-      // Żeby umożliwić obsługę „Faktury proforma” (BACS) po stronie frontu, nie filtrujemy BACS przez `enabled`.
+      // Keep real BACS even if Woo marks it oddly; never include stripe_bacs_debit.
       const normalizedMethods = paymentMethods.filter((method: any) => {
         const id = String(method?.id || '').toLowerCase();
-        return Boolean(method?.enabled) || id.includes('bacs');
+        return Boolean(method?.enabled) || id === 'bacs';
       });
 
       const enabledMethods = applyPaymentTitleOverrides(normalizedMethods);

@@ -45,6 +45,9 @@ const pickOnlineTransferMethod = (
     ),
   );
 
+const isProformaMethod = (method: PaymentMethod): boolean =>
+  String(method.id || '').toLowerCase() === PROFORMA_METHOD_ID;
+
 const paymentIcons: Record<string, string> = {
   [PAYNOW_PAYWALL_ID]: '/icons/paynow.png',
   [PAYNOW_PBL_ID]: '/icons/paynow.png',
@@ -61,16 +64,6 @@ const Payment: React.FC<PaymentProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Shipping method mapping (adjust if needed)
-  // const shippingMethodMapping: Record<string, string> = {
-  //   '1': 'kurier_gls',
-  //   '3': 'kurier_gls_pobranie',
-  //   '13': 'paczkomaty_inpost',
-  //   '11': 'kurier_gls_zagranica',
-  //   kurier_gls_pobranie: 'kurier_gls_pobranie', // For safety
-  // };
-
-  // Fetch payment methods on component mount, with auto-retry if error occurs
   useEffect(() => {
     const fetchPaymentMethods = async () => {
       try {
@@ -81,7 +74,7 @@ const Payment: React.FC<PaymentProps> = ({
           throw new Error(t.checkout.payment.errorLoading);
         }
         const data = await response.json();
-        
+
         setPaymentMethods(data);
       } catch (err) {
         console.error('Error fetching payment methods:', err);
@@ -118,11 +111,8 @@ const Payment: React.FC<PaymentProps> = ({
       return pickOnlineTransferMethod(paymentMethods)?.id ?? PAYNOW_PBL_ID;
     }
 
-    const proforma = paymentMethods.find((method) => {
-      const id = String(method.id || '').toLowerCase();
-      return id === PROFORMA_METHOD_ID || id.includes(PROFORMA_METHOD_ID);
-    });
-    return pickPaynowMethod(paymentMethods)?.id ?? proforma?.id ?? PAYNOW_PBL_ID;
+    // Never default to BACS/proforma — Paynow first.
+    return pickPaynowMethod(paymentMethods)?.id ?? PAYNOW_PBL_ID;
   };
 
   const getFilteredPaymentMethods = () => {
@@ -144,14 +134,9 @@ const Payment: React.FC<PaymentProps> = ({
       return onlineTransfer ? [onlineTransfer] : [];
     }
 
-    // For PL deliveries, allow both:
-    // - paynow (current behavior)
-    // - bacs as "Faktura proforma" (except "kurier gls pobranie", handled above)
     const paynow = pickPaynowMethod(paymentMethods);
-    const proforma = paymentMethods.find((method) => {
-      const id = String(method.id || '').toLowerCase();
-      return id === PROFORMA_METHOD_ID || id.includes(PROFORMA_METHOD_ID);
-    });
+    // Exact id === 'bacs' only — never stripe_bacs_debit etc.
+    const proforma = paymentMethods.find(isProformaMethod);
 
     const methods: PaymentMethod[] = [];
     if (paynow) methods.push(paynow);
@@ -162,11 +147,25 @@ const Payment: React.FC<PaymentProps> = ({
   const availableMethods = getFilteredPaymentMethods();
 
   useEffect(() => {
+    if (availableMethods.length === 0) return;
+
+    // Keep user selection when still valid (do not silently switch Paynow → BACS).
+    if (availableMethods.some((method) => method.id === paymentMethod)) {
+      return;
+    }
+
     const defaultMethodId = resolveDefaultPaymentMethodId();
     if (defaultMethodId) {
       setPaymentMethod(defaultMethodId);
     }
-  }, [shippingMethod, deliveryCountryCode, language, paymentMethods, setPaymentMethod]);
+  }, [
+    shippingMethod,
+    deliveryCountryCode,
+    language,
+    paymentMethods,
+    paymentMethod,
+    setPaymentMethod,
+  ]);
 
   if (loading) {
     return <p>{t.checkout.payment.loading}</p>;
@@ -186,10 +185,11 @@ const Payment: React.FC<PaymentProps> = ({
           {availableMethods.map((method) => (
             <label
               key={method.id}
-              className={`grid grid-cols-[1fr_auto] sm:grid-cols-[80%_20%] items-center py-[16px] border-b ${paymentMethod === method.id
+              className={`grid grid-cols-[1fr_auto] sm:grid-cols-[80%_20%] items-center py-[16px] border-b ${
+                paymentMethod === method.id
                   ? 'border-dark-pastel-red'
                   : 'border-beige-dark'
-                }`}
+              }`}
             >
               <div className="flex items-center min-w-0">
                 <input
@@ -200,10 +200,11 @@ const Payment: React.FC<PaymentProps> = ({
                   className="hidden"
                 />
                 <span
-                  className={`flex-shrink-0 w-5 h-5 rounded-full ${paymentMethod === method.id
+                  className={`flex-shrink-0 w-5 h-5 rounded-full ${
+                    paymentMethod === method.id
                       ? 'border-4 border-dark-pastel-red'
                       : 'border-2 border-gray-400'
-                    }`}
+                  }`}
                 ></span>
                 <span className="ml-2">{method.title}</span>
               </div>
@@ -220,9 +221,7 @@ const Payment: React.FC<PaymentProps> = ({
           ))}
         </div>
       ) : (
-        <p className="text-red-500 mt-4">
-          {t.checkout.payment.noMethods}
-        </p>
+        <p className="text-red-500 mt-4">{t.checkout.payment.noMethods}</p>
       )}
     </div>
   );
