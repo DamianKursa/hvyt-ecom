@@ -29,6 +29,7 @@ import {
   getInitialCheckoutCountryCode,
   isCountrySelected,
 } from '@/utils/countryCode';
+import { isPaczkomatyMethod, isPunktyGlsMethod } from '@/utils/shippingMethods';
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -316,13 +317,13 @@ const Checkout: React.FC = () => {
       setOrderDisabled(false);
       throw new Error('Validation error');
     }
-    if (shippingMethod.title.toLocaleLowerCase() === 'paczkomaty inpost' && !selectedLocker) {
+    if (isPaczkomatyMethod(shippingMethod) && !selectedLocker) {
       alert(t.checkout.validation.selectLocker);
       setOrderDisabled(false);
       throw new Error('Validation error');
     }
 
-    if (shippingMethod.title.toLocaleLowerCase() === 'punkty gls' && !selectedGlsPoint) {
+    if (isPunktyGlsMethod(shippingMethod) && !selectedGlsPoint) {
       alert(t.checkout.validation.selectGlsPoint);
       setOrderDisabled(false);
       throw new Error('Validation error');
@@ -445,7 +446,7 @@ const Checkout: React.FC = () => {
 
     // Prepare shipping meta data (if any)
     const shippingMetaData = [];
-    if (shippingMethod.title.toLowerCase() === 'paczkomaty inpost') {
+    if (isPaczkomatyMethod(shippingMethod)) {
       shippingMetaData.push(
         { key: '_integration', value: 'paczkomaty' },
         { key: '_paczkomat_id', value: selectedLocker },
@@ -460,7 +461,7 @@ const Checkout: React.FC = () => {
         { key: 'delivery_point_city', value: shippingData.city },
       );
     }
-    if (shippingMethod.title.toLowerCase() === 'punkty gls') {
+    if (isPunktyGlsMethod(shippingMethod)) {
       shippingMetaData.push(
         { key: '_integration', value: 'gls' },
         {

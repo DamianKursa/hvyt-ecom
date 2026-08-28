@@ -8,6 +8,11 @@ import {
   type CartShippingClassRef,
   resolveShippingMethodCost,
 } from '@/utils/shippingCost';
+import {
+  isPaczkomatyMethod,
+  isPunktyGlsMethod,
+  placePaczkomatyBeforeGls,
+} from '@/utils/shippingMethods';
 
 interface ShippingZone {
   zoneId: number;
@@ -226,6 +231,7 @@ const Shipping: React.FC<ShippingProps> = ({
     'kurier gls': '/icons/GLS_Logo_2021.svg',
     'kurier inpost': '/icons/inpost-kurier.svg',
     'paczkomaty inpost': '/icons/paczkomat.png',
+    'paczkomaty 24/7 inpost': '/icons/paczkomat.png',
     'kurier gls - darmowa wysyłka': '/icons/GLS_Logo_2021.svg',
     'darmowa dostawa': '/icons/free-shipping.svg',
     'kurier gls pobranie': '/icons/GLS_Logo_2021.svg',
@@ -521,13 +527,13 @@ const Shipping: React.FC<ShippingProps> = ({
 
           // Final filter pass: remove if cartContainsRestricted
           if (cartContainsRestricted) {
-            filteredMethods = filteredMethods.filter((method) => {
-              return (
-                // method.id !== 'paczkomaty_inpost' && method.id !== 'punkty_gls'
-                method.title.toLowerCase() !== 'paczkomaty inpost' && method.title !== 'punkty gls'
-              );
-            });
+            filteredMethods = filteredMethods.filter(
+              (method) =>
+                !isPaczkomatyMethod(method) && !isPunktyGlsMethod(method),
+            );
           }
+
+          filteredMethods = placePaczkomatyBeforeGls(filteredMethods);
 
           return { ...zone, methods: filteredMethods };
         });
@@ -619,7 +625,7 @@ const Shipping: React.FC<ShippingProps> = ({
     onCostsReadyChange?.(true);
     // When switching away from "Punkty GLS", do not reinitialize the GLS map.
     // if (method.id !== 'punkty_gls') {
-    if (method.title.toLowerCase() !== 'punkty gls') {
+    if (!isPunktyGlsMethod(method)) {
       setShowGlsMap(false);
     }
   };
@@ -659,7 +665,7 @@ const Shipping: React.FC<ShippingProps> = ({
         });
       }
     };
-    if (Object.keys(shippingMethod).length !== 0 && shippingMethod?.title.toLowerCase() === 'paczkomaty inpost') {
+    if (Object.keys(shippingMethod).length !== 0 && isPaczkomatyMethod(shippingMethod)) {
       loadEasyPackScript();
     }
   }, [shippingMethod]);
@@ -830,7 +836,9 @@ const Shipping: React.FC<ShippingProps> = ({
                 <div className="flex justify-center w-full">
                   <img
                     src={
-                      shippingIcons[method.title.toLowerCase()] ||
+                      (isPaczkomatyMethod(method)
+                        ? '/icons/paczkomat.png'
+                        : shippingIcons[method.title.toLowerCase()]) ||
                       '/icons/delivery.svg'
                     }
                     alt={`${method.title} Icon`}
@@ -839,8 +847,8 @@ const Shipping: React.FC<ShippingProps> = ({
                 </div>
               </label>
 
-              {method.title.toLowerCase() === 'paczkomaty inpost' &&
-                (Object.keys(shippingMethod).length !== 0 && shippingMethod.title.toLowerCase() === 'paczkomaty inpost') && (
+              {isPaczkomatyMethod(method) &&
+                (Object.keys(shippingMethod).length !== 0 && isPaczkomatyMethod(shippingMethod)) && (
                   <div>
                     <button
                       onClick={openInpostModal}
@@ -858,8 +866,8 @@ const Shipping: React.FC<ShippingProps> = ({
                   </div>
                 )}
 
-              {method.title.toLowerCase() === 'punkty gls' &&
-              (Object.keys(shippingMethod).length !== 0 && shippingMethod.title.toLowerCase() === 'punkty gls') && (
+              {isPunktyGlsMethod(method) &&
+              (Object.keys(shippingMethod).length !== 0 && isPunktyGlsMethod(shippingMethod)) && (
                   <div>
                     <button
                       onClick={() => {
