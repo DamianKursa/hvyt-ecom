@@ -12,23 +12,13 @@ export const isPunktyGlsMethod = (
   method?: { title?: string } | null,
 ): boolean => methodTitle(method).includes('punkty gls');
 
-/** Place InPost lockers immediately before GLS pickup points. */
-export const placePaczkomatyBeforeGls = (
+/** Place InPost lockers first on the shipping list. */
+export const placePaczkomatyFirst = (
   methods: ShippingMethod[],
 ): ShippingMethod[] => {
   const paczkomaty = methods.filter(isPaczkomatyMethod);
   if (paczkomaty.length === 0) return methods;
 
   const withoutPaczkomaty = methods.filter((method) => !isPaczkomatyMethod(method));
-  const glsIndex = withoutPaczkomaty.findIndex(isPunktyGlsMethod);
-
-  if (glsIndex === -1) {
-    return [...withoutPaczkomaty, ...paczkomaty];
-  }
-
-  return [
-    ...withoutPaczkomaty.slice(0, glsIndex),
-    ...paczkomaty,
-    ...withoutPaczkomaty.slice(glsIndex),
-  ];
+  return [...paczkomaty, ...withoutPaczkomaty];
 };

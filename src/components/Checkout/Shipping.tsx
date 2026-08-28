@@ -11,7 +11,7 @@ import {
 import {
   isPaczkomatyMethod,
   isPunktyGlsMethod,
-  placePaczkomatyBeforeGls,
+  placePaczkomatyFirst,
 } from '@/utils/shippingMethods';
 
 interface ShippingZone {
@@ -40,6 +40,7 @@ interface ShippingProps {
 // Extend the Window interface for TypeScript
 declare global {
   interface Window {
+    easyPackAsyncInit?: () => void;
     easyPack?: {
       init: (config?: object) => void;
       modalMap?: (
@@ -64,6 +65,77 @@ declare global {
     SzybkaPaczkaParcel?: new () => { getParcelObject: () => any };
   }
 }
+
+const EASYPACK_SCRIPT_SRC =
+  'https://geowidget.easypack24.net/js/sdk-for-javascript.js';
+const EASYPACK_STYLE_HREF =
+  'https://geowidget.easypack24.net/css/easypack.css';
+const EASYPACK_CONFIG = {
+  defaultLocale: 'pl',
+  mapType: 'osm',
+  searchType: 'osm',
+  points: { types: ['parcel_locker'] },
+  map: { initialTypes: ['parcel_locker'] },
+};
+
+let easyPackInitialized = false;
+const easyPackReadyListeners = new Set<() => void>();
+
+const isEasyPackReady = () =>
+  easyPackInitialized && typeof window.easyPack?.modalMap === 'function';
+
+const notifyEasyPackReady = () => {
+  easyPackReadyListeners.forEach((listener) => listener());
+  easyPackReadyListeners.clear();
+};
+
+const initEasyPackOnce = () => {
+  if (!window.easyPack) return;
+  if (!easyPackInitialized) {
+    window.easyPack.init(EASYPACK_CONFIG);
+    easyPackInitialized = true;
+  }
+  notifyEasyPackReady();
+};
+
+const ensureEasyPack = () => {
+  if (typeof window === 'undefined') return;
+
+  // Official SDK hook — fires when the widget is actually ready (not just script.onload).
+  window.easyPackAsyncInit = initEasyPackOnce;
+
+  if (window.easyPack) {
+    initEasyPackOnce();
+    return;
+  }
+
+  if (!document.querySelector(`link[href="${EASYPACK_STYLE_HREF}"]`)) {
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = EASYPACK_STYLE_HREF;
+    document.head.appendChild(link);
+  }
+
+  if (!document.querySelector(`script[src="${EASYPACK_SCRIPT_SRC}"]`)) {
+    const script = document.createElement('script');
+    script.src = EASYPACK_SCRIPT_SRC;
+    script.async = true;
+    script.onload = () => initEasyPackOnce();
+    script.onerror = () => {
+      console.error('Nie udało się załadować skryptu EasyPack.');
+    };
+    document.body.appendChild(script);
+  }
+};
+
+const whenEasyPackReady = (callback: () => void) => {
+  if (isEasyPackReady()) {
+    callback();
+    return;
+  }
+  easyPackReadyListeners.add(callback);
+  ensureEasyPack();
+};
 
 /**
  * Helper: Extract the GLS selection.
@@ -219,7 +291,6 @@ const Shipping: React.FC<ShippingProps> = ({
   const [costsReady, setCostsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedLockerData, setSelectedLockerData] = useState<any>(null);
-  const scriptLoadedRef = useRef(false);
   // State to control GLS map visibility
   const [showGlsMap, setShowGlsMap] = useState(false);
   const glsMapRef = useRef<HTMLDivElement>(null);
@@ -533,7 +604,7 @@ const Shipping: React.FC<ShippingProps> = ({
             );
           }
 
-          filteredMethods = placePaczkomatyBeforeGls(filteredMethods);
+          filteredMethods = placePaczkomatyFirst(filteredMethods);
 
           return { ...zone, methods: filteredMethods };
         });
@@ -631,47 +702,21 @@ const Shipping: React.FC<ShippingProps> = ({
   };
 
   // ─── EASYPACK (InPost) INTEGRATION ───────────────────────────────────────────
-  useEffect(() => {  
-    const loadEasyPackScript = () => {
-      if (!scriptLoadedRef.current) {
-        scriptLoadedRef.current = true;
-        const script = document.createElement('script');
-        script.src =
-          'https://geowidget.easypack24.net/js/sdk-for-javascript.js';
-        script.async = true;
-        script.onload = () => {
-          initializeEasyPack();
-        };
-        script.onerror = () => {
-          console.error('Nie udało się załadować skryptu EasyPack.');
-        };
-        document.body.appendChild(script);
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://geowidget.easypack24.net/css/easypack.css';
-        document.head.appendChild(link);
-      } else {
-        initializeEasyPack();
-      }
-    };
-    const initializeEasyPack = () => {
-      if (window.easyPack) {
-        window.easyPack.init({
-          defaultLocale: 'pl',
-          mapType: 'osm',
-          searchType: 'osm',
-          points: { types: ['parcel_locker'] },
-          map: { initialTypes: ['parcel_locker'] },
-        });
-      }
-    };
-    if (Object.keys(shippingMethod).length !== 0 && isPaczkomatyMethod(shippingMethod)) {
-      loadEasyPackScript();
+  useEffect(() => {
+    const hasPaczkomaty = shippingZones.some((zone) =>
+      zone.methods.some(isPaczkomatyMethod),
+    );
+    if (hasPaczkomaty || isPaczkomatyMethod(shippingMethod)) {
+      ensureEasyPack();
     }
-  }, [shippingMethod]);
+  }, [shippingZones, shippingMethod?.id, shippingMethod?.title]);
 
   const openInpostModal = () => {
-    if (window.easyPack && typeof window.easyPack.modalMap === 'function') {
+    whenEasyPackReady(() => {
+      if (!window.easyPack || typeof window.easyPack.modalMap !== 'function') {
+        console.error('Funkcja modalMap EasyPack jest niedostępna.');
+        return;
+      }
       window.easyPack.modalMap(
         (point: any, modal: any) => {
           modal.closeModal();
@@ -686,9 +731,7 @@ const Shipping: React.FC<ShippingProps> = ({
         },
         { width: 500, height: 600 },
       );
-    } else {
-      console.error('Funkcja modalMap EasyPack jest niedostępna.');
-    }
+    });
   };
 
   // ─── GLS INTEGRATION: LOAD SCRIPT & INIT INLINE MAP ─────────────────────────
