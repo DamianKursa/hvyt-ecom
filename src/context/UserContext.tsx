@@ -13,6 +13,8 @@ import { getLocalizedPath } from '@/utils/i18n/routing';
 interface User {
   id?: number | null;
   name: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   email: string | null;
 }
 
@@ -66,6 +68,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       const profileResponse = await fetch('/api/auth/profile', {
         method: 'GET',
         credentials: 'include',
+        cache: 'no-store',
       });
 
       if (profileResponse.ok) {
@@ -73,6 +76,8 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         persistUser({
           id: data.id || null,
           name: data.name,
+          firstName: data.firstName || null,
+          lastName: data.lastName || null,
           email: data.email,
         });
       } else {
@@ -123,19 +128,20 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     }
   };
 
-  // On mount, check for a saved user or a token to attempt fetching the user
+  // Hydrate from localStorage, then refresh from the session cookie
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
-    const hasToken = document.cookie.includes('token=');
 
     if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    } else if (hasToken) {
-      fetchUser();
-    } else {
-      setUser(null);
+      try {
+        setUser(JSON.parse(savedUser));
+      } catch {
+        localStorage.removeItem('user');
+      }
     }
-  }, []); // Empty dependency array to run only on mount
+
+    fetchUser();
+  }, []);
 
   return (
     <UserContext.Provider

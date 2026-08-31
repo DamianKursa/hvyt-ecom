@@ -39,6 +39,8 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
         setUser({
           id: userData.id || null,
           name: userData.name || null,
+          firstName: userData.firstName || null,
+          lastName: userData.lastName || null,
           email: userData.email || null,
         });
         const destination =

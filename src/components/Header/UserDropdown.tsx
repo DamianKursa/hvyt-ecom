@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useUserContext } from '@/context/UserContext';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { formatPersonName } from '@/utils/auth/displayName';
 
 interface UserDropdownProps {
   onLogout: () => void;
@@ -18,7 +19,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
 
   const { t, getPath } = useI18n()
 
-  console.log('User in UserDropdown:', user);
+  const displayName = formatPersonName(user?.firstName, user?.lastName) || t.account.user;
 
   return (
     <div
@@ -29,7 +30,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({
       {/* Greeting Section */}
       <div className="mb-4">
         <p className="font-bold px-4 pt-4 text-[#661F30] text-[18px]">
-          {user?.name || 'Użytkownik'}
+          {displayName}
         </p>
         <p className="font-light px-4 text-[#661F30] text-[16px]">
           {t.account.thanksMessage}

@@ -590,7 +590,8 @@ export const en: Translations = {
     messageEmailLinkSent: 'The activation link has been sent to your email address',
     messageEmailLinkClick: 'To complete registration, click the link.',
     messageLinkProblem: 'Problems with the link?',
-    messageCheckSpam: 'Don\'t see the email? Check your spam folder.'    
+    messageCheckSpam: 'Don\'t see the email? Check your spam folder.',
+    user: 'User'
   },
 
   // === AUTHENTICATION / LOGIN ===

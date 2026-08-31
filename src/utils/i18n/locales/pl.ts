@@ -591,7 +591,8 @@ export const pl = {
       messageEmailLinkSent: 'Link aktywacyjny został wysłany na adres e-mail',
       messageEmailLinkClick: 'W celu zakończenia rejestracji kliknij w link.',
       messageLinkProblem: 'Problemy z linkiem?',
-      messageCheckSpam: 'Nie widzisz maila? Sprawdź także w folderze spam.'
+      messageCheckSpam: 'Nie widzisz maila? Sprawdź także w folderze spam.',
+      user: 'Użytkownik'
     },
     // === AUTENTYKACJA / LOGOWANIE ===
     auth: {
