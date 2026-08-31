@@ -141,6 +141,8 @@ export const en: Translations = {
       placeholder: 'Enter your email address',
       button: 'Subscribe',
       consent: 'By subscribing, you agree to our Privacy Policy and to receive updates from our company.',
+      success: 'Thank you! You have been subscribed to the newsletter.',
+      error: 'Subscription failed. Please try again.',
     },
     // === PARTNERS & PAYMENTS ===
     partners: {
