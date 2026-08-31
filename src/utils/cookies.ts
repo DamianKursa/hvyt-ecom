@@ -1,4 +1,4 @@
-import { CookieSerializeOptions, parse, serialize } from 'cookie';
+import { SerializeOptions, parse, serialize } from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export const isHttpsRequest = (req: NextApiRequest): boolean => {
@@ -11,8 +11,8 @@ export const isHttpsRequest = (req: NextApiRequest): boolean => {
 
 export const getAuthCookieOptions = (
   req: NextApiRequest,
-  extra: CookieSerializeOptions = {},
-): CookieSerializeOptions => {
+  extra: SerializeOptions = {},
+): SerializeOptions => {
   const secure = isHttpsRequest(req);
   return {
     httpOnly: true,
