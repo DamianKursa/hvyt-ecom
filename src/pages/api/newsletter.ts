@@ -1,13 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import crypto from 'crypto';
 
-const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY || '';
+function env(name: string): string {
+  return String(process.env[name] || '')
+    .trim()
+    .replace(/^['"]|['"]$/g, '');
+}
+
+const MAILCHIMP_API_KEY = env('MAILCHIMP_API_KEY');
 const MAILCHIMP_AUDIENCE_ID =
-  process.env.MAILCHIMP_AUDIENCE_ID || process.env.MAILCHIMP_LIST_ID || '';
-const WORDPRESS_API_URL = process.env.WORDPRESS_API_URL || '';
+  env('MAILCHIMP_AUDIENCE_ID') || env('MAILCHIMP_LIST_ID');
 
 function getMailchimpStatus(): 'subscribed' | 'pending' {
-  return process.env.MAILCHIMP_DOUBLE_OPT_IN === 'true' ? 'pending' : 'subscribed';
+  return env('MAILCHIMP_DOUBLE_OPT_IN') === 'true' ? 'pending' : 'subscribed';
 }
 
 function isValidEmail(email: string): boolean {
@@ -15,9 +20,14 @@ function isValidEmail(email: string): boolean {
 }
 
 async function subscribeViaMailchimp(email: string) {
-  const dataCenter = MAILCHIMP_API_KEY.split('-')[1];
+  const dataCenter = MAILCHIMP_API_KEY.includes('-')
+    ? MAILCHIMP_API_KEY.split('-').pop()
+    : '';
+
   if (!dataCenter) {
-    throw new Error('Invalid MAILCHIMP_API_KEY format');
+    const err = new Error('Invalid MAILCHIMP_API_KEY format (expected key-usXX)');
+    (err as Error & { code?: string }).code = 'invalid_api_key';
+    throw err;
   }
 
   const status = getMailchimpStatus();
@@ -45,7 +55,7 @@ async function subscribeViaMailchimp(email: string) {
     return { ok: true, alreadySubscribed: false };
   }
 
-  const createBody = await createResponse.json().catch(() => ({}));
+  const createBody = await createResponse.json().catch(() => ({} as any));
   const title = String(createBody?.title || '');
 
   // Member already exists — update marketing status (e.g. re-subscribe)
@@ -65,33 +75,19 @@ async function subscribeViaMailchimp(email: string) {
     if (!updateResponse.ok) {
       const updateBody = await updateResponse.json().catch(() => ({}));
       console.error('Mailchimp update failed:', updateResponse.status, updateBody);
-      // Still treat as success if the address is already on the list
-      return { ok: true, alreadySubscribed: true };
     }
 
     return { ok: true, alreadySubscribed: true };
   }
 
   console.error('Mailchimp subscribe failed:', createResponse.status, createBody);
-  throw new Error(createBody?.detail || 'Mailchimp subscription failed');
-}
 
-async function subscribeViaWordPress(email: string) {
-  const response = await fetch(
-    `${WORDPRESS_API_URL}/wp-json/custom/v1/newsletter`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    },
+  const err = new Error(
+    createBody?.detail || createBody?.title || 'Mailchimp subscription failed',
   );
-
-  if (!response.ok) {
-    const body = await response.json().catch(() => ({}));
-    throw new Error(body?.message || body?.error || 'WordPress newsletter API error');
-  }
-
-  return { ok: true, alreadySubscribed: false };
+  (err as Error & { code?: string; status?: number }).code = 'mailchimp_error';
+  (err as Error & { status?: number }).status = createResponse.status;
+  throw err;
 }
 
 export default async function handler(
@@ -110,23 +106,37 @@ export default async function handler(
     return res.status(400).json({ error: 'Valid email is required' });
   }
 
-  try {
-    if (MAILCHIMP_API_KEY && MAILCHIMP_AUDIENCE_ID) {
-      const result = await subscribeViaMailchimp(email);
-      return res.status(200).json({ success: true, ...result });
-    }
+  if (!MAILCHIMP_API_KEY || !MAILCHIMP_AUDIENCE_ID) {
+    console.error(
+      'Newsletter misconfigured: missing MAILCHIMP_API_KEY and/or MAILCHIMP_AUDIENCE_ID',
+      {
+        hasKey: Boolean(MAILCHIMP_API_KEY),
+        hasAudience: Boolean(MAILCHIMP_AUDIENCE_ID),
+      },
+    );
+    return res.status(503).json({
+      error:
+        'Newsletter is not configured. Set MAILCHIMP_API_KEY and MAILCHIMP_AUDIENCE_ID in production env.',
+      code: 'not_configured',
+    });
+  }
 
-    if (WORDPRESS_API_URL) {
-      const result = await subscribeViaWordPress(email);
-      return res.status(200).json({ success: true, ...result });
-    }
+  try {
+    const result = await subscribeViaMailchimp(email);
+    return res.status(200).json({ success: true, ...result });
+  } catch (error) {
+    const err = error as Error & { code?: string; status?: number };
+    console.error('Newsletter subscribe error:', {
+      message: err?.message,
+      code: err?.code,
+      status: err?.status,
+    });
 
     return res.status(500).json({
-      error:
-        'Newsletter is not configured. Set MAILCHIMP_API_KEY and MAILCHIMP_AUDIENCE_ID.',
+      error: 'Something went wrong',
+      code: err?.code || 'subscribe_failed',
+      // Safe for ops debugging — no secrets, only Mailchimp's public error text
+      detail: err?.message || undefined,
     });
-  } catch (error) {
-    console.error('Newsletter subscribe error:', error);
-    return res.status(500).json({ error: 'Something went wrong' });
   }
 }
