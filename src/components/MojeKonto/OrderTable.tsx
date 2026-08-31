@@ -38,7 +38,7 @@ const getOrderStatusLabel = (status: string) : OrderStatusLabel=> {
       return {
         label: 'Zrealizowane',
         labelKey: 'statusCompleted',
-        className: 'bg-[#EAEFEC] text-[#EAEFEC]',
+        className: 'bg-green-600 text-white',
       };
     case 'cancelled':
       return {

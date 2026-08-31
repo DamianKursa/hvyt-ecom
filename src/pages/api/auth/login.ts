@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios, { AxiosError } from 'axios';
 import { serialize } from 'cookie';
+import { getUserIdFromJwt } from '@/utils/auth/jwt';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -16,10 +17,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       { username, password }
     );
 
-    const { token, user_display_name } = response.data;
+    const { token, user_display_name, user_email } = response.data;
+    const userId = getUserIdFromJwt(token);
 
-    console.log('loggedin', user_display_name, token );
-    
+    console.log('loggedin', user_display_name, userId);
 
     res.setHeader(
       'Set-Cookie',
@@ -33,7 +34,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       })
     );
 
-    res.status(200).json({ message: 'Login successful', name: user_display_name });
+    res.status(200).json({
+      message: 'Login successful',
+      id: userId || null,
+      name: user_display_name,
+      email: user_email || null,
+    });
   } catch (err) {
     const error = err as AxiosError;
     const statusCode = error.response?.status || 500;

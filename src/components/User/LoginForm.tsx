@@ -35,7 +35,11 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
 
       if (response.ok) {
         const userData = await response.json();
-        setUser(userData);
+        setUser({
+          id: userData.id || null,
+          name: userData.name || null,
+          email: userData.email || null,
+        });
         router.push(redirect && redirect.length > 0 ? redirect : getPath('/moje-konto/moje-zamowienia'));
       } else {
         const data = await response.json();

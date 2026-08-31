@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import axios, { AxiosError } from 'axios';
+import { getUserIdFromJwt } from '@/utils/auth/jwt';
 
 const WooCommerceAPI = axios.create({
   baseURL: process.env.REST_API,
@@ -72,15 +73,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const orderData: OrderData = req.body;
 
-
   if (!orderData.payment_method || !orderData.billing || !orderData.shipping || !orderData.shipping_lines || !orderData.line_items) {
 
     return res.status(400).json({ error: 'Missing required order data' });
   }
 
+  // Logged-in checkout: always take customer_id from the JWT session cookie.
+  // Client state can miss user.id after login, which used to create a guest order.
+  const sessionCustomerId = getUserIdFromJwt(req.cookies?.token);
+  if (sessionCustomerId) {
+    orderData.customer_id = sessionCustomerId;
+  }
+
   if (orderData.customer_id) {
     try {
-      const customerResponse = await WooCommerceAPI.get(`/customers/${orderData.customer_id}`);
+      await WooCommerceAPI.get(`/customers/${orderData.customer_id}`);
     } catch (error) {
       return res.status(400).json({ error: 'Invalid or non-existent customer_id' });
     }

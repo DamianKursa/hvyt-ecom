@@ -37,6 +37,16 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
   const verifyCalled = useRef(false);
 
+  const persistUser = (next: User | null) => {
+    setUser(next);
+    if (typeof window === 'undefined') return;
+    if (next) {
+      localStorage.setItem('user', JSON.stringify(next));
+    } else {
+      localStorage.removeItem('user');
+    }
+  };
+
   const fetchUser = async () => {
     if (verifyCalled.current) return;
     verifyCalled.current = true;
@@ -48,8 +58,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       });
 
       if (!validateResponse.ok) {
-        setUser(null);
-        localStorage.removeItem('user');
+        persistUser(null);
         return;
       }
 
@@ -60,21 +69,17 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
       if (profileResponse.ok) {
         const data = await profileResponse.json();
-        const newUser: User = {
+        persistUser({
           id: data.id || null,
           name: data.name,
           email: data.email,
-        };
-        setUser(newUser);
-        localStorage.setItem('user', JSON.stringify(newUser));
+        });
       } else {
-        setUser(null);
-        localStorage.removeItem('user');
+        persistUser(null);
       }
     } catch (error) {
       console.error('fetchUser error:', error);
-      setUser(null);
-      localStorage.removeItem('user');
+      persistUser(null);
     }
   };
 
@@ -84,8 +89,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         method: 'POST',
         credentials: 'include',
       });
-      setUser(null);
-      localStorage.removeItem('user');
+      persistUser(null);
       router.push('/logowanie');
     } catch (error) {
       console.error('Failed to log out:', error);
@@ -110,9 +114,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
       }
 
       const data = await response.json();
-      const newUser: User = { id: data.id || null, name: username, email };
-      setUser(newUser);
-      localStorage.setItem('user', JSON.stringify(newUser));
+      persistUser({ id: data.id || null, name: username, email });
       console.log('User registered and logged in.');
     } catch (error) {
       console.error('Error during registration:', error);
@@ -136,7 +138,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <UserContext.Provider
-      value={{ user, fetchUser, logout, register, setUser }}
+      value={{ user, fetchUser, logout, register, setUser: persistUser }}
     >
       {children}
     </UserContext.Provider>

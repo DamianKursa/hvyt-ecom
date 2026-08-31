@@ -31,18 +31,31 @@ const SectionPage: React.FC = () => {
   useEffect(() => {
     if (!section) return;
 
-    const fetchSectionData = async () => {
+    let cancelled = false;
+    const isOrdersSection =
+      section === 'moje-zamowienia' || section === 'kupione-produkty';
+
+    const fetchNoStore = (url: string) =>
+      fetch(url, {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache',
+        },
+      });
+
+    const fetchSectionData = async (showLoader: boolean) => {
       try {
-        setLoading(true);
+        if (showLoader) setLoading(true);
 
         if (section === 'moje-dane') {
-          const response = await fetch(`/api/moje-konto/${section}`, {
-            method: 'GET',
-            credentials: 'include',
-          });
+          const response = await fetchNoStore(`/api/moje-konto/${section}`);
 
           if (response.ok) {
             const userData = await response.json();
+            if (cancelled) return;
 
             setUser({
               id: userData.id || 0,
@@ -56,57 +69,73 @@ const SectionPage: React.FC = () => {
             throw new Error('Failed to fetch user data');
           }
         } else if (section === 'moje-adresy') {
-          const response = await fetch(`/api/moje-konto/adresy`, {
-            method: 'GET',
-            credentials: 'include',
-          });
+          const response = await fetchNoStore(`/api/moje-konto/adresy`);
 
           if (response.ok) {
             const addresses = await response.json();
+            if (cancelled) return;
             setContent(addresses);
-          } else {
+          } else if (!cancelled) {
             setContent([]);
           }
         } else if (section === 'dane-do-faktury') {
-          const response = await fetch(`/api/moje-konto/billing-addresses`, {
-            method: 'GET',
-            credentials: 'include',
-          });
+          const response = await fetchNoStore(`/api/moje-konto/billing-addresses`);
 
           if (response.ok) {
             const billingAddresses = await response.json();
+            if (cancelled) return;
             setContent(billingAddresses);
-          } else {
+          } else if (!cancelled) {
             setContent([]);
           }
         } else {
-          const response = await fetch(`/api/moje-konto/${section}`, {
-            method: 'GET',
-            credentials: 'include',
-          });
+          const cacheBust = isOrdersSection ? `?t=${Date.now()}` : '';
+          const response = await fetchNoStore(`/api/moje-konto/${section}${cacheBust}`);
 
           if (response.ok) {
             const data = await response.json();
+            if (cancelled) return;
             setContent(data);
           } else if (response.status === 401) {
+            if (cancelled) return;
             setError('Unauthorized. Redirecting to login...');
             router.push('/logowanie');
-          } else {
+            return;
+          } else if (!cancelled) {
             setError('Data not found for this section.');
+            return;
           }
         }
 
-        setError(null);
+        if (!cancelled) setError(null);
       } catch (error) {
         console.error('Error fetching section data:', error);
-        setError('An error occurred while loading data.');
+        if (!cancelled) setError('An error occurred while loading data.');
       } finally {
-        setLoading(false);
+        if (!cancelled && showLoader) setLoading(false);
       }
     };
 
-    fetchSectionData();
-  }, [section, router]);
+    fetchSectionData(true);
+
+    const refetchOnFocus = () => {
+      if (document.visibilityState === 'visible') {
+        fetchSectionData(false);
+      }
+    };
+
+    if (isOrdersSection) {
+      window.addEventListener('focus', refetchOnFocus);
+      document.addEventListener('visibilitychange', refetchOnFocus);
+    }
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('focus', refetchOnFocus);
+      document.removeEventListener('visibilitychange', refetchOnFocus);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- refetch when the account section changes
+  }, [section]);
 
   const handleUserUpdate = async (updatedUser: {
     id: number;

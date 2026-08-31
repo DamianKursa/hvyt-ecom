@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 import { parse } from 'cookie';
 import { Product } from '@/utils/functions/interfaces';
+import { getUserIdFromJwt } from '@/utils/auth/jwt';
 
 interface OrderItem {
   product_id: string;
@@ -17,6 +18,10 @@ interface Order {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   const { section } = req.query;
 
   const cookies = req.headers.cookie ? parse(req.headers.cookie) : {};
@@ -58,11 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(401).json({ error: 'Invalid token' });
     }
 
-    const decodedToken = JSON.parse(
-      Buffer.from(token.split('.')[1], 'base64').toString('utf-8')
-    ) as { data: { user: { id: number } } };
-
-    const customerId = decodedToken?.data?.user?.id;
+    const customerId = getUserIdFromJwt(token);
 
     if (!customerId && section !== 'moje-dane') {
       return res.status(401).json({ error: 'Unauthorized: Customer ID not found in token' });
@@ -149,13 +150,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // Fetch data for other sections
-    const response = await axios.get(`${process.env.WORDPRESS_API_URL}/wp-json/wc/v3/${apiEndpoint}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      params:
-        section === 'moje-zamowienia' || section === 'kupione-produkty'
-          ? { customer: customerId }
-          : undefined,
-    });
+    const isOrdersSection =
+      section === 'moje-zamowienia' || section === 'kupione-produkty';
+
+    const wcKey = process.env.WC_CONSUMER_KEY || '';
+    const wcSecret = process.env.WC_CONSUMER_SECRET || '';
+    const wcBase = process.env.REST_API || '';
+
+    const response = isOrdersSection && wcBase && wcKey && wcSecret
+      ? await axios.get(`${wcBase}/orders`, {
+          auth: { username: wcKey, password: wcSecret },
+          headers: { 'Cache-Control': 'no-cache' },
+          params: {
+            customer: customerId,
+            per_page: 100,
+            orderby: 'date',
+            order: 'desc',
+            t: Date.now(),
+          },
+        })
+      : await axios.get(`${process.env.WORDPRESS_API_URL}/wp-json/wc/v3/${apiEndpoint}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Cache-Control': 'no-cache',
+          },
+          params: isOrdersSection
+            ? { customer: customerId, per_page: 100, orderby: 'date', order: 'desc', t: Date.now() }
+            : undefined,
+        });
 
     if (section === 'kupione-produkty') {
       const products: Product[] = await Promise.all(

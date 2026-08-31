@@ -318,6 +318,19 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/api/moje-konto/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, no-cache, must-revalidate, private',
+          },
+          {
+            key: 'Pragma',
+            value: 'no-cache',
+          },
+        ],
+      },
     ];
   },  
 };
