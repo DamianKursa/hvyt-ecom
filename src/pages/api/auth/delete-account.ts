@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 import { parse, serialize } from 'cookie';
+import { getAuthCookieOptions } from '@/utils/cookies';
 
 const WP_API_URL =
     process.env.WORDPRESS_WP_API_URL ||
@@ -32,13 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Clear the auth cookie (same as logout)
         res.setHeader(
             'Set-Cookie',
-            serialize('token', '', {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                path: '/',
-                expires: new Date(0),
-            })
+            serialize('token', '', getAuthCookieOptions(req, { expires: new Date(0), maxAge: 0 })),
         );
 
         return res.status(200).json({ message: 'Account deleted successfully' });

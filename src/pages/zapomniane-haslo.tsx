@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { useI18n } from '@/utils/hooks/useI18n';
 
 const ResetPassword: React.FC = () => {
-  const {t} = useI18n();
+  const {t, getPath} = useI18n();
   const router = useRouter();
   const { key, login } = router.query;
 
@@ -44,7 +44,7 @@ const ResetPassword: React.FC = () => {
 
       if (response.ok) {
         setMessage('Hasło zostało pomyślnie zmienione.');
-        setTimeout(() => router.push('/logowanie'), 3000);
+        setTimeout(() => router.push(getPath('/logowanie')), 3000);
       } else {
         const data = await response.json();
         setError(data.message || 'Nie udało się zmienić hasła.');
@@ -160,7 +160,7 @@ const ResetPassword: React.FC = () => {
 
               {/* Back to Login */}
               <button
-                onClick={() => router.push('/logowanie')}
+                onClick={() => router.push(getPath('/logowanie'))}
                 className="mt-4 py-3 px-6 border-2 border-black text-black rounded-full"
               >
                 Wróć do logowania

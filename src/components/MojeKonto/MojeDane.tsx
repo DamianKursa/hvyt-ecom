@@ -25,7 +25,7 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
   const [isEditContactModalOpen, setIsEditContactModalOpen] = useState(false);
   const [isEditPasswordModalOpen, setIsEditPasswordModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const {t} = useI18n();
+  const {t, getPath} = useI18n();
   const router = useRouter();
 
   const handleDeleteAccount = async () => {
@@ -35,7 +35,7 @@ const MojeDane: React.FC<MojeDaneProps> = ({ user, onUpdate }) => {
         method: 'POST',
         credentials: 'include',
       });
-      router.push('/logowanie');
+      router.push(getPath('/logowanie'));
     } catch (error) {
       console.error('Error deleting account:', error);
     }

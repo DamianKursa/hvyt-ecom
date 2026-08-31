@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios, { AxiosError } from 'axios';
 import { serialize } from 'cookie';
 import { getUserIdFromJwt } from '@/utils/auth/jwt';
+import { getAuthCookieOptions } from '@/utils/cookies';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -24,14 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     res.setHeader(
       'Set-Cookie',
-      serialize('token', token, {
-        httpOnly: true,
-        secure: true, //process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24, 
-        // domain: process.env.COOKIE_DOMAIN || '.hvyt.pl', 
-      })
+      serialize('token', token, getAuthCookieOptions(req, { maxAge: 60 * 60 * 24 })),
     );
 
     res.status(200).json({

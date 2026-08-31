@@ -309,7 +309,7 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
                         onClick={() => {
                           fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
                           toggleMenu();
-                          router.push('/logowanie');
+                          router.push(getPath('/logowanie'));
                         }}
                         className="flex items-center py-2 rounded-[25px] cursor-pointer hover:bg-gray-100 text-[18px]"
                       >

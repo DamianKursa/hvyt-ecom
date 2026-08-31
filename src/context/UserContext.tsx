@@ -8,6 +8,7 @@ import React, {
   useRef,
 } from 'react';
 import { useRouter } from 'next/router';
+import { getLocalizedPath } from '@/utils/i18n/routing';
 
 interface User {
   id?: number | null;
@@ -90,7 +91,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         credentials: 'include',
       });
       persistUser(null);
-      router.push('/logowanie');
+      router.push(getLocalizedPath('/logowanie'));
     } catch (error) {
       console.error('Failed to log out:', error);
     }

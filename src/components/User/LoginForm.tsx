@@ -30,6 +30,7 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
@@ -40,7 +41,11 @@ const LoginForm: React.FC<{ onForgotPassword: () => void }> = ({
           name: userData.name || null,
           email: userData.email || null,
         });
-        router.push(redirect && redirect.length > 0 ? redirect : getPath('/moje-konto/moje-zamowienia'));
+        const destination =
+          redirect && redirect.length > 0
+            ? redirect
+            : getPath('/moje-konto/moje-zamowienia');
+        window.location.assign(destination);
       } else {
         const data = await response.json();
         const cleanedMessage =

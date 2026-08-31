@@ -12,7 +12,7 @@ import { Order, Product } from '@/utils/functions/interfaces';
 import { useI18n } from '@/utils/hooks/useI18n';
 
 const SectionPage: React.FC = () => {
-  const {t} = useI18n();
+  const { t, getPath } = useI18n();
   const router = useRouter();
   const { section } = router.query;
 
@@ -99,7 +99,7 @@ const SectionPage: React.FC = () => {
           } else if (response.status === 401) {
             if (cancelled) return;
             setError('Unauthorized. Redirecting to login...');
-            router.push('/logowanie');
+            router.push(getPath('/logowanie'));
             return;
           } else if (!cancelled) {
             setError('Data not found for this section.');

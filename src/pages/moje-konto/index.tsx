@@ -74,11 +74,11 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
           const userData = await response.json();
           setUser(userData);
         } else {
-          router.push('/logowanie');
+          router.push(getPath('/logowanie'));
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
-        router.push('/logowanie');
+        router.push(getPath('/logowanie'));
       } finally {
         setLoading(false);
       }
@@ -134,7 +134,7 @@ const MojeKonto: React.FC<MojeKontoProps> = ({ children }) => {
               <button
                 onClick={() => {
                   fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-                  router.push('/logowanie');
+                  router.push(getPath('/logowanie'));
                 }}
                 className="w-[100%] px-4 flex items-center py-2 rounded-[25px] cursor-pointer hover:bg-gray-100 text-[18px]"
               >
