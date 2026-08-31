@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CreateAccount from '@/components/UI/CreateAccount';
+import Checkbox from '@/components/UI/Checkbox';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { resolveCountryCode } from '@/utils/countryCode';
 
@@ -341,23 +342,12 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="newsletter"
+      <div className="mt-4">
+        <Checkbox
           checked={subscribeNewsletter}
           onChange={() => setSubscribeNewsletter((prev) => !prev)}
-          className="hidden"
+          label={t.checkout.billingAddress.subscribeNewsletter}
         />
-        <label
-          htmlFor="newsletter"
-          className="flex items-center cursor-pointer w-5 h-5 border border-[#969394] rounded"
-        >
-          {subscribeNewsletter && (
-            <img src="/icons/check.svg" alt="check" className="w-4 h-4" />
-          )}
-        </label>
-        <span className="text-sm">{t.checkout.billingAddress.subscribeNewsletter}</span>
       </div>
     </div>
   );

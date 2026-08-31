@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { InputField } from '../Input/InputField.component';
 import SocialIcons from '../UI/SocialIcons';
@@ -9,7 +10,10 @@ import { getCategoryPath } from '@/utils/i18n/routing';
 const Footer = () => {
   const router = useRouter();
   const { t, getPath, isEn } = useI18n();
-  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState('');
+  const [submitMessageType, setSubmitMessageType] = useState<'success' | 'error' | ''>('');
+
   const isSpecialPage =
     router.pathname.startsWith('/produkt') ||
     router.pathname.startsWith('/kategoria');
@@ -22,11 +26,36 @@ const Footer = () => {
 
   const {
     handleSubmit,
+    reset,
     formState: { errors },
   } = methods;
 
-  const onSubmit = (data: any) => {
-    console.log('Newsletter form data:', data);
+  const onSubmit = async (data: { email: string }) => {
+    setIsSubmitting(true);
+    setSubmitMessage('');
+    setSubmitMessageType('');
+
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.email }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Newsletter subscription failed');
+      }
+
+      setSubmitMessage(t.newsletter.success);
+      setSubmitMessageType('success');
+      reset({ email: '' });
+    } catch (error) {
+      console.error('Newsletter subscribe error:', error);
+      setSubmitMessage(t.newsletter.error);
+      setSubmitMessageType('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Category links mapping
@@ -36,6 +65,17 @@ const Footer = () => {
     { key: 'Wieszaki', label: t.links.categories.wallHooks.label },
     { key: 'Gałki', label: t.links.categories.knobs.label },
   ];
+
+  const submitFeedback =
+    submitMessage && (
+      <p
+        className={`text-extra-small mt-3 ${
+          submitMessageType === 'success' ? 'text-green-700' : 'text-red-600'
+        }`}
+      >
+        {submitMessage}
+      </p>
+    );
 
   return (
     <footer
@@ -191,10 +231,12 @@ const Footer = () => {
                   </p>
                   <button
                     type="submit"
-                    className="mt-4 w-full px-6 py-3 bg-black text-neutral-white rounded-full font-light hover:bg-neutral-dark transition-all"
+                    disabled={isSubmitting}
+                    className="mt-4 w-full px-6 py-3 bg-black text-neutral-white rounded-full font-light hover:bg-neutral-dark transition-all disabled:opacity-60"
                   >
                     {t.newsletter.button}
                   </button>
+                  {submitFeedback}
                 </form>
               </FormProvider>
             </div>
@@ -216,7 +258,8 @@ const Footer = () => {
                   </div>
                   <button
                     type="submit"
-                    className="ml-4 px-6 py-3 bg-black text-neutral-white rounded-full font-light hover:bg-neutral-dark transition-all"
+                    disabled={isSubmitting}
+                    className="ml-4 px-6 py-3 bg-black text-neutral-white rounded-full font-light hover:bg-neutral-dark transition-all disabled:opacity-60"
                   >
                     {t.newsletter.button}
                   </button>
@@ -224,6 +267,7 @@ const Footer = () => {
                 <p className="text-neutral-darkest text-extra-small font-light mt-4">
                   {t.newsletter.consent}
                 </p>
+                {submitFeedback}
               </FormProvider>
             </div>
           </div>

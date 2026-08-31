@@ -142,6 +142,8 @@ export const pl = {
       placeholder: 'Podaj swój adres e-mail',
       button: 'Zapisz się',
       consent: 'Subskrybując, wyrażasz zgodę na naszą Politykę prywatności i na otrzymywanie aktualizacji od naszej firmy.',
+      success: 'Dziękujemy! Zapisano Cię do newslettera.',
+      error: 'Nie udało się zapisać. Spróbuj ponownie.',
     },
     // === PARTNERZY I PŁATNOŚCI ===
     partners: {

@@ -9,6 +9,11 @@ const WooCommerceAPI = axios.create({
   },
 });
 
+interface OrderMeta {
+  key: string;
+  value: string;
+}
+
 interface OrderData {
   payment_method: string;
   payment_method_title: string;
@@ -50,6 +55,14 @@ interface OrderData {
   }[];
   customer_note?: string;
   customer_id?: number;
+  meta_data?: OrderMeta[];
+}
+
+const MAILCHIMP_SUBSCRIBED_META_KEY = 'mailchimp_woocommerce_is_subscribed';
+
+function isMailchimpSubscribed(metaData?: OrderMeta[]): boolean {
+  const meta = metaData?.find((item) => item.key === MAILCHIMP_SUBSCRIBED_META_KEY);
+  return meta?.value === '1' || meta?.value === 'true';
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -79,6 +92,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const response = await WooCommerceAPI.post('/orders', orderData);
 
     const createdOrder = response.data;
+
+    // Keep logged-in customer meta in sync so Mailchimp for WooCommerce can subscribe them
+    if (isMailchimpSubscribed(orderData.meta_data) && createdOrder.customer_id) {
+      try {
+        await WooCommerceAPI.put(`/customers/${createdOrder.customer_id}`, {
+          meta_data: [
+            {
+              key: MAILCHIMP_SUBSCRIBED_META_KEY,
+              value: '1',
+            },
+          ],
+        });
+      } catch (customerMetaError) {
+        console.error(
+          '⚠️ Failed to update Mailchimp subscription meta on customer:',
+          customerMetaError,
+        );
+      }
+    }
 
     res.status(200).json({
       id: createdOrder.id,

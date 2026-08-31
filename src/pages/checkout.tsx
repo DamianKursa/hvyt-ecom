@@ -523,6 +523,11 @@ const Checkout: React.FC = () => {
           key: 'billing_nip',
           value: customerType === 'company' ? billingData.vatNumber : '',
         },
+        // Mailchimp for WooCommerce reads this order meta when syncing subscribers
+        {
+          key: 'mailchimp_woocommerce_is_subscribed',
+          value: subscribeNewsletter ? '1' : '0',
+        },
       ],
       coupon_lines:
         Array.isArray((cart as any)?.applied_coupons || (cart as any)?.appliedCoupons)
