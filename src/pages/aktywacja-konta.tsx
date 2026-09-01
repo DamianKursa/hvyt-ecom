@@ -49,9 +49,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (tokenValue) {
     const lang =
       context.query.lang === 'en' || context.locale === 'en' ? 'en' : 'pl';
+    const forwardedHost = context.req.headers['x-forwarded-host'] || context.req.headers.host || '';
+    const host = Array.isArray(forwardedHost) ? forwardedHost[0] : forwardedHost;
+    const forwardedProto = context.req.headers['x-forwarded-proto'];
+    const protoHeader = Array.isArray(forwardedProto) ? forwardedProto[0] : forwardedProto;
+    const proto = protoHeader || (host.startsWith('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https');
+    const originFromQuery = Array.isArray(context.query.origin)
+      ? context.query.origin[0]
+      : context.query.origin;
+    const origin = (originFromQuery || (host ? `${proto}://${host}` : '')).replace(/\/$/, '');
+    const qs = new URLSearchParams({ token: tokenValue, lang });
+    if (origin) {
+      qs.set('origin', origin);
+    }
     return {
       redirect: {
-        destination: `/api/auth/activate?token=${encodeURIComponent(tokenValue)}&lang=${lang}`,
+        destination: `/api/auth/activate?${qs.toString()}`,
         permanent: false,
       },
     };

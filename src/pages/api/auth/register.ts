@@ -26,9 +26,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const origin = getFrontendOrigin(req);
 
   try {
+    const wpUrl = `${process.env.WORDPRESS_API_URL}/wp-json/custom/v1/register`;
     const response = await axios.post(
-      `${process.env.WORDPRESS_API_URL}/wp-json/custom/v1/register`,
-      { first_name, last_name, email, password, lang, origin }
+      origin ? `${wpUrl}?frontend=${encodeURIComponent(origin)}` : wpUrl,
+      { first_name, last_name, email, password, lang, origin, frontend: origin },
+      {
+        headers: origin
+          ? { 'Content-Type': 'application/json', 'X-Hvyt-Frontend': origin }
+          : { 'Content-Type': 'application/json' },
+      },
     );
 
     res.status(201).json(response.data);
