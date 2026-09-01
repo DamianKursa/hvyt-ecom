@@ -1,4 +1,5 @@
 import React from 'react';
+import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import Layout from '@/components/Layout/Layout.component';
 import { useI18n } from '@/utils/hooks/useI18n';
@@ -39,6 +40,24 @@ const ActivationPage: React.FC = () => {
       </div>
     </Layout>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const token = context.query.token;
+  const tokenValue = Array.isArray(token) ? token[0] : token;
+
+  if (tokenValue) {
+    const lang =
+      context.query.lang === 'en' || context.locale === 'en' ? 'en' : 'pl';
+    return {
+      redirect: {
+        destination: `/api/auth/activate?token=${encodeURIComponent(tokenValue)}&lang=${lang}`,
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
 };
 
 export default ActivationPage;

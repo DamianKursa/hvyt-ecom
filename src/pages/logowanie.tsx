@@ -1,20 +1,35 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import Layout from '@/components/Layout/Layout.component';
 import LoginForm from '@/components/User/LoginForm';
 import RegisterForm from '@/components/User/RegisterForm';
 import ForgotPassword from '@/components/User/ForgotPassword';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { getActivationNotice } from '@/utils/auth/activationStatus';
 
 const Logowanie = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   const { t } = useI18n();
+  const router = useRouter();
+  const activationNotice = getActivationNotice(router.query);
+  const noticeClass =
+    activationNotice?.type === 'success'
+      ? 'bg-[#2A5E45] text-white'
+      : activationNotice?.type === 'info'
+        ? 'bg-[#CBDBE7] text-black'
+        : 'bg-red-500 text-white';
 
   return (
     <Layout title="Hvyt | Logowanie">
       <div className=" px-4 bg-[#F9F6F2] flex justify-center items-center mt-12 ">
         <div className="w-full max-w-4xl bg-white rounded-[40px] shadow-md overflow-hidden transition-all duration-500">
+          {activationNotice && (
+            <div className={`px-10 py-4 text-[16px] font-light ${noticeClass}`}>
+              {t.auth[activationNotice.key]}
+            </div>
+          )}
           {!isForgotPassword ? (
             <>
               {/* Row 1 - Login Form */}

@@ -140,7 +140,9 @@ const nextConfig = {
       { source: '/thank-you/:path*', destination: '/dziekujemy/:path*' },
       { source: '/login/:path*', destination: '/logowanie/:path*' },
       { source: '/forgot-password/:path*', destination: '/zapomniane-haslo/:path*' },
-      { source: '/confirm-email/:path*', destination: '/potwierdzenie-email/:path*' },      
+      { source: '/confirm-email/:path*', destination: '/potwierdzenie-email/:path*' },
+      { source: '/activate-account/:path*', destination: '/aktywacja-konta/:path*' },
+      { source: '/wp-json/custom/v1/activate', destination: '/api/auth/activate' },      
       { source: '/terms/:path*', destination: '/regulamin/:path*' },      
       { source: '/order-received/:path*', destination: '/zamowienie-otrzymane/:path*' },      
       { source: '/cooperation/:path*', destination: '/wspolpraca/:path*' },      
@@ -193,7 +195,7 @@ const nextConfig = {
       },
 
       {
-        source: '/:path((?!_next|api|static|wp-json|wp-admin|auth|moje-konto|orders|posts|blog|kategoria|kolekcje|category|contact|create-order|payment-webhooks|payment|reviews|shipping|waiting-list|woocommerce|checkout|dostawa|dziekujemy|hvyt-objects|kase|koszyk|logowanie|o-nas|polityka-prywatnosci|potwierdzenie-email|regulamin|ulubione|wspolpraca|wygodne-zwroty|zapomniane-haslo|zwroty-i-reklamacje|produkt).+)',
+        source: '/:path((?!_next|api|static|wp-json|wp-admin|auth|moje-konto|orders|posts|blog|kategoria|kolekcje|category|contact|create-order|payment-webhooks|payment|reviews|shipping|waiting-list|woocommerce|checkout|dostawa|dziekujemy|hvyt-objects|kase|koszyk|logowanie|o-nas|polityka-prywatnosci|potwierdzenie-email|aktywacja-konta|activate-account|regulamin|ulubione|wspolpraca|wygodne-zwroty|zapomniane-haslo|zwroty-i-reklamacje|produkt).+)',
         destination: 'https://wp.hvyt.pl/:path*',
       },
       // English category routes

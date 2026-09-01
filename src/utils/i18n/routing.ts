@@ -40,6 +40,9 @@ const slugMap: Record<string, { pl: string; en: string }> = {
   'ulubione': { pl: 'ulubione', en: 'wishlist' },
   'dziekujemy': { pl: 'dziekujemy', en: 'thank-you' },
   'logowanie': { pl: 'logowanie', en: 'login' },
+  'aktywacja-konta': { pl: 'aktywacja-konta', en: 'activate-account' },
+  'potwierdzenie-email': { pl: 'potwierdzenie-email', en: 'confirm-email' },
+  'zapomniane-haslo': { pl: 'zapomniane-haslo', en: 'forgot-password' },
   'zamowienie-otrzymane': { pl: 'zamowienie-otrzymane', en: 'order-received' },
 };
 
