@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
+import axios from '@/utils/api/http';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { page = 1, per_page = 10, lang } = req.query; 

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
+import axios from '@/utils/api/http';
 
 // Recursive function to follow redirects
 async function getFinalUrl(url: string): Promise<string> {

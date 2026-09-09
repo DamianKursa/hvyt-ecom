@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { apiFetch } from '@/utils/api/http';
 
 export default async function handler(
   req: NextApiRequest,
@@ -16,7 +17,7 @@ export default async function handler(
   }
 
   try {
-    const response = await fetch(
+    const response = await apiFetch(
       `${wordpressApiUrl}/wp-json/custom/v1/contact`,
       {
         method: 'POST',

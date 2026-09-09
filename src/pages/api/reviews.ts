@@ -1,15 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
 import { getCache, setCache } from '../../lib/cache';
 import formidable from 'formidable';
 import fs from 'fs';
 import FormData from 'form-data';
+import axios, { createApiClient } from '@/utils/api/http';
 
 export const config = { api: { bodyParser: false } } as const;
 
 const CACHE_TTL = 3600;
 
-const WooCommerceAPI = axios.create({
+const WooCommerceAPI = createApiClient({
   baseURL: process.env.REST_API,
   auth: {
     username: process.env.WC_CONSUMER_KEY || '',

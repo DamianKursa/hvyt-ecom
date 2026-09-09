@@ -1,8 +1,8 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
+import { createApiClient } from '@/utils/api/http';
 
-const WooCommerceAPI = axios.create({
+const WooCommerceAPI = createApiClient({
   baseURL: process.env.REST_API, // e.g. https://wp.hvyt.pl/wp-json/wc/v3
   auth: {
     username: process.env.WC_CONSUMER_KEY || '',

@@ -1,9 +1,9 @@
 // lib/wpml-translations.ts
 // import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
 import type { WooProduct } from '@/types/woocommerce';
-import axios from 'axios';
+import { createApiClient } from '@/utils/api/http';
 
-const WooCommerceAPI = axios.create({
+const WooCommerceAPI = createApiClient({
   baseURL: process.env.REST_API,
   auth: {
     username: process.env.WC_CONSUMER_KEY || '',
@@ -16,7 +16,7 @@ export class WPMLTranslationService {
 
   constructor() {
     // WooCommerce API client setup
-    this.api = axios.create({
+    this.api = createApiClient({
       baseURL: process.env.REST_API,
       auth: {
         username: process.env.WC_CONSUMER_KEY || '',

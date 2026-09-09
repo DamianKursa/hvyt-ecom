@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import axios, { AxiosError } from 'axios';
+import axios from '@/utils/api/http';
+import { AxiosError } from 'axios';
 import { serialize } from 'cookie';
 import { getUserIdFromJwt } from '@/utils/auth/jwt';
 import { resolveCustomerPersonName } from '@/utils/auth/resolveCustomerName';

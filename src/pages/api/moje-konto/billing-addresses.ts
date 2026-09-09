@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { parse } from 'cookie';
-import axios from 'axios';
+import axios from '@/utils/api/http';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const cookies = req.headers.cookie ? parse(req.headers.cookie) : {};

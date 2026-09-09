@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
+import axios from '@/utils/api/http';
 import { getCurrentLanguage, type Language } from '@/utils/i18n/config';
 import { parseHostname } from '@/utils/i18n/domains';
 import { getLoginPathForLang } from '@/utils/auth/activationStatus';

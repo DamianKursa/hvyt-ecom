@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { apiFetch } from '@/utils/api/http';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = process.env.INSTAGRAM_ACCESS_TOKEN;
@@ -10,7 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const response = await fetch(
+    const response = await apiFetch(
       `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink,thumbnail_url,timestamp&access_token=${token}`,
     );
 

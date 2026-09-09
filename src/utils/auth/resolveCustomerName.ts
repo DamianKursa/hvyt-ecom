@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '@/utils/api/http';
 import { formatPersonName } from './displayName';
 import { getUserIdFromJwt } from './jwt';
 

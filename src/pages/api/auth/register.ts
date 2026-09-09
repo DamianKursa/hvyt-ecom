@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
+import axios from '@/utils/api/http';
 
 function getFrontendOrigin(req: NextApiRequest): string {
   const fromBody = typeof req.body?.origin === 'string' ? req.body.origin.trim() : '';

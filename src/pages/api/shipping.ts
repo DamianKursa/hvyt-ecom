@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
+import { createApiClient } from '@/utils/api/http';
 import { deleteCache, getCache, setCache } from '../../lib/cache';
 import { getShippingCountries } from '@/utils/api/shipping';
 
@@ -84,7 +84,7 @@ const mergeShippingClassCostsFromFallback = (
   });
 };
 
-const WooCommerceAPI = axios.create({
+const WooCommerceAPI = createApiClient({
   baseURL: process.env.REST_API,
   auth: {
     username: process.env.WC_CONSUMER_KEY || '', 
@@ -92,7 +92,7 @@ const WooCommerceAPI = axios.create({
   },
 });
 
-const CustomAPI = axios.create({
+const CustomAPI = createApiClient({
   baseURL: process.env.REST_API_CUSTOM,
   auth: {
     username: process.env.WC_CONSUMER_KEY || '', 

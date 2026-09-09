@@ -1,3 +1,5 @@
+import { apiFetch } from './http';
+
 export const getPostsArchive = async (page: number = 1, lang: string) => {
   const response = await fetch(`/api/posts/posts?page=${page}&lang=${lang}`);
   if (!response.ok) throw new Error('Failed to fetch posts');
@@ -10,7 +12,7 @@ export const getSinglePost = async (slug: string, lang: string) => {
       slug,
     )}&lang=${lang}&_embed`;
 
-    const response = await fetch(url);
+    const response = await apiFetch(url);
 
     if (!response.ok) {
       throw new Error(`Failed to fetch post with slug: ${slug}`);

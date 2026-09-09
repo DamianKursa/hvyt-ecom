@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
+import axios from '@/utils/api/http';
 import { parse } from 'cookie';
 import { resolveCustomerPersonName } from '@/utils/auth/resolveCustomerName';
 

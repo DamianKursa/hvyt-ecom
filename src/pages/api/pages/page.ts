@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
+import axios from '@/utils/api/http';
 import { getCache, setCache } from '@/lib/cache';
 
 const CACHE_TTL = 86400;

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
+import axios from '@/utils/api/http';
 import { parse, serialize } from 'cookie';
 import { getAuthCookieOptions } from '@/utils/cookies';
 

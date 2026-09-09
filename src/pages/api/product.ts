@@ -1,7 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import axios from 'axios';
 import { fetchProductById, fetchProductBySlug } from '../../utils/api/woocommerce';
 import { getCache, setCache } from '../../lib/cache';
 import { fetchProductIdBySlug, fetchProductMultilangIds } from '@/utils/api/woocommerce_custom';
+
+export const config = {
+  maxDuration: 20,
+};
 
 const STATIC_TTL = 21600; // Cache static data for 6 hours
 
@@ -51,7 +56,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       res.status(200).json(mergedData);
     } catch (error) {
-      console.error('Error fetching product by slug:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Error fetching product by slug:', {
+          code: error.code,
+          status: error.response?.status,
+          message: error.message,
+        });
+      } else {
+        console.error('Error fetching product by slug:', error);
+      }
       res.status(500).json({ error: 'Error loading product data' });
     }
   }

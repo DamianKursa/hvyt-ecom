@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
+import axios from '@/utils/api/http';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { method } = req;

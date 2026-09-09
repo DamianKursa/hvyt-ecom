@@ -2,8 +2,9 @@ import axios from 'axios';
 import { Kolekcja } from '../functions/interfaces';
 import { NowosciPost } from '../functions/interfaces';
 import { getCurrencyByLocale, getCurrencySlugByLocale } from '@/config/currencies';
+import { apiAxios, apiFetch, createApiClient } from './http';
 
-const WooCommerceAPI = axios.create({
+const WooCommerceAPI = createApiClient({
   baseURL: process.env.REST_API,
   auth: {
     username: process.env.WC_CONSUMER_KEY || '',
@@ -56,17 +57,27 @@ export const fetchProductBySlug = async (slug: string) => {
 
 export const fetchProductById = async (id: number | string, lang: string) => {
   try {
-
     const currency = getCurrencySlugByLocale(lang) ?? '';
 
     const response = await WooCommerceAPI.get(`/products/${id}`, {
       params: { ts: Date.now(), currency, lang },
-      timeout: 5000,
     });
 
     return response.data;
   } catch (error) {
-    console.error('Error fetching product by id:', error);
+    if (axios.isAxiosError(error)) {
+      console.error('Error fetching product by id:', {
+        id,
+        code: error.code,
+        status: error.response?.status,
+        url: error.config?.baseURL
+          ? `${error.config.baseURL}${error.config.url}`
+          : error.config?.url,
+        message: error.message,
+      });
+    } else {
+      console.error('Error fetching product by id:', error);
+    }
     throw error;
   }
 };
@@ -80,7 +91,6 @@ export const fetchVariationById = async (
       `/products/${productId}/variations/${variationId}`,
       {
         params: { ts: Date.now() },
-        timeout: 5000,
       },
     );
     return response.data;
@@ -93,7 +103,7 @@ export const fetchVariationById = async (
 // Fetch media by ID
 export const fetchMediaById = async (mediaId: number) => {
   try {
-    const response = await axios.get(
+    const response = await apiAxios.get(
       `${process.env.NEXT_PUBLIC_WP_REST_API}/media/${mediaId}`,
     );
     return response.data.source_url;
@@ -107,7 +117,7 @@ export const fetchKolekcjePostsWithImages = async (lang: string) => {
   try {
     console.log('kolekcjeurl', `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`);
     
-    const response = await axios.get(
+    const response = await apiAxios.get(
       `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`,
       {
         params: { per_page: 50, lang: lang },
@@ -121,11 +131,10 @@ export const fetchKolekcjePostsWithImages = async (lang: string) => {
       .filter(Boolean)
       .join(',');
 
-    const mediaResponse = await axios.get(
+    const mediaResponse = await apiAxios.get(
       `${process.env.NEXT_PUBLIC_WP_REST_API}/media`,
       {
         params: { include: mediaIds, per_page: 50 },
-        timeout: 5000,
       },
     );
 
@@ -170,7 +179,7 @@ export const fetchKolekcjePostsWithImages = async (lang: string) => {
 export const fetchNowosciPosts = async (): Promise<NowosciPost[]> => {
   try {
     const apiBase = process.env.NEXT_PUBLIC_WP_REST_API;
-    const response = await axios.get(`${apiBase}/nowosci`, {
+    const response = await apiAxios.get(`${apiBase}/nowosci`, {
       params: {
         per_page: 4,
         _embed: true,
@@ -228,7 +237,7 @@ export const fetchProductAttributesWithTerms = async (categoryId: number) => {
 // Fetch the latest "Kolekcja" with featured image
 export const fetchLatestKolekcja = async () => {
   try {
-    const response = await axios.get(
+    const response = await apiAxios.get(
       `${process.env.NEXT_PUBLIC_WP_REST_API}/kolekcje`,
       {
         params: {
@@ -242,7 +251,7 @@ export const fetchLatestKolekcja = async () => {
     const latestKolekcja = response.data[0];
 
     if (latestKolekcja && latestKolekcja.featured_media) {
-      const mediaResponse = await axios.get(
+      const mediaResponse = await apiAxios.get(
         `${process.env.NEXT_PUBLIC_WP_REST_API}/media/${latestKolekcja.featured_media}`,
       );
       latestKolekcja.imageUrl = mediaResponse.data.source_url;
@@ -300,7 +309,6 @@ export const fetchCrossSellProducts = async (productId: string, lang: string) =>
         lang: lang,
         currency: currency.name
       },
-      timeout: 5000,
     });
 
     let items: any[] = Array.isArray(response.data) ? response.data : [];
@@ -360,7 +368,7 @@ export const fetchInstagramPosts = async () => {
     );
   }
 
-  const response = await fetch(
+  const response = await apiFetch(
     `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink,thumbnail_url,timestamp&access_token=${token}`,
   );
 

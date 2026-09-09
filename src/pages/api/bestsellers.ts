@@ -1,7 +1,7 @@
 // pages/api/bestsellers.ts
 
 import type { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
+import { createApiClient } from '@/utils/api/http';
 import { getCache, setCache } from '../../lib/cache';
 
 const CACHE_TTL = 6 * 3600;
@@ -54,7 +54,7 @@ export default async function handler(
   }
 
   // Create an Axios instance with Basic Auth
-  const WooCommerceAPI = axios.create({
+  const WooCommerceAPI = createApiClient({
     baseURL: wcBase,
     auth: {
       username: wcKey,

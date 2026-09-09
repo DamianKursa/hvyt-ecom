@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import axios from 'axios';
-import { getCache, setCache } from '../../lib/cache'; 
+import { getCache, setCache } from '../../lib/cache';
+import { createApiClient } from '@/utils/api/http'; 
 
 const CACHE_TTL = 86400;
 
@@ -22,7 +22,7 @@ const applyPaymentTitleOverrides = (methods: any[]) =>
     };
   });
 
-const WooCommerceAPI = axios.create({
+const WooCommerceAPI = createApiClient({
   baseURL: process.env.REST_API, 
   auth: {
     username: process.env.WC_CONSUMER_KEY || '', 

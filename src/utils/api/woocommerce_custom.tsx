@@ -1,8 +1,8 @@
-import axios from 'axios';
 import { Kolekcja } from '../functions/interfaces';
 import { NowosciPost } from '../functions/interfaces';
+import { createApiClient } from './http';
 
-const WooCommerceAPI = axios.create({
+const WooCommerceAPI = createApiClient({
   baseURL: process.env.REST_API_CUSTOM,
   auth: {
     username: process.env.WC_CONSUMER_KEY || '',
@@ -16,7 +16,6 @@ export const fetchProductMultilangIds = async (id: number | string) => {
 
     const response = await WooCommerceAPI.get(`/product-multilang`, {
       params: { ts: Date.now(), id },
-      timeout: 5000,
     });
     
     return response.data;

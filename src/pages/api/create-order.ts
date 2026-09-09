@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
+import { createApiClient } from '@/utils/api/http';
 import { getUserIdFromJwt } from '@/utils/auth/jwt';
 
-const WooCommerceAPI = axios.create({
+const WooCommerceAPI = createApiClient({
   baseURL: process.env.REST_API,
   auth: {
     username: process.env.WC_CONSUMER_KEY || '',
