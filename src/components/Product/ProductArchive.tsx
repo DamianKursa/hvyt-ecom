@@ -52,7 +52,7 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
   };
 
   return (
-    <div>
+    <div aria-busy={loading} aria-live="polite">
       {/* Product Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {loading
@@ -65,7 +65,7 @@ const ProductArchive: React.FC<ProductArchiveProps> = ({
       </div>
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {!loading && totalPages > 1 && (
         <div className="flex justify-end items-center mt-8 space-x-2">
           <button
             onClick={() => handlePageClick(currentPage - 1)}

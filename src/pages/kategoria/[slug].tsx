@@ -1,6 +1,6 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import Head from 'next/head';
 import useSWR from 'swr';
 import Layout from '@/components/Layout/Layout.component';
@@ -133,6 +133,39 @@ const ignoredParams = new Set([
   'page',
 ]);
 
+const parseListingStateFromQuery = (
+  query: Record<string, string | string[] | undefined>,
+  sortingOptions: dropdownOption[],
+  defaultSorting: dropdownOption,
+) => {
+  const queryFilters: { name: string; value: string }[] = [];
+  let sorting = defaultSorting;
+  const pageFromQuery = Number(query.page ?? 1);
+
+  Object.keys(query).forEach((key) => {
+    if (ignoredParams.has(key)) return;
+    if (key === 'sort') {
+      const sortOption = sortingOptions.find(
+        (option) => option.key === query[key],
+      );
+      sorting = sortOption || defaultSorting;
+      return;
+    }
+    const values = query[key];
+    if (Array.isArray(values)) {
+      values.forEach((value) => queryFilters.push({ name: key, value }));
+    } else if (typeof values === 'string') {
+      queryFilters.push({ name: key, value: values });
+    }
+  });
+
+  return {
+    filters: queryFilters,
+    sorting,
+    page: Number.isFinite(pageFromQuery) && pageFromQuery > 0 ? pageFromQuery : 1,
+  };
+};
+
 const fetcher = async (url: string) => {
   const res = await fetch(url);
   if (!res.ok) {
@@ -156,6 +189,7 @@ const CategoryPage = ({
   const router = useRouter();
   const { t } = useI18n()
   const [sortingOptions, updateSortingOptions] = useState<dropdownOption[]>(getSortingOptions(t));
+  const [isRouteLoading, setIsRouteLoading] = useState(false);
   
   // Determine current language from server prop, locale, or slug
   const slug = Array.isArray(router.query.slug)
@@ -165,15 +199,25 @@ const CategoryPage = ({
   const currentLang = serverLang || (isEnglishCategorySlug(slug || '') ? 'en' : (router.locale || 'pl'));
   
   useEffect(() => {
-    console.log('🛠 CategoryPage props on mount:', {
-      category,
-      initialProducts,
-      initialTotalProducts,
-      seoData,
-      initialAttributes,
-      lang: currentLang,
-    });
-  }, []);
+    const isCategoryPath = (url: string) =>
+      /\/(kategoria|category)\//.test(url.split('?')[0]);
+
+    const onStart = (url: string, { shallow }: { shallow: boolean }) => {
+      if (!shallow && isCategoryPath(url)) {
+        setIsRouteLoading(true);
+      }
+    };
+    const onDone = () => setIsRouteLoading(false);
+
+    router.events.on('routeChangeStart', onStart);
+    router.events.on('routeChangeComplete', onDone);
+    router.events.on('routeChangeError', onDone);
+    return () => {
+      router.events.off('routeChangeStart', onStart);
+      router.events.off('routeChangeComplete', onDone);
+      router.events.off('routeChangeError', onDone);
+    };
+  }, [router.events]);
 
   const seoTitle =
     seoData && seoData.yoastTitle
@@ -190,40 +234,32 @@ const CategoryPage = ({
   const [isMobile, setIsMobile] = useState(false);
   const [filtersVisible, setFiltersVisible] = useState(true);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [listingCategoryId, setListingCategoryId] = useState(category.id);
 
-  // Update filters from URL query parameters on initial load
+  if (listingCategoryId !== category.id) {
+    const listingState = parseListingStateFromQuery(
+      router.query,
+      sortingOptions,
+      { key: 'sort', label: t.filters.sorting },
+    );
+    setListingCategoryId(category.id);
+    setActiveFilters(listingState.filters);
+    setSortingOption(listingState.sorting);
+    setCurrentPage(listingState.page);
+  }
+
   useEffect(() => {
-    const updateFiltersFromQuery = () => {
-      const queryFilters: { name: string; value: string }[] = [];
-      let sortFromQuery = {key: 'sort', label: t.filters.sorting};
-      
-      const pageFromQuery = Number(router.query.page ?? 1);
-      Object.keys(router.query).forEach((key) => {
-        if (ignoredParams.has(key)) return;
-        if (key === 'sort') {
-          const sortOption = sortingOptions.find(option => option.key === router.query[key] as string);
-          sortFromQuery = sortOption || {key: 'sort', label: t.filters.sorting};
-          return;
-        }
-        const values = router.query[key];
-        if (Array.isArray(values)) {
-          values.forEach((value) => queryFilters.push({ name: key, value }));
-        } else if (typeof values === 'string') {
-          queryFilters.push({ name: key, value: values });
-        }
-      });
-      setActiveFilters(queryFilters);
-      if (sortFromQuery.key !== 'sort') {
-        console.log('sortFromQuery', sortFromQuery);
-        
-        setSortingOption(sortFromQuery);
-      }
-      setCurrentPage(Number.isFinite(pageFromQuery) && pageFromQuery > 0 ? pageFromQuery : 1);
-    };
-
-    if (router.isReady) {
-      updateFiltersFromQuery();
+    if (!router.isReady) return;
+    const listingState = parseListingStateFromQuery(
+      router.query,
+      sortingOptions,
+      { key: 'sort', label: t.filters.sorting },
+    );
+    setActiveFilters(listingState.filters);
+    if ('sort' in router.query) {
+      setSortingOption(listingState.sorting);
     }
+    setCurrentPage(listingState.page);
   }, [router.query, router.isReady]);
 
     useEffect(()=>{
@@ -277,13 +313,16 @@ const CategoryPage = ({
       currentPage === 1
       ? { products: initialProducts, totalProducts: initialTotalProducts }
       : undefined;
+  const hasFallbackProducts = Boolean(fallback?.products?.length);
 
-  const { data, error } = useSWR(swrKey, fetcher, {
+  const { data, error, isValidating } = useSWR(swrKey, fetcher, {
     fallbackData: fallback,
     revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateOnMount: !hasFallbackProducts,
+    keepPreviousData: true,
     errorRetryCount: Infinity,
     errorRetryInterval: 30000,
-    keepPreviousData: true,
   });
   const useInitialProducts =
     currentPage === 1 && activeFilters.length === 0 && sortingOption.key === 'sort';
@@ -299,6 +338,7 @@ const CategoryPage = ({
       : useInitialProducts
         ? initialTotalProducts
         : data?.totalProducts || 0;
+  const isProductsLoading = isRouteLoading || (isValidating && !hasFallbackProducts);
 
   const handleFilterChange = (
     selectedFilters: { name: string; value: string }[],
@@ -446,7 +486,7 @@ const CategoryPage = ({
             <ProductArchive
               products={products}
               totalProducts={filteredProductCount}
-              loading={!data && !error}
+              loading={isProductsLoading}
               perPage={12}
               currentPage={currentPage}
               onPageChange={onPageChange}
