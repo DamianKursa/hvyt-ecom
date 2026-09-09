@@ -52,7 +52,9 @@ export const createApiClient = (config: AxiosRequestConfig = {}): AxiosInstance 
   return instance;
 };
 
-const apiAxios = createApiClient();
+export const apiAxios = Object.assign(createApiClient(), {
+  isAxiosError: axios.isAxiosError,
+}) as AxiosInstance & { isAxiosError: typeof axios.isAxiosError };
 
 export default apiAxios;
 
