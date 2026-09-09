@@ -51,22 +51,14 @@ const ReviewItem = ({ review }: { review: Review }) => {
 
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const [processedContent, setProcessedContent] = useState<string>('');
-  const [modalImages, setModalImages] = useState<string[]>([]);
-
   const [isClient, setIsClient] = useState(false);
+
+  const processedContent = contentWithoutAttachments.replace(/\n/g, '<br/>');
+  const modalImages = imageUrls;
+
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  useEffect(() => {
-    // Build HTML content similar to SingleProductDetails (attachments already stripped above)
-    let base = contentWithoutAttachments.replace(/\n/g, '<br/>');
-    // Do not append inline images; they will be shown only in the thumbnail list below
-    setProcessedContent(base);
-    setModalImages(imageUrls);
-  }, [contentWithoutAttachments, imageUrls]);
 
   const handleImageClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLElement;
