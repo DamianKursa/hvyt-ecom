@@ -133,7 +133,17 @@ const ignoredParams = new Set([
   'page',
 ]);
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Category fetch failed: ${res.status}`);
+  }
+  const json = await res.json();
+  if (!Array.isArray(json?.products)) {
+    throw new Error('Invalid category products response');
+  }
+  return json;
+};
 
 const CategoryPage = ({
   category,
@@ -273,9 +283,22 @@ const CategoryPage = ({
     revalidateOnFocus: false,
     errorRetryCount: Infinity,
     errorRetryInterval: 30000,
+    keepPreviousData: true,
   });
-  const products = data?.products || [];
-  const filteredProductCount = data?.totalProducts || 0;
+  const useInitialProducts =
+    currentPage === 1 && activeFilters.length === 0 && sortingOption.key === 'sort';
+  const products =
+    data?.products?.length > 0
+      ? data.products
+      : useInitialProducts
+        ? initialProducts
+        : data?.products || [];
+  const filteredProductCount =
+    data?.products?.length > 0
+      ? data.totalProducts || 0
+      : useInitialProducts
+        ? initialTotalProducts
+        : data?.totalProducts || 0;
 
   const handleFilterChange = (
     selectedFilters: { name: string; value: string }[],

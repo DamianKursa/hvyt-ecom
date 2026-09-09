@@ -96,11 +96,7 @@ export const fetchProductsByCategoryId = async (
     };
   } catch (error) {
     console.error('Error in fetchProductsByCategoryId:', error);
-    return {
-      products: [],
-      totalProducts: 0,
-      _fields: 'id,name,price,regular_price,sale_price,slug,images',
-    };
+    throw error;
   }
 };
 
