@@ -1,6 +1,6 @@
 import { GetStaticProps, GetStaticPaths } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Head from 'next/head';
 import useSWR from 'swr';
 import Layout from '@/components/Layout/Layout.component';
@@ -189,30 +189,61 @@ const CategoryPage = ({
   const router = useRouter();
   const { t } = useI18n()
   const [sortingOptions, updateSortingOptions] = useState<dropdownOption[]>(getSortingOptions(t));
-  const [isRouteLoading, setIsRouteLoading] = useState(false);
-  
+  const [isCategorySwitching, setIsCategorySwitching] = useState(false);
+  const categorySwitchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Determine current language from server prop, locale, or slug
   const slug = Array.isArray(router.query.slug)
     ? router.query.slug[0]
     : router.query.slug;
-  
+  const slugRef = useRef(slug);
+  slugRef.current = slug;
+
   const currentLang = serverLang || (isEnglishCategorySlug(slug || '') ? 'en' : (router.locale || 'pl'));
-  
+
   useEffect(() => {
     const isCategoryPath = (url: string) =>
       /\/(kategoria|category)\//.test(url.split('?')[0]);
 
-    const onStart = (url: string, { shallow }: { shallow: boolean }) => {
-      if (!shallow && isCategoryPath(url)) {
-        setIsRouteLoading(true);
+    const destinationSlug = (url: string) => {
+      const path = url.split('?')[0];
+      const segment = path.split('/').filter(Boolean).pop() || '';
+      try {
+        return decodeURIComponent(segment);
+      } catch {
+        return segment;
       }
     };
-    const onDone = () => setIsRouteLoading(false);
+
+    const clearSwitchTimer = () => {
+      if (categorySwitchTimer.current) {
+        clearTimeout(categorySwitchTimer.current);
+        categorySwitchTimer.current = null;
+      }
+    };
+
+    const onStart = (url: string, { shallow }: { shallow: boolean }) => {
+      if (shallow || !isCategoryPath(url)) return;
+      const destSlug = destinationSlug(url);
+      if (!destSlug || destSlug === slugRef.current) return;
+
+      clearSwitchTimer();
+      // Prefetched pages resolve so fast that an immediate skeleton only blinks,
+      // then previous SWR data flashes. Delay until the wait is actually visible.
+      categorySwitchTimer.current = setTimeout(() => {
+        setIsCategorySwitching(true);
+      }, 200);
+    };
+    const onDone = () => {
+      clearSwitchTimer();
+      setIsCategorySwitching(false);
+    };
 
     router.events.on('routeChangeStart', onStart);
     router.events.on('routeChangeComplete', onDone);
     router.events.on('routeChangeError', onDone);
     return () => {
+      clearSwitchTimer();
       router.events.off('routeChangeStart', onStart);
       router.events.off('routeChangeComplete', onDone);
       router.events.off('routeChangeError', onDone);
@@ -243,6 +274,7 @@ const CategoryPage = ({
       { key: 'sort', label: t.filters.sorting },
     );
     setListingCategoryId(category.id);
+    setIsCategorySwitching(false);
     setActiveFilters(listingState.filters);
     setSortingOption(listingState.sorting);
     setCurrentPage(listingState.page);
@@ -287,7 +319,7 @@ const CategoryPage = ({
     if (activeFilters.length > 0) {
       return `/api/category?action=fetchProductsWithFilters&categoryId=${category.id}&filters=${encodeURIComponent(
         JSON.stringify(activeFilters),
-      )}&page=${currentPage}&perPage=12&lang=${router.locale}`;
+      )}&page=${currentPage}&perPage=12&lang=${currentLang}`;
     } else if (sortingOption.key !== 'sort') {
       const sortingMap: Record<string, { orderby: string; order: string }> = {
         'bestseller': { orderby: 'popularity', order: 'desc' },
@@ -307,38 +339,42 @@ const CategoryPage = ({
 
   const swrKey = buildApiEndpoint();
 
-  const fallback =
+  const isDefaultCategoryView =
+    currentPage === 1 &&
     activeFilters.length === 0 &&
-      sortingOption.label === t.filters.sorting &&
-      currentPage === 1
-      ? { products: initialProducts, totalProducts: initialTotalProducts }
-      : undefined;
-  const hasFallbackProducts = Boolean(fallback?.products?.length);
+    sortingOption.key === 'sort';
+  const listingFallback = useMemo(() => {
+    if (!isDefaultCategoryView || !initialProducts?.length) {
+      return undefined;
+    }
+    return {
+      products: initialProducts,
+      totalProducts: initialTotalProducts ?? 0,
+    };
+  }, [isDefaultCategoryView, initialProducts, initialTotalProducts]);
 
   const { data, error, isValidating } = useSWR(swrKey, fetcher, {
-    fallbackData: fallback,
+    ...(listingFallback ? { fallbackData: listingFallback } : {}),
     revalidateOnFocus: false,
     revalidateOnReconnect: false,
-    revalidateOnMount: !hasFallbackProducts,
+    revalidateOnMount: !(isDefaultCategoryView && initialProducts?.length),
+    revalidateIfStale: false,
     keepPreviousData: true,
-    errorRetryCount: Infinity,
-    errorRetryInterval: 30000,
+    errorRetryCount: 3,
+    errorRetryInterval: 5000,
   });
-  const useInitialProducts =
-    currentPage === 1 && activeFilters.length === 0 && sortingOption.key === 'sort';
-  const products =
-    data?.products?.length > 0
-      ? data.products
-      : useInitialProducts
-        ? initialProducts
-        : data?.products || [];
-  const filteredProductCount =
-    data?.products?.length > 0
-      ? data.totalProducts || 0
-      : useInitialProducts
-        ? initialTotalProducts
-        : data?.totalProducts || 0;
-  const isProductsLoading = isRouteLoading || (isValidating && !hasFallbackProducts);
+  const swrProducts = Array.isArray(data?.products) ? data.products : undefined;
+  const products = isDefaultCategoryView
+    ? (initialProducts?.length ? initialProducts : swrProducts ?? [])
+    : swrProducts ?? [];
+  const filteredProductCount = isDefaultCategoryView
+    ? (initialProducts?.length ? initialTotalProducts : data?.totalProducts ?? 0)
+    : data?.totalProducts ?? 0;
+  const isProductsLoading =
+    isCategorySwitching ||
+    (!isDefaultCategoryView &&
+      (isValidating || (swrProducts === undefined && !error))) ||
+    (isDefaultCategoryView && !products.length && isValidating);
 
   const handleFilterChange = (
     selectedFilters: { name: string; value: string }[],
@@ -484,6 +520,7 @@ const CategoryPage = ({
             className={`w-full ${filtersVisible && !isMobile ? 'lg:w-3/4' : ''}`}
           >
             <ProductArchive
+              key={category.id}
               products={products}
               totalProducts={filteredProductCount}
               loading={isProductsLoading}
