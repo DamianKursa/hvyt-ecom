@@ -661,7 +661,7 @@ Dla danego Zamówienia wiążąca jest Cena z momentu złożenia Zamówienia.
         />
       </Head>
       {pageData && ! isLoading? (      
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto px-4">
         <div 
             className="page-content"
             dangerouslySetInnerHTML={{ __html: pageData?.content || '' }}

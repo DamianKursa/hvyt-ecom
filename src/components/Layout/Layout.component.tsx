@@ -55,7 +55,7 @@ const Layout: React.FC<ILayoutProps> = ({ children, title, description }) => {
         className={
           isFullWidthHero
             ? 'w-full sm:px-4 md:px-0'
-            : 'container mx-auto max-w-[1440px] mt-0 lg:mt-[88px] py-16'
+            : 'container mx-auto max-w-[1440px] mt-0 lg:mt-[88px] py-16 mt-[64px]'
         }
       >
         {children}
