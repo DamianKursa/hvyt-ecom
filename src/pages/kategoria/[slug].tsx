@@ -19,6 +19,11 @@ import { useI18n } from '@/utils/hooks/useI18n';
 import { dropdownOption } from '@/types/filters';
 import { getSortingOptions } from '@/utils/data/filters';
 import { getCurrentLanguage } from '@/utils/i18n/config';
+import {
+  fetchCategoryBySlug,
+  fetchProductAttributesWithTerms,
+  fetchProductsByCategoryId,
+} from '@/utils/api/category';
 
 interface Category {
   id: number;
@@ -337,7 +342,7 @@ const CategoryPage = ({
     }
   };
 
-  const swrKey = buildApiEndpoint();
+  const swrKey = category?.id > 0 ? buildApiEndpoint() : null;
 
   const isDefaultCategoryView =
     currentPage === 1 &&
@@ -564,17 +569,17 @@ const CategoryPage = ({
 export const getStaticProps: GetStaticProps = async (context) => {
   const slug = context.params?.slug as string;
   const locale = context.locale || 'pl';
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const wpOrigin = (process.env.WORDPRESS_API_URL || 'https://wp.hvyt.pl').replace(/\/$/, '');
   const wpApi =
-    process.env.NEXT_PUBLIC_WP_REST_API || 'https://hvyt.pl/wp-json/wp/v2';
+    process.env.NEXT_PUBLIC_WP_REST_API || `${wpOrigin}/wp-json/wp/v2`;
 
   // Determine language: check if slug is English or use locale
   const isEnSlug = isEnglishCategorySlug(slug);
   const lang = isEnSlug ? 'en' : (locale === 'en' ? 'en' : 'pl');
-  
+
   // Get Polish slug for WP/WooCommerce queries (they use Polish slugs as primary)
   const polishSlug = getPolishCategorySlug(slug);
-  
+
   // Get the appropriate slug for display based on language
   const displaySlug = getLocalizedCategorySlug(slug, lang as 'pl' | 'en');
 
@@ -585,7 +590,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   try {
     // Fetch the WP product_cat term by Polish slug (includes yoast_head_json)
-    // Add lang parameter for WPML support
     const langParam = lang === 'en' ? '&lang=en' : '';
     const termRes = await fetch(
       `${wpApi}/product_cat?slug=${encodeURIComponent(polishSlug)}` +
@@ -594,7 +598,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
     if (termRes.ok) {
       const terms = await termRes.json();
-      const term = terms[0];
+      const term = Array.isArray(terms) ? terms[0] : null;
       if (term) {
         categoryInfo = { id: term.id, name: term.name, slug: displaySlug };
         seoData = {
@@ -615,7 +619,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
     console.warn('Error fetching category term from WP:', err);
   }
 
-  // If we didn't find the category with Polish slug and lang=en, try without lang parameter
   if (categoryInfo.id === 0 && lang === 'en') {
     try {
       const termRes = await fetch(
@@ -625,7 +628,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
       if (termRes.ok) {
         const terms = await termRes.json();
-        const term = terms[0];
+        const term = Array.isArray(terms) ? terms[0] : null;
         if (term) {
           categoryInfo = { id: term.id, name: term.name, slug: displaySlug };
           seoData = {
@@ -641,46 +644,58 @@ export const getStaticProps: GetStaticProps = async (context) => {
     }
   }
 
-  // aggregator fetch with lang parameter
-  let aggregatorData = {
-    category: categoryInfo,
-    products: [] as any[],
-    totalProducts: 0,
-    attributes: [] as any[],
-  };
+  // Resolve WooCommerce category directly. Do not HTTP-call this app's
+  // /api/category-aggregator — NEXT_PUBLIC_SITE_URL on staging points at WordPress.
   try {
-    const aggRes = await fetch(
-      `${baseUrl}/api/category-aggregator` +
-      `?slug=${encodeURIComponent(polishSlug)}` +
-      `&page=1&perPage=12&lang=${lang}`,
-    );
-    if (aggRes.ok) {
-      aggregatorData = await aggRes.json();
-      // Override slug in category to use display slug
-      if (aggregatorData.category) {
-        aggregatorData.category.slug = displaySlug;
-      }
-      console.log(`[kategoria/${slug}] Aggregator returned ${aggregatorData.products?.length || 0} products, category id: ${aggregatorData.category?.id}`);
-    } else {
-      console.error('Aggregator fetch failed:', await aggRes.text());
+    const wcCategory = await fetchCategoryBySlug(polishSlug, lang);
+    if (wcCategory?.id) {
+      categoryInfo = {
+        id: wcCategory.id,
+        name: wcCategory.name || categoryInfo.name,
+        slug: displaySlug,
+      };
     }
   } catch (err) {
-    console.error('Aggregator fetch error:', err);
+    console.error(`[kategoria/${slug}] fetchCategoryBySlug failed:`, err);
   }
 
-  // Use aggregator category if we have a valid one, otherwise use our fetched one
-  const finalCategory = aggregatorData.category?.id ? aggregatorData.category : categoryInfo;
-  // Ensure display slug is correct
-  finalCategory.slug = displaySlug;
+  if (!categoryInfo.id) {
+    return { notFound: true, revalidate: 60 };
+  }
+
+  let products: any[] = [];
+  let totalProducts = 0;
+  let attributes: any[] = [];
+
+  try {
+    const productsData = await fetchProductsByCategoryId(
+      categoryInfo.id,
+      1,
+      12,
+      [],
+      'default',
+      lang,
+    );
+    products = productsData.products || [];
+    totalProducts = productsData.totalProducts || 0;
+  } catch (err) {
+    console.error(`[kategoria/${slug}] fetchProductsByCategoryId failed:`, err);
+  }
+
+  try {
+    attributes = await fetchProductAttributesWithTerms(categoryInfo.id, lang);
+  } catch (err) {
+    console.error(`[kategoria/${slug}] fetchProductAttributesWithTerms failed:`, err);
+  }
 
   return {
     props: {
-      category: finalCategory,
-      initialProducts: aggregatorData.products,
-      initialTotalProducts: aggregatorData.totalProducts,
-      initialAttributes: aggregatorData.attributes,
+      category: categoryInfo,
+      initialProducts: products,
+      initialTotalProducts: totalProducts,
+      initialAttributes: attributes,
       seoData,
-      lang, // Pass language to the component
+      lang,
     },
     revalidate: 21600,
   };

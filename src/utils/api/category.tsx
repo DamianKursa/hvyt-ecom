@@ -47,6 +47,10 @@ export const fetchProductsByCategoryId = async (
   sortingOption: string = 'default',
   lang: string
 ) => {
+  if (!Number.isFinite(categoryId) || categoryId <= 0) {
+    throw new Error(`Invalid categoryId: ${categoryId}`);
+  }
+
   try {
     const params: Record<string, any> = {
       category: categoryId,
