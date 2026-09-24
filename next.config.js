@@ -104,6 +104,8 @@ const nextConfig = {
       process.env.NEXT_PUBLIC_MAINTENANCE_MODE ||
       process.env.MAINTENANCE_MODE ||
       'false',
+    NEXT_PUBLIC_FB_PIXEL_ID:
+      process.env.NEXT_PUBLIC_FB_PIXEL_ID || '831581281016056',
   },
   
   async redirects() {

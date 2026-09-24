@@ -18,6 +18,10 @@ import { pushGTMEvent } from '@/utils/gtm';
 import CreateAccount from '@/components/UI/CreateAccount';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { getCurrencySlugByLocale } from '@/config/currencies';
+import {
+  getClientEventSourceUrl,
+  getTrackingCurrency,
+} from '@/utils/facebookCapi';
 import { ShippingCountryItem, ShippingMethod } from '@/types/checkout';
 import { PaymentFormWrapper } from '@/components/Checkout/PaymentForm';
 import { PaymentFormData, StripePaymentFormHandle } from '@/types/stripe';
@@ -642,10 +646,20 @@ const Checkout: React.FC = () => {
       }
       // ── end fire‑and‑forget address save ───────────────────────────────────
 
+      const trackingCurrency = getTrackingCurrency(
+        router.locale,
+        createdOrder.currency,
+      );
+      const trackingValue =
+        createdOrder.total != null && createdOrder.total !== ''
+          ? parseFloat(createdOrder.total)
+          : cart.totalProductsPrice;
+      const eventSourceUrl = getClientEventSourceUrl();
+
       pushGTMEvent('purchase', {
         transaction_id: createdOrder.id,
-        value: cart.totalProductsPrice,
-        currency: 'PLN', // Adjust as needed
+        value: trackingValue,
+        currency: trackingCurrency,
         items: cart.products.map((product) => ({
           item_id: product.productId,
           item_name: product.name,
@@ -662,8 +676,8 @@ const Checkout: React.FC = () => {
           'track',
           'Purchase',
           {
-            value: cart.totalProductsPrice,
-            currency: 'PLN',
+            value: trackingValue,
+            currency: trackingCurrency,
             content_ids: cart.products.map((p) => p.productId),
             contents: cart.products.map((p) => ({
               id: p.productId,
@@ -702,9 +716,10 @@ const Checkout: React.FC = () => {
           body: JSON.stringify({
             eventName: 'Purchase',
             eventId: purchaseEventId,
+            eventSourceUrl,
             customData: {
-              value: cart.totalProductsPrice,
-              currency: 'PLN',
+              value: trackingValue,
+              currency: trackingCurrency,
               content_ids: cart.products.map((p) => p.productId),
               contents: cart.products.map((p) => ({
                 id: p.productId,
@@ -732,8 +747,8 @@ const Checkout: React.FC = () => {
           price: p.price,
           quantity: p.qty,
         })),
-        value: cart.totalProductsPrice,
-        currency: 'PLN',
+        value: trackingValue,
+        currency: trackingCurrency,
         order_id: createdOrder.id.toString(),
         click_id: document.cookie.match(/_epik=([^;]+)/)?.[1] || '',
         firstName: billingData.firstName,
@@ -940,7 +955,7 @@ const Checkout: React.FC = () => {
                         )}
                       </span>
                       <span className="text-sm leading-tight w-full">
-                        <span className='text-red-500'>*</span>{t.checkout.terms.confirm}{' '}
+                        <span className='text-red-500'>*</span> {t.checkout.terms.confirm}{' '}
                         <Link className="underline" href={getPath('/regulamin')}>
                           {t.checkout.terms.term}
                         </Link>{' '}

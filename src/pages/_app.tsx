@@ -15,6 +15,7 @@ import type { AppProps } from 'next/app';
 import { ExternalIdProvider } from '@/context/ExternalIdContext';
 import { isMaintenanceMode } from '@/utils/maintenance';
 import MaintenanceScreen from '@/components/Maintenance/MaintenanceScreen';
+import { META_PIXEL_ID } from '@/utils/facebookCapi';
 
 import '@/styles/globals.css';
 import 'nprogress/nprogress.css';
@@ -94,7 +95,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             window, document, 'script',
             'https://connect.facebook.net/en_US/fbevents.js'
           );
-          fbq('init', '${process.env.NEXT_PUBLIC_FB_PIXEL_ID}');
+          fbq('init', '${META_PIXEL_ID}');
           fbq('track', 'PageView');
         `}
       </Script>

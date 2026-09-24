@@ -411,7 +411,7 @@ export const pl = {
         termsLink: 'Regulaminu',
         privacyLink: 'Polityki Prywatności',
         termsAcceptance: 'oraz akceptuję ich postanowienia.',
-        confirm: '*Potwierdzam, że zapoznałam/em się z treścią',
+        confirm: 'Potwierdzam, że zapoznałam/em się z treścią',
         term: 'Regulaminu',
         and: 'i',
         privacyPolicy: 'Polityki Prywatności',

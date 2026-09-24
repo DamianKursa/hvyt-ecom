@@ -1,6 +1,11 @@
 // pages/api/fb-capi.ts
 import type { NextApiRequest, NextApiResponse } from 'next'
 import crypto from 'crypto'
+import {
+  META_PIXEL_ID,
+  currencyFromEventSourceUrl,
+  resolveEventSourceUrl,
+} from '@/utils/facebookCapi'
 
 function sha256(val: string) {
   return crypto
@@ -14,13 +19,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const pixelId     = process.env.FB_PIXEL_ID
+  // Same Pixel / access token for hvyt.pl and hvyt.eu — no domain filter.
+  const pixelId     = process.env.FB_PIXEL_ID || META_PIXEL_ID
   const accessToken = process.env.FB_ACCESS_TOKEN
   if (!pixelId || !accessToken) {
     return res.status(500).json({ error: 'Missing FB credentials' })
   }
 
-  const { eventName, eventId, customData, userData } = req.body
+  const { eventName, eventId, customData, userData, eventSourceUrl } = req.body
 
   // Build up the user_data object
   const user_data: Record<string,string> = {}
@@ -49,6 +55,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     user_data.client_user_agent = req.headers['user-agent'] as string
   }
 
+  const event_source_url = resolveEventSourceUrl({
+    clientUrl: eventSourceUrl,
+    referer: (req.headers.referer || req.headers.referrer) as string | undefined,
+    host:
+      (req.headers['x-forwarded-host'] as string) ||
+      (req.headers.host as string),
+    proto: (req.headers['x-forwarded-proto'] as string) || 'https',
+  })
+
+  const custom_data = { ...(customData || {}) }
+  const currencyFromUrl = currencyFromEventSourceUrl(event_source_url)
+  if (currencyFromUrl) {
+    custom_data.currency = currencyFromUrl
+  }
+
   const fbUrl = `https://graph.facebook.com/v16.0/${pixelId}/events?access_token=${accessToken}`
 
   const payload = {
@@ -57,9 +78,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       event_time:       Math.floor(Date.now() / 1000),
       event_id:         eventId,
       action_source:    'website',
-      event_source_url: req.headers.referer,
+      event_source_url,
       user_data,
-      custom_data:      customData || {}
+      custom_data,
     }]
   }
 
