@@ -112,3 +112,53 @@ export const resolveEventSourceUrl = ({
 
   return undefined;
 };
+
+export type MetaCustomData = Record<string, unknown>;
+
+export const getMetaPixelUserData = (
+  extra: Record<string, string> = {},
+): Record<string, string> => {
+  if (typeof document === 'undefined') return extra;
+
+  const fbp = document.cookie.match(/_fbp=([^;]+)/)?.[1] ?? '';
+  const fbc = document.cookie.match(/_fbc=([^;]+)/)?.[1] ?? '';
+  const fbLoginId =
+    typeof window !== 'undefined'
+      ? String((window as unknown as { fb_login_id?: string }).fb_login_id ?? '')
+      : '';
+
+  return {
+    ...(fbLoginId ? { fb_login_id: fbLoginId } : {}),
+    ...(fbp ? { fbp } : {}),
+    ...(fbc ? { fbc } : {}),
+    ...extra,
+  };
+};
+
+export const trackMetaEvent = (
+  eventName: string,
+  customData: MetaCustomData,
+  userData: Record<string, string> = {},
+  eventId: string,
+): void => {
+  if (typeof window !== 'undefined' && (window as any).fbq) {
+    (window as any).fbq('track', eventName, customData, { eventID: eventId });
+  }
+
+  fetch('/api/fb-capi', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      eventName,
+      eventId,
+      eventSourceUrl: getClientEventSourceUrl(),
+      customData,
+      userData: getMetaPixelUserData(userData),
+    }),
+  })
+    .then(async (res) => {
+      const json = await res.json();
+      if (!res.ok) console.error('CAPI error:', json);
+    })
+    .catch((err) => console.error('CAPI network error:', err));
+};

@@ -27,7 +27,7 @@ import Head from 'next/head';
 import LowestPriceInfo from '@/components/SingleProduct/LowestPriceInfo';
 import { pushGTMEvent } from '@/utils/gtm';
 import { getCurrency, getCurrentLanguage, Language } from '@/utils/i18n/config';
-import { getClientEventSourceUrl } from '@/utils/facebookCapi';
+import { getClientEventSourceUrl, trackMetaEvent } from '@/utils/facebookCapi';
 import { WooProductIds } from '@/types/woocommerce';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { get } from 'lodash';
@@ -87,6 +87,7 @@ const ProductPage = () => {
   const [waitingListError, setWaitingListError] = useState<string | null>(null);
   const externalAnonId = useContext(ExternalIdContext);
   const { user } = useUserContext();
+  const viewContentKeyRef = useRef<string | null>(null);
   const {
     product,
     loading,
@@ -215,6 +216,7 @@ const ProductPage = () => {
 
         // ─────────────── LOOK UP VARIANT BY URL PARAM ───────────────
         const queryAttrKey = Object.keys(query).find(k => k.startsWith('attribute_pa_'));
+        let viewedVariation: BaselinkerVariation | undefined;
 
         if (
           queryAttrKey &&
@@ -234,6 +236,7 @@ const ProductPage = () => {
             );
 
             if (matchedVariation) {
+              viewedVariation = matchedVariation;
               // pull the exact attribute object that matched
               const matchedAttr = matchedVariation.attributes.find(a =>
                 normalize(a.option) === normalize(attributeValue)
@@ -282,6 +285,49 @@ const ProductPage = () => {
           value: parseFloat(productData.price),
           currency: currency.code,
         });
+
+        const viewContentKey = `${productData.id}:${router.locale ?? ''}`;
+        if (viewContentKeyRef.current !== viewContentKey) {
+          viewContentKeyRef.current = viewContentKey;
+
+          const contentId = String(productData.id);
+          const viewPrice = parseFloat(
+            String(viewedVariation?.price ?? productData.price),
+          );
+          const contentCategory = (productData.categories as Category[] | undefined)
+            ?.map((category) => category.name)
+            .filter(Boolean)
+            .join(', ');
+          const metaUserData: Record<string, string> = {
+            external_id:
+              user?.id != null
+                ? String(user.id)
+                : externalAnonId ?? uuidv4(),
+          };
+          if (user?.email) metaUserData.email = user.email;
+
+          trackMetaEvent(
+            'ViewContent',
+            {
+              content_type: 'product',
+              content_ids: [contentId],
+              content_name: productData.name,
+              ...(contentCategory ? { content_category: contentCategory } : {}),
+              value: viewPrice,
+              currency: currency.code,
+              contents: [
+                {
+                  id: contentId,
+                  quantity: 1,
+                  item_price: viewPrice,
+                },
+              ],
+              num_items: 1,
+            },
+            metaUserData,
+            uuidv4(),
+          );
+        }
 
         // update crossell items
         setCrosssellProdId(productData.id)
