@@ -27,6 +27,7 @@ import Head from 'next/head';
 import LowestPriceInfo from '@/components/SingleProduct/LowestPriceInfo';
 import { pushGTMEvent } from '@/utils/gtm';
 import { getCurrency, getCurrentLanguage, Language } from '@/utils/i18n/config';
+import { getClientEventSourceUrl } from '@/utils/facebookCapi';
 import { WooProductIds } from '@/types/woocommerce';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { get } from 'lodash';
@@ -279,7 +280,7 @@ const ProductPage = () => {
             },
           ],
           value: parseFloat(productData.price),
-          currency: 'PLN',
+          currency: currency.code,
         });
 
         // update crossell items
@@ -299,7 +300,7 @@ const ProductPage = () => {
               },
             ],
             value: parseFloat(productData.price),
-            currency: 'PLN',
+            currency: currency.code,
             click_id: document.cookie.match(/_epik=([^;]+)/)?.[1] || '',
           }),
         });
@@ -495,9 +496,6 @@ const ProductPage = () => {
       });
     });
 
-    const currentLang = getCurrentLanguage();
-    const currentCurrency = getCurrency(currentLang as Language);
-
     const cartItem: Product = {
       cartKey: selectedVariation?.id || product.id.toString(),
       name: product.name,
@@ -517,9 +515,9 @@ const ProductPage = () => {
       baselinker_variations: product.baselinker_variations,
       availableStock,
       // Pola walutowe - zachowują oryginalną walutę z momentu dodania
-      currency: currentCurrency.code,      // 'PLN' lub 'EUR'
-      currencySymbol: currentCurrency.symbol, // 'zł' lub '€'
-      lang: currentLang,                   // 'pl' lub 'en'
+      currency: currency.code,      // 'PLN' lub 'EUR'
+      currencySymbol: currency.symbol, // 'zł' lub '€'
+      lang: (router.locale as Language) ?? 'pl',
 
       shipping_class: product.shipping_class,
       shipping_class_id: product.shipping_class_id,
@@ -531,7 +529,7 @@ const ProductPage = () => {
     (window as any).window.dataLayer?.push({
       event: 'add_to_cart',
       ecommerce: {
-        currency: currentCurrency.code,
+        currency: currency.code,
         value: cartItem.totalPrice,
         items: [
           {
@@ -558,7 +556,7 @@ const ProductPage = () => {
           },
         ],
         value: cartItem.totalPrice,
-        currency: 'PLN',
+        currency: currency.code,
         order_id: cartItem.cartKey,
         click_id: document.cookie.match(/_epik=([^;]+)/)?.[1] || '',
       }),
@@ -575,7 +573,7 @@ const ProductPage = () => {
           content_type: 'product',
           content_ids: [product.id],
           value: cartItem.totalPrice,
-          currency: 'PLN',
+          currency: currency.code,
         },
         { eventID: eventId },
       );
@@ -613,11 +611,12 @@ const ProductPage = () => {
         body: JSON.stringify({
           eventName: 'AddToCart',
           eventId,
+          eventSourceUrl: getClientEventSourceUrl(),
           customData: {
             content_type: 'product',
             content_ids: [product.id],
             value: cartItem.totalPrice,
-            currency: 'PLN',
+            currency: currency.code,
           },
           userData, // ← now every field is string
         }),
