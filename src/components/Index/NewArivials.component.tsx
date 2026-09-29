@@ -139,7 +139,7 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
                 fill
                 style={{
                   objectFit: 'cover',
-                  objectPosition: 'center bottom',
+                  objectPosition: 'center center',
                 }}
                 className="rounded-[16px]"
               />
@@ -154,83 +154,12 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
       </div>
 
       {/* Desktop View */}
-      <div className="hidden md:flex gap-6">
-        {/* Left Column */}
-        <div className="relative w-1/2" style={{ height: '642px' }}>
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="flex gap-6 h-full">
-              {/* First Left Image */}
-              <div className="w-full relative overflow-hidden h-full rounded-[16px]">
-                <motion.div
-                  className="absolute inset-0"
-                  style={{ borderRadius: '16px' }}
-                  variants={maskVariants}
-                  initial="initial"
-                  animate={animationTrigger ? 'animate' : 'initial'}
-                >
-                  <motion.div
-                    className="absolute"
-                    style={{
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      height: '642px',
-                      borderRadius: '16px',
-                    }}
-                    variants={imageVariants}
-                    initial="initial"
-                    animate={animationTrigger ? 'animate' : 'initial'}
-                  >
-                    <Image
-                      src={nowosciItems[0].src}
-                      alt={nowosciItems[0].alt}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      className="rounded-[16px]"
-                    />
-                  </motion.div>
-                </motion.div>
-              </div>
-              {/* Second Left Image */}
-              <div className="w-full relative overflow-hidden h-full rounded-[16px]">
-                <motion.div
-                  className="absolute inset-0"
-                  style={{ borderRadius: '16px' }}
-                  variants={maskVariants}
-                  initial="initial"
-                  animate={animationTrigger ? 'animate' : 'initial'}
-                >
-                  <motion.div
-                    className="absolute"
-                    style={{
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      height: '642px',
-                      borderRadius: '16px',
-                    }}
-                    variants={imageVariants}
-                    initial="initial"
-                    animate={animationTrigger ? 'animate' : 'initial'}
-                  >
-                    <Image
-                      src={nowosciItems[1].src}
-                      alt={nowosciItems[1].alt}
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      className="rounded-[16px]"
-                    />
-                  </motion.div>
-                </motion.div>
-              </div>
-            </div>
-          </div>
-          {/* Title Block – overlaps the images */}
-          <motion.div
+      <div className="hidden md:flex flex-col gap-6">
+      <motion.div
             initial={{ y: 0 }}
             animate={animationTrigger ? { y: -300 } : { y: 0 }}
             transition={{ duration: 1 }}
-            className="absolute z-20 left-0 p-4"
+            className="relative z-20 p-4"
           >
             <h2 className="font-size-h2 font-bold text-neutral-darkest">
               {t.product.newProductsTitle}
@@ -244,29 +173,23 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
             >
               {t.index.seeFurniture} →
             </Link>
-          </motion.div>
-        </div>
-        {/* Right Column – static images */}
-        <div className="flex flex-col w-1/2">
+        </motion.div>
+
+        {/* static images */}
+        <div className="flex flex-col">
           <div className="flex gap-6 h-full">
-            <div className="w-full h-full">
-              <Image
-                src={nowosciItems[2].src}
-                alt={nowosciItems[2].alt}
-                width={322}
-                height={642}
-                className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-[16px]"
-              />
-            </div>
-            <div className="w-full h-full">
-              <Image
-                src={nowosciItems[3].src}
-                alt={nowosciItems[3].alt}
-                width={322}
-                height={642}
-                className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-[16px]"
-              />
-            </div>
+            {nowosciItems.map((item, index) => ( index < 4 && (
+              <div className="w-full h-full">
+                <Image
+                  key={item.id}
+                  src={item.src}
+                  alt={item.alt}
+                  width={322}
+                  height={350}
+                  className="w-full w-full md:h-[350px] h-[350px] object-cover rounded-[16px]"
+                />
+              </div>
+            )))}
           </div>
         </div>
       </div>
