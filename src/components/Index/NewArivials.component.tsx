@@ -179,9 +179,8 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
         <div className="flex flex-col">
           <div className="flex gap-6 h-full">
             {nowosciItems.map((item, index) => ( index < 4 && (
-              <div className="w-full h-full">
+              <div key={item.id} className="w-full h-full">
                 <Image
-                  key={item.id}
                   src={item.src}
                   alt={item.alt}
                   width={322}
