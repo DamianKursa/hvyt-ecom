@@ -680,7 +680,7 @@ export const pl = {
       seeKnobs: 'Zobacz gałki',
       seeAllCollections: 'Zobacz wszystkie kolekcje →',
       seeOurNews: 'Zobacz nasze nowości',
-      seeFurniture: 'Zobacz meble',
+      seeFurniture: 'Zobacz nowości',
       seeOurInstagram: 'Zobacz nasz Instagram',
       seeAll: 'Zobacz wszystkie',
       addAtLeast4Images: 'Dodaj co najmniej 4 obrazy do sekcji „Wybierz swój HVYT".',
