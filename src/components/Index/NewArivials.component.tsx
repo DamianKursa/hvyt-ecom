@@ -153,9 +153,9 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
         />
       </div>
 
-      {/* Desktop View */}
-      <div className="hidden md:flex flex-col gap-6">
-      <motion.div
+      {/* Tablet View */}
+      <div className="hidden md:flex lg:hidden flex-col gap-6">
+        <motion.div
             initial={{ y: 0 }}
             animate={animationTrigger ? { y: -300 } : { y: 0 }}
             transition={{ duration: 1 }}
@@ -192,6 +192,124 @@ const NewArrivalsSection: React.FC<NewArrivalsSectionProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Desktop View */}
+      <div className="hidden lg:flex gap-6">
+        {/* Left Column */}
+        <div className="relative w-1/2" style={{ height: '642px' }}>
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="flex gap-6 h-full">
+              {/* First Left Image */}
+              <div className="w-full relative overflow-hidden h-full rounded-[16px]">
+                <motion.div
+                  className="absolute inset-0"
+                  style={{ borderRadius: '16px' }}
+                  variants={maskVariants}
+                  initial="initial"
+                  animate={animationTrigger ? 'animate' : 'initial'}
+                >
+                  <motion.div
+                    className="absolute"
+                    style={{
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: '642px',
+                      borderRadius: '16px',
+                    }}
+                    variants={imageVariants}
+                    initial="initial"
+                    animate={animationTrigger ? 'animate' : 'initial'}
+                  >
+                    <Image
+                      src={nowosciItems[0].src}
+                      alt={nowosciItems[0].alt}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      className="rounded-[16px]"
+                    />
+                  </motion.div>
+                </motion.div>
+              </div>
+              {/* Second Left Image */}
+              <div className="w-full relative overflow-hidden h-full rounded-[16px]">
+                <motion.div
+                  className="absolute inset-0"
+                  style={{ borderRadius: '16px' }}
+                  variants={maskVariants}
+                  initial="initial"
+                  animate={animationTrigger ? 'animate' : 'initial'}
+                >
+                  <motion.div
+                    className="absolute"
+                    style={{
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      height: '642px',
+                      borderRadius: '16px',
+                    }}
+                    variants={imageVariants}
+                    initial="initial"
+                    animate={animationTrigger ? 'animate' : 'initial'}
+                  >
+                    <Image
+                      src={nowosciItems[1].src}
+                      alt={nowosciItems[1].alt}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      className="rounded-[16px]"
+                    />
+                  </motion.div>
+                </motion.div>
+              </div>
+            </div>
+          </div>
+          {/* Title Block – overlaps the images */}
+          <motion.div
+            initial={{ y: 0 }}
+            animate={animationTrigger ? { y: -300 } : { y: 0 }}
+            transition={{ duration: 1 }}
+            className="absolute z-20 left-0 p-4"
+          >
+            <h2 className="font-size-h2 font-bold text-neutral-darkest">
+              {t.product.newProductsTitle}
+            </h2>
+            <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
+              {t.product.newProductsMessage}
+            </p>
+            <Link
+              href={getPath('/kategoria/meble')}
+              className="mt-[40px] inline-block px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
+            >
+              {t.index.seeFurniture} →
+            </Link>
+          </motion.div>
+        </div>
+        {/* Right Column – static images */}
+        <div className="flex flex-col w-1/2">
+          <div className="flex gap-6 h-full">
+            <div className="w-full h-full">
+              <Image
+                src={nowosciItems[2].src}
+                alt={nowosciItems[2].alt}
+                width={322}
+                height={642}
+                className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-[16px]"
+              />
+            </div>
+            <div className="w-full h-full">
+              <Image
+                src={nowosciItems[3].src}
+                alt={nowosciItems[3].alt}
+                width={322}
+                height={642}
+                className="w-full md:w-[322px] md:h-[642px] h-[245px] object-cover rounded-[16px]"
+              />
+            </div>
+          </div>
+        </div>
+      </div>      
     </section>
   );
 };
