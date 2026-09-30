@@ -11,6 +11,8 @@ const resolveShippingClassCost = (shippingClass: {
   cost_original?: number | string | null;
   price_source?: string;
 }): number | null => {
+  if (shippingClass.price_source === 'not_set') return null;
+
   const original = parseCost(shippingClass.cost_original);
   const cost = parseCost(shippingClass.cost);
   const priceSource = shippingClass.price_source;
@@ -56,8 +58,8 @@ const shippingClassMatchesCart = (
 /**
  * Resolve shipping method cost.
  * When the cart has shipping classes matching method rules, use the highest class cost.
+ * A blank class cost is ignored so the method base cost applies. An explicit 0 is kept.
  * Matches by class_id and shipping_class slug (WPML uses different term ids per language).
- * Otherwise fall back to the method base cost.
  */
 export const resolveShippingMethodCost = (
   method: ShippingMethod,
