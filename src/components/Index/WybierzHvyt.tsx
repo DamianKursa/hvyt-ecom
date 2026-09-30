@@ -117,8 +117,56 @@ const WybierzHvyt: React.FC<WybierzHvytProps> = ({ items, useInViewTrigger = fal
                 />
             </div>
 
+            {/* Tablet View */}
+            <div className="hidden md:flex lg:hidden flex-col gap-6">
+                <motion.div
+                    initial={{ y: 0 }}
+                    animate={animationTrigger ? { y: -300 } : { y: 0 }}
+                    transition={{ duration: 1 }}
+                    className="relative z-20 p-4"
+                >
+                    <h2 className="font-size-h2 font-bold text-neutral-darkest">
+                        {t.index.chooseHVYT}
+                    </h2>
+                    <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
+                        {t.index.chooseSloganMobile}
+                    </p>
+                    <div className="mt-[40px] flex gap-3 flex-wrap">
+                        <Link
+                            href={getPath('/kategoria/uchwyty-meblowe')}
+                            className="inline-block px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
+                        >
+                            {t.index.seeHandles}
+                        </Link>
+                        <Link
+                            href={getPath('/kategoria/uchwyty-meblowe?pa_rodzaj=galki&pa_rodzaj=t-bary')}
+                            className="inline-block px-6 py-3 text-lg font-light border border-black rounded-full hover:bg-dark-pastel-red hover:text-neutral-white transition-all"
+                        >
+                            {t.index.seeKnobs}
+                        </Link>
+                    </div>
+                </motion.div>
+
+        {/* static images */}
+        <div className="flex flex-col">
+          <div className="flex gap-6 h-full">
+            {items.map((item, index) => ( index < 4 && (
+              <div key={item.id} className="w-full h-full">
+                <Image
+                  src={item.src}
+                  alt={item.alt}
+                  width={322}
+                  height={350}
+                  className="w-full w-full md:h-[350px] h-[350px] object-cover rounded-[16px]"
+                />
+              </div>
+            )))}
+          </div>
+        </div>
+      </div>
+
             {/* Desktop View */}
-            <div className="hidden md:flex gap-6">
+            <div className="hidden lg:flex gap-6">
                 {/* Left Column */}
                 <div className="relative w-1/2" style={{ height: '642px' }}>
                     <div className="absolute inset-0 overflow-hidden">

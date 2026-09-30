@@ -683,7 +683,7 @@ export const en: Translations = {
     seeKnobs: 'See knobs',
     seeAllCollections: 'See all collections →',
     seeOurNews: 'See our news',
-    seeFurniture: 'See furniture',
+    seeFurniture: 'See new products',
     seeOurInstagram: 'See our Instagram',
     seeAll: 'See all',
     addAtLeast4Images: 'Add at least 4 images to the "Choose your HVYT" section.',
