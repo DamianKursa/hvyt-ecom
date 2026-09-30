@@ -45,11 +45,30 @@ export const getCacheEnv = (): string => {
   return sanitizeCacheEnv(process.env.NODE_ENV || 'dev');
 };
 
-export const withCacheEnv = (key: string): string => {
+const ALLOWED_TARGET_ENVS = new Set(['staging', 'prod']);
+
+export class UnsupportedCacheEnvError extends Error {
+  constructor(env: string) {
+    super(`Unsupported cache env "${env}". Use "staging" or "prod".`);
+    this.name = 'UnsupportedCacheEnvError';
+  }
+}
+
+/** Explicit target for flush/delete. Omitted value keeps the current deployment env. */
+export const resolveTargetCacheEnv = (requested?: string | null): string => {
+  if (!requested?.trim()) return getCacheEnv();
+  const env = sanitizeCacheEnv(requested);
+  if (!ALLOWED_TARGET_ENVS.has(env)) {
+    throw new UnsupportedCacheEnvError(env);
+  }
+  return env;
+};
+
+export const withCacheEnv = (key: string, env: string = getCacheEnv()): string => {
   if (key.startsWith(`${CACHE_KEY_PREFIX}:`)) {
     return key;
   }
-  return `${CACHE_KEY_PREFIX}:${getCacheEnv()}:${key}`;
+  return `${CACHE_KEY_PREFIX}:${env}:${key}`;
 };
 
 export async function getCache(key: string): Promise<any> {
@@ -87,8 +106,8 @@ export async function setCache(key: string, data: any, ttl: number): Promise<voi
   }
 }
 
-export async function deleteCache(key: string): Promise<number> {
-  const scopedKey = withCacheEnv(key);
+export async function deleteCache(key: string, env: string = getCacheEnv()): Promise<number> {
+  const scopedKey = withCacheEnv(key, env);
   try {
     const result = await redis.del(scopedKey);
     console.log(`[CACHE DELETE] key: ${scopedKey}`);
@@ -100,10 +119,11 @@ export async function deleteCache(key: string): Promise<number> {
 }
 
 /**
- * Delete only keys for the current environment (prod/staging/preview).
+ * Delete only keys for one environment (prod/staging/preview).
+ * Defaults to the current deployment env.
  */
-export async function flushCache(): Promise<number> {
-  const pattern = `${CACHE_KEY_PREFIX}:${getCacheEnv()}:*`;
+export async function flushCache(env: string = getCacheEnv()): Promise<number> {
+  const pattern = `${CACHE_KEY_PREFIX}:${env}:*`;
   let cursor = '0';
   let deleted = 0;
 
