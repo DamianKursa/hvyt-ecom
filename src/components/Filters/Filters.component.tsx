@@ -314,18 +314,22 @@ const Filters: React.FC<FiltersProps> = ({
                       />
                       <label
                         htmlFor={`${attribute.slug}-${option.slug}`}
-                        className={`flex items-center cursor-pointer w-5 h-5 border border-black rounded ${isChecked ? 'bg-black' : ''
-                          }`}
+                        className="flex items-center"
                       >
-                        {isChecked && (
-                          <img
-                            src="/icons/check.svg"
-                            alt="check"
-                            className="w-4 h-4"
-                          />
-                        )}
+                        <span className={`flex items-center shrink-0 cursor-pointer w-5 h-5 border border-black rounded ${isChecked ? 'bg-black' : ''
+                          }`}
+                          >
+                          {isChecked && (
+                            <img
+                              src="/icons/check.svg"
+                              alt="check"
+                              className="w-4 h-4"
+                            />
+                          )}
+                        </span>
+                        <span className="ml-2">{option.name}</span>
                       </label>
-                      <span className="ml-2">{option.name}</span>
+                      
                     </div>
                   );
                 })}

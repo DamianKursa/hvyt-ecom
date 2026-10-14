@@ -22,6 +22,9 @@
   --color-beige: #E9E5DF;
   --color-beige-dark: #DAD3C8;
 
+  --color-beige-50: #D8D3C9;
+  --color-beige-100: #661F30;
+
   --font-family-primary: 'Neue Haas Grotesk Display', sans-serif;
   --font-size-h1: 56px;
   --font-size-h2: 48px;
@@ -360,3 +363,31 @@ p.lead {
  font-weight: 100;
 }
 
+.filter-item {
+  padding: 2px 16px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid var(--color-beige-50);
+  border-radius: 32px;
+  transition: all 0.3s ease;
+}
+
+.filter-item:hover {
+  border-color: var(--color-beige-100);
+}
+
+.filter-item svg:hover path {
+  stroke: var(--color-beige-100);
+}
+
+.filter-item--mobile  {
+  min-height: 32px;
+  font-size: 0.8rem;
+}
+
+.filter-item--mobile svg {
+  width: 10px;
+}
