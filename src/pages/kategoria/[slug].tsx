@@ -491,6 +491,7 @@ const CategoryPage = ({
               : () => setFiltersVisible(!filtersVisible)
           }
           filters={activeFilters}
+          attributes={initialAttributes}
           sorting={sortingOption}
           onSortingChange={handleSortingChange}
           onRemoveFilter={(filterToRemove) => {

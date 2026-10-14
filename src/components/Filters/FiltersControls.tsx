@@ -3,11 +3,13 @@ import CustomDropdown from '@/components/UI/CustomDropdownWithLabels.component';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { dropdownOption } from '@/types/filters';
 import { getSortingOptions } from '@/utils/data/filters';
+import { FilterAttribute } from '@/components/Filters/Filters.component';
 
 interface FiltersControlsProps {
   filtersVisible: boolean;
   toggleFilters: () => void;
   filters: { name: string; value: string }[];
+  attributes?: FilterAttribute[];
   sorting: dropdownOption;
   onSortingChange: (value: dropdownOption) => void;
   onRemoveFilter: (filter: { name: string; value: string }) => void;
@@ -18,6 +20,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
   filtersVisible,
   toggleFilters,
   filters,
+  attributes = [],
   sorting,
   onSortingChange,
   onRemoveFilter,
@@ -30,6 +33,12 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
 
   const handleFilterRemove = (filter: { name: string; value: string }) => {
     onRemoveFilter(filter);
+  };
+
+  const getFilterLabel = (filter: { name: string; value: string }) => {
+    const attribute = attributes.find((item) => item.slug === filter.name);
+    const option = attribute?.options?.find((item) => item.slug === filter.value);
+    return option?.name || filter.value;
   };
 
   if (isMobile) {
@@ -73,7 +82,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
                 key={`${filter.name}-${filter.value}`}
                 className="filter-item filter-item--mobile"
               >
-                {filter.value}
+                {getFilterLabel(filter)}
                 <button
                   onClick={() => handleFilterRemove(filter)}
                   className="ml-2 shrink-0"
@@ -119,7 +128,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
                   key={`${filter.name}-${filter.value}`}
                   className="filter-item"
                 >
-                  {filter.value}
+                  {getFilterLabel(filter)}
                   <button
                     onClick={() => handleFilterRemove(filter)}
                     className="ml-2 shrink-0"
