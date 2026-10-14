@@ -126,9 +126,72 @@ export const fetchProductAttributesWithTerms = async (categoryId: number, lang: 
   }
 };
 
+type ListingFilter = { name: string; value: string };
+
+const parsePriceFilter = (filters: ListingFilter[]) => {
+  const priceFilter = filters.find((filter) => filter.name === 'price');
+  if (!priceFilter?.value) return null;
+  const [minPrice, maxPrice] = priceFilter.value.split('-').map(Number);
+  if (!Number.isFinite(minPrice) || !Number.isFinite(maxPrice)) return null;
+  return { minPrice, maxPrice };
+};
+
+/** Values of one attribute are OR. Separate attributes are AND. */
+const groupAttributeFilters = (filters: ListingFilter[]) => {
+  const groups = new Map<string, string[]>();
+  filters.forEach((filter) => {
+    if (!filter.name || !filter.value || filter.name === 'price') return;
+    const taxonomy = filter.name.startsWith('pa_')
+      ? filter.name
+      : `pa_${filter.name}`;
+    const values = groups.get(taxonomy) ?? [];
+    if (!values.includes(filter.value)) values.push(filter.value);
+    groups.set(taxonomy, values);
+  });
+  return groups;
+};
+
+const formatMinorUnitPrice = (raw: unknown, minorUnit: number) => {
+  const text = String(raw ?? '').trim();
+  if (!text) return '';
+  const negative = text.startsWith('-');
+  const digits = text.replace('-', '').replace(/\D/g, '');
+  if (!digits) return '';
+  const unit = Number.isFinite(minorUnit) && minorUnit > 0 ? minorUnit : 0;
+  const padded = digits.padStart(unit + 1, '0');
+  const whole = padded.slice(0, padded.length - unit) || '0';
+  const fraction =
+    unit > 0 ? padded.slice(padded.length - unit).replace(/0+$/, '') : '';
+  const formatted = fraction ? `${whole}.${fraction}` : whole;
+  return negative ? `-${formatted}` : formatted;
+};
+
+const mapStoreProduct = (product: any) => {
+  const minorUnit = Number(product?.prices?.currency_minor_unit ?? 2);
+  return {
+    id: product.id,
+    slug: product.slug,
+    name: product.name,
+    price: formatMinorUnitPrice(product?.prices?.price, minorUnit),
+    on_sale: Boolean(product.on_sale),
+    images: (product.images || [])
+      .filter((image: { src?: string }) => image?.src)
+      .map((image: { src: string }) => ({ src: image.src })),
+    attributes: (product.attributes || []).map(
+      (attribute: { name?: string; terms?: { name?: string }[] }) => ({
+        name: attribute.name,
+        options: (attribute.terms || [])
+          .map((term) => term.name)
+          .filter((name): name is string => Boolean(name)),
+      }),
+    ),
+    date_created: null,
+  };
+};
+
 export const fetchProductsWithFilters = async (
   categoryId: number,
-  filters: { name: string; value: string }[],
+  filters: ListingFilter[],
   page = 1,
   perPage = 12,
   lang: string,
@@ -139,46 +202,46 @@ export const fetchProductsWithFilters = async (
     );
   }
 
-  const params: any = {
+  const price = parsePriceFilter(filters);
+  const attributeGroups = groupAttributeFilters(filters);
+  const storeRoot = `${(process.env.REST_API || '').replace(/\/wc\/v3\/?$/i, '')}/wc/store/v1`;
+  const params: Record<string, unknown> = {
     category: categoryId,
     page,
     per_page: perPage,
-    lang
+    orderby: 'date',
+    order: 'desc',
+    attribute_relation: 'and',
   };
 
-  filters.forEach((filter) => {
-    if (filter.name === 'price') {
-      const [minPrice, maxPrice] = filter.value.split('-').map(Number);
-      params.min_price = minPrice;
-      params.max_price = maxPrice;
-    } else {
-      params.attributes = params.attributes || [];
-      params.attributes.push({
-        key: filter.name,
-        value: filter.value,
-      });
-    }
-  });
+  if (lang === 'pl' || lang === 'en') {
+    params.wpml_language = lang;
+  }
+
+  if (attributeGroups.size > 0) {
+    params.attributes = [...attributeGroups.entries()].map(
+      ([taxonomy, slugs]) => ({
+        attribute: taxonomy,
+        slug: slugs,
+        operator: 'in',
+      }),
+    );
+  }
+
+  if (price) {
+    params.min_price = String(Math.round(price.minPrice * 100));
+    params.max_price = String(Math.round(price.maxPrice * 100));
+  }
 
   try {
-    const response = await CustomAPI.get('/filtered-products', { params });
-    
-    const mapped = (response.data.products || []).map((p: any) => ({
-      ...p,
-      // ensure date_created exists so the "Nowość" badge logic works
-      date_created:
-        p.date_created ||
-        p.date_gmt ||
-        p.date_created_gmt ||
-        p.date ||
-        p.created_date ||
-        p.created_at ||
-        null,
-    }));
+    const response = await WooCommerceAPI.get('/products', {
+      baseURL: storeRoot,
+      params,
+    });
 
     return {
-      products: mapped,
-      totalProducts: response.data.total || 0,
+      products: (response.data || []).map(mapStoreProduct),
+      totalProducts: parseInt(response.headers['x-wp-total'] || '0', 10),
     };
   } catch (error) {
     console.error('Error fetching products with filters:', error);
