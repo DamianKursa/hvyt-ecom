@@ -2,7 +2,11 @@
 import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
 import { getStripeClient, createPaymentIntent, getStripeLocale } from '@/lib/stripe';
-import type { PaymentFormData, StripePaymentFormHandle } from '@/types/stripe';
+import type {
+  PaymentFormData,
+  StripePaymentFormHandle,
+  StripeShippingDetails,
+} from '@/types/stripe';
 import { Cart } from '@/stores/CartProvider';
 import { getCurrencySlugByLocale } from '@/config/currencies';
 import { useRouter } from 'next/router';
@@ -12,14 +16,16 @@ interface PaymentFormWrapperProps {
   cart: Cart | null;
   shippingPrice: number;
   billingData: PaymentFormData;
+  shippingDetails?: StripeShippingDetails;
 }
 
 /**
  * Wrapper komponentu płatności - ładuje Stripe Elements po wyborze karty.
  */
 export const PaymentFormWrapper = forwardRef<StripePaymentFormHandle, PaymentFormWrapperProps>(
-  function PaymentFormWrapper({ cart, shippingPrice, billingData }, ref) {
+  function PaymentFormWrapper({ cart, shippingPrice, billingData, shippingDetails }, ref) {
     const [clientSecret, setClientSecret] = useState<string | null>(null);
+    const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     const router = useRouter();
@@ -42,6 +48,7 @@ export const PaymentFormWrapper = forwardRef<StripePaymentFormHandle, PaymentFor
 
           if (result.success && result.clientSecret) {
             setClientSecret(result.clientSecret);
+            setPaymentIntentId(result.paymentIntentId);
             setError(null);
           } else if (!result.success) {
             setError(result.error || t.stripePayment.errorInit);
@@ -102,6 +109,8 @@ export const PaymentFormWrapper = forwardRef<StripePaymentFormHandle, PaymentFor
         <PaymentFormContent
           ref={ref}
           billingData={billingData}
+          shippingDetails={shippingDetails}
+          paymentIntentId={paymentIntentId}
         />
       </Elements>
     );
@@ -110,10 +119,12 @@ export const PaymentFormWrapper = forwardRef<StripePaymentFormHandle, PaymentFor
 
 interface PaymentFormContentProps {
   billingData: PaymentFormData;
+  shippingDetails?: StripeShippingDetails;
+  paymentIntentId: string | null;
 }
 
 const PaymentFormContent = forwardRef<StripePaymentFormHandle, PaymentFormContentProps>(
-  function PaymentFormContent({ billingData }, ref) {
+  function PaymentFormContent({ billingData, shippingDetails, paymentIntentId }, ref) {
     const stripe = useStripe();
     const elements = useElements();
     const { t } = useI18n();
@@ -122,6 +133,7 @@ const PaymentFormContent = forwardRef<StripePaymentFormHandle, PaymentFormConten
     useImperativeHandle(
       ref,
       () => ({
+        getPaymentIntentId: () => paymentIntentId,
         confirmPayment: async () => {
           if (!stripe || !elements) {
             setErrorMessage(t.stripePayment.errorNotReady);
@@ -130,10 +142,33 @@ const PaymentFormContent = forwardRef<StripePaymentFormHandle, PaymentFormConten
 
           setErrorMessage(null);
 
+          const shippingAddress = shippingDetails?.address;
+          const shipping =
+            shippingDetails?.name.trim() &&
+            shippingAddress?.line1.trim() &&
+            shippingAddress.city.trim() &&
+            shippingAddress.postal_code.trim() &&
+            shippingAddress.country.trim()
+              ? {
+                  name: shippingDetails.name.trim(),
+                  phone: shippingDetails.phone || undefined,
+                  address: {
+                    line1: shippingAddress.line1,
+                    line2: shippingAddress.line2 || undefined,
+                    city: shippingAddress.city,
+                    state: shippingAddress.state || undefined,
+                    postal_code: shippingAddress.postal_code,
+                    country: shippingAddress.country,
+                  },
+                }
+              : undefined;
+
           try {
             const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
               elements,
               confirmParams: {
+                return_url: `${window.location.origin}${window.location.pathname}`,
+                ...(shipping ? { shipping } : {}),
                 payment_method_data: {
                   billing_details: {
                     name: billingData.name,
@@ -158,8 +193,14 @@ const PaymentFormContent = forwardRef<StripePaymentFormHandle, PaymentFormConten
               return null;
             }
 
-            if (paymentIntent?.status === 'succeeded') {
-              return paymentIntent.id;
+            if (
+              paymentIntent &&
+              (paymentIntent.status === 'succeeded' || paymentIntent.status === 'processing')
+            ) {
+              return {
+                id: paymentIntent.id,
+                paid: paymentIntent.status === 'succeeded',
+              };
             }
 
             setErrorMessage(t.stripePayment.errorNeddsAuth);
@@ -171,7 +212,7 @@ const PaymentFormContent = forwardRef<StripePaymentFormHandle, PaymentFormConten
           }
         },
       }),
-      [stripe, elements, billingData, t],
+      [stripe, elements, billingData, shippingDetails, paymentIntentId, t],
     );
 
     return (
@@ -179,6 +220,23 @@ const PaymentFormContent = forwardRef<StripePaymentFormHandle, PaymentFormConten
         <PaymentElement
           options={{
             layout: 'tabs',
+            paymentMethodOrder: ['card', 'ideal', 'klarna', 'paypal'],
+            defaultValues: {
+              billingDetails: {
+                name: billingData.name.trim() || undefined,
+                email: billingData.email || undefined,
+                phone: billingData.phone || undefined,
+                address: billingData.address.country
+                  ? {
+                      country: billingData.address.country,
+                      postal_code: billingData.address.postal_code || undefined,
+                      city: billingData.address.city || undefined,
+                      line1: billingData.address.line1 || undefined,
+                      line2: billingData.address.line2 || undefined,
+                    }
+                  : undefined,
+              },
+            },
           }}
         />
 

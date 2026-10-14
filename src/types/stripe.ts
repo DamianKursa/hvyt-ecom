@@ -22,8 +22,20 @@ export interface CartItem {
   variation_id?: number;
 }
 
+  export interface StripeShippingDetails {
+    name: string;
+    phone?: string;
+    address: PaymentFormData['address'];
+  }
+
+  export interface StripePaymentResult {
+    id: string;
+    paid: boolean;
+  }
+
   export interface StripePaymentFormHandle {
-    confirmPayment: () => Promise<string | null>;
+    confirmPayment: () => Promise<StripePaymentResult | null>;
+    getPaymentIntentId: () => string | null;
   }
 
   export interface StripePaymentData {

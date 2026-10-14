@@ -24,7 +24,19 @@ import {
 } from '@/utils/facebookCapi';
 import { ShippingCountryItem, ShippingMethod } from '@/types/checkout';
 import { PaymentFormWrapper } from '@/components/Checkout/PaymentForm';
-import { PaymentFormData, StripePaymentFormHandle } from '@/types/stripe';
+import { PaymentFormData, StripePaymentFormHandle, StripeShippingDetails } from '@/types/stripe';
+import { getPaymentIntent } from '@/lib/stripe';
+import {
+  beginStripeResume,
+  clearPendingStripeOrder,
+  endStripeResume,
+  isStripeRedirectReturn,
+  markStripePaymentCompleted,
+  readCompletedStripePayment,
+  readPendingStripeOrder,
+  savePendingStripeOrder,
+  type StripeCheckoutTracking,
+} from '@/lib/stripePendingOrder';
 import {
   resolveCountryCode,
   localizeCountryList,
@@ -56,6 +68,10 @@ const Checkout: React.FC = () => {
   );
 
   const stripeFormRef = useRef<StripePaymentFormHandle>(null);
+  const stripeResumeStarted = useRef<string | null>(null);
+  const completeOrderRef = useRef<
+    (orderData: Record<string, any>, track: StripeCheckoutTracking) => Promise<void>
+  >(async () => {});
 
   const [email, setEmail] = useState<string>('');
   const [subscribeNewsletter, setSubscribeNewsletter] =
@@ -220,6 +236,7 @@ const Checkout: React.FC = () => {
   }, [deliveryCountryCode, countryList]);
 
   useEffect(() => {
+    if (isStripeRedirectReturn()) return;
     if (!cart || cart.products.length === 0) {
       router.push(getPath('/koszyk'));
     }
@@ -310,6 +327,210 @@ const Checkout: React.FC = () => {
       });
     }
   }, [cart]);
+
+  completeOrderRef.current = async (orderData, track) => {
+    pushGTMEvent('add_shipping_info', {
+      shipping_method: track.shippingMethod,
+      shipping_cost: track.shippingCost,
+      shipping_address: track.shippingAddress,
+    });
+    pushGTMEvent('add_payment_info', {
+      payment_method: track.paymentMethod,
+    });
+
+    try {
+      const response = await axios.post('/api/create-order', orderData, {
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const createdOrder = response.data;
+
+      if (user && track.saveAddress && track.addressToSave) {
+        axios
+          .post(
+            '/api/moje-konto/adresy',
+            {
+              action: 'add',
+              address: track.addressToSave,
+            },
+            {
+              headers: { 'Content-Type': 'application/json' },
+              withCredentials: true,
+            },
+          )
+          .then(() => {
+            console.log('Address saved to account');
+          })
+          .catch((err) => {
+            console.error('Error saving address:', err);
+          });
+      }
+
+      const trackingCurrency = getTrackingCurrency(
+        router.locale,
+        createdOrder.currency,
+      );
+      const trackingValue =
+        createdOrder.total != null && createdOrder.total !== ''
+          ? parseFloat(createdOrder.total)
+          : track.value;
+      const eventSourceUrl = getClientEventSourceUrl();
+
+      pushGTMEvent('purchase', {
+        transaction_id: createdOrder.id,
+        value: trackingValue,
+        currency: trackingCurrency,
+        items: track.products.map((product) => ({
+          item_id: product.productId,
+          item_name: product.name,
+          price: product.price,
+          quantity: product.qty,
+        })),
+      });
+
+      const purchaseEventId = createdOrder.id.toString();
+
+      if (typeof window !== 'undefined' && (window as any).fbq) {
+        (window as any).fbq(
+          'track',
+          'Purchase',
+          {
+            value: trackingValue,
+            currency: trackingCurrency,
+            content_ids: track.products.map((p) => p.productId),
+            contents: track.products.map((p) => ({
+              id: p.productId,
+              quantity: p.qty,
+            })),
+          },
+          { eventID: purchaseEventId },
+        );
+      }
+
+      {
+        const fbp = document.cookie.match(/_fbp=([^;]+)/)?.[1];
+        const fbc = document.cookie.match(/_fbc=([^;]+)/)?.[1];
+        const fbLoginId = (window as any).fb_login_id;
+        const externalId = track.userId || track.externalId || uuidv4();
+
+        const userData = {
+          fb_login_id: fbLoginId,
+          fbp,
+          fbc,
+          external_id: externalId,
+          fn: track.billing.firstName,
+          ln: track.billing.lastName,
+          phone: track.billing.phone,
+          zip: track.billing.postalCode,
+          ct: track.billing.city,
+          email: track.email,
+        };
+
+        await fetch('/api/fb-capi', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventName: 'Purchase',
+            eventId: purchaseEventId,
+            eventSourceUrl,
+            customData: {
+              value: trackingValue,
+              currency: trackingCurrency,
+              content_ids: track.products.map((p) => p.productId),
+              contents: track.products.map((p) => ({
+                id: p.productId,
+                quantity: p.qty,
+              })),
+            },
+            userData,
+          }),
+        })
+          .then(async (res) => {
+            const json = await res.json();
+            if (!res.ok) console.error('🚨 CAPI error:', json);
+            else console.log('✅ CAPI success:', json);
+          })
+          .catch((err) => console.error('❌ CAPI network error:', err));
+      }
+
+      const pinterestPayload = {
+        eventName: 'purchase',
+        items: track.products.map((p) => ({
+          item_id: p.productId,
+          item_name: p.name,
+          price: p.price,
+          quantity: p.qty,
+        })),
+        value: trackingValue,
+        currency: trackingCurrency,
+        order_id: createdOrder.id.toString(),
+        click_id: document.cookie.match(/_epik=([^;]+)/)?.[1] || '',
+        firstName: track.billing.firstName,
+        lastName: track.billing.lastName,
+        phone: track.billing.phone,
+        postalCode: track.billing.postalCode,
+        city: track.billing.city,
+        country: track.billing.country,
+      };
+
+      const blob = new Blob([JSON.stringify(pinterestPayload)], {
+        type: 'application/json',
+      });
+      navigator.sendBeacon('/api/pinterest-capi', blob);
+
+      localStorage.setItem('recentOrderId', createdOrder.id.toString());
+      localStorage.setItem('recentOrderKey', createdOrder.order_key);
+
+      const stripePaymentIntentId = Array.isArray(orderData.meta_data)
+        ? orderData.meta_data.find(
+            (item: { key?: string }) => item?.key === 'stripe_payment_intent_id',
+          )?.value
+        : undefined;
+
+      const thankYouPath =
+        createdOrder.id && createdOrder.order_key
+          ? `${getPath('/dziekujemy')}?orderId=${createdOrder.id}&orderKey=${createdOrder.order_key}`
+          : '';
+
+      if (typeof stripePaymentIntentId === 'string' && thankYouPath) {
+        markStripePaymentCompleted({
+          paymentIntentId: stripePaymentIntentId,
+          thankYouPath,
+        });
+        clearPendingStripeOrder();
+      }
+
+      if (
+        (track.paymentMethod === 'przelewy24' ||
+          track.paymentMethod === 'p24-online-payments' ||
+          track.paymentMethod === 'pay_by_paynow_pl_paywall' ||
+          track.paymentMethod === 'pay_by_paynow_pl_pbl') &&
+        createdOrder.payment_url
+      ) {
+        router.push(createdOrder.payment_url);
+      } else if (thankYouPath) {
+        router.push(thankYouPath);
+      } else {
+        alert(t.checkout.validation.orderCreatedNoId);
+      }
+    } catch (error: any) {
+      console.error('❌ Error creating order:', error);
+      const details = error?.response?.data?.details;
+      const detailsText =
+        typeof details === 'string'
+          ? details
+          : typeof details?.message === 'string'
+            ? details.message
+            : JSON.stringify(details || '');
+
+      if (/coupon|rabat|discount|kupon|expired|wygas/i.test(detailsText)) {
+        alert(t.checkout.errors.couponInvalid || t.checkout.errors.orderCreationFailed);
+      } else {
+        alert(t.checkout.errors.orderCreationFailed);
+      }
+    } finally {
+      setOrderDisabled(false);
+    }
+  };
 
   const handleOrderSubmit = async () => {
     setOrderDisabled(true);
@@ -408,19 +629,10 @@ const Checkout: React.FC = () => {
       }
     }
 
-    let stripePaymentIntentId: string | null = null;
-    if (paymentMethod === 'stripe') {
-      if (language !== 'en') {
-        setOrderDisabled(false);
-        alert(t.checkout.validation.selectPayment);
-        return;
-      }
-
-      stripePaymentIntentId = (await stripeFormRef.current?.confirmPayment()) ?? null;
-      if (!stripePaymentIntentId) {
-        setOrderDisabled(false);
-        throw new Error('Stripe payment failed');
-      }
+    if (paymentMethod === 'stripe' && language !== 'en') {
+      setOrderDisabled(false);
+      alert(t.checkout.validation.selectPayment);
+      return;
     }
 
     // Map country names to codes
@@ -590,217 +802,163 @@ const Checkout: React.FC = () => {
       customer_id: user?.id || undefined,
     };
 
-    // add stripe payment intent id to order data if paying with Stripe
-    if (paymentMethod === 'stripe' && stripePaymentIntentId) {
-      orderData.meta_data.push({
-        key: 'stripe_payment_intent_id',
-        value: stripePaymentIntentId,
-      });
-
-      orderData.set_paid = true;
-    }
-
-    pushGTMEvent('add_shipping_info', {
-      shipping_method: shippingMethod,
-      shipping_cost: shippingPrice,
-      shipping_address: {
-        city: shippingAddress.city,
-        country: shippingAddress.country,
-        postcode: shippingAddress.postcode,
-      },
-    });
-    pushGTMEvent('add_payment_info', {
-      payment_method: paymentMethod,
-      // Optionally, include additional details such as payment type or billing info
-    });
-    
-    try {
-      const response = await axios.post('/api/create-order', orderData, {
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const createdOrder = response.data;
-
-      // ── Fire‑and‑forget address save (never blocks checkout) ───────────────
-      if (user && saveAddress) {
-        const addressToSave = isShippingDifferent ? shippingData : billingData;
-
-        axios
-          .post(
-            '/api/moje-konto/adresy',
-            {
-              action: 'add',
-              address: addressToSave,
-            },
-            {
-              headers: { 'Content-Type': 'application/json' },
-              withCredentials: true, // send auth cookies
-            },
-          )
-          .then(() => {
-            console.log('Address saved to account');
-          })
-          .catch((err) => {
-            // Log error for Vercel diagnostics, but NEVER block the order flow
-            console.error('Error saving address:', err);
-          });
-      }
-      // ── end fire‑and‑forget address save ───────────────────────────────────
-
-      const trackingCurrency = getTrackingCurrency(
-        router.locale,
-        createdOrder.currency,
-      );
-      const trackingValue =
-        createdOrder.total != null && createdOrder.total !== ''
-          ? parseFloat(createdOrder.total)
-          : cart.totalProductsPrice;
-      const eventSourceUrl = getClientEventSourceUrl();
-
-      pushGTMEvent('purchase', {
-        transaction_id: createdOrder.id,
-        value: trackingValue,
-        currency: trackingCurrency,
-        items: cart.products.map((product) => ({
-          item_id: product.productId,
-          item_name: product.name,
-          price: product.price,
-          quantity: product.qty,
-        })),
-      });
-
-      const purchaseEventId = createdOrder.id.toString();
-
-      // PIXEL → browser
-      if (typeof window !== 'undefined' && (window as any).fbq) {
-        (window as any).fbq(
-          'track',
-          'Purchase',
-          {
-            value: trackingValue,
-            currency: trackingCurrency,
-            content_ids: cart.products.map((p) => p.productId),
-            contents: cart.products.map((p) => ({
-              id: p.productId,
-              quantity: p.qty,
-            })),
-          },
-          { eventID: purchaseEventId },
-        );
-      }
-
-      // ── Your updated CAPI block ────────────────────────────
-      {
-        const fbp = document.cookie.match(/_fbp=([^;]+)/)?.[1];
-        const fbc = document.cookie.match(/_fbc=([^;]+)/)?.[1];
-        const fbLoginId = (window as any).fb_login_id;
-
-        // use real user.id if available, otherwise your one‐and‐only anon ID
-        const externalId = user?.id || externalAnonId || uuidv4();
-
-        const userData = {
-          fb_login_id: fbLoginId,
-          fbp,
-          fbc,
-          external_id: externalId,
-          fn: billingData.firstName,
-          ln: billingData.lastName,
-          phone: billingData.phone,
-          zip: billingData.postalCode,
-          ct: billingData.city,
-          email, // optional
-        };
-
-        await fetch('/api/fb-capi', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            eventName: 'Purchase',
-            eventId: purchaseEventId,
-            eventSourceUrl,
-            customData: {
-              value: trackingValue,
-              currency: trackingCurrency,
-              content_ids: cart.products.map((p) => p.productId),
-              contents: cart.products.map((p) => ({
-                id: p.productId,
-                quantity: p.qty,
-              })),
-            },
-            userData, // ← your full object here
-          }),
-        })
-          .then(async (res) => {
-            const json = await res.json();
-            if (!res.ok) console.error('🚨 CAPI error:', json);
-            else console.log('✅ CAPI success:', json);
-          })
-          .catch((err) => console.error('❌ CAPI network error:', err));
-      }
-      // ── end CAPI block ────────────────────────────────────
-
-      // ── end Facebook Purchase tracking ────────────────────────────
-      const pinterestPayload = {
-        eventName: 'purchase',
-        items: cart.products.map((p) => ({
-          item_id: p.productId,
-          item_name: p.name,
-          price: p.price,
-          quantity: p.qty,
-        })),
-        value: trackingValue,
-        currency: trackingCurrency,
-        order_id: createdOrder.id.toString(),
-        click_id: document.cookie.match(/_epik=([^;]+)/)?.[1] || '',
+    const tracking: StripeCheckoutTracking = {
+      products: cart.products.map((product) => ({
+        productId: product.productId,
+        name: product.name,
+        price: product.price,
+        qty: product.qty,
+      })),
+      value: cart.totalProductsPrice,
+      email,
+      userId: user?.id || undefined,
+      externalId: externalAnonId || undefined,
+      paymentMethod,
+      billing: {
         firstName: billingData.firstName,
         lastName: billingData.lastName,
         phone: billingData.phone,
         postalCode: billingData.postalCode,
         city: billingData.city,
-        country: toCountryCode(billingData.country),
-      };
+        country: mappedBillingCountry,
+      },
+      shippingMethod,
+      shippingCost: shippingPrice,
+      shippingAddress: {
+        city: shippingAddress.city,
+        country: shippingAddress.country,
+        postcode: shippingAddress.postcode,
+      },
+      saveAddress,
+      addressToSave: saveAddress
+        ? (isShippingDifferent ? shippingData : billingData)
+        : null,
+    };
 
-      // fire-and-forget so it won’t block the redirect
-      const blob = new Blob([JSON.stringify(pinterestPayload)], {
-        type: 'application/json',
+    if (paymentMethod === 'stripe') {
+      const paymentIntentId = stripeFormRef.current?.getPaymentIntentId() ?? null;
+      if (!paymentIntentId) {
+        setOrderDisabled(false);
+        alert(t.stripePayment.errorNotReady);
+        throw new Error('Stripe payment failed');
+      }
+
+      savePendingStripeOrder({
+        paymentIntentId,
+        orderData,
+        tracking,
       });
-      navigator.sendBeacon('/api/pinterest-capi', blob);
 
-      localStorage.setItem('recentOrderId', createdOrder.id.toString());
-      localStorage.setItem('recentOrderKey', createdOrder.order_key);
-
-      if (
-        (paymentMethod === 'przelewy24' ||
-          paymentMethod === 'p24-online-payments' ||
-          paymentMethod === 'pay_by_paynow_pl_paywall' ||
-          paymentMethod === 'pay_by_paynow_pl_pbl') &&
-        createdOrder.payment_url
-      ) {
-        router.push(createdOrder.payment_url);
-      } else if (createdOrder.id && createdOrder.order_key) {
-        router.push(
-          `${getPath('/dziekujemy')}?orderId=${createdOrder.id}&orderKey=${createdOrder.order_key}`,
-        );
-      } else {
-        alert(t.checkout.validation.orderCreatedNoId);
+      let stripePayment: { id: string; paid: boolean } | null = null;
+      try {
+        stripePayment = (await stripeFormRef.current?.confirmPayment()) ?? null;
+      } catch (error) {
+        setOrderDisabled(false);
+        throw error;
       }
-    } catch (error: any) {
-      console.error('❌ Error creating order:', error);
-      const details = error?.response?.data?.details;
-      const detailsText =
-        typeof details === 'string'
-          ? details
-          : typeof details?.message === 'string'
-            ? details.message
-            : JSON.stringify(details || '');
 
-      if (/coupon|rabat|discount|kupon|expired|wygas/i.test(detailsText)) {
-        alert(t.checkout.errors.couponInvalid || t.checkout.errors.orderCreationFailed);
-      } else {
-        alert(t.checkout.errors.orderCreationFailed);
+      if (!stripePayment) {
+        clearPendingStripeOrder();
+        setOrderDisabled(false);
+        throw new Error('Stripe payment failed');
       }
-    } finally {
-      setOrderDisabled(false);
+
+      orderData.meta_data.push({
+        key: 'stripe_payment_intent_id',
+        value: stripePayment.id,
+      });
+      orderData.set_paid = stripePayment.paid;
     }
+
+    await completeOrderRef.current(orderData, tracking);
+  };
+
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const paymentIntentParam = router.query.payment_intent;
+    const redirectStatus = router.query.redirect_status;
+    const paymentIntentId = Array.isArray(paymentIntentParam)
+      ? paymentIntentParam[0]
+      : paymentIntentParam;
+
+    if (!paymentIntentId) return;
+    if (stripeResumeStarted.current === paymentIntentId) return;
+    stripeResumeStarted.current = paymentIntentId;
+
+    const completed = readCompletedStripePayment();
+    if (completed?.paymentIntentId === paymentIntentId) {
+      router.replace(completed.thankYouPath);
+      return;
+    }
+
+    if (!beginStripeResume(paymentIntentId)) return;
+
+    const resume = async () => {
+      setOrderDisabled(true);
+      try {
+        if (redirectStatus === 'failed') {
+          clearPendingStripeOrder();
+          alert(t.stripePayment.errorTryAgain);
+          router.replace(window.location.pathname);
+          return;
+        }
+
+        const pending = readPendingStripeOrder();
+        if (!pending || pending.paymentIntentId !== paymentIntentId) {
+          alert(t.stripePayment.errorUnexpected);
+          router.replace(window.location.pathname);
+          return;
+        }
+
+        const payment = await getPaymentIntent(paymentIntentId);
+        const status = payment.paymentIntent?.status;
+        if (
+          !payment.success ||
+          (status !== 'succeeded' && status !== 'processing')
+        ) {
+          clearPendingStripeOrder();
+          alert(t.stripePayment.errorTryAgain);
+          router.replace(window.location.pathname);
+          return;
+        }
+
+        const orderData = pending.orderData;
+        const meta = Array.isArray(orderData.meta_data) ? orderData.meta_data : [];
+        if (!meta.some((item: { key?: string }) => item?.key === 'stripe_payment_intent_id')) {
+          meta.push({
+            key: 'stripe_payment_intent_id',
+            value: paymentIntentId,
+          });
+        }
+        orderData.meta_data = meta;
+        orderData.set_paid = status === 'succeeded';
+
+        await completeOrderRef.current(orderData, pending.tracking);
+      } catch (error) {
+        console.error('Stripe redirect resume failed:', error);
+        alert(t.stripePayment.errorUnexpected);
+      } finally {
+        endStripeResume();
+        setOrderDisabled(false);
+      }
+    };
+
+    resume();
+  }, [router.isReady, router.query.payment_intent, router.query.redirect_status]);
+
+  const stripeShippingDetails: StripeShippingDetails = {
+    name: `${billingData.firstName} ${billingData.lastName}`.trim(),
+    phone: billingData.phone,
+    address: isShippingDifferent
+      ? {
+          line1: `${shippingData.street} ${shippingData.buildingNumber}`.trim(),
+          line2: shippingData.apartmentNumber || '',
+          city: shippingData.city,
+          postal_code: shippingData.postalCode,
+          country: toCountryCode(shippingData.country),
+        }
+      : paymentFormData.address,
   };
 
   return (
@@ -928,6 +1086,7 @@ const Checkout: React.FC = () => {
                       cart={cart}
                       shippingPrice={shippingPrice}
                       billingData={paymentFormData}
+                      shippingDetails={stripeShippingDetails}
                     />
                   )}
                   

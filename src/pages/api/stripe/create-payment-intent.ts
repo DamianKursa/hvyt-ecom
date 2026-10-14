@@ -1,6 +1,7 @@
 // pages/api/stripe/create-payment-intent.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { convertToStripeAmount } from '@/lib/stripe';
+import { activateStripeCheckoutPaymentMethods } from '@/lib/stripePaymentMethods';
 import { stripe } from '@/utils/api/stripe';
 import Stripe from 'stripe';
 
@@ -37,10 +38,15 @@ export default async function handler(
   }
 
   try {
+    await activateStripeCheckoutPaymentMethods(stripe);
+
     const paymentIntent: Stripe.PaymentIntent = await stripe.paymentIntents.create({
       amount: stripeAmount,
       currency: currency.toLowerCase(),
-      automatic_payment_methods: { enabled: true },
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'always',
+      },
       metadata: {
         integration: 'nextjs-woocommerce',
         ...metadata,
