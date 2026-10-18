@@ -219,7 +219,7 @@ export const fetchProductsWithFilters = async (
   }
 
   if (attributeGroups.size > 0) {
-    params.attributes = [...attributeGroups.entries()].map(
+    params.attributes = Array.from(attributeGroups.entries()).map(
       ([taxonomy, slugs]) => ({
         attribute: taxonomy,
         slug: slugs,

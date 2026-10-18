@@ -1,5 +1,5 @@
 import React from 'react';
-import Filters from './Filters.component';
+import Filters, { FilterAttribute } from './Filters.component';
 import { useI18n } from '@/utils/hooks/useI18n';
 
 interface FilterModalProps {
@@ -15,7 +15,7 @@ interface FilterModalProps {
   setProducts: React.Dispatch<React.SetStateAction<any[]>>; // Update products when filters change
   setTotalProducts: React.Dispatch<React.SetStateAction<number>>; // Update total products count
   filterOrder: string[]; // Add filterOrder prop
-  initialAttributes: any[];
+  initialAttributes: FilterAttribute[];
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({
@@ -31,9 +31,16 @@ const FilterModal: React.FC<FilterModalProps> = ({
   setProducts,
   setTotalProducts,
   filterOrder,
+  initialAttributes = [],
 }) => {
   
   const {t} = useI18n();
+
+  const getFilterLabel = (filter: { name: string; value: string }) => {
+    const attribute = initialAttributes.find((item) => item.slug === filter.name);
+    const option = attribute?.options?.find((item) => item.slug === filter.value);
+    return option?.name || filter.value;
+  };
 
   if (!isOpen) return null;
 
@@ -63,9 +70,9 @@ const FilterModal: React.FC<FilterModalProps> = ({
             {activeFilters.map((filter) => (
               <span
                 key={`${filter.name}-${filter.value}`}
-                className="flex items-center px-3 py-1 text-[#661F30] capitalize bg-beige text-sm rounded-full"
+                className="filter-item filter-item--mobile"
               >
-                {filter.value}
+                {getFilterLabel(filter)}
                 <button
                   onClick={() =>
                     onFilterChange(
@@ -75,9 +82,9 @@ const FilterModal: React.FC<FilterModalProps> = ({
                       ),
                     )
                   }
-                  className="text-[#857C7F] ml-2 text-[20px]"
+                  className="ml-2 shrink-0"
                 >
-                  &times;
+                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path stroke="#363132" stroke-width="2" d="m.707.707 11.314 11.314M12.021.707.707 12.021"/></svg>
                 </button>
               </span>
             ))}
