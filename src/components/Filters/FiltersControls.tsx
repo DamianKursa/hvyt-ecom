@@ -120,7 +120,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
       </div>
       {/* Right column (w-3/4): subdivided into active filters and sort dropdown */}
       <div className="w-3/4 flex items-center">
-        <div className="w-2/3 pl-4 pr-8">
+        <div className="w-2/3 pr-8">
           {filters.length > 0 && (
             <div className="flex gap-2 flex-wrap">
               {filters.map((filter) => (
