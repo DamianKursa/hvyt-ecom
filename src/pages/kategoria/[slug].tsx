@@ -505,6 +505,7 @@ const CategoryPage = ({
             setActiveFilters(updatedFilters);
             handleFilterChange(updatedFilters);
           }}
+          onRemoveAllFilters={clearFilters}
           isMobile={isMobile}
         />
         <div className="flex">
