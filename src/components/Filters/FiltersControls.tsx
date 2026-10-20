@@ -13,6 +13,7 @@ interface FiltersControlsProps {
   sorting: dropdownOption;
   onSortingChange: (value: dropdownOption) => void;
   onRemoveFilter: (filter: { name: string; value: string }) => void;
+  onRemoveAllFilters: () => void;
   isMobile: boolean;
 }
 
@@ -24,6 +25,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
   sorting,
   onSortingChange,
   onRemoveFilter,
+  onRemoveAllFilters,
   isMobile,
 }) => {
 
@@ -76,7 +78,20 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
           </div>
         </div>
         {filters.length > 0 && (
+          <>
           <div className="flex gap-2 flex-wrap mt-2 mb-4">
+            <span
+              key={`clear-all-mobile`}
+              className="filter-item filter-item--mobile"
+            >
+              {t.filters.clearAll}
+              <button
+                onClick={() => onRemoveAllFilters()}
+                className="ml-2 shrink-0"
+              >
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path stroke="#363132" stroke-width="2" d="m.707.707 11.314 11.314M12.021.707.707 12.021"/></svg>
+              </button>
+            </span>            
             {filters.map((filter) => (
               <span
                 key={`${filter.name}-${filter.value}`}
@@ -93,6 +108,7 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
               </span>
             ))}
           </div>
+          </>
         )}
       </>
     );
@@ -120,8 +136,9 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
       </div>
       {/* Right column (w-3/4): subdivided into active filters and sort dropdown */}
       <div className="w-3/4 flex items-center">
-        <div className="w-2/3 pr-8">
+        <div className="w-2/3 flex gap-4 justify-between">
           {filters.length > 0 && (
+            <>
             <div className="flex gap-2 flex-wrap">
               {filters.map((filter) => (
                 <span
@@ -138,6 +155,20 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
                 </span>
               ))}
             </div>
+            <div className='shrink-0'>
+                <span
+                  className="filter-item"
+                >
+                  {t.filters.clearAll}
+                  <button
+                    onClick={() => onRemoveAllFilters()}
+                    className="ml-2 shrink-0"
+                  >
+                    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path stroke="#363132" stroke-width="2" d="m.707.707 11.314 11.314M12.021.707.707 12.021"/></svg>
+                  </button>
+                </span>
+            </div>
+            </>
           )}
         </div>
         <div className="w-1/3 pl-[1.3rem] flex justify-end">

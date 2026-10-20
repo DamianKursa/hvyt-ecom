@@ -674,6 +674,7 @@ export const en: Translations = {
     show: 'Show',
     products: 'products',
     infoSpacing: 'CC-sizeis the distance between the screw holes on a handle or knob. It\'s an important measurement to ensure that the handle or knob will fit your furniture properly.',
+    clearAll: 'clear filters',
   },
   // === INDEX / HOME PAGE ===
   index: {

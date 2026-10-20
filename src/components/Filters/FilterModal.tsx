@@ -112,7 +112,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
               activeFilters.length === 0 ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            {t.filters.emptyFilter}
+            {t.filters.clearAll}
           </button>
           <button
             onClick={onApplyFilters}
