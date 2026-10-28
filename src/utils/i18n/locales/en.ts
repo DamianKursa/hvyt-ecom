@@ -73,7 +73,7 @@ export const en: Translations = {
     serviceInfo: {
       freeShipping: {
         title: 'Free Shipping',
-        desc: 'For orders over 300 PLN',
+        desc: 'For orders over €100',
       },
       shipping24h: {
         title: '24h Dispatch',

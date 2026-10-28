@@ -242,8 +242,25 @@ const NON_FREE_SHIPPING_METHODS_IDS = [3];
 // FREE SHIPPING LIMITS
 const FREE_SHIPPING_LIMITS:Record<string, number> = {
   PLN: 300,
-  EUR: 70,
+  EUR: 100,
 };
+
+const isPolandShippingZone = (zoneName: string) => {
+  const name = zoneName.toLocaleLowerCase();
+  return name === 'polska' || name === 'poland';
+};
+
+/** Zeruje cenę metody i klas wysyłki. Koszt zagraniczny siedzi w klasach, samo `cost: null` go nie zdejmuje. */
+const waiveShippingCost = (method: ShippingMethod): ShippingMethod => ({
+  ...method,
+  cost: null,
+  shipping_classes: method.shipping_classes?.map((shippingClass) => ({
+    ...shippingClass,
+    cost: null,
+    cost_original: null,
+    price_source: 'not_set',
+  })),
+});
 
 // const EMMA_ZADBANO_PRODUCT_IDS = new Set([
 //   '7563916',
@@ -486,8 +503,23 @@ const Shipping: React.FC<ShippingProps> = ({
 
         // update zones by contstrains (only for polish shipping methods)
         let updatedZones = selectedZoneData.map((zone: ShippingZone) => {
-          if (zone.zoneName.toLocaleLowerCase() !== 'polska' && zone.zoneName.toLocaleLowerCase() !== 'poland') {
-            return zone;
+          const freeShippingLimit = FREE_SHIPPING_LIMITS[currency_slug];
+
+          if (!isPolandShippingZone(zone.zoneName)) {
+            if (typeof freeShippingLimit !== 'number') {
+              return zone;
+            }
+
+            let methods = zone.methods.filter(
+              (method) =>
+                !(cartTotal < freeShippingLimit && method.method_id === 'free_shipping'),
+            );
+
+            if (cartTotal >= freeShippingLimit) {
+              methods = methods.map(waiveShippingCost);
+            }
+
+            return { ...zone, methods };
           }
 
           let filteredMethods = zone.methods.filter((method) => {
