@@ -29,6 +29,7 @@ export const pl = {
       errorUnexpected: 'Wystąpił nieoczekiwany błąd',
       errorLoading: 'Nie udało się przygotować formularza płatności',
       errorInit: 'Błąd inicjalizacji płatności',
+      cancelled: 'Płatność została anulowana. Zamówienie pozostaje nieopłacone. Możesz spróbować ponownie.',
     },
     // === PRODUKT ===
     product: {  

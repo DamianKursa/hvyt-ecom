@@ -28,6 +28,7 @@ export const en: Translations = {
       errorUnexpected: 'An unexpected error occurred',
       errorLoading: 'Failed to prepare payment form',
       errorInit: 'Failed to initialize payment',
+      cancelled: 'Payment was cancelled. The order is still unpaid. You can try again.',
     },    
     // === PRODUCT ===
     product: {  

@@ -23,20 +23,6 @@ import {
   getTrackingCurrency,
 } from '@/utils/facebookCapi';
 import { ShippingCountryItem, ShippingMethod } from '@/types/checkout';
-import { PaymentFormWrapper } from '@/components/Checkout/PaymentForm';
-import { PaymentFormData, StripePaymentFormHandle, StripeShippingDetails } from '@/types/stripe';
-import { getPaymentIntent } from '@/lib/stripe';
-import {
-  beginStripeResume,
-  clearPendingStripeOrder,
-  endStripeResume,
-  isStripeRedirectReturn,
-  markStripePaymentCompleted,
-  readCompletedStripePayment,
-  readPendingStripeOrder,
-  savePendingStripeOrder,
-  type StripeCheckoutTracking,
-} from '@/lib/stripePendingOrder';
 import {
   resolveCountryCode,
   localizeCountryList,
@@ -46,6 +32,37 @@ import {
   isCountrySelected,
 } from '@/utils/countryCode';
 import { isPaczkomatyMethod, isPunktyGlsMethod } from '@/utils/shippingMethods';
+
+type StripeCheckoutTracking = {
+  products: Array<{
+    productId: number;
+    name: string;
+    price: number;
+    qty: number;
+  }>;
+  value: number;
+  email: string;
+  userId?: string | number;
+  externalId?: string;
+  paymentMethod: string;
+  billing: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    postalCode: string;
+    city: string;
+    country: string;
+  };
+  shippingMethod: unknown;
+  shippingCost: number;
+  shippingAddress: {
+    city: string;
+    country: string;
+    postcode: string;
+  };
+  saveAddress: boolean;
+  addressToSave: Record<string, unknown> | null;
+};
 
 const Checkout: React.FC = () => {
   const router = useRouter();
@@ -67,8 +84,7 @@ const Checkout: React.FC = () => {
     'p24-online-payments',
   );
 
-  const stripeFormRef = useRef<StripePaymentFormHandle>(null);
-  const stripeResumeStarted = useRef<string | null>(null);
+  const stripeCancelAlerted = useRef(false);
   const completeOrderRef = useRef<
     (orderData: Record<string, any>, track: StripeCheckoutTracking) => Promise<void>
   >(async () => {});
@@ -95,20 +111,6 @@ const Checkout: React.FC = () => {
     city: '',
     postalCode: '',
     country: initialCountryCode,
-  });
-
-  const [paymentFormData, setPaymentFormData] = useState<PaymentFormData>({
-      email: '',
-      name: '',
-      phone: '',
-      address: {
-        line1: '',
-        line2: '',
-        city: '',
-        state: '',
-        postal_code: '',
-        country: ''
-      }
   });
 
   const [shippingData, setShippingData] = useState({
@@ -166,27 +168,6 @@ const Checkout: React.FC = () => {
     }
   };
 
-  useEffect(()=>{
-
-    const mappedBillingCountry = toCountryCode(billingData.country);
-
-    setPaymentFormData({
-      email: email,
-      name: `${billingData.firstName} ${billingData.lastName}`,
-      phone: billingData.phone,
-      address: {
-        line1: `${billingData.street} ${billingData.buildingNumber} ${billingData.apartmentNumber}`,
-        line2: '',
-        city: billingData.city,
-        state: '',
-        postal_code: billingData.postalCode,
-        country: mappedBillingCountry
-      }
-    })
-    // console.log( 'formdata', paymentFormData);
-    
-  }, [billingData, countryList, email]);
-
   useEffect(() => {
     if (!countryList.length) return;
 
@@ -236,11 +217,18 @@ const Checkout: React.FC = () => {
   }, [deliveryCountryCode, countryList]);
 
   useEffect(() => {
-    if (isStripeRedirectReturn()) return;
     if (!cart || cart.products.length === 0) {
       router.push(getPath('/koszyk'));
     }
   }, [cart, router]);
+
+  useEffect(() => {
+    if (!router.isReady || stripeCancelAlerted.current) return;
+    if (router.query.stripe !== 'cancelled') return;
+    stripeCancelAlerted.current = true;
+    alert(t.stripePayment.cancelled);
+    router.replace('/checkout', undefined, { shallow: true });
+  }, [router, router.isReady, router.query.stripe, t.stripePayment.cancelled]);
 
   // useEffect(() => {
   //   console.log('zoneMethods', shippingZonesWithMethods?.get(selectedZone));
@@ -480,24 +468,10 @@ const Checkout: React.FC = () => {
       localStorage.setItem('recentOrderId', createdOrder.id.toString());
       localStorage.setItem('recentOrderKey', createdOrder.order_key);
 
-      const stripePaymentIntentId = Array.isArray(orderData.meta_data)
-        ? orderData.meta_data.find(
-            (item: { key?: string }) => item?.key === 'stripe_payment_intent_id',
-          )?.value
-        : undefined;
-
       const thankYouPath =
         createdOrder.id && createdOrder.order_key
           ? `${getPath('/dziekujemy')}?orderId=${createdOrder.id}&orderKey=${createdOrder.order_key}`
           : '';
-
-      if (typeof stripePaymentIntentId === 'string' && thankYouPath) {
-        markStripePaymentCompleted({
-          paymentIntentId: stripePaymentIntentId,
-          thankYouPath,
-        });
-        clearPendingStripeOrder();
-      }
 
       if (
         (track.paymentMethod === 'przelewy24' ||
@@ -507,7 +481,34 @@ const Checkout: React.FC = () => {
         createdOrder.payment_url
       ) {
         router.push(createdOrder.payment_url);
-      } else if (thankYouPath) {
+        return;
+      }
+
+      if (track.paymentMethod === 'stripe') {
+        try {
+          const sessionResponse = await axios.post('/api/stripe/create-checkout-session', {
+            orderId: createdOrder.id,
+            orderKey: createdOrder.order_key,
+          });
+          const checkoutUrl = sessionResponse.data?.url;
+          if (typeof checkoutUrl === 'string' && checkoutUrl) {
+            window.location.assign(checkoutUrl);
+            return;
+          }
+          const paidPath = sessionResponse.data?.thankYouPath;
+          if (typeof paidPath === 'string' && paidPath) {
+            router.push(paidPath);
+            return;
+          }
+          alert(t.stripePayment.errorInit);
+        } catch (sessionError) {
+          console.error('Stripe Checkout session failed:', sessionError);
+          alert(t.stripePayment.errorInit);
+        }
+        return;
+      }
+
+      if (thankYouPath) {
         router.push(thankYouPath);
       } else {
         alert(t.checkout.validation.orderCreatedNoId);
@@ -719,9 +720,11 @@ const Checkout: React.FC = () => {
               : paymentMethod === 'przelewy24' ||
                   paymentMethod === 'p24-online-payments'
                 ? 'Przelewy24'
-                : shippingTitle,
-      
+                : paymentMethod === 'stripe'
+                  ? 'Stripe'
+                  : shippingTitle,
       set_paid: false,
+      ...(paymentMethod === 'stripe' ? { status: 'pending' } : {}),
       billing: {
         first_name: billingData.firstName,
         last_name: billingData.lastName,
@@ -836,129 +839,13 @@ const Checkout: React.FC = () => {
     };
 
     if (paymentMethod === 'stripe') {
-      const paymentIntentId = stripeFormRef.current?.getPaymentIntentId() ?? null;
-      if (!paymentIntentId) {
-        setOrderDisabled(false);
-        alert(t.stripePayment.errorNotReady);
-        throw new Error('Stripe payment failed');
-      }
-
-      savePendingStripeOrder({
-        paymentIntentId,
-        orderData,
-        tracking,
-      });
-
-      let stripePayment: { id: string; paid: boolean } | null = null;
-      try {
-        stripePayment = (await stripeFormRef.current?.confirmPayment()) ?? null;
-      } catch (error) {
-        setOrderDisabled(false);
-        throw error;
-      }
-
-      if (!stripePayment) {
-        clearPendingStripeOrder();
-        setOrderDisabled(false);
-        throw new Error('Stripe payment failed');
-      }
-
       orderData.meta_data.push({
-        key: 'stripe_payment_intent_id',
-        value: stripePayment.id,
+        key: 'order_language',
+        value: 'en',
       });
-      orderData.set_paid = stripePayment.paid;
     }
 
     await completeOrderRef.current(orderData, tracking);
-  };
-
-  useEffect(() => {
-    if (!router.isReady) return;
-
-    const paymentIntentParam = router.query.payment_intent;
-    const redirectStatus = router.query.redirect_status;
-    const paymentIntentId = Array.isArray(paymentIntentParam)
-      ? paymentIntentParam[0]
-      : paymentIntentParam;
-
-    if (!paymentIntentId) return;
-    if (stripeResumeStarted.current === paymentIntentId) return;
-    stripeResumeStarted.current = paymentIntentId;
-
-    const completed = readCompletedStripePayment();
-    if (completed?.paymentIntentId === paymentIntentId) {
-      router.replace(completed.thankYouPath);
-      return;
-    }
-
-    if (!beginStripeResume(paymentIntentId)) return;
-
-    const resume = async () => {
-      setOrderDisabled(true);
-      try {
-        if (redirectStatus === 'failed') {
-          clearPendingStripeOrder();
-          alert(t.stripePayment.errorTryAgain);
-          router.replace(window.location.pathname);
-          return;
-        }
-
-        const pending = readPendingStripeOrder();
-        if (!pending || pending.paymentIntentId !== paymentIntentId) {
-          alert(t.stripePayment.errorUnexpected);
-          router.replace(window.location.pathname);
-          return;
-        }
-
-        const payment = await getPaymentIntent(paymentIntentId);
-        const status = payment.paymentIntent?.status;
-        if (
-          !payment.success ||
-          (status !== 'succeeded' && status !== 'processing')
-        ) {
-          clearPendingStripeOrder();
-          alert(t.stripePayment.errorTryAgain);
-          router.replace(window.location.pathname);
-          return;
-        }
-
-        const orderData = pending.orderData;
-        const meta = Array.isArray(orderData.meta_data) ? orderData.meta_data : [];
-        if (!meta.some((item: { key?: string }) => item?.key === 'stripe_payment_intent_id')) {
-          meta.push({
-            key: 'stripe_payment_intent_id',
-            value: paymentIntentId,
-          });
-        }
-        orderData.meta_data = meta;
-        orderData.set_paid = status === 'succeeded';
-
-        await completeOrderRef.current(orderData, pending.tracking);
-      } catch (error) {
-        console.error('Stripe redirect resume failed:', error);
-        alert(t.stripePayment.errorUnexpected);
-      } finally {
-        endStripeResume();
-        setOrderDisabled(false);
-      }
-    };
-
-    resume();
-  }, [router.isReady, router.query.payment_intent, router.query.redirect_status]);
-
-  const stripeShippingDetails: StripeShippingDetails = {
-    name: `${billingData.firstName} ${billingData.lastName}`.trim(),
-    phone: billingData.phone,
-    address: isShippingDifferent
-      ? {
-          line1: `${shippingData.street} ${shippingData.buildingNumber}`.trim(),
-          line2: shippingData.apartmentNumber || '',
-          city: shippingData.city,
-          postal_code: shippingData.postalCode,
-          country: toCountryCode(shippingData.country),
-        }
-      : paymentFormData.address,
   };
 
   return (
@@ -1080,16 +967,6 @@ const Checkout: React.FC = () => {
                       isShippingDifferent ? shippingData.country : billingData.country,
                     )}
                   />
-                  {paymentMethod === 'stripe' && language === 'en' && (
-                    <PaymentFormWrapper
-                      ref={stripeFormRef}
-                      cart={cart}
-                      shippingPrice={shippingPrice}
-                      billingData={paymentFormData}
-                      shippingDetails={stripeShippingDetails}
-                    />
-                  )}
-                  
                   {/* Terms and Privacy Checkbox */}
                   <div className="mt-6">
                     <label className="flex items-center gap-3 text-sm cursor-pointer w-full">
