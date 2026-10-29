@@ -71,17 +71,17 @@ const FilterModal: React.FC<FilterModalProps> = ({
               <span
                 key={`${filter.name}-${filter.value}`}
                 className="filter-item filter-item--mobile"
+                onClick={() =>
+                  onFilterChange(
+                    activeFilters.filter(
+                      (f) =>
+                        f.name !== filter.name || f.value !== filter.value,
+                    ),
+                  )
+                }
               >
                 {getFilterLabel(filter)}
                 <button
-                  onClick={() =>
-                    onFilterChange(
-                      activeFilters.filter(
-                        (f) =>
-                          f.name !== filter.name || f.value !== filter.value,
-                      ),
-                    )
-                  }
                   className="ml-2 shrink-0"
                 >
                   <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path stroke="#363132" stroke-width="2" d="m.707.707 11.314 11.314M12.021.707.707 12.021"/></svg>

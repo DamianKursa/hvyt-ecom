@@ -83,10 +83,10 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
             <span
               key={`clear-all-mobile`}
               className="filter-item filter-item--mobile"
+              onClick={() => onRemoveAllFilters()}
             >
               {t.filters.clearAll}
               <button
-                onClick={() => onRemoveAllFilters()}
                 className="ml-2 shrink-0"
               >
                 <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path stroke="#363132" stroke-width="2" d="m.707.707 11.314 11.314M12.021.707.707 12.021"/></svg>
@@ -96,10 +96,10 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
               <span
                 key={`${filter.name}-${filter.value}`}
                 className="filter-item filter-item--mobile"
+                onClick={() => handleFilterRemove(filter)}
               >
                 {getFilterLabel(filter)}
                 <button
-                  onClick={() => handleFilterRemove(filter)}
                   className="ml-2 shrink-0"
                   aria-label="Usuń filtr"
                 >
@@ -144,10 +144,10 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
                 <span
                   key={`${filter.name}-${filter.value}`}
                   className="filter-item"
+                  onClick={() => handleFilterRemove(filter)}
                 >
                   {getFilterLabel(filter)}
                   <button
-                    onClick={() => handleFilterRemove(filter)}
                     className="ml-2 shrink-0"
                   >
                     <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path stroke="#363132" stroke-width="2" d="m.707.707 11.314 11.314M12.021.707.707 12.021"/></svg>
@@ -158,10 +158,10 @@ const FiltersControls: React.FC<FiltersControlsProps> = ({
             <div className='shrink-0'>
                 <span
                   className="filter-item"
+                  onClick={() => onRemoveAllFilters()}
                 >
                   {t.filters.clearAll}
                   <button
-                    onClick={() => onRemoveAllFilters()}
                     className="ml-2 shrink-0"
                   >
                     <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg"><path stroke="#363132" stroke-width="2" d="m.707.707 11.314 11.314M12.021.707.707 12.021"/></svg>
