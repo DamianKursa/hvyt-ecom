@@ -119,6 +119,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
       mode: 'payment',
       ui_mode: 'hosted',
       locale: 'en',
+      adaptive_pricing: { enabled: false },
       customer_email: email || undefined,
       client_reference_id: String(order.id),
       line_items: buildCheckoutLineItems(order),
