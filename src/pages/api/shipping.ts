@@ -112,7 +112,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             //   return res.status(400).json({ error: 'Wrong method' });
             // }
 
-            const cacheKey = `fetchShippingCountries:v3:${lang}`;
+            const cacheKey = `fetchShippingCountries:v4:${lang}`;
             const cached = await getCache(cacheKey);
             if (cached) return res.status(200).json(cached);
     
