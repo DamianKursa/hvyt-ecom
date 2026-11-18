@@ -122,6 +122,7 @@ const ProductPage = () => {
   const [showNotifyForm, setShowNotifyForm] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [wishlistMessage, setWishlistMessage] = useState<string | null>(null);
+  const [reviewProductIds, setReviewProductIds] = useState<number[]>([]);
 
   const methods = useForm<NotifyFormData>({
     defaultValues: { notifyEmail: '' },
@@ -157,6 +158,11 @@ const ProductPage = () => {
           throw new Error('No product id found');
         }
         const productIdData : WooProductIds = await productIdRes.json();
+        setReviewProductIds(Array.from(new Set(
+          Object.values(productIdData.ids || {})
+            .map((id) => Number(id))
+            .filter((id) => Number.isInteger(id) && id > 0),
+        )));
 
         let productId = null;
 
@@ -1136,7 +1142,12 @@ const ProductPage = () => {
       </div>
       <Instagram />
       <div className="w-full">
-        {product && <Reviews productId={Number(product.id)} />}
+        {product && (
+          <Reviews
+            productId={Number(product.id)}
+            productIds={reviewProductIds}
+          />
+        )}
       </div>
       {wishlistMessage && (
         <div className="fixed bottom-4 left-4 bg-green-800 text-white rounded-full py-3 px-4 flex items-center shadow-lg">

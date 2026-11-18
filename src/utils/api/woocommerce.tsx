@@ -386,7 +386,8 @@ export const fetchProductReviews = async (productId: number) => {
     if (!response.ok) {
       throw new Error('Failed to fetch reviews');
     }
-    return await response.json();
+    const data = await response.json();
+    return Array.isArray(data) ? data : data?.reviews ?? [];
   } catch (error) {
     console.error('Error fetching product reviews:', error);
     return [];

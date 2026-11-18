@@ -35,8 +35,8 @@ export function readReviewUploadToken(token: string, secret: string): { nonce: s
     throw new Error('invalid_token');
   }
   const expected = crypto.createHmac('sha256', secret).update(payload).digest('base64url');
-  const actual = Buffer.from(sig);
-  const wanted = Buffer.from(expected);
+  const actual = Uint8Array.from(Buffer.from(sig));
+  const wanted = Uint8Array.from(Buffer.from(expected));
   if (actual.length !== wanted.length || !crypto.timingSafeEqual(actual, wanted)) {
     throw new Error('invalid_token');
   }

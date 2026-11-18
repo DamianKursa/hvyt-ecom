@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReviewItem from './ReviewItem';
 import ReviewForm from './ReviewForm';
 import { useI18n } from '@/utils/hooks/useI18n';
@@ -17,23 +17,29 @@ interface Review {
 
 const Reviews = ({ productId }: { productId: number }) => {
   const { t } = useI18n();
+  const sectionRef = useRef<HTMLElement>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const itemsPerPage = 2;
-
-  const loadReviews = async () => {
+  const loadReviews = async (nextPage: number, scroll: boolean) => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/reviews?productId=${productId}`);
+      const res = await fetch(`/api/reviews?productId=${productId}&page=${nextPage}`);
       if (!res.ok) {
         throw new Error('Error fetching reviews');
       }
       const data = await res.json();
-      setReviews(data);
+      const list = Array.isArray(data) ? data : data?.reviews;
+      setReviews(Array.isArray(list) ? list : []);
+      setPage(Number(data?.page) || nextPage);
+      setTotalPages(Math.max(0, Number(data?.totalPages) || 0));
+      if (scroll) {
+        sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     } catch (error) {
       console.error('Error fetching reviews:', error);
     } finally {
@@ -42,95 +48,84 @@ const Reviews = ({ productId }: { productId: number }) => {
   };
 
   useEffect(() => {
-    loadReviews();
+    setPage(1);
+    loadReviews(1, false);
   }, [productId]);
 
   const handleReviewSubmit = async () => {
     setSubmitted(true);
     setShowForm(false);
     try {
-      await loadReviews();
+      await loadReviews(page, false);
     } catch (error) {
       console.error('Error refreshing reviews:', error);
     }
   };
 
-  const totalSlides = Math.ceil(reviews.length / itemsPerPage);
-  const canGoPrev = currentIndex > 0;
-  const canGoNext = currentIndex < totalSlides - 1;
-
-  const handlePrev = () => {
-    if (canGoPrev) setCurrentIndex((prev) => prev - 1);
-  };
-
-  const handleNext = () => {
-    if (canGoNext) setCurrentIndex((prev) => prev + 1);
-  };
-
   return (
-    <section className="w-full bg-beige py-16">
+    <section ref={sectionRef} className="w-full bg-beige py-16">
       <div className="max-w-[1440px] mx-auto px-4">
-        <div className="flex justify-between mb-[40px]">
-          <div className="flex px-[16px] lg:px-0 flex-col h-full">
-            <h2 className="font-size-h2 font-bold text-neutral-darkest">
-              {t.product.reviewsTitle}
-            </h2>
-            <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
-              {t.product.reviewsMessage}
-            </p>
-          </div>
-
-          {/* Custom Navigation - Desktop Only */}
-          <div className="hidden md:flex items-center space-x-4">
-            <button
-              onClick={handlePrev}
-              className={`p-3 rounded-full shadow-lg ${canGoPrev
-                ? 'bg-black text-white'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              disabled={!canGoPrev}
-            >
-              <img src="/icons/arrow-left.svg" alt="Previous" />
-            </button>
-            <button
-              onClick={handleNext}
-              className={`p-3 rounded-full shadow-lg ${canGoNext
-                ? 'bg-black text-white'
-                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              disabled={!canGoNext}
-            >
-              <img src="/icons/arrow-right.svg" alt="Next" />
-            </button>
-          </div>
+        <div className="flex px-[16px] lg:px-0 flex-col h-full mb-[40px]">
+          <h2 className="font-size-h2 font-bold text-neutral-darkest">
+            {t.product.reviewsTitle}
+          </h2>
+          <p className="font-size-text-medium mt-[10px] text-neutral-darkest">
+            {t.product.reviewsMessage}
+          </p>
         </div>
 
-        {/* Reviews Slider */}
-        <div className="overflow-hidden">
-          <div
-            className="flex transition-transform duration-300"
-            style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-          >
-            {Array.from({ length: totalSlides }).map((_, slideIndex) => (
-              <div
-                key={slideIndex}
-                className="flex-shrink-0 flex w-full"
-                style={{ width: '100%' }}
-              >
-                {reviews
-                  .slice(
-                    slideIndex * itemsPerPage,
-                    slideIndex * itemsPerPage + itemsPerPage,
-                  )
-                  .map((review) => (
-                    <div key={review.id} className="w-1/2 px-3">
-                      <ReviewItem review={review} />
-                    </div>
-                  ))}
-              </div>
-            ))}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {reviews.map((review) => (
+            <ReviewItem key={review.id} review={review} />
+          ))}
         </div>
+
+        {totalPages > 1 && (
+          <nav className="flex justify-center items-center mt-8 space-x-2" aria-label="Strony opinii">
+            <button
+              type="button"
+              onClick={() => loadReviews(page - 1, true)}
+              disabled={page <= 1 || loading}
+              className="p-2 disabled:opacity-40"
+              aria-label="Poprzednia strona"
+            >
+              <img
+                src={page <= 1 ? '/icons/arrow-left-pagination.svg' : '/icons/arrow-left-black-pagination.svg'}
+                alt=""
+                className="w-4 h-4"
+              />
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => {
+              const pageNumber = index + 1;
+              const current = pageNumber === page;
+              return (
+                <button
+                  key={pageNumber}
+                  type="button"
+                  onClick={() => loadReviews(pageNumber, true)}
+                  disabled={loading}
+                  aria-current={current ? 'page' : undefined}
+                  className={`w-8 h-8 flex items-center justify-center ${current ? 'text-black font-bold' : 'text-gray-700 hover:bg-gray-100'}`}
+                >
+                  {pageNumber}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => loadReviews(page + 1, true)}
+              disabled={page >= totalPages || loading}
+              className="p-2 disabled:opacity-40"
+              aria-label="Następna strona"
+            >
+              <img
+                src={page >= totalPages ? '/icons/arrow-right-pagination.svg' : '/icons/arrow-right-black-pagination.svg'}
+                alt=""
+                className="w-4 h-4"
+              />
+            </button>
+          </nav>
+        )}
 
         {/* Success Message */}
         {submitted && (

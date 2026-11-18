@@ -29,9 +29,12 @@ function clientIp(req: NextApiRequest): string {
 }
 
 async function readJsonBody(req: NextApiRequest): Promise<Record<string, unknown>> {
-  const chunks: Buffer[] = [];
+  const chunks: Uint8Array[] = [];
   for await (const chunk of req) {
-    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+    const source = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
+    const bytes = new Uint8Array(source.length);
+    bytes.set(source);
+    chunks.push(bytes);
   }
   const raw = Buffer.concat(chunks).toString('utf8').trim();
   if (!raw) return {};
@@ -59,9 +62,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'Product ID is required' });
       }
 
+      const perPage = 4;
       const page = Math.max(1, Number(req.query.page) || 1);
-      const perPage = Math.min(100, Math.max(1, Number(req.query.per_page) || 50));
-      const cacheKey = `reviews:product:v3:${productId}:${page}:${perPage}`;
+      const cacheKey = `reviews:product:v5:${productId}:${page}:${perPage}`;
       const cachedReviews = await getCache(cacheKey);
       if (cachedReviews) {
         return res.status(200).json(cachedReviews);
@@ -75,10 +78,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           status: 'approved',
         },
       });
-
-      const reviews = withReviewMedia(Array.isArray(response.data) ? response.data : []);
-      await setCache(cacheKey, reviews, CACHE_TTL);
-      return res.status(200).json(reviews);
+      const batch = Array.isArray(response.data) ? response.data : [];
+      const total = Number(response.headers?.['x-wp-total'] ?? batch.length) || 0;
+      const headerPages = Number(response.headers?.['x-wp-totalpages']);
+      const totalPages = Number.isFinite(headerPages) && headerPages >= 0
+        ? headerPages
+        : Math.ceil(total / perPage);
+      const payload = {
+        reviews: withReviewMedia(batch),
+        page,
+        perPage,
+        total,
+        totalPages,
+      };
+      await setCache(cacheKey, payload, CACHE_TTL);
+      return res.status(200).json(payload);
     }
 
     if (method === 'POST' && String(req.query.uploadToken || '') === '1') {
