@@ -20,6 +20,7 @@ const Reviews = ({ productId }: { productId: number }) => {
   const sectionRef = useRef<HTMLElement>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -36,6 +37,7 @@ const Reviews = ({ productId }: { productId: number }) => {
       const list = Array.isArray(data) ? data : data?.reviews;
       setReviews(Array.isArray(list) ? list : []);
       setPage(Number(data?.page) || nextPage);
+      setPerPage(Number(data?.perPage) || 0);
       setTotalPages(Math.max(0, Number(data?.totalPages) || 0));
       if (scroll) {
         sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -74,10 +76,27 @@ const Reviews = ({ productId }: { productId: number }) => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {reviews.map((review) => (
-            <ReviewItem key={review.id} review={review} />
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6" aria-busy={loading}>
+          {loading
+            ? Array.from({ length: perPage || reviews.length || 2 }, (_, index) => (
+              <div
+                key={index}
+                className="border-2 border-[#661F30]/30 rounded-xl p-6 h-full animate-pulse"
+                aria-hidden
+              >
+                <div className="h-4 w-28 bg-neutral-300 rounded mb-6" />
+                <div className="h-3 w-full bg-neutral-300 rounded mb-2" />
+                <div className="h-3 w-5/6 bg-neutral-300 rounded mb-2" />
+                <div className="h-3 w-2/3 bg-neutral-300 rounded mb-8" />
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-neutral-300" />
+                  <div className="h-3 w-24 bg-neutral-300 rounded" />
+                </div>
+              </div>
+            ))
+            : reviews.map((review) => (
+              <ReviewItem key={review.id} review={review} />
+            ))}
         </div>
 
         {totalPages > 1 && (
