@@ -56,7 +56,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     if (method === 'GET') {
-      const { productId } = req.query;
+      const rawProductId = req.query.productId;
+      const productId = Array.isArray(rawProductId)
+        ? rawProductId.join(',')
+        : String(rawProductId || '');
 
       if (!productId) {
         return res.status(400).json({ error: 'Product ID is required' });

@@ -15,7 +15,13 @@ interface Review {
   meta_data?: Array<{ key: string; value: unknown }>;
 }
 
-const Reviews = ({ productId }: { productId: number }) => {
+const Reviews = ({
+  productId,
+  productIds = [],
+}: {
+  productId: number;
+  productIds?: number[];
+}) => {
   const { t } = useI18n();
   const sectionRef = useRef<HTMLElement>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -25,11 +31,16 @@ const Reviews = ({ productId }: { productId: number }) => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const productQuery = Array.from(new Set(
+    [productId, ...productIds]
+      .map((id) => Number(id))
+      .filter((id) => Number.isInteger(id) && id > 0),
+  )).join(',');
 
   const loadReviews = async (nextPage: number, scroll: boolean) => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/reviews?productId=${productId}&page=${nextPage}`);
+      const res = await fetch(`/api/reviews?productId=${encodeURIComponent(productQuery)}&page=${nextPage}`);
       if (!res.ok) {
         throw new Error('Error fetching reviews');
       }
@@ -52,7 +63,7 @@ const Reviews = ({ productId }: { productId: number }) => {
   useEffect(() => {
     setPage(1);
     loadReviews(1, false);
-  }, [productId]);
+  }, [productQuery]);
 
   const handleReviewSubmit = async () => {
     setSubmitted(true);
