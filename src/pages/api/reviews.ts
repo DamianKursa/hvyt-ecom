@@ -4,6 +4,7 @@ import formidable from 'formidable';
 import fs from 'fs';
 import FormData from 'form-data';
 import axios, { createApiClient } from '@/utils/api/http';
+import { withReviewMedia } from '@/lib/reviewMedia';
 
 export const config = { api: { bodyParser: false } } as const;
 
@@ -37,24 +38,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: 'Product ID is required' });
       }
 
-      const cacheKey = `reviews:product:${productId}`;
+      const page = Math.max(1, Number(req.query.page) || 1);
+      const perPage = Math.min(100, Math.max(1, Number(req.query.per_page) || 50));
+      const cacheKey = `reviews:product:v3:${productId}:${page}:${perPage}`;
       const cachedReviews = await getCache(cacheKey);
       if (cachedReviews) {
         return res.status(200).json(cachedReviews);
       }
 
-      // ← Add status: 'approved' here
       const response = await WooCommerceAPI.get('/products/reviews', {
         params: {
           product: productId,
-          per_page: 50,
+          page,
+          per_page: perPage,
           status: 'approved',
         },
       });
 
-      await setCache(cacheKey, response.data, CACHE_TTL);
+      const reviews = withReviewMedia(Array.isArray(response.data) ? response.data : []);
 
-      return res.status(200).json(response.data);
+      await setCache(cacheKey, reviews, CACHE_TTL);
+
+      return res.status(200).json(reviews);
     } else if (method === 'POST') {
       const isMultipart = (req.headers['content-type'] || '').includes('multipart/form-data');
 

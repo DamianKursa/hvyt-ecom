@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReviewItem from './ReviewItem';
 import ReviewForm from './ReviewForm';
 import { useI18n } from '@/utils/hooks/useI18n';
+import { ReviewMediaItem } from '@/lib/reviewMedia';
 
 interface Review {
   id: number;
@@ -9,6 +10,9 @@ interface Review {
   review: string;
   rating: number;
   date_created: string;
+  media?: ReviewMediaItem[];
+  meta?: Record<string, unknown>;
+  meta_data?: Array<{ key: string; value: unknown }>;
 }
 
 const Reviews = ({ productId }: { productId: number }) => {

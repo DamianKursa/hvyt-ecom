@@ -1,9 +1,26 @@
 import React, { useEffect, useState } from 'react';
 
+export type GalleryMedia = {
+  src: string;
+  type?: 'image' | 'video';
+  poster?: string;
+};
+
 interface ModalImageGalleryProps {
-  images: string[];
+  images: Array<string | GalleryMedia>;
   selectedImageIndex: number;
   onClose: () => void;
+}
+
+function normalizeSlide(slide: string | GalleryMedia) {
+  if (typeof slide === 'string') {
+    return { src: slide, type: 'image' as const, poster: undefined };
+  }
+  return {
+    src: slide.src,
+    type: slide.type === 'video' ? ('video' as const) : ('image' as const),
+    poster: slide.poster,
+  };
 }
 
 const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
@@ -40,13 +57,16 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
     if (e.target === e.currentTarget) onClose();
   };
 
+  const slide = images[currentIndex] ? normalizeSlide(images[currentIndex]) : null;
+  if (!slide) return null;
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
       onMouseDown={handleBackdropClick}
       role="dialog"
       aria-modal="true"
-      aria-label="Image gallery modal"
+      aria-label="Media gallery"
     >
       <div
         className="
@@ -57,29 +77,45 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
       >
         {/* Close */}
         <button
-          className="absolute top-4 right-4 text-black text-2xl hover:text-gray-700 z-10"
+          className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-2xl leading-none text-black hover:text-gray-700"
           onClick={onClose}
           aria-label="Close"
         >
           &times;
         </button>
 
-        {/* Image (CSS only: natural size, capped by 90vw/90vh, object-contain) */}
-        <div className="flex items-center justify-center">
-          <img
-            key={images[currentIndex]} // retrigger CSS transition on change
-            src={images[currentIndex]}
-            alt={`Image ${currentIndex + 1} of ${images.length}`}
-            className="
-              block
-              w-auto h-auto
-              max-w-[90vw] max-h-[90vh]
-              object-contain
-              transition-opacity duration-300 ease-in-out
-              opacity-100
-            "
-            draggable={false}
-          />
+        <div className={`flex items-center justify-center ${slide.type === 'video' ? 'bg-black' : ''}`}>
+          {slide.type === 'video' ? (
+            <video
+              key={slide.src}
+              src={slide.src}
+              poster={slide.poster}
+              controls
+              autoPlay
+              playsInline
+              className="
+                block
+                w-auto h-auto
+                max-w-[90vw] max-h-[90vh]
+                bg-black
+              "
+            />
+          ) : (
+            <img
+              key={slide.src}
+              src={slide.src}
+              alt={`Image ${currentIndex + 1} of ${images.length}`}
+              className="
+                block
+                w-auto h-auto
+                max-w-[90vw] max-h-[90vh]
+                object-contain
+                transition-opacity duration-300 ease-in-out
+                opacity-100
+              "
+              draggable={false}
+            />
+          )}
         </div>
 
         {showArrows && (
@@ -88,7 +124,7 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
             className={`absolute left-4 md:left-6 top-1/2 -translate-y-1/2 p-3 rounded-full shadow-lg ${canGoPrev ? 'bg-black text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
               } z-10`}
             disabled={!canGoPrev}
-            aria-label="Previous Image"
+            aria-label="Previous"
           >
             <img src="/icons/arrow-left.svg" alt="Previous" className="h-6 w-6" />
           </button>
@@ -100,7 +136,7 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
             className={`absolute right-4 md:right-6 top-1/2 -translate-y-1/2 p-3 rounded-full shadow-lg ${canGoNext ? 'bg-black text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
               } z-10`}
             disabled={!canGoNext}
-            aria-label="Next Image"
+            aria-label="Next"
           >
             <img src="/icons/arrow-right.svg" alt="Next" className="h-6 w-6" />
           </button>
