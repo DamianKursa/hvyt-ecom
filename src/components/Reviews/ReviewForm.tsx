@@ -1,6 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useI18n } from '@/utils/hooks/useI18n';
+
+const FILE_KIND: Record<string, 'image' | 'video'> = {
+  jpg: 'image',
+  jpeg: 'image',
+  png: 'image',
+  gif: 'image',
+  webp: 'image',
+  mp4: 'video',
+  webm: 'video',
+  ogg: 'video',
+  mov: 'video',
+  mpeg: 'video',
+  mpg: 'video',
+  avi: 'video',
+};
+
+const DEFAULT_LIMITS = { maxFiles: 5, maxFileSizeMb: 25 };
+
+type PendingFile = { file: File; url: string };
+
+function fill(template: string, vars: Record<string, string | number>) {
+  return template.replace(/\{(\w+)\}/g, (_, key) => String(vars[key] ?? ''));
+}
+
+function fileKind(file: File): 'image' | 'video' | null {
+  const ext = file.name.split('.').pop()?.toLowerCase() || '';
+  return FILE_KIND[ext] || null;
+}
 
 const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: () => void }> = ({
   productId,
@@ -17,38 +45,108 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
   });
   const [error, setError] = useState<string>('');
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
-  const [attachments, setAttachments] = useState<File[]>([]);
+  const [attachments, setAttachments] = useState<PendingFile[]>([]);
   const [attachmentError, setAttachmentError] = useState<string>('');
+  const [limits, setLimits] = useState(DEFAULT_LIMITS);
+  const [submitting, setSubmitting] = useState(false);
+  const attachmentsRef = useRef<PendingFile[]>([]);
+  attachmentsRef.current = attachments;
 
   const handleStarClick = (rating: number) => {
     setFormData({ ...formData, rating });
   };
 
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/reviews?limits=1')
+      .then((response) => response.json())
+      .then((data) => {
+        if (cancelled || !data?.maxFiles || !data?.maxFileSizeMb) return;
+        setLimits({ maxFiles: Number(data.maxFiles), maxFileSizeMb: Number(data.maxFileSizeMb) });
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => () => {
+    attachmentsRef.current.forEach((item) => URL.revokeObjectURL(item.url));
+  }, []);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     setAttachmentError('');
-
-    if (!files.length) {
-      setAttachments([]);
-      return;
-    }
-
-    const current = [...attachments];
-    for (const file of files) {
-      if (current.length >= 5) break; // max 5
-      const isImage = file.type.startsWith('image/');
-      const isSmall = file.size <= 1024 * 1024; // 1MB
-      if (!isImage) { setAttachmentError(t.reviews.onlyImages); continue; }
-      if (!isSmall) { setAttachmentError(t.reviews.maxFileSize); continue; }
-      current.push(file);
-    }
-    setAttachments(current.slice(0, 5));
-    // reset input so same files can be re-selected
     e.currentTarget.value = '';
+    if (!files.length) return;
+
+    const maxBytes = limits.maxFileSizeMb * 1024 * 1024;
+    const accepted: PendingFile[] = [];
+    let message = '';
+    for (const file of files) {
+      if (attachments.length + accepted.length >= limits.maxFiles) {
+        message = fill(t.reviews.tooManyFiles, { count: limits.maxFiles });
+        break;
+      }
+      if (!fileKind(file)) {
+        message = t.reviews.onlyImages;
+        continue;
+      }
+      if (file.size > maxBytes) {
+        message = fill(t.reviews.maxFileSize, { size: limits.maxFileSizeMb });
+        continue;
+      }
+      accepted.push({ file, url: URL.createObjectURL(file) });
+    }
+    setAttachmentError(message);
+    if (accepted.length > 0) {
+      setAttachments((current) => [...current, ...accepted].slice(0, limits.maxFiles));
+    }
+  };
+
+  const removeAttachment = (index: number) => {
+    setAttachments((current) => {
+      const removed = current[index];
+      if (removed) URL.revokeObjectURL(removed.url);
+      return current.filter((_, itemIndex) => itemIndex !== index);
+    });
+  };
+
+  const uploadAttachments = async () => {
+    const tokenResponse = await fetch('/api/reviews?uploadToken=1', { method: 'POST' });
+    const tokenData = await tokenResponse.json().catch(() => ({}));
+    if (!tokenResponse.ok || !tokenData.token || !tokenData.uploadUrl) {
+      const unavailable = new Error(t.reviews.mediaUnavailable) as Error & { code?: string };
+      unavailable.code = tokenData.code || 'media_unavailable';
+      throw unavailable;
+    }
+
+    const ids: number[] = [];
+    for (const item of attachments) {
+      const body = new FormData();
+      body.append('file', item.file);
+      body.append('token', tokenData.token);
+      const uploadResponse = await fetch(tokenData.uploadUrl, {
+        method: 'POST',
+        body,
+      });
+      const uploadData = await uploadResponse.json().catch(() => ({}));
+      if (!uploadResponse.ok || !uploadData.id) {
+        const failed = new Error(
+          uploadResponse.status === 404 ? t.reviews.mediaUnavailable : t.reviews.reviewError,
+        ) as Error & { code?: string };
+        failed.code = uploadData.code || uploadData.data?.code || (uploadResponse.status === 404 ? 'media_unavailable' : 'upload_failed');
+        throw failed;
+      }
+      ids.push(Number(uploadData.id));
+    }
+
+    return { ids, token: tokenData.token as string };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
 
     const errors: { [k: string]: string } = {};
     if (!formData.name.trim()) errors.name = t.reviews.fillName;
@@ -60,42 +158,44 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
       return;
     }
     setFieldErrors({});
+    setError('');
+    setSubmitting(true);
 
     try {
-      const hasFiles = attachments.length > 0;
-      let res: Response;
-      if (!hasFiles) {
-        // Keep existing JSON flow when no images selected
-        res = await fetch('/api/reviews', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            productId,
-            name: formData.name,
-            email: formData.email,
-            content: formData.content,
-            rating: formData.rating,
-            status: 'hold',
-          }),
-        });
-      } else {
-        // Send multipart when images are attached
-        const form = new FormData();
-        form.append('productId', String(productId));
-        form.append('name', formData.name);
-        form.append('email', formData.email);
-        form.append('content', formData.content);
-        form.append('rating', String(formData.rating));
-        attachments.forEach((file) => form.append('attachments', file));
-        res = await fetch('/api/reviews', { method: 'POST', body: form });
+      let attachmentIds: number[] = [];
+      let uploadToken = '';
+      if (attachments.length > 0) {
+        const uploaded = await uploadAttachments();
+        attachmentIds = uploaded.ids;
+        uploadToken = uploaded.token;
       }
+
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productId,
+          name: formData.name,
+          email: formData.email,
+          content: formData.content,
+          rating: formData.rating,
+          attachmentIds,
+          uploadToken,
+        }),
+      });
       if (!res.ok) {
-        throw new Error('Error submitting review');
+        const data = await res.json().catch(() => ({}));
+        if (data.code === 'media_unavailable') {
+          throw new Error(t.reviews.mediaUnavailable);
+        }
+        throw new Error(t.reviews.reviewError);
       }
       onSubmit();
-    } catch (error) {
-      console.error('Error submitting review:', error);
-      alert(t.reviews.reviewError);
+    } catch (submitError) {
+      console.error('Error submitting review:', submitError);
+      setError(submitError instanceof Error ? submitError.message : t.reviews.reviewError);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -181,11 +281,14 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
       )}
       {/* Załączniki (opcjonalne) */}
       <div className="mt-2">
-        <label className="block text-sm mb-2">{t.reviews.attachments}</label>
+        <label className="block text-sm mb-1">{t.reviews.attachments}</label>
+        <p className="text-sm text-gray-500 mb-2">
+          {fill(t.reviews.attachmentsHint, { count: limits.maxFiles, size: limits.maxFileSizeMb })}
+        </p>
         <div className="flex items-center gap-4">
           <input
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm,video/ogg,video/quicktime,video/mpeg,.avi"
             multiple
             onChange={handleFileChange}
             className="text-sm"
@@ -200,8 +303,22 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
       </div>
       {attachments.length > 0 && (
         <div className="flex flex-wrap gap-2 text-sm text-neutral-darkest mt-2">
-          {attachments.map((file, idx) => (
-            <img key={idx} src={URL.createObjectURL(file)} alt={`${t.reviews.preview} ${idx + 1}`} className="w-14 h-14 object-cover rounded-md" />
+          {attachments.map((item, idx) => (
+            <div key={item.url} className="relative">
+              {fileKind(item.file) === 'video' ? (
+                <video src={item.url} muted playsInline preload="metadata" className="w-14 h-14 object-cover rounded-md bg-neutral-200" />
+              ) : (
+                <img src={item.url} alt={`${t.reviews.preview} ${idx + 1}`} className="w-14 h-14 object-cover rounded-md" />
+              )}
+              <button
+                type="button"
+                onClick={() => removeAttachment(idx)}
+                className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black text-xs text-white"
+                aria-label={t.reviews.removeFile}
+              >
+                ×
+              </button>
+            </div>
           ))}
         </div>
       )}
@@ -241,12 +358,19 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
           </div>
         )}
       </div>
+      {error && (
+        <div className="flex items-center text-[#A83232] text-sm mt-6">
+          <img src="/icons/Warning_Circle_Warning.svg" alt="Warning" className="w-4 h-4 mr-2" />
+          <span>{error}</span>
+        </div>
+      )}
       <div className="flex justify-end mt-6">
         <button
           type="submit"
-          className="px-[75px] font-light py-3 bg-black text-white rounded-full hover:bg-dark-pastel-red transition-all"
+          disabled={submitting}
+          className="px-[75px] font-light py-3 bg-black text-white rounded-full hover:bg-dark-pastel-red transition-all disabled:opacity-60"
         >
-          {t.reviews.addReview}
+          {submitting ? t.reviews.sending : t.reviews.addReview}
         </button>
       </div>
     </form>

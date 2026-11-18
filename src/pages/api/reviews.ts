@@ -1,10 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getCache, setCache } from '../../lib/cache';
-import formidable from 'formidable';
-import fs from 'fs';
-import FormData from 'form-data';
 import axios, { createApiClient } from '@/utils/api/http';
+import { getCache, setCache } from '../../lib/cache';
 import { withReviewMedia } from '@/lib/reviewMedia';
+import {
+  createReviewUploadToken,
+  fetchReviewLimits,
+  readReviewUploadToken,
+  reviewUploadSecret,
+  wpCustomBase,
+} from '@/lib/reviewSubmit';
 
 export const config = { api: { bodyParser: false } } as const;
 
@@ -18,19 +22,36 @@ const WooCommerceAPI = createApiClient({
   },
 });
 
-const parseForm = (req: NextApiRequest): Promise<{ fields: any; files: any }> =>
-  new Promise((resolve, reject) => {
-    const form = formidable({ multiples: true, maxFileSize: 1024 * 1024 }); // 1MB per file
-    form.parse(req, (err, fields, files) => {
-      if (err) return reject(err);
-      resolve({ fields, files });
-    });
-  });
+function clientIp(req: NextApiRequest): string {
+  const forwarded = req.headers['x-forwarded-for'];
+  const raw = Array.isArray(forwarded) ? forwarded[0] : forwarded || req.socket.remoteAddress || '';
+  return raw.split(',')[0].trim();
+}
+
+async function readJsonBody(req: NextApiRequest): Promise<Record<string, unknown>> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of req) {
+    chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
+  }
+  const raw = Buffer.concat(chunks).toString('utf8').trim();
+  if (!raw) return {};
+  const parsed = JSON.parse(raw);
+  return parsed && typeof parsed === 'object' ? parsed as Record<string, unknown> : {};
+}
+
+function attachmentIds(value: unknown): number[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => Number(item)).filter((id) => Number.isInteger(id) && id > 0);
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req;
 
   try {
+    if (method === 'GET' && String(req.query.limits || '') === '1') {
+      return res.status(200).json(await fetchReviewLimits());
+    }
+
     if (method === 'GET') {
       const { productId } = req.query;
 
@@ -56,137 +77,103 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       const reviews = withReviewMedia(Array.isArray(response.data) ? response.data : []);
-
       await setCache(cacheKey, reviews, CACHE_TTL);
-
       return res.status(200).json(reviews);
-    } else if (method === 'POST') {
-      const isMultipart = (req.headers['content-type'] || '').includes('multipart/form-data');
+    }
 
-      if (!isMultipart) {
-        // Prefer unauthenticated WP comments (guest), fall back to WC authenticated if needed
-        const { productId, name, email, content, rating } = req.body;
-        if (!productId || !name || !email || !content || !rating) {
-          return res.status(400).json({ error: 'All fields are required' });
+    if (method === 'POST' && String(req.query.uploadToken || '') === '1') {
+      const secret = reviewUploadSecret();
+      if (!secret) {
+        return res.status(503).json({ code: 'media_unavailable', error: 'Upload is not configured' });
+      }
+      const limits = await fetchReviewLimits();
+      return res.status(200).json({
+        token: createReviewUploadToken(secret),
+        uploadUrl: `${wpCustomBase()}/product-review-media`,
+        ...limits,
+      });
+    }
+
+    if (method === 'POST') {
+      const body = await readJsonBody(req);
+      const productId = Number(body.productId);
+      const name = String(body.name ?? '').trim();
+      const email = String(body.email ?? '').trim();
+      const content = String(body.content ?? '').trim();
+      const rating = Number(body.rating);
+      const mediaIds = attachmentIds(body.attachmentIds);
+
+      if (!productId || !name || !email || !content || !rating || rating < 1 || rating > 5) {
+        return res.status(400).json({ code: 'validation', error: 'All fields are required' });
+      }
+      if (Array.isArray(body.attachmentIds) && mediaIds.length !== body.attachmentIds.length) {
+        return res.status(400).json({ code: 'validation', error: 'Invalid attachments' });
+      }
+
+      if (mediaIds.length > 0) {
+        const secret = reviewUploadSecret();
+        if (!secret) {
+          return res.status(503).json({ code: 'media_unavailable', error: 'Upload is not configured' });
         }
-        const BASE = (process.env.REST_API || '').replace(/\/$/, '');
-        const wcReviewsEndpoint = `${BASE}/products/reviews`; // wc/v3
-        const wpCommentsEndpoint = BASE.replace('/wc/v3', '/wp/v2') + '/comments';
+        const limits = await fetchReviewLimits();
+        if (mediaIds.length > limits.maxFiles) {
+          return res.status(400).json({ code: 'too_many_files', error: 'Too many files' });
+        }
+        let nonce = '';
+        try {
+          nonce = readReviewUploadToken(String(body.uploadToken ?? ''), secret).nonce;
+        } catch {
+          return res.status(400).json({ code: 'validation', error: 'Invalid upload token' });
+        }
+
         try {
           const response = await axios.post(
-            wpCommentsEndpoint,
+            `${wpCustomBase()}/product-review`,
             {
-              post: Number(productId),
-              author_name: name,
-              author_email: email,
-              content: content,
-              meta: { rating: Number(rating) },
+              product_id: productId,
+              reviewer: name,
+              reviewer_email: email,
+              review: content,
+              rating,
+              attachment_ids: mediaIds,
+              nonce,
+              client_ip: clientIp(req),
             },
-            { headers: { 'Content-Type': 'application/json' } }
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                'x-hvyt-upload-key': secret,
+              },
+              timeout: 20000,
+            },
           );
           return res.status(201).json(response.data);
-        } catch (e) {
-          // Fallback to AUTHENTICATED WooCommerce reviews API
-          const response = await WooCommerceAPI.post('/products/reviews', {
-            product_id: Number(productId),
-            reviewer: name,
-            reviewer_email: email,
-            review: content,
-            rating: Number(rating),
-            status: 'hold',
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response?.status === 404) {
+            return res.status(503).json({ code: 'media_unavailable', error: 'Media endpoint is not available' });
+          }
+          const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+          const data = axios.isAxiosError(error) ? error.response?.data : undefined;
+          return res.status(status && status >= 400 && status < 500 ? status : 502).json({
+            code: data?.code || data?.data?.code || 'review_rejected',
+            error: data?.message || 'Review could not be saved',
           });
-          return res.status(201).json(response.data);
         }
       }
 
-      // Multipart flow with image uploads
-      const { fields, files } = await parseForm(req);
-      const first = (v: any) => (Array.isArray(v) ? v[0] : v);
-
-      const productId = Number(first(fields.productId));
-      const name = String(first(fields.name) ?? '').trim();
-      const email = String(first(fields.email) ?? '').trim();
-      const content = String(first(fields.content) ?? '').trim();
-      const rating = Number(first(fields.rating));
-
-      if (!productId || !name || !email || !content || !rating) {
-        return res.status(400).json({ error: 'All fields are required' });
-      }
-
-      // Upload up to 5 images to WP Media
-      const urls: string[] = [];
-      const incoming = (files as any)?.attachments;
-      const list: any[] = Array.isArray(incoming) ? incoming : incoming ? [incoming] : [];
-
-      for (const file of list) {
-        const f = Array.isArray(file) ? file[0] : file;
-        if (!f) continue;
-        if (!f.mimetype?.startsWith('image/')) {
-          return res.status(400).json({ error: 'Dozwolone są tylko pliki graficzne.' });
-        }
-        if (Number(f.size) > 1024 * 1024) {
-          return res.status(400).json({ error: 'Maksymalny rozmiar pliku to 1MB.' });
-        }
-        const filename = f.originalFilename || 'review-image.jpg';
-
-        // Upload to custom WP endpoint secured by shared secret header
-        const uploadUrl = (process.env.WP_REVIEW_UPLOAD_URL || 'https://wp.hvyt.pl/wp-json/custom/v1/review-media');
-        const secret = process.env.HVYT_REVIEW_UPLOAD_KEY || '';
-        if (!secret) {
-          throw new Error('Missing HVYT_REVIEW_UPLOAD_KEY env var');
-        }
-
-        const fd = new FormData();
-        fd.append('file', fs.createReadStream(f.filepath), { filename, contentType: f.mimetype || 'application/octet-stream' });
-
-        const uploadRes = await axios.post(uploadUrl, fd, {
-          headers: {
-            ...fd.getHeaders(),
-            'x-hvyt-upload-key': secret,
-          },
-          maxContentLength: Infinity,
-          maxBodyLength: Infinity,
-        });
-
-        const url = uploadRes.data?.url; // { id, url, mime }
-        if (url) urls.push(url);
-        if (urls.length >= 5) break; // cap
-      }
-
-      const attachmentsLine = urls.length ? `\n\nZałączniki: ${urls.join(' ')}` : '';
-
-      const BASE = (process.env.REST_API || '').replace(/\/$/, '');
-      const wcReviewsEndpoint = `${BASE}/products/reviews`; // wc/v3
-      const wpCommentsEndpoint = BASE.replace('/wc/v3', '/wp/v2') + '/comments';
-
-      try {
-        const response = await axios.post(
-          wpCommentsEndpoint,
-          {
-            post: Number(productId),
-            author_name: name,
-            author_email: email,
-            content: `${content}${attachmentsLine}`,
-            meta: { rating: Number(rating) },
-          },
-          { headers: { 'Content-Type': 'application/json' } }
-        );
-        return res.status(201).json(response.data);
-      } catch (e) {
-        const response = await WooCommerceAPI.post('/products/reviews', {
-          product_id: Number(productId),
-          reviewer: name,
-          reviewer_email: email,
-          review: `${content}${attachmentsLine}`,
-          rating: Number(rating),
-          status: 'hold',
-        });
-        return res.status(201).json(response.data);
-      }
-    } else {
-      res.setHeader('Allow', ['GET', 'POST']);
-      return res.status(405).json({ error: `Method ${method} Not Allowed` });
+      const response = await WooCommerceAPI.post('/products/reviews', {
+        product_id: productId,
+        reviewer: name,
+        reviewer_email: email,
+        review: content,
+        rating,
+        status: 'hold',
+      });
+      return res.status(201).json(response.data);
     }
+
+    res.setHeader('Allow', ['GET', 'POST']);
+    return res.status(405).json({ error: `Method ${method} Not Allowed` });
   } catch (error) {
     console.error('Error in /api/reviews:', error);
     return res.status(500).json({ error: 'Internal Server Error' });
