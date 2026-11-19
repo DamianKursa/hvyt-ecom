@@ -6,6 +6,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/next';
 import Header from '@/components/Header/Header.component';
 import Footer from '@/components/Footer/Footer.component';
+import ScrollToTop from '@/components/UI/ScrollToTop';
 import { isFullWidthHeroRoute } from '@/utils/i18n/routing';
 
 import { CartContext } from '@/stores/CartProvider';
@@ -63,6 +64,7 @@ const Layout: React.FC<ILayoutProps> = ({ children, title, description }) => {
       </main>
 
       <Footer />
+      <ScrollToTop />
       <SpeedInsights />
     </>
   );
