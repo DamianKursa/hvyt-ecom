@@ -273,6 +273,7 @@ export const en: Translations = {
         discountValue: 'Discount value',
         shipping: 'Shipping',
         shippingFree: 'Free',
+        selectDeliveryCountry: 'Select delivery country',
         total: 'Total',
         vatInfo: 'price includes 23% VAT',
         proceedToCheckout: 'Proceed to checkout',
@@ -364,6 +365,7 @@ export const en: Translations = {
         loadingBillingData: 'Loading billing data...',
       },
       shipping: {
+        shipping: 'Shipping',
         title: 'Delivery & Payment',
         selectMethod: 'Select delivery method',
         loading: 'Loading delivery methods...',
@@ -382,6 +384,7 @@ export const en: Translations = {
         retryMessage: 'Error loading shipping methods. Retrying in 5 seconds.',        
       },
       payment: {
+        payment: 'Payment',
         title: 'Select payment method',
         selectMethod: 'Select payment method',
         loading: 'Loading payment methods...',

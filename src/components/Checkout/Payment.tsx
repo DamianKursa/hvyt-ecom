@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { ShippingMethod } from '@/types/checkout';
 import { isPolandCountryCode } from '@/utils/countryCode';
+import InputRadio from '@/components/Input/InputRadio';
 
 interface PaymentProps {
   paymentMethod: string;
@@ -48,6 +49,7 @@ const pickOnlineTransferMethod = (
 const paymentIcons: Record<string, string> = {
   [PAYNOW_PAYWALL_ID]: '/icons/paynow.png',
   [PAYNOW_PBL_ID]: '/icons/paynow.png',
+  [STRIPE_METHOD_ID]: '/icons/stripe.png',
 };
 
 const Payment: React.FC<PaymentProps> = ({
@@ -179,44 +181,36 @@ const Payment: React.FC<PaymentProps> = ({
   return (
     <div>
       <h2 className="text-[20px] font-bold mb-6 text-neutral-darkest">
-        {t.checkout.payment.title}
+        {availableMethods.length > 1 ? t.checkout.payment.title : t.checkout.payment.payment}
       </h2>
       {availableMethods.length > 0 ? (
         <div>
           {availableMethods.map((method) => (
-            <label
+            <div
               key={method.id}
               className={`grid grid-cols-[1fr_auto] sm:grid-cols-[80%_20%] items-center py-[16px] border-b ${paymentMethod === method.id
                   ? 'border-dark-pastel-red'
                   : 'border-beige-dark'
                 }`}
             >
-              <div className="flex items-center min-w-0">
-                <input
-                  type="radio"
-                  value={method.id}
-                  checked={paymentMethod === method.id}
-                  onChange={() => setPaymentMethod(method.id)}
-                  className="hidden"
-                />
-                <span
-                  className={`flex-shrink-0 w-5 h-5 rounded-full ${paymentMethod === method.id
-                      ? 'border-4 border-dark-pastel-red'
-                      : 'border-2 border-gray-400'
-                    }`}
-                ></span>
-                <span className="ml-2">{method.title}</span>
-              </div>
+              <InputRadio
+                name="payment-method"
+                value={method.id}
+                label={method.title}
+                currentValue={paymentMethod}
+                onChange={setPaymentMethod}
+                className="min-w-0"
+              />
               {paymentIcons[method.id] && (
                 <div className="flex justify-start w-full">
                   <img
                     src={paymentIcons[method.id]}
                     alt={`${method.title} Icon`}
-                    className="w-[50px] sm:w-[55px] h-auto"
+                    className="w-[55px] sm:w-[65px] h-auto"
                   />
                 </div>
               )}
-            </label>
+            </div>
           ))}
         </div>
       ) : (
