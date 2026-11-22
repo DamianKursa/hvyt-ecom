@@ -4,14 +4,16 @@ import Image from 'next/image';
 
 interface ExpandableSectionProps {
   title: string;
-  content: string;
+  content?: string;
   isWymiary?: boolean;
+  children?: React.ReactNode;
 }
 
 const ExpandableSection: React.FC<ExpandableSectionProps> = ({
   title,
-  content,
+  content = '',
   isWymiary = false,
+  children,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -74,16 +76,20 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
 
       {/* Section Content */}
       {isExpanded && (
-        <div className="formatted-content py-[24px]">
-          {isWymiary ? (
-            renderWymiaryContent()
-          ) : (
-            <div
-              ref={contentRef}
-              dangerouslySetInnerHTML={{ __html: cleanHTML(content) }}
-            />
-          )}
-        </div>
+        children ? (
+          <div className="py-[24px]">{children}</div>
+        ) : (
+          <div className="formatted-content py-[24px]">
+            {isWymiary ? (
+              renderWymiaryContent()
+            ) : (
+              <div
+                ref={contentRef}
+                dangerouslySetInnerHTML={{ __html: cleanHTML(content) }}
+              />
+            )}
+          </div>
+        )
       )}
     </div>
   );

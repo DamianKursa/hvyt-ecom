@@ -5,13 +5,16 @@ import { Product } from '@/utils/functions/interfaces';
 import { cleanHTML } from '@/utils/cleanHTML';
 import ModalImageGallery from '../UI/ModalGalleryImage';
 import { useI18n } from '@/utils/hooks/useI18n';
+import Reviews from '@/components/Reviews/Reviews';
 
 interface SingleProductDetailsProps {
   product: Product;
+  reviewProductIds?: number[];
 }
 
 const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
   product,
+  reviewProductIds = [],
 }) => {
   const {t} = useI18n();
 
@@ -139,6 +142,11 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
           content={processedContent}
         />
       )}
+
+      <Reviews
+        productId={Number(product.id)}
+        productIds={reviewProductIds}
+      />
 
       {isModalOpen && modalImages.length > 0 && (
         <ModalImageGallery

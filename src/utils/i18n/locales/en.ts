@@ -54,6 +54,7 @@ export const en: Translations = {
       dimensions: 'Dimensions',
       additionalInfo: 'Additional info',
       productCardModel3d: 'Product card and 3D model',
+      productReviews: 'Product reviews',
       crossSellTtile: 'Most often bought together',
       crossSellMessage: 'Check out the products that perfectly match your chosen product.',
       instagramTitle: 'Hvyt in your homes',

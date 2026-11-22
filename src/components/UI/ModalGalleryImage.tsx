@@ -93,12 +93,7 @@ const ModalImageGallery: React.FC<ModalImageGalleryProps> = ({
               controls
               autoPlay
               playsInline
-              className="
-                block
-                w-auto h-auto
-                max-w-[90vw] max-h-[90vh]
-                bg-black
-              "
+              className="block aspect-video w-[80vw] max-h-[90vh] max-w-[90vw] bg-black object-contain"
             />
           ) : (
             <img

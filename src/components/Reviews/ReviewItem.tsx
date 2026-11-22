@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import Image from 'next/image';
 import ExpandableReview from '@/components/UI/ExpandableReview';
 import ModalImageGallery, { GalleryMedia } from '../UI/ModalGalleryImage';
 import { getReviewMedia, videoFrameSrc, ReviewMediaItem } from '@/lib/reviewMedia';
@@ -25,6 +24,56 @@ function PlayIcon() {
         </svg>
       </span>
     </span>
+  );
+}
+
+function ReviewThumb({
+  item,
+  index,
+  onOpen,
+}: {
+  item: ReviewMediaItem;
+  index: number;
+  onOpen: (index: number) => void;
+}) {
+  const [ready, setReady] = useState(false);
+  const poster = item.type === 'video' ? item.poster : item.url;
+  const showIfDecoded = (node: HTMLImageElement | null) => {
+    if (node?.complete && node.naturalWidth > 0) setReady(true);
+  };
+
+  return (
+    <button
+      type="button"
+      className="relative h-[100px] w-[100px] shrink-0 overflow-hidden rounded-[8px] bg-beige"
+      onClick={() => onOpen(index)}
+      aria-label={
+        item.type === 'video'
+          ? `Odtwórz film ${index + 1}`
+          : `Powiększ zdjęcie ${index + 1}`
+      }
+    >
+      {poster ? (
+        <img
+          ref={showIfDecoded}
+          src={poster}
+          alt=""
+          loading="lazy"
+          onLoad={() => setReady(true)}
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity ${ready ? 'opacity-100' : 'opacity-0'}`}
+        />
+      ) : (
+        <video
+          src={videoFrameSrc(item.url)}
+          muted
+          playsInline
+          preload="metadata"
+          onLoadedData={() => setReady(true)}
+          className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity ${ready ? 'opacity-100' : 'opacity-0'}`}
+        />
+      )}
+      {item.type === 'video' && <PlayIcon />}
+    </button>
   );
 }
 
@@ -72,9 +121,9 @@ const ReviewItem = ({ review }: { review: Review }) => {
   };
 
   return (
-    <div className="border-2 border-[#661F30] rounded-xl p-6 flex flex-col h-full">
-      <div className="mb-4">
-        <div className="flex items-center gap-1">
+    <div className="mb-[36px]">
+      <div className="mb-3 flex items-center gap-2">
+        <div className="flex items-center gap-0.5 text-[24px] leading-none">
           {Array.from({ length: 5 }, (_, index) => (
             <span
               key={index}
@@ -84,59 +133,27 @@ const ReviewItem = ({ review }: { review: Review }) => {
             </span>
           ))}
         </div>
-        <p className="text-sm text-gray-500">{review.rating}/5</p>
+        <span className="text-[20px] leading-none text-black">{review.rating}/5</span>
       </div>
 
-      <div className="flex-1">
+      <div className="text-[16px] leading-[24px] text-black">
         <ExpandableReview content={processedContent} />
-        {media.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-3">
-            {media.map((item, index) => (
-              <button
-                key={`${item.type}-${item.url}`}
-                type="button"
-                className="relative h-16 w-16 overflow-hidden rounded-md border border-black bg-neutral-200"
-                onClick={() => openAt(index)}
-                aria-label={
-                  item.type === 'video'
-                    ? `Odtwórz film ${index + 1}`
-                    : `Powiększ zdjęcie ${index + 1}`
-                }
-              >
-                {item.type === 'video' ? (
-                  item.poster ? (
-                    <img src={item.poster} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <video
-                      src={videoFrameSrc(item.url)}
-                      muted
-                      playsInline
-                      preload="metadata"
-                      className="pointer-events-none h-full w-full object-cover"
-                    />
-                  )
-                ) : (
-                  <img src={item.url} alt="" className="h-full w-full object-cover" />
-                )}
-                {item.type === 'video' && <PlayIcon />}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
-      <div className="flex items-center gap-3 mt-4">
-        <Image
-          src="/images/dummy-user.jpg"
-          alt={review.reviewer || 'Reviewer'}
-          width={40}
-          height={40}
-          className="rounded-full"
-        />
-        <div>
-          <h4 className="text-md font-medium text-black">{review.reviewer || 'Anonymous'}</h4>
+      <p className="text-[16px] font-bold text-black">{review.reviewer || 'Anonymous'}</p>
+
+      {media.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {media.map((item, index) => (
+            <ReviewThumb
+              key={`${item.type}-${item.url}`}
+              item={item}
+              index={index}
+              onOpen={openAt}
+            />
+          ))}
         </div>
-      </div>
+      )}
 
       {isClient && isGalleryOpen &&
         createPortal(

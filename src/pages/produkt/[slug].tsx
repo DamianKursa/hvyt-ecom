@@ -13,7 +13,6 @@ import CartModal from '@/components/Cart/CartModal';
 import ColorSwitcher from '@/components/SingleProduct/ColorSwitcher.component';
 import DeliveryReturnInfo from '@/components/SingleProduct/DeliveryReturnInfo.component';
 import AttributeSwitcher from '@/components/UI/AttributeSwitcher.component';
-import Reviews from '@/components/Reviews/Reviews';
 import QuantityChanger from '@/components/UI/QuantityChanger';
 import { useProductState } from '@/utils/hooks/useProductState';
 import { CartContext } from '@/stores/CartProvider';
@@ -779,7 +778,12 @@ const ProductPage = () => {
             </div>
             <div className="hidden lg:block">
               {product && <SingleProductGallery images={galleryImages} primaryImage={primaryFirstImage} />}
-              {product && <SingleProductDetails product={product} />}
+              {product && (
+                <SingleProductDetails
+                  product={product}
+                  reviewProductIds={reviewProductIds}
+                />
+              )}
             </div>
           </div>
 
@@ -1108,7 +1112,12 @@ const ProductPage = () => {
           </div>
         </div>
         <div className="block lg:hidden mt-[64px] md:mt-6">
-          {product && <SingleProductDetails product={product} />}
+          {product && (
+            <SingleProductDetails
+              product={product}
+              reviewProductIds={reviewProductIds}
+            />
+          )}
         </div>
       </section>
       {showModal && product && (
@@ -1141,14 +1150,6 @@ const ProductPage = () => {
         />
       </div>
       <Instagram />
-      <div className="w-full">
-        {product && (
-          <Reviews
-            productId={Number(product.id)}
-            productIds={reviewProductIds}
-          />
-        )}
-      </div>
       {wishlistMessage && (
         <div className="fixed bottom-4 left-4 bg-green-800 text-white rounded-full py-3 px-4 flex items-center shadow-lg">
           <img

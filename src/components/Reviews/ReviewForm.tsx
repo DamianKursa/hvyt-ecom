@@ -202,7 +202,7 @@ const ReviewForm: React.FC<{ productId: number; onSubmit: () => void; onCancel: 
   return (
     <form
       onSubmit={handleSubmit}
-      className="relative bg-white w-full max-w-[900px] mx-4 p-6 rounded-[24px] shadow-lg"
+      className="relative bg-white w-full p-6 rounded-[24px] shadow-lg"
     >
       <button
         type="button"

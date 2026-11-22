@@ -17,6 +17,9 @@ const ExpandableReview: React.FC<ExpandableReviewProps> = ({ content }) => {
 
   useEffect(() => {
     if (contentRef.current) {
+      contentRef.current.querySelectorAll('img').forEach((img) => {
+        img.loading = 'lazy';
+      });
       const lineHeight = parseFloat(
         getComputedStyle(contentRef.current).lineHeight,
       );
@@ -28,10 +31,10 @@ const ExpandableReview: React.FC<ExpandableReviewProps> = ({ content }) => {
   }, [content]);
 
   return (
-    <div className="mb-4">
+    <div className="mb-1">
       <div
         ref={contentRef}
-        className={`text-black overflow-hidden transition-all duration-300 ${
+        className={`text-[16px] text-black overflow-hidden transition-all duration-300 ${
           isExpanded ? 'max-h-full' : 'max-h-[6rem]'
         }`}
         style={{
