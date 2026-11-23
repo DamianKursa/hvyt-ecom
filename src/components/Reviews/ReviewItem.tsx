@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import ExpandableReview from '@/components/UI/ExpandableReview';
 import ModalImageGallery, { GalleryMedia } from '../UI/ModalGalleryImage';
+import LoaderSpinner from '@/components/UI/LoaderSpinner';
 import { getReviewMedia, ReviewMediaItem } from '@/lib/reviewMedia';
 
 interface Review {
@@ -27,6 +28,29 @@ function PlayIcon() {
   );
 }
 
+function preloadFullMedia(item: ReviewMediaItem) {
+  return new Promise<void>((resolve) => {
+    if (item.type === 'video') {
+      const video = document.createElement('video');
+      video.preload = 'auto';
+      const finish = () => {
+        video.removeAttribute('src');
+        video.load();
+        resolve();
+      };
+      video.addEventListener('loadeddata', finish, { once: true });
+      video.addEventListener('error', finish, { once: true });
+      video.src = item.url;
+      return;
+    }
+
+    const image = new Image();
+    image.onload = () => resolve();
+    image.onerror = () => resolve();
+    image.src = item.url;
+  });
+}
+
 function ReviewThumb({
   item,
   index,
@@ -37,16 +61,29 @@ function ReviewThumb({
   onOpen: (index: number) => void;
 }) {
   const [ready, setReady] = useState(false);
+  const [opening, setOpening] = useState(false);
   const [src, setSrc] = useState(item.thumb || item.url);
   const showIfDecoded = (node: HTMLImageElement | null) => {
     if (node?.complete && node.naturalWidth > 0) setReady(true);
+  };
+
+  const openFullSize = async () => {
+    if (opening) return;
+    setOpening(true);
+    try {
+      await preloadFullMedia(item);
+    } finally {
+      setOpening(false);
+    }
+    onOpen(index);
   };
 
   return (
     <button
       type="button"
       className="relative h-[100px] w-[100px] shrink-0 overflow-hidden rounded-[8px] bg-beige"
-      onClick={() => onOpen(index)}
+      onClick={openFullSize}
+      aria-busy={opening}
       aria-label={
         item.type === 'video'
           ? `Odtwórz film ${index + 1}`
@@ -65,6 +102,11 @@ function ReviewThumb({
         className={`absolute inset-0 h-full w-full object-cover transition-opacity ${ready ? 'opacity-100' : 'opacity-0'}`}
       />
       {item.type === 'video' && <PlayIcon />}
+      {opening && (
+        <span className="absolute inset-0 z-10 flex items-center justify-center bg-beige/80">
+          <LoaderSpinner className="animate-spin h-8 w-8" />
+        </span>
+      )}
     </button>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import LoaderSpinner from '@/components/UI/LoaderSpinner';
 
 interface LoadingModalProps {
   title: string;
@@ -27,11 +28,7 @@ const LoadingModal: React.FC<LoadingModalProps> = ({
         }}
       >
         <h2 className="text-center text-xl font-semibold mb-2">{title}</h2>
-        <img
-          src="/icons/logowanie-spinner.svg"
-          alt="Loading Spinner"
-          className="animate-spin mb-4 w-12 h-12"
-        />
+        <LoaderSpinner />
         {description && (
           <p className="text-center text-gray-600 font-light">{description}</p>
         )}
