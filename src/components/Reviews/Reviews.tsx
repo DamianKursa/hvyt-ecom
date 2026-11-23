@@ -137,7 +137,7 @@ const Reviews = ({
               alt=""
               className="w-5 h-5 mr-2"
             />
-            <span>Dziękujemy za podzielenie się Twoją opinią.</span>
+            <span>{t.reviews.thankYou}</span>
           </div>
         </div>
       )}

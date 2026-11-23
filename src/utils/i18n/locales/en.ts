@@ -651,6 +651,7 @@ export const en: Translations = {
     fillEmail: 'Please enter your email',
     mustAcceptConsent: 'You must accept the consent',
     reviewError: 'An error occurred while submitting the review.',
+    thankYou: 'Thank you for sharing your review.',
     attachments: 'Photos and videos (optional)',
     attachmentsHint: 'You can add up to {count} files, {size} MB each.',
     onlyImages: 'Photos (JPG, PNG, GIF, WEBP) and videos (MP4, WEBM, MOV, OGG, MPEG, AVI) are allowed.',

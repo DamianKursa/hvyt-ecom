@@ -649,6 +649,7 @@ export const pl = {
       fillEmail: 'Uzupełnij adres e-mail',
       mustAcceptConsent: 'Musisz zaakceptować zgodę',
       reviewError: 'Wystąpił błąd podczas przesyłania opinii.',
+      thankYou: 'Dziękujemy za podzielenie się Twoją opinią.',
       attachments: 'Zdjęcia i filmy (opcjonalnie)',
       attachmentsHint: 'Możesz dodać do {count} plików, każdy do {size} MB.',
       onlyImages: 'Dozwolone są zdjęcia (JPG, PNG, GIF, WEBP) i filmy (MP4, WEBM, MOV, OGG, MPEG, AVI).',
