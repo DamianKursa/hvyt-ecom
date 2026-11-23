@@ -67,7 +67,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const perPage = 4;
       const page = Math.max(1, Number(req.query.page) || 1);
-      const cacheKey = `reviews:product:v6:${productId}:${page}:${perPage}`;
+      const rawLang = Array.isArray(req.query.lang) ? req.query.lang[0] : req.query.lang;
+      const lang = rawLang === 'en' ? 'en' : 'pl';
+      const cacheKey = `reviews:product:v7:${lang}:${productId}:${page}:${perPage}`;
       const cachedReviews = await getCache(cacheKey);
       if (cachedReviews) {
         return res.status(200).json(cachedReviews);
@@ -79,6 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           page,
           per_page: perPage,
           status: 'approved',
+          lang,
         },
       });
       const batch = Array.isArray(response.data) ? response.data : [];

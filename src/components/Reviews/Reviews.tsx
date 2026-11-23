@@ -25,7 +25,7 @@ const Reviews = ({
   productIds?: number[];
   onTotal?: (total: number) => void;
 }) => {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const sectionRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -51,7 +51,7 @@ const Reviews = ({
       } else {
         setLoading(true);
       }
-      const res = await fetch(`/api/reviews?productId=${encodeURIComponent(productQuery)}&page=${nextPage}`);
+      const res = await fetch(`/api/reviews?productId=${encodeURIComponent(productQuery)}&page=${nextPage}&lang=${language}`);
       if (!res.ok) {
         throw new Error('Error fetching reviews');
       }
@@ -76,7 +76,7 @@ const Reviews = ({
     setReviews([]);
     setTotal(null);
     loadReviews(1, false);
-  }, [productQuery]);
+  }, [productQuery, language]);
 
   useEffect(() => {
     if (total !== null) onTotal?.(total);
