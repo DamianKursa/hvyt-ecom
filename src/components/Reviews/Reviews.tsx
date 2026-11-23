@@ -19,11 +19,15 @@ interface Review {
 const Reviews = ({
   productId,
   productIds = [],
+  onTotal,
 }: {
   productId: number;
   productIds?: number[];
+  onTotal?: (total: number) => void;
 }) => {
   const { t } = useI18n();
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [expanded, setExpanded] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(0);
@@ -75,6 +79,19 @@ const Reviews = ({
   }, [productQuery]);
 
   useEffect(() => {
+    if (total !== null) onTotal?.(total);
+  }, [total, onTotal]);
+
+  useEffect(() => {
+    const openVisibleSection = () => {
+      if (!sectionRef.current || sectionRef.current.getClientRects().length === 0) return;
+      setExpanded(true);
+    };
+    window.addEventListener('hvyt-open-product-reviews', openVisibleSection);
+    return () => window.removeEventListener('hvyt-open-product-reviews', openVisibleSection);
+  }, []);
+
+  useEffect(() => {
     if (!submitted) return;
     thanksRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }, [submitted]);
@@ -90,7 +107,12 @@ const Reviews = ({
   const hasMore = page < totalPages;
 
   return (
-    <ExpandableSection title={title}>
+    <div ref={sectionRef} data-product-reviews className="scroll-mt-24 md:scroll-mt-36">
+    <ExpandableSection
+      title={title}
+      expanded={expanded}
+      onToggle={() => setExpanded((open) => !open)}
+    >
       <div className="flex flex-col gap- pt-[8px]" aria-busy={loading || loadingMore}>
         {loading
           ? Array.from({ length: perPage || 2 }, (_, index) => (
@@ -154,6 +176,7 @@ const Reviews = ({
         </div>
       )}
     </ExpandableSection>
+    </div>
   );
 };
 

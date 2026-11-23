@@ -7,6 +7,8 @@ interface ExpandableSectionProps {
   content?: string;
   isWymiary?: boolean;
   children?: React.ReactNode;
+  expanded?: boolean;
+  onToggle?: () => void;
 }
 
 const ExpandableSection: React.FC<ExpandableSectionProps> = ({
@@ -14,8 +16,11 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
   content = '',
   isWymiary = false,
   children,
+  expanded,
+  onToggle,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [internalExpanded, setInternalExpanded] = useState(false);
+  const isExpanded = expanded ?? internalExpanded;
 
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -62,7 +67,7 @@ const ExpandableSection: React.FC<ExpandableSectionProps> = ({
     >
       {/* Section Title */}
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={() => (onToggle ? onToggle() : setInternalExpanded((open) => !open))}
         className="w-full text-[24px] flex justify-between text-left items-center py-2 text-lg font-semibold"
       >
         <span className="text-[20px]">{title}</span>

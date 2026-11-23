@@ -122,6 +122,7 @@ const ProductPage = () => {
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [wishlistMessage, setWishlistMessage] = useState<string | null>(null);
   const [reviewProductIds, setReviewProductIds] = useState<number[]>([]);
+  const [reviewTotal, setReviewTotal] = useState<number | null>(null);
 
   const methods = useForm<NotifyFormData>({
     defaultValues: { notifyEmail: '' },
@@ -758,6 +759,35 @@ const ProductPage = () => {
     !(availableStock > 0) ||
     (product as any)?.stock_status === 'outofstock';
 
+  const handleOpenReviews = () => {
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-product-reviews]'));
+    const target = sections.find((section) => section.getClientRects().length > 0);
+    if (!target) return;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    const openReviews = () => window.dispatchEvent(new Event('hvyt-open-product-reviews'));
+    if (reduced) {
+      openReviews();
+      return;
+    }
+    let last = window.scrollY;
+    let still = 0;
+    const started = performance.now();
+    const waitForScroll = () => {
+      const current = window.scrollY;
+      still = Math.abs(current - last) < 1 ? still + 1 : 0;
+      last = current;
+      if (still >= 4 || performance.now() - started > 1600) {
+        openReviews();
+        return;
+      }
+      requestAnimationFrame(waitForScroll);
+    };
+    requestAnimationFrame(waitForScroll);
+  };
+
+  
+
   return (
     <Layout title={seoTitle}>
       <Head>
@@ -782,6 +812,7 @@ const ProductPage = () => {
                 <SingleProductDetails
                   product={product}
                   reviewProductIds={reviewProductIds}
+                  onReviewTotal={setReviewTotal}
                 />
               )}
             </div>
@@ -1109,6 +1140,15 @@ const ProductPage = () => {
               isMeble={isMeble}
               productId={product?.id}
             />
+            {reviewTotal !== null && (
+              <button
+                type="button"
+                onClick={handleOpenReviews}
+                className="mt-4 inline-flex h-[54px] w-fit self-start items-center rounded-full border border-black px-5 text-[14px] md:text-[18px] font-light text-black transition-all hover:border-dark-pastel-red hover:bg-dark-pastel-red hover:text-white"
+              >
+                {t.product.discoverReviews.replace('{count}', String(reviewTotal))}
+              </button>
+            )}
           </div>
         </div>
         <div className="block lg:hidden mt-[64px] md:mt-6">
@@ -1116,6 +1156,7 @@ const ProductPage = () => {
             <SingleProductDetails
               product={product}
               reviewProductIds={reviewProductIds}
+              onReviewTotal={setReviewTotal}
             />
           )}
         </div>

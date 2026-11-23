@@ -56,6 +56,7 @@ export const pl = {
       additionalInfo: 'Informacje dodatkowe',
       productCardModel3d: 'Karta produktu i model 3D',
       productReviews: 'Opinie o produkcie',
+      discoverReviews: 'Poznaj opinie o tym produkcie ({count})',
       crossSellTtile: 'Najczęściej kupowane razem',
       crossSellMessage: 'Sprawdź produkty, które idealnie pasują z wybranym produktem.',
       instagramTitle: 'Hvyt w waszych domach',

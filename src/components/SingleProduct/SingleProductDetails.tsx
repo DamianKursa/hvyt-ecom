@@ -10,11 +10,13 @@ import Reviews from '@/components/Reviews/Reviews';
 interface SingleProductDetailsProps {
   product: Product;
   reviewProductIds?: number[];
+  onReviewTotal?: (total: number) => void;
 }
 
 const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
   product,
   reviewProductIds = [],
+  onReviewTotal,
 }) => {
   const {t} = useI18n();
 
@@ -146,6 +148,7 @@ const SingleProductDetails: React.FC<SingleProductDetailsProps> = ({
       <Reviews
         productId={Number(product.id)}
         productIds={reviewProductIds}
+        onTotal={onReviewTotal}
       />
 
       {isModalOpen && modalImages.length > 0 && (
