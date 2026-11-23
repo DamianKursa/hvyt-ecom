@@ -67,7 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const perPage = 4;
       const page = Math.max(1, Number(req.query.page) || 1);
-      const cacheKey = `reviews:product:v5:${productId}:${page}:${perPage}`;
+      const cacheKey = `reviews:product:v6:${productId}:${page}:${perPage}`;
       const cachedReviews = await getCache(cacheKey);
       if (cachedReviews) {
         return res.status(200).json(cachedReviews);

@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: HVYT product reviews
- * Description: Zapis opinii z karty produktu Next.js w formacie mediów CusRev.
+ * Description: Zapis opinii z karty produktu Next.js i media CusRev w odpowiedzi REST.
  * Place this file in wp-content/mu-plugins/ on wp.hvyt.pl.
  * Define the same secret as HVYT_REVIEW_UPLOAD_KEY in the Next app:
  * define('HVYT_REVIEW_UPLOAD_KEY', '...');
@@ -30,7 +30,93 @@ add_action('rest_api_init', function () {
         'callback' => 'hvyt_product_review_upload',
         'permission_callback' => '__return_true',
     ));
+
+    register_rest_route('custom/v1', '/review-media', array(
+        'methods' => 'POST',
+        'callback' => 'hvyt_review_media_upload',
+        'permission_callback' => '__return_true',
+    ));
 });
+
+function hvyt_product_review_attachment_thumb($id) {
+    foreach (array('woocommerce_thumbnail', 'medium', 'thumbnail') as $size) {
+        $thumb = wp_get_attachment_image_url((int) $id, $size);
+        if ($thumb) {
+            return $thumb;
+        }
+    }
+    return '';
+}
+
+function hvyt_product_review_push_media(&$media, $type, $url, $thumb = '') {
+    if (!is_string($url) || $url === '') {
+        return;
+    }
+    if ($type !== 'image' || !is_string($thumb) || $thumb === '') {
+        $thumb = $type === 'image' ? $url : '';
+    }
+    $item = array('type' => $type, 'url' => $url);
+    if ($thumb !== '') {
+        $item['thumb'] = $thumb;
+    }
+    $media[] = $item;
+}
+
+function hvyt_product_review_prepare_response($response, $review) {
+    $data = $response->get_data();
+    $media = array();
+
+    foreach ((array) get_comment_meta($review->comment_ID, 'ivole_review_image') as $pic) {
+        if (is_array($pic) && !empty($pic['url'])) {
+            hvyt_product_review_push_media($media, 'image', $pic['url'], $pic['url']);
+        }
+    }
+    foreach ((array) get_comment_meta($review->comment_ID, 'ivole_review_image2') as $id) {
+        $url = wp_get_attachment_url((int) $id);
+        if ($url) {
+            hvyt_product_review_push_media($media, 'image', $url, hvyt_product_review_attachment_thumb($id));
+        }
+    }
+    foreach ((array) get_comment_meta($review->comment_ID, 'ivole_review_video') as $vid) {
+        if (is_array($vid) && !empty($vid['url'])) {
+            hvyt_product_review_push_media($media, 'video', $vid['url']);
+        }
+    }
+    foreach ((array) get_comment_meta($review->comment_ID, 'ivole_review_video2') as $id) {
+        $url = wp_get_attachment_url((int) $id);
+        if ($url) {
+            hvyt_product_review_push_media($media, 'video', $url);
+        }
+    }
+
+    $data['media'] = $media;
+    $response->set_data($data);
+    return $response;
+}
+add_filter('woocommerce_rest_prepare_product_review', 'hvyt_product_review_prepare_response', 10, 2);
+
+function hvyt_review_media_upload(WP_REST_Request $request) {
+    if (isset($_FILES['file']) && $_FILES['file']['size'] > 10 * 1024 * 1024) {
+        return new WP_Error(
+            'file_size',
+            'Twój plik jest za duży. Maksymalnie 10 MB ',
+            array('status' => 400)
+        );
+    }
+
+    $file = $_FILES['file'];
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    $upload = wp_handle_upload($file, array('test_form' => false));
+
+    if (isset($upload['error'])) {
+        return new WP_Error('upload_error', $upload['error'], array('status' => 500));
+    }
+
+    return array(
+        'success' => true,
+        'url' => $upload['url'],
+    );
+}
 
 function hvyt_product_review_secret() {
     if (defined('HVYT_REVIEW_UPLOAD_KEY') && HVYT_REVIEW_UPLOAD_KEY) {
@@ -248,4 +334,45 @@ function hvyt_product_review_create(WP_REST_Request $request) {
     update_comment_meta($comment_id, 'ivole_media_count', count($accepted));
 
     return array('id' => (int) $comment_id, 'status' => 'hold');
+}
+
+function hvyt_upload_review_media(WP_REST_Request $request) {
+    $secret = isset($_SERVER['HTTP_X_HVYT_UPLOAD_KEY']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_X_HVYT_UPLOAD_KEY'])) : '';
+    $expected = defined('HVYT_UPLOAD_SECRET') ? HVYT_UPLOAD_SECRET : get_option('hvyt_upload_secret');
+
+    if ($expected === '' || $expected === false || $secret === '' || !hash_equals((string) $expected, (string) $secret)) {
+        return new WP_Error('forbidden', __('Invalid upload key', 'hvyt'), array('status' => 403));
+    }
+
+    if (empty($_FILES) || empty($_FILES['file']) || empty($_FILES['file']['tmp_name'])) {
+        return new WP_Error('no_file', __('No file provided. Use multipart/form-data with field "file".', 'hvyt'), array('status' => 400));
+    }
+
+    $file = $_FILES['file'];
+    $allowed_mimes = array('image/jpeg', 'image/png', 'image/webp', 'image/gif');
+    $type = isset($file['type']) ? $file['type'] : '';
+    $size = isset($file['size']) ? (int) $file['size'] : 0;
+
+    if (!defined('HVYT_UPLOAD_MAX_BYTES') || $size <= 0 || $size > HVYT_UPLOAD_MAX_BYTES) {
+        $limit = defined('HVYT_UPLOAD_MAX_BYTES') ? HVYT_UPLOAD_MAX_BYTES : 0;
+        return new WP_Error('file_size', sprintf(__('Max file size is %d bytes', 'hvyt'), $limit), array('status' => 400));
+    }
+    if (!in_array($type, $allowed_mimes, true)) {
+        return new WP_Error('file_type', __('Only JPG, PNG, WEBP, GIF are allowed.', 'hvyt'), array('status' => 400));
+    }
+
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+    require_once ABSPATH . 'wp-admin/includes/media.php';
+    require_once ABSPATH . 'wp-admin/includes/image.php';
+
+    $attachment_id = media_handle_upload('file', 0);
+    if (is_wp_error($attachment_id)) {
+        return new WP_Error('upload_failed', $attachment_id->get_error_message(), array('status' => 500));
+    }
+
+    return rest_ensure_response(array(
+        'id' => $attachment_id,
+        'url' => wp_get_attachment_url($attachment_id),
+        'mime' => get_post_mime_type($attachment_id),
+    ));
 }

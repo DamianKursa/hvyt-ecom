@@ -1,7 +1,9 @@
+export const REVIEW_VIDEO_THUMB = '/images/review-video-placeholder.svg';
+
 export type ReviewMediaItem = {
   type: 'image' | 'video';
   url: string;
-  poster?: string;
+  thumb: string;
 };
 
 type LooseRecord = Record<string, unknown>;
@@ -46,18 +48,31 @@ function mediaType(value: unknown, fallback: 'image' | 'video'): 'image' | 'vide
   return fallback;
 }
 
+const UPLOAD_SIZE_SUFFIX = /-\d+x\d+(?=\.[a-z0-9]+(?:\?|#|$))/i;
+
+function imageThumb(url: string, explicit?: unknown): string {
+  if (isHttpUrl(explicit)) {
+    const thumb = explicit.trim();
+    if (thumb !== url) return thumb;
+  }
+  if (!/\/wp-content\/uploads\//i.test(url) || UPLOAD_SIZE_SUFFIX.test(url)) return url;
+  return url.replace(/(\.[a-z0-9]+)(\?.*)?$/i, '-300x300$1$2');
+}
+
 function addUrl(
   items: ReviewMediaItem[],
   type: 'image' | 'video',
   url: unknown,
-  poster?: unknown,
+  thumb?: unknown,
 ) {
   if (!isHttpUrl(url)) return;
   const cleanUrl = url.trim();
   if (items.some((item) => item.url === cleanUrl)) return;
-  const item: ReviewMediaItem = { type, url: cleanUrl };
-  if (isHttpUrl(poster)) item.poster = poster.trim();
-  items.push(item);
+  items.push({
+    type,
+    url: cleanUrl,
+    thumb: type === 'video' ? REVIEW_VIDEO_THUMB : imageThumb(cleanUrl, thumb),
+  });
 }
 
 function consumeValue(
@@ -76,8 +91,7 @@ function consumeValue(
   if (typeof parsed === 'object') {
     const record = parsed as LooseRecord;
     const url = record.url ?? record.href ?? record.src ?? record.source_url;
-    const poster = record.poster ?? record.thumbnail ?? record.thumb;
-    addUrl(items, mediaType(record, fallback), url, poster);
+    addUrl(items, mediaType(record, fallback), url, record.thumb);
     return;
   }
 
@@ -137,8 +151,4 @@ export function withReviewMedia<T>(reviews: T[]): T[] {
     if (!review || typeof review !== 'object') return review;
     return { ...(review as LooseRecord), media: getReviewMedia(review) } as T;
   });
-}
-
-export function videoFrameSrc(url: string): string {
-  return url.includes('#') ? url : `${url}#t=0.1`;
 }

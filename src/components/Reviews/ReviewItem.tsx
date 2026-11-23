@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import ExpandableReview from '@/components/UI/ExpandableReview';
 import ModalImageGallery, { GalleryMedia } from '../UI/ModalGalleryImage';
-import { getReviewMedia, videoFrameSrc, ReviewMediaItem } from '@/lib/reviewMedia';
+import { getReviewMedia, ReviewMediaItem } from '@/lib/reviewMedia';
 
 interface Review {
   id: number;
@@ -37,7 +37,7 @@ function ReviewThumb({
   onOpen: (index: number) => void;
 }) {
   const [ready, setReady] = useState(false);
-  const poster = item.type === 'video' ? item.poster : item.url;
+  const [src, setSrc] = useState(item.thumb || item.url);
   const showIfDecoded = (node: HTMLImageElement | null) => {
     if (node?.complete && node.naturalWidth > 0) setReady(true);
   };
@@ -53,25 +53,17 @@ function ReviewThumb({
           : `Powiększ zdjęcie ${index + 1}`
       }
     >
-      {poster ? (
-        <img
-          ref={showIfDecoded}
-          src={poster}
-          alt=""
-          loading="lazy"
-          onLoad={() => setReady(true)}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity ${ready ? 'opacity-100' : 'opacity-0'}`}
-        />
-      ) : (
-        <video
-          src={videoFrameSrc(item.url)}
-          muted
-          playsInline
-          preload="metadata"
-          onLoadedData={() => setReady(true)}
-          className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity ${ready ? 'opacity-100' : 'opacity-0'}`}
-        />
-      )}
+      <img
+        ref={showIfDecoded}
+        src={src}
+        alt=""
+        loading="lazy"
+        onLoad={() => setReady(true)}
+        onError={() => {
+          if (item.type === 'image' && src !== item.url) setSrc(item.url);
+        }}
+        className={`absolute inset-0 h-full w-full object-cover transition-opacity ${ready ? 'opacity-100' : 'opacity-0'}`}
+      />
       {item.type === 'video' && <PlayIcon />}
     </button>
   );
@@ -108,7 +100,7 @@ const ReviewItem = ({ review }: { review: Review }) => {
   const gallery: GalleryMedia[] = media.map((item) => ({
     src: item.url,
     type: item.type,
-    poster: item.poster,
+    poster: item.type === 'video' ? item.thumb : undefined,
   }));
 
   useEffect(() => {

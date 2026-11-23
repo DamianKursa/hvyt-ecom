@@ -1551,37 +1551,6 @@ function custom_delete_account(WP_REST_Request $request) {
     return rest_ensure_response(['success' => true, 'message' => 'Account deleted']);
 }
 
-add_action('rest_api_init', function() {
-    register_rest_route('custom/v1', '/review-media', [
-        'methods' => 'POST',
-        'callback' => function(WP_REST_Request $request) {
-            // Only check if file exceeds allowed size
-            if (isset($_FILES['file']) && $_FILES['file']['size'] > 10 * 1024 * 1024) { // 10 MB
-                return new WP_Error(
-                    'file_size',
-                    'Twój plik jest za duży. Maksymalnie 10 MB ',
-                    ['status' => 400]
-                );
-            }
-
-            // Continue with your existing upload process
-            $file = $_FILES['file'];
-            require_once(ABSPATH . 'wp-admin/includes/file.php');
-            $upload = wp_handle_upload($file, ['test_form' => false]);
-
-            if (isset($upload['error'])) {
-                return new WP_Error('upload_error', $upload['error'], ['status' => 500]);
-            }
-
-            return [
-                'success' => true,
-                'url' => $upload['url']
-            ];
-        },
-        'permission_callback' => '__return_true'
-    ]);
-});
-
 /**
  * Custom coupon restrictions (BFFORBFF, CASA10 etc.).
  *
@@ -1806,55 +1775,6 @@ function hvyt_coupon_filter_discount_amount( $amount, $discounting_amount, $cart
     return hvyt_coupon_product_is_allowed( $cart_item['data'], $rules[ $code ] ) ? $amount : 0;
 }
 add_filter( 'woocommerce_coupon_get_discount_amount', 'hvyt_coupon_filter_discount_amount', 99, 5 );
-function hvyt_upload_review_media( WP_REST_Request $request ) {
-    // 1) Check shared secret header
-    $secret = isset($_SERVER['HTTP_X_HVYT_UPLOAD_KEY']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_X_HVYT_UPLOAD_KEY'])) : '';
-    $expected = defined('HVYT_UPLOAD_SECRET') ? HVYT_UPLOAD_SECRET : get_option('hvyt_upload_secret');
-
-    if ( empty($expected) || empty($secret) || ! hash_equals((string) $expected, (string) $secret) ) {
-        return new WP_Error('forbidden', __('Invalid upload key', 'hvyt'), ['status' => 403]);
-    }
-
-    // 2) Basic file presence
-    if ( empty($_FILES) || empty($_FILES['file']) || empty($_FILES['file']['tmp_name']) ) {
-        return new WP_Error('no_file', __('No file provided. Use multipart/form-data with field "file".', 'hvyt'), ['status' => 400]);
-    }
-
-    $file = $_FILES['file'];
-
-    // 3) Validate size & type
-    $allowed_mimes = [ 'image/jpeg', 'image/png', 'image/webp', 'image/gif' ];
-    $type = isset($file['type']) ? $file['type'] : '';
-    $size = isset($file['size']) ? (int) $file['size'] : 0;
-
-    if ( $size <= 0 || $size > HVYT_UPLOAD_MAX_BYTES ) {
-        return new WP_Error('file_size', sprintf(__('Max file size is %d bytes', 'hvyt'), HVYT_UPLOAD_MAX_BYTES), ['status' => 400]);
-    }
-    if ( ! in_array($type, $allowed_mimes, true) ) {
-        return new WP_Error('file_type', __('Only JPG, PNG, WEBP, GIF are allowed.', 'hvyt'), ['status' => 400]);
-    }
-
-    // 4) Hand off to WP media handler
-    require_once ABSPATH . 'wp-admin/includes/file.php';
-    require_once ABSPATH . 'wp-admin/includes/media.php';
-    require_once ABSPATH . 'wp-admin/includes/image.php';
-
-    // Force uploads to treat as from a form field named 'file'
-    $attachment_id = media_handle_upload('file', 0);
-
-    if ( is_wp_error($attachment_id) ) {
-        return new WP_Error('upload_failed', $attachment_id->get_error_message(), ['status' => 500]);
-    }
-
-    $url  = wp_get_attachment_url($attachment_id);
-    $mime = get_post_mime_type($attachment_id);
-
-    return rest_ensure_response([
-        'id'   => $attachment_id,
-        'url'  => $url,
-        'mime' => $mime,
-    ]);
-}
 
 // Ensure product_search_clicks table exists (lightweight tracking)
 if ( ! function_exists( 'hvyt_ensure_search_clicks_table' ) ) {
