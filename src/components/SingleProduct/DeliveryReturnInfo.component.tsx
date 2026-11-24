@@ -9,6 +9,8 @@ const CUSTOM_DELIVERY_PRODUCT_IDS = new Set([
 
 interface DeliveryReturnInfoProps {
   onScrollToSection?: () => void;
+  onOpenReviews?: () => void;
+  reviewCount?: number | null;
   stock?: number | null;
   stockStatus?: string;
   isMeble?: boolean;
@@ -17,6 +19,8 @@ interface DeliveryReturnInfoProps {
 
 const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
   onScrollToSection,
+  onOpenReviews,
+  reviewCount = null,
   stock,
   stockStatus,
   isMeble,
@@ -70,9 +74,7 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
   return (
     <div className="mt-4 border border-beige-dark rounded-[24px]">
       {shouldRenderStockRow && (
-        <div
-          className={`flex items-center p-4 space-x-4 w-full ${filteredItems.length > 0 ? 'border-b border-[#DAD3C8]' : ''}`}
-        >
+        <div className="flex items-center p-4 space-x-4 w-full border-b border-[#DAD3C8]">
           <Image
             src="/icons/stock.svg"
             alt="Stock info"
@@ -87,8 +89,7 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
       {filteredItems.map((item, index) => (
         <div
           key={index}
-          className={`flex items-center p-4 space-x-4 w-full ${index < filteredItems.length - 1 ? 'border-b border-[#DAD3C8]' : ''
-            }`}
+          className="flex items-center p-4 space-x-4 w-full border-b border-[#DAD3C8]"
         >
           <div className="w-6 h-6 flex items-center justify-center">
             <Image
@@ -115,6 +116,27 @@ const DeliveryReturnInfo: React.FC<DeliveryReturnInfoProps> = ({
           </span>
         </div>
       ))}
+      <div className="flex items-center p-4 space-x-4 w-full">
+        <div className="w-6 h-6 flex items-center justify-center">
+          <Image
+            src="/icons/reviews.svg"
+            alt="Reviews"
+            width={24}
+            height={24}
+          />
+        </div>
+        <span className="text-black">
+          <span
+            className="underline cursor-pointer text-dark-pastel-red"
+            onClick={onOpenReviews}
+          >
+            {t.product.discoverReviewsLink}
+          </span>
+          {' '}
+          {t.product.discoverReviews.replace(t.product.discoverReviewsLink, '').trim()}
+          {reviewCount !== null && ` (${reviewCount})`}
+        </span>
+      </div>
     </div>
   );
 };

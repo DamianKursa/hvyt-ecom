@@ -1131,6 +1131,8 @@ const ProductPage = () => {
 
             <DeliveryReturnInfo
               onScrollToSection={handleScrollToFrequentlyBought}
+              onOpenReviews={handleOpenReviews}
+              reviewCount={reviewTotal}
               stock={availableStock}
               stockStatus={
                 selectedVariation
@@ -1140,15 +1142,6 @@ const ProductPage = () => {
               isMeble={isMeble}
               productId={product?.id}
             />
-            {reviewTotal !== null && (
-              <button
-                type="button"
-                onClick={handleOpenReviews}
-                className="mt-4 inline-flex h-[54px] w-fit self-start items-center rounded-full border border-black px-5 text-[14px] md:text-[18px] font-light text-black transition-all hover:border-dark-pastel-red hover:bg-dark-pastel-red hover:text-white"
-              >
-                {t.product.discoverReviews.replace('{count}', String(reviewTotal))}
-              </button>
-            )}
           </div>
         </div>
         <div className="block lg:hidden mt-[64px] md:mt-6">
