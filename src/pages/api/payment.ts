@@ -8,6 +8,7 @@ const PAYMENT_TITLE_OVERRIDES: Record<string, string> = {
   pay_by_paynow_pl_paywall:
     'Paynow (BLIK, szybkie przelewy, karty, Google Pay)',
   pay_by_paynow_pl_pbl: 'Paynow (BLIK, szybkie przelewy, karty, Google Pay)',
+  stripe: 'Stripe (Credit / Debit Card / iDEAL | Wero / Klarna / Bancontact / EPS)'
 };
 
 const applyPaymentTitleOverrides = (methods: any[]) =>

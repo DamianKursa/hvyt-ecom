@@ -13,6 +13,7 @@ import {
   isPunktyGlsMethod,
   placePaczkomatyFirst,
 } from '@/utils/shippingMethods';
+import InputRadio from '@/components/Input/InputRadio';
 
 interface ShippingZone {
   zoneId: number;
@@ -862,7 +863,7 @@ const Shipping: React.FC<ShippingProps> = ({
   return (
     <div>
       <h2 className="text-[20px] font-bold mb-6 text-neutral-darkest">
-        {t.checkout.shipping.title}
+        {t.checkout.shipping.shipping}
       </h2>
       {error ? (
         <p className="text-red-500">{error}</p>
@@ -874,30 +875,21 @@ const Shipping: React.FC<ShippingProps> = ({
         <div key={zone.zoneName}>
           {zone.methods.map((method) => (
             <div key={method.id}>
-              <label
+              <div
                 className={`grid grid-cols-[60%_20%_20%] sm:grid-cols-3 items-center py-[16px] border-b ${shippingMethod.id === method.id
                   ? 'border-dark-pastel-red'
                   : 'border-beige-dark'
                   }`}
               >
-                {/* First Column: Shipping Name */}
-                <div className="flex items-center gap-4 w-full">
-                  <input
-                    type="radio"
-                    value={method.id}
-                    checked={shippingMethod.id === method.id}
-                    onChange={() => handleShippingChange(method)}
-                    className="hidden"
-                    disabled={loading}
-                  />
-                  <span
-                    className={`flex-shrink-0 w-5 h-5 rounded-full ${shippingMethod.id === method.id
-                      ? 'border-4 border-dark-pastel-red'
-                      : 'border-2 border-gray-400'
-                      }`}
-                  ></span>
-                  <span>{method.title}</span>
-                </div>
+                <InputRadio
+                  name="shipping-method"
+                  value={method.id}
+                  label={method.title}
+                  currentValue={shippingMethod.id || ''}
+                  disabled={loading}
+                  onChange={() => handleShippingChange(method)}
+                  className="w-full"
+                />
 
                 {/* Second Column: Price */}
                 <span className="text-sm text-gray-700 text-center w-full">
@@ -920,7 +912,7 @@ const Shipping: React.FC<ShippingProps> = ({
                     className="w-[50px] sm:w-[55px] h-auto"
                   />
                 </div>
-              </label>
+              </div>
 
               {isPaczkomatyMethod(method) &&
                 (Object.keys(shippingMethod).length !== 0 && isPaczkomatyMethod(shippingMethod)) && (

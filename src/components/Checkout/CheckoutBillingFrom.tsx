@@ -3,6 +3,7 @@ import CreateAccount from '@/components/UI/CreateAccount';
 import Checkbox from '@/components/UI/Checkbox';
 import { useI18n } from '@/utils/hooks/useI18n';
 import { resolveCountryCode } from '@/utils/countryCode';
+import InputRadio from '@/components/Input/InputRadio';
 
 export interface CheckoutBillingFormProps {
   customerType: 'individual' | 'company';
@@ -154,38 +155,20 @@ const CheckoutBillingForm: React.FC<CheckoutBillingFormProps> = ({
 
       {/* Customer Type Toggle */}
       <div className="flex gap-6 md:gap-4 mb-4">
-        <label className="flex items-center">
-          <input
-            type="radio"
-            value="individual"
-            checked={customerType === 'individual'}
-            onChange={() => setCustomerType('individual')}
-            className="hidden"
-          />
-          <span
-            className={`w-5 h-5 rounded-full border-2 ${customerType === 'individual'
-              ? 'border-black border-[5px]'
-              : 'border-gray-400'
-              }`}
-          ></span>
-          <span className="ml-2">{t.checkout.billingAddress.individualCustomer}</span>
-        </label>
-        <label className="flex items-center">
-          <input
-            type="radio"
-            value="company"
-            checked={customerType === 'company'}
-            onChange={() => setCustomerType('company')}
-            className="hidden"
-          />
-          <span
-            className={`w-5 h-5 rounded-full border-2 ${customerType === 'company'
-              ? 'border-black border-[5px]'
-              : 'border-gray-400'
-              }`}
-          ></span>
-          <span className="ml-2">{t.checkout.billingAddress.company}</span>
-        </label>
+        <InputRadio
+          name="customer-type"
+          value="individual"
+          label={t.checkout.billingAddress.individualCustomer}
+          currentValue={customerType}
+          onChange={(value) => setCustomerType(value as 'individual' | 'company')}
+        />
+        <InputRadio
+          name="customer-type"
+          value="company"
+          label={t.checkout.billingAddress.company}
+          currentValue={customerType}
+          onChange={(value) => setCustomerType(value as 'individual' | 'company')}
+        />
       </div>
 
       {/* Always Render Personal Data Fields */}

@@ -1,5 +1,6 @@
 import { useI18n } from '@/utils/hooks/useI18n';
 import React, { useState } from 'react';
+import InputRadio from '@/components/Input/InputRadio';
 
 interface BillingData {
   type: 'individual' | 'company';
@@ -97,70 +98,40 @@ const BillingModal: React.FC<BillingModalProps> = ({
         <div className="space-y-4">
           {/* Radio Buttons */}
           <div className="flex space-x-4">
-            <div className="w-full flex items-center">
-              <input
-                type="radio"
-                id="individual"
-                name="type"
-                value="individual"
-                checked={formData.type === 'individual'}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    type: e.target.value as 'individual' | 'company',
-                    firstName: '',
-                    lastName: '',
-                    companyName: '',
-                    nip: '',
-                  }))
-                }
-                className="hidden"
-              />
-              <label
-                htmlFor="individual"
-                className={`flex items-center cursor-pointer`}
-              >
-                <span
-                  className={`w-5 h-5 rounded-full border-2 ${formData.type === 'individual'
-                    ? 'border-black border-[5px]'
-                    : 'border-gray-400'
-                    }`}
-                ></span>
-                <span className="ml-2">{t.checkout.personalData.customerTypeIndividual}</span>
-              </label>
-            </div>
-            <div className="w-full flex items-center">
-              <input
-                type="radio"
-                id="company"
-                name="type"
-                value="company"
-                checked={formData.type === 'company'}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    type: e.target.value as 'individual' | 'company',
-                    firstName: '',
-                    lastName: '',
-                    companyName: '',
-                    nip: '',
-                  }))
-                }
-                className="hidden"
-              />
-              <label
-                htmlFor="company"
-                className={`flex items-center cursor-pointer`}
-              >
-                <span
-                  className={`w-5 h-5 rounded-full border-2 ${formData.type === 'company'
-                    ? 'border-black border-[5px]'
-                    : 'border-gray-400'
-                    }`}
-                ></span>
-                <span className="ml-2">{t.checkout.personalData.customerTypeCompany}</span>
-              </label>
-            </div>
+            <InputRadio
+              name="billing-type"
+              value="individual"
+              label={t.checkout.personalData.customerTypeIndividual}
+              currentValue={formData.type}
+              onChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  type: value as 'individual' | 'company',
+                  firstName: '',
+                  lastName: '',
+                  companyName: '',
+                  nip: '',
+                }))
+              }
+              className="w-full"
+            />
+            <InputRadio
+              name="billing-type"
+              value="company"
+              label={t.checkout.personalData.customerTypeCompany}
+              currentValue={formData.type}
+              onChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  type: value as 'individual' | 'company',
+                  firstName: '',
+                  lastName: '',
+                  companyName: '',
+                  nip: '',
+                }))
+              }
+              className="w-full"
+            />
           </div>
 
           {formData.type === 'individual' ? (

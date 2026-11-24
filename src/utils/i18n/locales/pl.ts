@@ -276,6 +276,7 @@ export const pl = {
         discountValue: 'Wartość rabatu',
         shipping: 'Wysyłka',
         shippingFree: 'Darmowa',
+        selectDeliveryCountry: 'Wybierz kraj dostawy',
         total: 'Suma',
         vatInfo: 'kwota zawiera 23% VAT',
         proceedToCheckout: 'Przejdź do kasy',
@@ -367,6 +368,7 @@ export const pl = {
         loadingBillingData: 'Ładowanie danych do faktury...',
       },
       shipping: {
+        shipping: 'Dostawa',
         title: 'Dostawa i płatność',
         selectMethod: 'Wybierz sposób dostawy',
         loading: 'Ładowanie metod dostawy...',
@@ -385,6 +387,7 @@ export const pl = {
         retryMessage: 'Wystąpił błąd podczas ładowania metod dostawy. Ponowna próba za 5 sekund.',        
       },
       payment: {
+        payment: 'Płatność',
         title: 'Wybierz sposób płatności',
         selectMethod: 'Wybierz sposób płatności',
         loading: 'Ładowanie metod płatności...',

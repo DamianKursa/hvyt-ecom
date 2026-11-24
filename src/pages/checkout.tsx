@@ -7,6 +7,7 @@ import Layout from '@/components/Layout/Layout.component';
 import CartProgress from '@/components/Cart/CartProgress';
 import OrderItems from '@/components/Checkout/OrderItems';
 import CartSummary from '@/components/Cart/CartSummary';
+import type { ActionNeeded } from '@/components/Cart/actionNeeded';
 import CheckoutBillingForm from '@/components/Checkout/CheckoutBillingFrom';
 import CheckoutAddressForm from '@/components/Checkout/CheckoutAdressForm';
 import Shipping from '@/components/Checkout/Shipping';
@@ -152,6 +153,9 @@ const Checkout: React.FC = () => {
   );
 
   const deliveryZone = countryList.find((country) => country.code === deliveryCountryCode);
+  const actionNeeded: ActionNeeded | null = isCountrySelected(deliveryCountryCode)
+    ? null
+    : 'selectDeliveryCountry';
   const isShippingContextReady =
     countryList.length > 0 &&
     isCountrySelected(deliveryCountryCode) &&
@@ -1017,6 +1021,7 @@ const Checkout: React.FC = () => {
               <CartSummary
                 shippingPrice={shippingPrice}
                 shippingLoading={!shippingCostsReady}
+                actionNeeded={actionNeeded}
                 totalProductsPrice={cart?.totalProductsPrice || 0}
                 onCheckout={handleOrderSubmit}
                 isCheckoutPage={true}
