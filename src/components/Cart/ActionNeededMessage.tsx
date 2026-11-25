@@ -65,7 +65,7 @@ const ActionNeededMessage: React.FC<ActionNeededMessageProps> = ({
   return (
     <div
       role="status"
-      className={`mb-6 flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm leading-snug ${TONE_CLASS[type]}`}
+      className={`my-6 flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm leading-snug ${TONE_CLASS[type]}`}
     >
       <MessageIcon type={type} />
       <span>{message}</span>
